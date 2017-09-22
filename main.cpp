@@ -17,7 +17,6 @@ void test_range() {
     cout<<A.size()<<endl;
     B.shift(2);
     B.display("B");
-    
 }
 
 int main(int argc, char** argv) {
