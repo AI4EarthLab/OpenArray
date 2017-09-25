@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     if (world_rank == 0) {
         test_Range();
         test_Box();
+        test_Partition();
     }
    
     MPI_Finalize();

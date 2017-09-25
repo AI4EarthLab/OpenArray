@@ -29,15 +29,15 @@ class Partition {
         vector<int> lx = {1};
         vector<int> ly = {1};
         vector<int> lz = {1};
-        vector<int> clx;
-        vector<int> cly;
-        vector<int> clz;
+        vector<int> clx = {0, 1};
+        vector<int> cly = {0, 1};
+        vector<int> clz = {0, 1};
         
     public:
         typedef shared_ptr<Partition> PartitionPtr;
         Partition();
-        Partition(MPI_Comm &comm, int size, vector<int> &gs);
-        Partition(MPI_Comm &comm, vector<int> &x, vector<int> &y, vector<int> &z);
+        Partition(MPI_Comm comm, int size, vector<int> gs);
+        Partition(MPI_Comm comm, vector<int> &x, vector<int> &y, vector<int> &z);
         
         // check if two Partition is equal or not
         bool equal(PartitionPtr par_ptr);
@@ -56,7 +56,8 @@ class Partition {
         int get_procs_rank(vector<int> &coord);
         int get_procs_rank(int x, int y, int z);
         vector<int> get_procs_3d(int rank);
-
+        void display(const char *prefix = "", bool all = true); 
+        void display_distr(const char *prefix = "");
 };
 
 

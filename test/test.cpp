@@ -1,5 +1,6 @@
 #include "../Range.hpp"
 #include "../Box.hpp"
+#include "../Partition.hpp"
 #include <assert.h>
 
 void test_Range() {
@@ -63,5 +64,16 @@ void test_Box() {
 	assert(B.intersection(C));
 	D.display("B and C");
 	cout<<"-----------------------------------------------------------"<<endl;
+	cout<<endl;
+}
+
+void test_Partition() {
+	cout<<endl;
+	cout<<"-----------------------test_Partition----------------------------"<<endl;
+	Partition A;
+	A.display("A");
+	Partition B(MPI_COMM_WORLD, 4, {4, 4, 4});
+	B.display("B");
+	cout<<"-----------------------------------------------------------------"<<endl;
 	cout<<endl;
 }

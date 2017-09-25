@@ -3,7 +3,7 @@ CC 			= mpicc
 CXX 		= mpicxx
 CFLAGS 		=
 
-OBJS 		= Range.o Box.o
+OBJS 		= Range.o Box.o Partition.o
 OBJS_TEST 	= $(addprefix ./test/, test.o)
 OBJ_MAIN 	= ${OBJS} ${OBJS_TEST} main.o
 
