@@ -1,5 +1,4 @@
 #include<iostream>
-#include<string>
 using namespace std;
 
 #ifndef RANGE_HPP
@@ -22,11 +21,17 @@ class Range {
         int size();
         void display(char const *prefix = "");
 
-        // check if range is inside the range u
+        // check if Range is inside the Range u
         bool is_inside(Range &u);
 
         // [lower, upper) + num = [lower + num, upper + num)
         void shift(int num);
+
+        // check if Range has intersection with Range u
+        bool intersection(Range &u); 
+
+        // get intersection Range with Range u
+        Range get_intersection(Range &u);
 };
 
 #endif

@@ -2,22 +2,9 @@
 #include<cstdio>
 #include<string>
 #include<mpi.h>
-#include<assert.h>
-#include "Range.hpp"
+#include "./test/test.hpp"
 
 using namespace std;
-
-void test_range() {
-    Range A(1, 2);
-    Range B;
-    A.display("A");
-    B.display();
-    assert(A.equal(1, 2));
-    assert(!A.equal(B));
-    cout<<A.size()<<endl;
-    B.shift(2);
-    B.display("B");
-}
 
 int main(int argc, char** argv) {
     MPI_Init(NULL, NULL);
@@ -30,7 +17,8 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     
     if (world_rank == 0) {
-        test_range();
+        test_Range();
+        test_Box();
     }
    
     MPI_Finalize();
