@@ -3,6 +3,7 @@
 #include <assert.h>
 
 void test_Range() {
+	cout<<endl;
 	cout<<"-----------------------test_Range----------------------------"<<endl;
     // A [0, 0)
     Range A;
@@ -33,9 +34,11 @@ void test_Range() {
     Range D(2, 2);
     assert(C.get_intersection(B).equal(D));
     cout<<"------------------------------------------------------------"<<endl;
+    cout<<endl;
 }
 
 void test_Box() {
+	cout<<endl;
 	cout<<"-----------------------test_Box----------------------------"<<endl;
 	Box A;
 	A.display("A");
@@ -60,4 +63,5 @@ void test_Box() {
 	assert(B.intersection(C));
 	D.display("B and C");
 	cout<<"-----------------------------------------------------------"<<endl;
+	cout<<endl;
 }

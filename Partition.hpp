@@ -1,5 +1,9 @@
 #include<mpi.h>
 #include<vector>
+#include<memory>
+#include "type.hpp"
+#include "Box.hpp"
+
 using namespace std;
 
 #ifndef PARTITION_HPP
@@ -15,21 +19,45 @@ using namespace std;
 
 class Partition {
     private:
-        MPI_Comm comm;
-        vector<int> shape;
-        vector<int> procs_shape;
-        vector<BoundType> bound_type;
-        StencilType stencil_type;
-        int stencil_width;
-        
-        vector<int> lx;
-        vector<int> ly;
-        vector<int> lz;
+        MPI_Comm comm = MPI_COMM_SELF;
+        vector<int> global_shape = {1, 1, 1};
+        vector<int> procs_shape = {1, 1, 1};
+        vector<int> bound_type = {0, 0, 0};
+        int stencil_type = STENCIL_STAR;
+        int stencil_width = 0;
+
+        vector<int> lx = {1};
+        vector<int> ly = {1};
+        vector<int> lz = {1};
         vector<int> clx;
         vector<int> cly;
         vector<int> clz;
         
+    public:
+        typedef shared_ptr<Partition> PartitionPtr;
+        Partition();
+        Partition(MPI_Comm &comm, int size, vector<int> &gs);
+        Partition(MPI_Comm &comm, vector<int> &x, vector<int> &y, vector<int> &z);
+        
+        // check if two Partition is equal or not
+        bool equal(PartitionPtr par_ptr);
+        bool equal_distr(PartitionPtr par_ptr);
+        
+        // return global shape of Partition
+        vector<int> shape();
+
+        // return global size of Partition
+        int size();
+        void update_distr();
+        void update_acc_distr();
+        void set_stencil(int type, int width);
+        Box :: BoxPtr get_local_box(vector<int> &coord);
+        Box :: BoxPtr get_local_box(int rank);
+        int get_procs_rank(vector<int> &coord);
+        int get_procs_rank(int x, int y, int z);
+        vector<int> get_procs_3d(int rank);
 
 };
+
 
 #endif

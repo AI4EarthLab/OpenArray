@@ -1,4 +1,5 @@
 #include<vector>
+#include<memory>
 #include "Range.hpp"
 
 #ifndef BOX_HPP
@@ -14,6 +15,7 @@ class Box {
         Range rx, ry, rz;
 
     public:
+        typedef shared_ptr<Box> BoxPtr;
         Box();
         Box(Range x, Range y, Range z);
         Box(int* starts, int* counts);

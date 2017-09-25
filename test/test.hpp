@@ -3,4 +3,5 @@
 
 void test_Range();
 void test_Box();
+void test_Partition();
 #endif
