@@ -6,7 +6,7 @@
 
 /*
  * Box:
- *      dimension: x, y, z
+ *      dimension: rx, ry, rz
  */
 
 class Box {
