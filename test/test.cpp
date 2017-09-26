@@ -74,6 +74,19 @@ void test_Partition() {
 	A.display("A");
 	Partition B(MPI_COMM_WORLD, 4, {4, 4, 4});
 	B.display("B");
+	Partition C(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4});
+	C.display("C");
+	assert(B.equal(C));
+	vector<int> B_shape = B.shape();
+	printf("B_shape is [%d %d %d]\n", B_shape[0], B_shape[1], B_shape[2]);
+	assert(B.size() == 4 * 4 * 4);
+	B.set_stencil(1, 1);
+	assert(!B.equal(C));
+	Box :: BoxPtr box_ptr = B.get_local_box({0, 0, 0});
+	box_ptr->display("box at [0, 0, 0]");
+	box_ptr = B.get_local_box(1);
+	box_ptr->display("box at [1, 0, 0]");
+	assert(B.get_procs_rank(0, 1, 0) == 2);
 	cout<<"-----------------------------------------------------------------"<<endl;
 	cout<<endl;
 }
