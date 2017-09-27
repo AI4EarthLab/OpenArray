@@ -1,6 +1,7 @@
 #include "../Range.hpp"
 #include "../Box.hpp"
 #include "../Partition.hpp"
+#include "../Array.hpp"
 #include <assert.h>
 
 void test_Range() {
@@ -82,11 +83,24 @@ void test_Partition() {
 	assert(B.size() == 4 * 4 * 4);
 	B.set_stencil(1, 1);
 	assert(!B.equal(C));
-	Box :: BoxPtr box_ptr = B.get_local_box({0, 0, 0});
+	BoxPtr box_ptr = B.get_local_box({0, 0, 0});
 	box_ptr->display("box at [0, 0, 0]");
 	box_ptr = B.get_local_box(1);
 	box_ptr->display("box at [1, 0, 0]");
 	assert(B.get_procs_rank(0, 1, 0) == 2);
 	cout<<"-----------------------------------------------------------------"<<endl;
+	cout<<endl;
+}
+
+void test_Array() {
+	cout<<endl;
+	cout<<"-----------------------test_Array----------------------------"<<endl;
+	Partition par(MPI_COMM_WORLD, 4, {4, 4, 4});
+	PartitionPtr par_ptr = make_shared<Partition>(par);
+	Array A(par_ptr);
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	if (rank == 0) A.partition()->display("A");
+	cout<<"-------------------------------------------------------------"<<endl;
 	cout<<endl;
 }

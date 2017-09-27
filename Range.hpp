@@ -10,8 +10,8 @@ using namespace std;
 
 class Range {
     private:
-        int lower;
-        int upper;
+        int m_lower;
+        int m_upper;
 
     public:
         Range();

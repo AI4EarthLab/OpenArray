@@ -12,10 +12,9 @@
 
 class Box {
     private:
-        Range rx, ry, rz;
+        Range m_rx, m_ry, m_rz;
 
     public:
-        typedef shared_ptr<Box> BoxPtr;
         Box();
         Box(Range x, Range y, Range z);
         Box(int* starts, int* counts);
@@ -40,4 +39,5 @@ class Box {
         int size();
         
 };
+typedef shared_ptr<Box> BoxPtr;
 #endif

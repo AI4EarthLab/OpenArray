@@ -21,7 +21,9 @@ int main(int argc, char** argv) {
         test_Box();
         test_Partition();
     }
-   
+    
+    test_Array();
+
     MPI_Finalize();
     return 0;
 }
