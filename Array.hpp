@@ -1,8 +1,6 @@
-#include<vector>
-#include<memory>
+#include <vector>
+#include <memory>
 #include "Partition.hpp"
-
-using namespace std;
 
 #ifndef ARRAY_HPP
 #define ARRAY_HPP
@@ -32,6 +30,7 @@ class Array {
         Array(PartitionPtr ptr, void *data, int data_type = DATA_DOUBLE); 
         int data_type();
         void* buffer();
+        void set_buffer(void *buffer, int size);
         PartitionPtr partition();
         void display(const char *prefix = "");
         BoxPtr corners();

@@ -1,5 +1,5 @@
-#include<vector>
-#include<memory>
+#include <vector>
+#include <memory>
 #include "Range.hpp"
 
 #ifndef BOX_HPP

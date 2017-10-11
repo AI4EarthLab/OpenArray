@@ -1,7 +1,7 @@
-#include<iostream>
-#include<cstdio>
-#include<string>
-#include<mpi.h>
+#include <iostream>
+#include <cstdio>
+#include <string>
+#include <mpi.h>
 #include "./test/test.hpp"
 
 using namespace std;

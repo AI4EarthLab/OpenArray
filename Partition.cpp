@@ -1,7 +1,9 @@
 #include "Partition.hpp"
-#include<assert.h>
-#include<math.h>
-#include<limits.h>
+#include <assert.h>
+#include <math.h>
+#include <limits.h>
+#include <functional>
+#include <iostream>
 using namespace std;
 
 /*
@@ -13,8 +15,8 @@ Partition :: Partition() { }
  * give global_shape, and total process number
  * find the approriate partition
  */
-Partition :: Partition(MPI_Comm comm, int size, vector<int> gs) :
-    m_comm(comm), m_global_shape(gs) {
+Partition :: Partition(MPI_Comm comm, int size, vector<int> gs, int sw) :
+    m_comm(comm), m_global_shape(gs), m_stencil_width(sw) {
         assert(gs[0] > 0 && gs[1] > 0 && gs[2] > 0 && size > 0);
         double tot = pow(gs[0] * gs[1] * gs[2] * 1.0, 1.0 / 3);
         double fx = gs[0] / tot;
@@ -58,8 +60,8 @@ Partition :: Partition(MPI_Comm comm, int size, vector<int> gs) :
 /*
  * Give partition information, calculate procs_shape & global_shape
  */
-Partition :: Partition(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z) :
-    m_comm(comm), m_lx(x), m_ly(y), m_lz(z) {
+Partition :: Partition(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int sw) :
+    m_comm(comm), m_stencil_width(sw), m_lx(x), m_ly(y), m_lz(z) {
         assert(m_lx.size() && m_ly.size() && m_lz.size());
         m_procs_shape[0] = m_lx.size();
         m_procs_shape[1] = m_ly.size();
@@ -191,5 +193,34 @@ void Partition :: display_distr(const char *prefix) {
     printf("]\n");
     printf("\tclz = [%d", m_clz[0]);
     for (int i = 1; i < m_clz.size(); i++) printf(", %d", m_clz[i]);
-    printf("]\n");        
+    printf("]\n");
+    //flush();        
 }
+
+size_t Partition :: gen_hash(MPI_Comm comm, int size, vector<int> gs, int stencil_width) {
+    hash<string> str_hash;
+    string str = "";
+    str += to_string(comm) + ":";
+    str += to_string(size) + ":";
+    str += to_string(gs[0]);
+    for (int i = 1; i < gs.size(); i++) str += "," + to_string(gs[i]);
+    str += ":" + to_string(stencil_width);
+    cout<<"gen_hash 1: "<<str<<endl;
+    return str_hash(str);    
+}
+static size_t gen_hash(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width) {
+    hash<string> str_hash;
+    string str = "";
+    str += to_string(comm) + ":";
+    str += to_string(x[0]);
+    for (int i = 1; i < x.size(); i++) str += "," + to_string(x[i]);
+    str += ":" + to_string(y[0]);
+    for (int i = 1; i < y.size(); i++) str += "," + to_string(y[i]);
+    str += ":" + to_string(z[0]);
+    for (int i = 1; i < z.size(); i++) str += "," + to_string(z[i]);
+    str += ":" + stencil_width;
+    return str_hash(str);
+}
+
+
+

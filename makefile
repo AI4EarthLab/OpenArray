@@ -3,9 +3,11 @@ CC 			= mpicc
 CXX 		= mpicxx
 CFLAGS 		=
 
+
 OBJS 		= Range.o Box.o Partition.o Array.o
 OBJS_TEST 	= $(addprefix ./test/, test.o)
-OBJ_MAIN 	= ${OBJS} ${OBJS_TEST} main.o
+OBJS_UTILS	= $(addprefix ./utils/, calcTime.o gettimeofday.o)
+OBJ_MAIN 	= ${OBJS} ${OBJS_UTILS} ${OBJS_TEST} main.o
 
 .DEFAULT_GOAL := all
 
@@ -19,6 +21,7 @@ all:
 	@cp makefile build/ 2>/dev/null
 	@cp *.cpp *.hpp build/ 2>/dev/null
 	@cp -r test build/ 2>/dev/null
+	@cp -r utils build/ 2>/dev/null
 	@cd build && make clean 
 	@echo "Cleaning done."
 	@cd build && make main
