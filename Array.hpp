@@ -24,6 +24,7 @@ class Array {
         BoxPtr m_ref_box_ptr;
         bool m_is_scalar = false;
         bool m_is_seq = false;
+        size_t m_hash;
 
     public:
         Array(PartitionPtr ptr); 
@@ -39,6 +40,8 @@ class Array {
         vector<int> shape();
         int size();
         bool is_scalar();
+        void set_hash(size_t hash);
+        size_t hash();
 };
 
 #endif

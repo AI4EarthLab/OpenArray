@@ -10,14 +10,18 @@
 
 /*
  * Partition:
- *      shape:          array global shape [gx, gy, gz]
- *      procs_shape:    processes shape [px, py, pz]
- *      lx, ly, lz:     partition info of every dimension
- *      clx, cly, clz:  accumulate info
+ *      comm:               MPI_Comm, default as MPI_COMM_SELF
+ *      global_shape:       array global shape [gx, gy, gz], default as [1, 1, 1]
+ *      procs_shape:        processes shape [px, py, pz], default as [1, 1, 1]
+ *      bound_type:         bound_type [bx, by, bz], default as [0, 0, 0]
+ *      stencil_type:       array stencil type, default as STENCIL_STAR
+ *      stencil_width:      array stencil width, default as 1
+ *      hash:               each partiton has it's hash, used in PartitionPool
+ *      lx, ly, lz:         partition info of every dimension
+ *      clx, cly, clz:      accumulate info of every dimension
  */
 class Partition;
 typedef shared_ptr<Partition> PartitionPtr;
-typedef list<Partition> PartitionList;
 
 class Partition {
     private:
@@ -57,6 +61,8 @@ class Partition {
         vector<int> get_procs_3d(int rank);
         void display(const char *prefix = "", bool all = true); 
         void display_distr(const char *prefix = "");
+        void set_hash(size_t hash);
+        size_t hash();
 
         static size_t gen_hash(MPI_Comm comm, int size, vector<int> gs, int stencil_width = 1);
         static size_t gen_hash(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width = 1);

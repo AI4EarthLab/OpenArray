@@ -73,7 +73,7 @@ namespace oa {
           printf("%-15s %-15s %-15s %-15s %-15s %-15s %-15s%%\n", "function", "min", "max", "call", 
         	 "total", "average", "per");
           printf("--------------------------------------------------------------------------------------------------------------------\n");
-          for (map<string, int> :: iterator it = cnt.begin(); it != cnt.end(); it++) {
+          for (map<string, int>::iterator it = cnt.begin(); it != cnt.end(); it++) {
             string str = it->first;
             printf("%-15s %-15.6f %-15.6f %-15d %-15.6f %-15.6f %-15.6f%%\n", str.c_str(), minTime[str] / 1e6, 
         	   maxTime[str] / 1e6, cnt[str], totTime[str] / 1e6, totTime[str] / 1e6 / cnt[str], totTime[str] * 100.0 / tot);
@@ -84,7 +84,7 @@ namespace oa {
     }
 }
 
-//using namespace oa :: utils;
+//using namespace oa::utils;
 //int main() {
 //	tic("A");
 //	tic("B");
