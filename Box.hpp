@@ -1,9 +1,10 @@
+#ifndef __BOX_HPP__
+#define __BOX_HPP__
+
 #include <vector>
 #include <memory>
+#include "common.hpp"
 #include "Range.hpp"
-
-#ifndef BOX_HPP
-#define BOX_HPP
 
 /*
  * Box:
@@ -19,25 +20,27 @@ class Box {
         Box(Range x, Range y, Range z);
         Box(int* starts, int* counts);
         Box(int sx, int ex, int sy, int ey, int sz, int ez);
-        bool equal(Box &u);
-        bool equal_shape(Box &b);
+        bool equal(const Box &u);
+        bool equal_shape(const Box &b);
         void display(char const *prefix = "");
 
         // check if Box is inside Box u
-        bool is_inside(Box &u);
+        bool is_inside(const Box &u);
 
         // check if Box and Box u has intersection
-        bool intersection(Box &u);
+        bool intersection(const Box &u);
 
         // get the intersection box
-        Box get_intersection(Box &u);
+        Box get_intersection(const Box &u);
         
         // return [shape_x, shape_y, shape_z]
-        vector<int> shape();
+        Shape shape() const;
 
         // return shape_x * shape_y * shape_z
-        int size();
+        int size(int stencil_width = 0);
         
 };
-typedef shared_ptr<Box> BoxPtr;
+
+typedef std::shared_ptr<Box> BoxPtr;
+
 #endif

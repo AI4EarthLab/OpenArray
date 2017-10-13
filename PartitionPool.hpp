@@ -12,7 +12,7 @@ typedef unordered_map<size_t, PartitionPtr> PartitionPoolMap;
 
 /*
  * Partition Pool:
- *      m_pool:    		use [comm, process_size, (gx, gy, gz), stencil_width] as identicial key
+ *      m_pool:    		use [comm, procs_size, (gx, gy, gz), stencil_width] as identicial key
  *		m_pool_xyz:		use [comm, lx, ly, lz, stencil_width] as identical key
  */
 class PartitionPool {
@@ -23,12 +23,14 @@ class PartitionPool {
 	public:
 		// get a PartitionPtr from m_pool based on hash created by key:
         // [comm, process_size, (gx, gy, gz), stencil_width] 
-        PartitionPtr get(MPI_Comm comm, int size, vector<int> gs, int stencil_width = 1, size_t par_hash = 0) {
-			PartitionPtr par_ptr;
+        PartitionPtr get(MPI_Comm comm, int size, const Shape& gs, 
+        	int stencil_width = 1, size_t par_hash = 0) {
+        	PartitionPtr par_ptr;
 			// par_hash == 0:	should gen hash
 			// par_hash != 0:	means arraypool has already gen hash, just use it
-			if (par_hash == 0) par_hash = Partition::gen_hash(comm, size, gs, stencil_width);
-
+			
+			if (par_hash == 0) par_hash = Partition::gen_hash(comm, gs, stencil_width);
+			
 			PartitionPoolMap::iterator it = m_pool.find(par_hash);
 			if (it == m_pool.end()) {	// create new partition in pool
 				par_ptr = PartitionPtr(new Partition(comm, size, gs, stencil_width));
@@ -42,7 +44,8 @@ class PartitionPool {
 
 		// get a PartitionPtr from m_pool_xyz based on hash created by key:
 		// [comm, lx, ly, lz, stencil_width]
-		PartitionPtr get(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width = 1, size_t par_hash = 0) {
+		PartitionPtr get(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+			const vector<int> &z, int stencil_width = 1, size_t par_hash = 0) {
 			PartitionPtr par_ptr;
 			// par_hash == 0:	should gen hash
 			// par_hash != 0:	means arraypool has already gen hash, just use it

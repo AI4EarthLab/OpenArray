@@ -1,6 +1,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include <array>
+
 // define stencil type
 #define STENCIL_STAR 0
 #define STENCIL_BOX 1
@@ -19,5 +21,7 @@
 
 // define shape dimension [x, y, z]
 typedef std::array<int, 3> Shape;
+
+typedef int DataType;
 
 #endif

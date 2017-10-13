@@ -1,6 +1,7 @@
 #ifndef __ARRAYPOOL_HPP__
 #define __ARRAYPOOL_HPP__
 
+#include "common.hpp"
 #include "Array.hpp"
 #include "PartitionPool.hpp"
 #include <unordered_map>
@@ -9,7 +10,7 @@
 
 using namespace std;
 
-typedef list<Array> ArrayList;
+typedef list<Array*> ArrayList;
 typedef unordered_map<size_t, ArrayList*> ArrayPoolMap; 
 
 /*
@@ -25,15 +26,19 @@ class ArrayPool{
     public:
         // get an ArrayPtr from m_pools based on hash created by key:
         // [comm, process_size, (gx, gy, gz), stencil_width, buffer_data_type]
-        ArrayPtr get(MPI_Comm comm, int size, vector<int> gs, int stencil_width = 1, int data_type = DATA_DOUBLE) {
+        ArrayPtr get(MPI_Comm comm, const Shape& gs, int stencil_width = 1, 
+            int data_type = DATA_DOUBLE) {
             Array* ap;
-            size_t par_hash = Partition::gen_hash(comm, size, gs, stencil_width);
+            size_t par_hash = Partition::gen_hash(comm, gs, stencil_width);
             
             // only use array_hash = par_hash + buffer_data_type (may be a bug)
             size_t array_hash = par_hash + data_type;
 
             ArrayPoolMap::iterator it = m_pools.find(array_hash);
             
+            int size;
+            MPI_Comm_size(comm, &size);
+
             //    not found in ArrayPool 
             // OR found, but arraylist is empty
             if (it == m_pools.end() || it->second->size() < 1) { 
@@ -55,7 +60,8 @@ class ArrayPool{
 
         // get an ArrayPtr from m_pools based on hash created by key:
         // [comm, lx, ly, lz, stencil_width, buffer_data_type]
-        ArrayPtr get(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width = 1, int data_type = DATA_DOUBLE) {
+        ArrayPtr get(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+            const vector<int> &z, int stencil_width = 1, int data_type = DATA_DOUBLE) {
             Array* ap;
             size_t par_hash = Partition::gen_hash(comm, x, y, z, stencil_width);
             
@@ -85,7 +91,7 @@ class ArrayPool{
 
         void dispose(Array* ap){
             cout<<"ArrayPool dispose called!\n"<<endl;
-            size_t array_hash = ap->hash();
+            size_t array_hash = ap->get_hash();
 
             ArrayPoolMap::iterator it = m_pools.find(array_hash);
             if (it == m_pools.end()){

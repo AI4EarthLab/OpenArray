@@ -22,26 +22,28 @@ class Array {
         int m_data_type = 2;
         PartitionPtr m_par_ptr;
         BoxPtr m_ref_box_ptr;
+        BoxPtr m_corners;
         bool m_is_scalar = false;
         bool m_is_seq = false;
         size_t m_hash;
 
     public:
-        Array(PartitionPtr ptr); 
-        Array(PartitionPtr ptr, void *data, int data_type = DATA_DOUBLE); 
-        int data_type();
-        void* buffer();
+        Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
+        ~Array();
+        const int get_data_type() const;
+        void* get_buffer();
         void set_buffer(void *buffer, int size);
-        PartitionPtr partition();
+        const PartitionPtr get_partition() const;
         void display(const char *prefix = "");
-        BoxPtr corners();
-        vector<int> local_shape();
+        void set_corners();
+        BoxPtr get_corners();
+        Shape local_shape();
         int local_size();
-        vector<int> shape();
+        Shape shape();
         int size();
         bool is_scalar();
-        void set_hash(size_t hash);
-        size_t hash();
+        void set_hash(const size_t &hash);
+        const size_t get_hash() const;
 };
 
 #endif

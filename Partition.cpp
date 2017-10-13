@@ -4,6 +4,7 @@
 #include <limits.h>
 #include <functional>
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 // Partition has default parameters
@@ -11,7 +12,7 @@ Partition::Partition() { }
     
 // give global_shape, and total process number
 // find the approriate partition
-Partition::Partition(MPI_Comm comm, int size, vector<int> gs, int sw) :
+Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
     m_comm(comm), m_global_shape(gs), m_stencil_width(sw) {
         assert(gs[0] > 0 && gs[1] > 0 && gs[2] > 0 && size > 0);
         double tot = pow(gs[0] * gs[1] * gs[2] * 1.0, 1.0 / 3);
@@ -55,7 +56,8 @@ Partition::Partition(MPI_Comm comm, int size, vector<int> gs, int sw) :
 
 
 // Give partition information, calculate procs_shape & global_shape
-Partition::Partition(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int sw) :
+Partition::Partition(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+    const vector<int> &z, int sw) :
     m_comm(comm), m_stencil_width(sw), m_lx(x), m_ly(y), m_lz(z) {
         assert(m_lx.size() && m_ly.size() && m_lz.size());
         m_procs_shape[0] = m_lx.size();
@@ -68,7 +70,7 @@ Partition::Partition(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z,
 }
     
 // check if two Partition is equal or not
-bool Partition::equal(PartitionPtr par_ptr) {
+bool Partition::equal(const PartitionPtr &par_ptr) {
     if (m_comm != par_ptr->m_comm || m_stencil_type != par_ptr->m_stencil_type || 
         m_stencil_width != par_ptr->m_stencil_width) return false;
     for (int i = 0; i < 3; i++) {
@@ -80,13 +82,13 @@ bool Partition::equal(PartitionPtr par_ptr) {
 }
 
 // check if two Partition is equal or not
-bool Partition::equal(Partition &par) {
+bool Partition::equal(const Partition &par) {
     PartitionPtr par_ptr = make_shared<Partition>(par);
     return equal(par_ptr);
 }
 
 // check if two Partition distribution is equal or not
-bool Partition::equal_distr(PartitionPtr par_ptr) {
+bool Partition::equal_distr(const PartitionPtr &par_ptr) {
     if (m_lx.size() != par_ptr->m_lx.size() || m_ly.size() != par_ptr->m_ly.size() ||
         m_lz.size() != par_ptr->m_lz.size()) return false;
 
@@ -97,7 +99,7 @@ bool Partition::equal_distr(PartitionPtr par_ptr) {
 }
 
 // return global shape of Partition
-vector<int> Partition::shape() {
+Shape Partition::shape() {
     return m_global_shape;
 }
 
@@ -123,8 +125,15 @@ void Partition::set_stencil(int type, int width) {
     m_stencil_width = width;
 }
 
+// get the box info
+BoxPtr Partition::get_local_box() {
+    int rank;
+    MPI_Comm_rank(m_comm, &rank);
+    return get_local_box(rank);
+}
+
 // get the box info based on process's coord [px, py, pz]
-BoxPtr Partition::get_local_box(vector<int> coord) {
+BoxPtr Partition::get_local_box(const vector<int> &coord) {
     for (int i = 0; i < 3; i++) assert(0 <= coord[i] && coord[i] < m_procs_shape[i]);
     Box box(m_clx[coord[0]], m_clx[coord[0] + 1] - 1, 
             m_cly[coord[1]], m_cly[coord[1] + 1] - 1,
@@ -145,16 +154,16 @@ int Partition::get_procs_rank(int x, int y, int z) {
 }
 
 // coord = [x, y, z], rank = x + y * px + z * px * py
-int Partition::get_procs_rank(vector<int> coord) {
+int Partition::get_procs_rank(const vector<int> &coord) {
     return get_procs_rank(coord[0], coord[1], coord[2]);
 }
 
 // given rank, calculate coord[x, y, z]
 vector<int> Partition::get_procs_3d(int rank) {
     vector<int> coord(3, 0);
-    coord[0] = rank % m_global_shape[0];
-    coord[1] = rank % (m_global_shape[0] * m_global_shape[1]) / m_global_shape[0];
-    coord[2] = rank / (m_global_shape[0] * m_global_shape[1]);
+    coord[0] = rank % m_procs_shape[0];
+    coord[1] = rank % (m_procs_shape[0] * m_procs_shape[1]) / m_procs_shape[0];
+    coord[2] = rank / (m_procs_shape[0] * m_procs_shape[1]);
     return coord;
 }
 
@@ -198,42 +207,59 @@ void Partition::display_distr(const char *prefix) {
     //flush();        
 }
 
-// set partition hash
-void Partition::set_hash(size_t hash) {
+void Partition::set_hash(const size_t &hash) {
     m_hash = hash;    
 }
 
-// get partition hash
-size_t Partition::hash() {
+size_t Partition::get_hash() const {
     return m_hash;
 }
 
-// static function, gen hash based on [comm, size, gs, stencil_width]
-size_t Partition::gen_hash(MPI_Comm comm, int size, vector<int> gs, int stencil_width) {
+MPI_Comm Partition::get_comm() const {
+    return m_comm;
+}
+
+int Partition::get_stencil_width() const {
+    return m_stencil_width;
+}
+
+// static function, gen hash based on [comm, gs(x, y, z), stencil_width]
+size_t Partition::gen_hash(MPI_Comm comm, const Shape &gs, int stencil_width) {
     std::hash<string> str_hash;
-    string str = "";
-    str += to_string(comm) + ":";
-    str += to_string(size) + ":";
-    str += to_string(gs[0]);
-    for (int i = 1; i < gs.size(); i++) str += "," + to_string(gs[i]);
-    str += ":" + to_string(stencil_width);
-    cout<<"gen_hash 1: "<<str<<endl;
-    return str_hash(str);    
+    std::stringstream sstream;
+    
+    sstream<<comm<<":";
+    sstream<<gs[0];
+    for (int i = 1; i < gs.size(); i++) 
+        sstream<<","<<gs[i];
+    
+    sstream<<":"<<stencil_width;
+    //cout<<"gen_hash 1: "<<sstream.str()<<endl;
+    return str_hash(sstream.str());    
 }
 
 // static function, gen hash based on [comm, x, y, z, stencil_width]
-size_t Partition::gen_hash(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width) {
+size_t Partition::gen_hash(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+    const vector<int> &z, int stencil_width) {
     std::hash<string> str_hash;
-    string str = "";
-    str += to_string(comm) + ":";
-    str += to_string(x[0]);
-    for (int i = 1; i < x.size(); i++) str += "," + to_string(x[i]);
-    str += ":" + to_string(y[0]);
-    for (int i = 1; i < y.size(); i++) str += "," + to_string(y[i]);
-    str += ":" + to_string(z[0]);
-    for (int i = 1; i < z.size(); i++) str += "," + to_string(z[i]);
-    str += ":" + to_string(stencil_width);
-    return str_hash(str);
+    std::stringstream sstream;
+
+    sstream<<comm<<":";
+    sstream<<x[0];
+    for (int i = 1; i < x.size(); i++)
+        sstream<<","<<x[i];
+
+    sstream<<":"<<y[0];
+    for (int i = 1; i < y.size(); i++) 
+        sstream<<","<<y[i];
+
+    sstream<<":"<<z[0];
+    for (int i = 1; i < z.size(); i++)
+        sstream<<","<<z[i];
+
+    sstream<<":"<<stencil_width;
+
+    return str_hash(sstream.str());
 }
 
 

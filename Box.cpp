@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
+#include "common.hpp"
 #include "Box.hpp"
+
 using namespace std;
 
 Box::Box() {}
@@ -16,13 +18,13 @@ Box::Box(int *starts, int *counts) :
 Box::Box(int sx, int ex, int sy, int ey, int sz, int ez) :
     m_rx(sx, ex), m_ry(sy, ey), m_rz(sz, ez) {}
 
-bool Box::equal(Box &u) {
+bool Box::equal(const Box &u) {
     return m_rx.equal(u.m_rx) && m_ry.equal(u.m_ry) && m_rz.equal(u.m_rz);
 }
 
-bool Box::equal_shape(Box &b) {
-    vector<int> s = shape();
-    vector<int> u = b.shape();
+bool Box::equal_shape(const Box &b) {
+    Shape s = shape();
+    Shape u = b.shape();
     return s[0] == u[0] && s[1] == u[1] && s[2] == u[2]; 
 }
 
@@ -34,28 +36,31 @@ void Box::display(char const *prefix) {
 }
 
 // check if Box is inside Box u
-bool Box::is_inside(Box &u) {
+bool Box::is_inside(const Box &u) {
     return m_rx.is_inside(u.m_rx) && m_ry.is_inside(u.m_ry) && m_rz.is_inside(u.m_rz);
 }
 
 // check if Box and Box u has intersection
-bool Box::intersection(Box &u) {
-    return m_rx.intersection(u.m_rx) && m_ry.intersection(u.m_ry) && m_rz.intersection(u.m_rz);    
+bool Box::intersection(const Box &u) {
+    return m_rx.intersection(u.m_rx) && 
+    m_ry.intersection(u.m_ry) && m_rz.intersection(u.m_rz);    
 }
 
 // get the intersection box
-Box Box::get_intersection(Box &u) {
+Box Box::get_intersection(const Box &u) {
     if (!intersection(u)) return Box();
-    return Box(m_rx.get_intersection(u.m_rx), m_ry.get_intersection(u.m_ry), m_rz.get_intersection(u.m_rz));
+    return Box(m_rx.get_intersection(u.m_rx), 
+        m_ry.get_intersection(u.m_ry), m_rz.get_intersection(u.m_rz));
 }
 
 // return [shape_x, shape_y, shape_z]
-vector<int> Box::shape() {
-    vector<int> s{m_rx.size(), m_ry.size(), m_rz.size()};
+Shape Box::shape() const {
+    Shape s{m_rx.size(), m_ry.size(), m_rz.size()};
     return s; 
 }
 
 // return shape_x * shape_y * shape_z
-int Box::size() {
-    return m_rx.size() * m_ry.size() * m_rz.size();
+int Box::size(int sw) {
+    return (m_rx.size() + 2 * sw) * (m_ry.size() + 2 * sw) * 
+        (m_rz.size() + 2 * sw);
 }

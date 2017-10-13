@@ -8,6 +8,8 @@
 #include "common.hpp"
 #include "Box.hpp"
 
+using namespace std;
+
 /*
  * Partition:
  *      comm:               MPI_Comm, default as MPI_COMM_SELF
@@ -21,14 +23,14 @@
  *      clx, cly, clz:      accumulate info of every dimension
  */
 class Partition;
-typedef shared_ptr<Partition> PartitionPtr;
+typedef std::shared_ptr<Partition> PartitionPtr;
 
 class Partition {
-    private:
+    public:
         MPI_Comm m_comm = MPI_COMM_SELF;
-        vector<int> m_global_shape = {1, 1, 1};
-        vector<int> m_procs_shape = {1, 1, 1};
-        vector<int> m_bound_type = {0, 0, 0};
+        Shape m_global_shape = {1, 1, 1};
+        Shape m_procs_shape = {1, 1, 1};
+        Shape m_bound_type = {0, 0, 0};
         int m_stencil_type = STENCIL_STAR;
         int m_stencil_width = 1;
         size_t m_hash;
@@ -45,27 +47,32 @@ class Partition {
     
     public:
         Partition();
-        Partition(MPI_Comm comm, int size, vector<int> gs, int stencil_width = 1);
-        Partition(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width = 1);
-        bool equal(PartitionPtr par_ptr);
-        bool equal(Partition &par);
-        bool equal_distr(PartitionPtr par_ptr);
-        vector<int> shape();
+        Partition(MPI_Comm comm, int size, const Shape &gs, int stencil_width = 1);
+        Partition(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+            const vector<int> &z, int stencil_width = 1);
+        bool equal(const PartitionPtr &par_ptr);
+        bool equal(const Partition &par);
+        bool equal_distr(const PartitionPtr &par_ptr);
+        Shape shape();
         int size();
         void update_acc_distr();
         void set_stencil(int type, int width);
-        BoxPtr get_local_box(vector<int> coord);
+        BoxPtr get_local_box();
+        BoxPtr get_local_box(const vector<int> &coord);
         BoxPtr get_local_box(int rank);
         int get_procs_rank(int x, int y, int z);
-        int get_procs_rank(vector<int> coord);
+        int get_procs_rank(const vector<int> &coord);
         vector<int> get_procs_3d(int rank);
         void display(const char *prefix = "", bool all = true); 
         void display_distr(const char *prefix = "");
-        void set_hash(size_t hash);
-        size_t hash();
+        void set_hash(const size_t &hash);
+        size_t get_hash() const;
+        MPI_Comm get_comm() const;
+        int get_stencil_width() const;
 
-        static size_t gen_hash(MPI_Comm comm, int size, vector<int> gs, int stencil_width = 1);
-        static size_t gen_hash(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width = 1);
+        static size_t gen_hash(MPI_Comm comm, const Shape& gs, int stencil_width = 1);
+        static size_t gen_hash(MPI_Comm comm, const vector<int> &x, 
+            const vector<int> &y, const vector<int> &z, int stencil_width = 1);
 };
 
 

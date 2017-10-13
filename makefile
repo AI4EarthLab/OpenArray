@@ -5,9 +5,8 @@ CFLAGS 		=
 
 
 OBJS 		= Range.o Box.o Partition.o Array.o
-OBJS_TEST 	= $(addprefix ./test/, test.o)
 OBJS_UTILS	= $(addprefix ./utils/, calcTime.o gettimeofday.o)
-OBJ_MAIN 	= ${OBJS} ${OBJS_UTILS} ${OBJS_TEST} main.o
+OBJ_MAIN 	= ${OBJS} ${OBJS_UTILS} main.o
 
 .DEFAULT_GOAL := all
 
