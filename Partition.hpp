@@ -1,11 +1,11 @@
-#ifndef PARTITION_HPP
-#define PARTITION_HPP
+#ifndef __PARTITION_HPP__
+#define __PARTITION_HPP__
 
 #include <mpi.h>
 #include <vector>
 #include <memory>
 #include <list>
-#include "type.hpp"
+#include "common.hpp"
 #include "Box.hpp"
 
 /*

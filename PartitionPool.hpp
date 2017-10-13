@@ -46,7 +46,7 @@ class PartitionPool {
 			PartitionPtr par_ptr;
 			// par_hash == 0:	should gen hash
 			// par_hash != 0:	means arraypool has already gen hash, just use it
-			if (par_hash = 0) par_hash = Partition::gen_hash(comm, x, y, z, stencil_width);
+			if (par_hash == 0) par_hash = Partition::gen_hash(comm, x, y, z, stencil_width);
 
 			PartitionPoolMap::iterator it = m_pool_xyz.find(par_hash);
 			if (it == m_pool_xyz.end()) { // create new partition in pool

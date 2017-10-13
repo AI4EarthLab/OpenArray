@@ -6,7 +6,6 @@
 #include <iostream>
 using namespace std;
 
-
 // Partition has default parameters
 Partition::Partition() { }
     
@@ -211,7 +210,7 @@ size_t Partition::hash() {
 
 // static function, gen hash based on [comm, size, gs, stencil_width]
 size_t Partition::gen_hash(MPI_Comm comm, int size, vector<int> gs, int stencil_width) {
-    hash<string> str_hash;
+    std::hash<string> str_hash;
     string str = "";
     str += to_string(comm) + ":";
     str += to_string(size) + ":";
@@ -224,7 +223,7 @@ size_t Partition::gen_hash(MPI_Comm comm, int size, vector<int> gs, int stencil_
 
 // static function, gen hash based on [comm, x, y, z, stencil_width]
 size_t Partition::gen_hash(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width) {
-    hash<string> str_hash;
+    std::hash<string> str_hash;
     string str = "";
     str += to_string(comm) + ":";
     str += to_string(x[0]);
@@ -233,7 +232,7 @@ size_t Partition::gen_hash(MPI_Comm comm, vector<int> x, vector<int> y, vector<i
     for (int i = 1; i < y.size(); i++) str += "," + to_string(y[i]);
     str += ":" + to_string(z[0]);
     for (int i = 1; i < z.size(); i++) str += "," + to_string(z[i]);
-    str += ":" + stencil_width;
+    str += ":" + to_string(stencil_width);
     return str_hash(str);
 }
 

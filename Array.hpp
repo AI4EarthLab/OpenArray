@@ -1,9 +1,9 @@
+#ifndef __ARRAY_HPP__
+#define __ARRAY_HPP__
+
 #include <vector>
 #include <memory>
 #include "Partition.hpp"
-
-#ifndef ARRAY_HPP
-#define ARRAY_HPP
 
 /*
  * Array:

@@ -1,4 +1,3 @@
-
 #ifndef __ARRAYPOOL_HPP__
 #define __ARRAYPOOL_HPP__
 
@@ -26,7 +25,7 @@ class ArrayPool{
     public:
         // get an ArrayPtr from m_pools based on hash created by key:
         // [comm, process_size, (gx, gy, gz), stencil_width, buffer_data_type]
-        ArrayPtr get(MPI_Comm comm, int size, vector<int> gs, int stencil_width = 1, int data_type = 0) {
+        ArrayPtr get(MPI_Comm comm, int size, vector<int> gs, int stencil_width = 1, int data_type = DATA_DOUBLE) {
             Array* ap;
             size_t par_hash = Partition::gen_hash(comm, size, gs, stencil_width);
             
@@ -37,12 +36,12 @@ class ArrayPool{
             
             //    not found in ArrayPool 
             // OR found, but arraylist is empty
-            if (it == m_pools.end() || it->second.size() < 1) { 
+            if (it == m_pools.end() || it->second->size() < 1) { 
                 PartitionPtr par_ptr = PartitionPool::global()->
                     get(comm, size, gs, stencil_width, par_hash);
                 ap = new Array(par_ptr, data_type);
                 ap->set_hash(array_hash);
-            else {
+            } else {
                 ap = it->second->back();
                 it->second->pop_back();
             }
@@ -56,7 +55,7 @@ class ArrayPool{
 
         // get an ArrayPtr from m_pools based on hash created by key:
         // [comm, lx, ly, lz, stencil_width, buffer_data_type]
-        ArrayPtr get(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width = 1, int data_type = 0) {
+        ArrayPtr get(MPI_Comm comm, vector<int> x, vector<int> y, vector<int> z, int stencil_width = 1, int data_type = DATA_DOUBLE) {
             Array* ap;
             size_t par_hash = Partition::gen_hash(comm, x, y, z, stencil_width);
             
@@ -67,12 +66,12 @@ class ArrayPool{
             
             //    not found in ArrayPool 
             // OR found, but arraylist is empty
-            if (it == m_pools.end() || it->second.size() < 1) { 
+            if (it == m_pools.end() || it->second->size() < 1) { 
                 PartitionPtr par_ptr = PartitionPool::global()->
-                    get(comm, size, gs, stencil_width, par_hash);
+                    get(comm, x, y, z, stencil_width, par_hash);
                 ap = new Array(par_ptr, data_type);
                 ap->set_hash(array_hash);
-            else {
+            } else {
                 ap = it->second->back();
                 it->second->pop_back();
             }
