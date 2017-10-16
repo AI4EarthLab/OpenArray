@@ -56,6 +56,73 @@ const PartitionPtr Array::get_partition() const{
 
 void Array::display(const char *prefix) {
 
+  Shape ps = m_par_ptr->procs_shape();
+
+  int npx = s[0];
+  int npy = s[1];
+  int npz = s[2];
+  
+  int num_procs = npx * npy * npz;
+
+  Shape gs = shape();
+  char* global_buf = NULL;
+  
+  MPI_Request reqs[num_procs];
+  
+  if(my_rank() == 0){
+    global_buf = new char[gs[0] * gs[1] * gs[2] * DATA_SIZE(m_data_type)];
+    for(int z = 0; z < npz; ++z){
+      for(int y = 0; y < npy; ++y){
+	for(int x = 0; x < npx; ++x){
+	  
+	  BoxPtr bp = m_par_ptr -> get_local_box({x, y, z});
+	  
+	  int xs, ys, zs, xe, ye, ze;
+	  bp->get_corners(xs, xe, ys, ye, zs, ze);
+	  
+	  MPI_Datatype target_sub_array;
+	  int starts[3] = {xs, ys, zs};
+	  int sw = m_par_ptr -> get_stencil_width();
+	  int subsize[3] = {xe-xs, ye-ys, ze-zs};
+	  int bigsize[3] = {gs[0], gs[1], gs[2]};
+
+	  MPI_Type_create_subarray(3, bigsize, subsize,
+				   starts, MPI_ORDER_C,
+				   oa::utils::MPI_Datatype(m_data_type),
+				   &target_sub_array);
+	  
+	  MPI_Type_commit(&target_sub_array);
+	  int target_rank = m_par_ptr->get_procs_rank({x, y, z});
+	  if(target_rank != 0){
+	    MPI_Irecv(global_buf, 1,
+		      target_sub_array,
+		      target_rank, 100,
+		      MPI_COMM_WORLD,
+		      &reqs[target_rank]);
+	  }
+	}
+      }
+    }
+  }else{
+    MPI_Datatype mysubarray;
+
+    int sw = m_par_ptr -> get_stencil_width();    
+    int starts[3]  = {sw, sw, sw};
+    int bigsize[3] = {xe-xs+sw, ye-ys+sw, ze-zs+sw};
+    int subsize[3] = {xe-xs, ye-ys, ze-zs};
+    MPI_Type_create_subarray(3, bigsize, subsize,
+			     starts, MPI_ORDER_C,
+			     oa::utils::MPI_Datatype(m_data_type),
+			     &mysubarray);
+    MPI_Type_commit(&mysubarray);
+    MPI_Send(local_buf, 1, mysubarray, 0, 100, MPI_COMM_WORLD);
+  }
+
+  if(rank == 0){
+    MPI_Waitall(size-1, &reqs[1], MPI_STATUSES_IGNORE);
+    oa::utils::print_data((void*)global_buf, gs, m_data_type);
+    delete(global_buf);
+  }
 }
 
 // set local box in each process

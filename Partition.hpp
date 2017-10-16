@@ -55,6 +55,7 @@ class Partition {
         bool equal_distr(const PartitionPtr &par_ptr);
         Shape shape();
         int size();
+  Shape procs_shape() const {return m_procs_shape;};
         void update_acc_distr();
         void set_stencil(int type, int width);
         BoxPtr get_local_box();
