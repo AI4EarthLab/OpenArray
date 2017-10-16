@@ -3,6 +3,9 @@
 
 #include <array>
 
+// define random seed
+#define SEED 2333333
+
 // define stencil type
 #define STENCIL_STAR 0
 #define STENCIL_BOX 1

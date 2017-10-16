@@ -114,7 +114,16 @@ void test_Pool() {
 	ArrayPtr ap = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) ap->get_partition()->display();
+	if (rank == 0) ap->get_partition()->display("Array_Consts_m1");
+	
+	ap = oa::funcs::consts(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4}, 1, 1);
+	if (rank == 0) ap->get_partition()->display("Array_Consts_m2");
+
+	ap = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 4}, 1);
+	if (rank == 0) ap->get_partition()->display("Array_ones");
+	
+	ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1);
+	if (rank == 0) ap->get_partition()->display("Array_zeros");	
 }
 
 #endif

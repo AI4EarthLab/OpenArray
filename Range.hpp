@@ -16,6 +16,8 @@ class Range {
     public:
         Range();
         Range(int st, int ed);
+        int get_lower();
+        int get_upper();
         bool equal(int st, int ed);
         bool equal(const Range &rg);
         int size() const;

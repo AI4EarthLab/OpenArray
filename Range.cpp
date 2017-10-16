@@ -10,6 +10,14 @@ Range::Range() {
 Range::Range(int st, int ed) : 
     m_lower(st), m_upper(ed + 1) {}
 
+int Range::get_lower() {
+    return m_lower;
+}
+
+int Range::get_upper() {
+    return m_upper;
+}
+
 bool Range::equal(int st, int ed) {
     return m_lower == st && m_upper == ed + 1;
 }

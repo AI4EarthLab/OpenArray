@@ -20,6 +20,12 @@ class Box {
         Box(Range x, Range y, Range z);
         Box(int* starts, int* counts);
         Box(int sx, int ex, int sy, int ey, int sz, int ez);
+        
+        Range get_range_x();
+        Range get_range_y();
+        Range get_range_z();
+        void get_corners(int &xs, int &xe, int &ys, int &ye, int &zs, int &ze, int sw = 0);
+
         bool equal(const Box &u);
         bool equal_shape(const Box &b);
         void display(char const *prefix = "");

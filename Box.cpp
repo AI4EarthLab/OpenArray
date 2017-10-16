@@ -18,6 +18,27 @@ Box::Box(int *starts, int *counts) :
 Box::Box(int sx, int ex, int sy, int ey, int sz, int ez) :
     m_rx(sx, ex), m_ry(sy, ey), m_rz(sz, ez) {}
 
+Range Box::get_range_x() {
+    return m_rx;
+}
+
+Range Box::get_range_y() {
+    return m_ry;
+}
+
+Range Box::get_range_z() {
+    return m_rz;
+}
+
+void Box::get_corners(int &xs, int &xe, int &ys, int &ye, int &zs, int &ze, int sw) {
+    xs = m_rx.get_lower() - sw;
+    xe = m_rx.get_upper() + sw;
+    ys = m_ry.get_lower() - sw;
+    ye = m_ry.get_upper() + sw;
+    zs = m_rz.get_lower() - sw;
+    ze = m_rz.get_upper() + sw;
+}
+
 bool Box::equal(const Box &u) {
     return m_rx.equal(u.m_rx) && m_ry.equal(u.m_ry) && m_rz.equal(u.m_rz);
 }
