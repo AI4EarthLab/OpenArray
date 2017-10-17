@@ -10,24 +10,24 @@ class NodePool{
   
 public:
   NodePtr get(){
-    Node *p = NULL:
-    if(m_list.size() > 0){
-      p = m_list.back()
-    }else{
-      p = new Node();
-    }
-    return NodePtr(p, [](Node* np){
+  Node *p = NULL:
+  if(m_list.size() > 0){
+  p = m_list.back()
+  }else{
+  p = new Node();
+  }
+  return NodePtr(p, [](Node* np){
 	NodePool::global()-restore(np);
-      })
+  })
   }
 
   void restore(Node* n){
-    m_list.push_back(n);
+  m_list.push_back(n);
   }
 
   static const NodePool* global(){
-    static NodePool np;
-    return &np;
+  static NodePool np;
+  return &np;
   }
 };
 

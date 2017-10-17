@@ -5,7 +5,8 @@ CFLAGS 		=
 
 
 OBJS 		= Range.o Box.o Partition.o Array.o
-OBJS_UTILS	= $(addprefix ./utils/, calcTime.o gettimeofday.o)
+OBJS_UTILS	= $(addprefix ./utils/, calcTime.o gettimeofday.o \
+								utils.o)
 OBJ_MAIN 	= ${OBJS} ${OBJS_UTILS} main.o
 
 .DEFAULT_GOAL := all

@@ -2,7 +2,7 @@
 #define __FUNCTION_HPP__
 
 #include "common.hpp"
-#include "utils/to_type.hpp"
+#include "utils/utils.hpp"
 #include "Internal.hpp"
 #include "ArrayPool.hpp"
 
@@ -14,8 +14,8 @@ namespace oa {
 		ArrayPtr consts(MPI_Comm comm, const Shape& s, T val, int stencil_width = 1) {
 			int data_type = oa::utils::to_type<T>();
 			ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, data_type);
-			BoxPtr box_ptr = ap->get_corners();
-			int size = box_ptr->size(stencil_width);
+			Box box = ap->get_corners();
+			int size = box.size(stencil_width);
 			oa::internal::set_buffer_consts((T*)ap->get_buffer(), size, val);
 			return ap;
 		}
@@ -26,8 +26,8 @@ namespace oa {
 			const vector<int>&z, T val, int stencil_width = 1) {
 			int data_type = oa::utils::to_type<T>();
 			ArrayPtr ap = ArrayPool::global()->get(comm, x, y, z, stencil_width, data_type);
-			BoxPtr box_ptr = ap->get_corners();
-			int size = box_ptr->size(stencil_width);
+			Box box = ap->get_corners();
+			int size = box.size(stencil_width);
 			oa::internal::set_buffer_consts((T*)ap->get_buffer(), size, val);
 			return ap;
 		}
@@ -47,8 +47,8 @@ namespace oa {
 		// create a rand array
 		ArrayPtr rand(MPI_Comm comm, const Shape& s, int stencil_width = 1) {
 			ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, DATA_INT);
-			BoxPtr box_ptr = ap->get_corners();
-			int size = box_ptr->size(stencil_width);
+			Box box = ap->get_corners();
+			int size = box.size(stencil_width);
 			oa::internal::set_buffer_rand((int*)ap->get_buffer(), size);
 			return ap;
 		}
@@ -56,8 +56,9 @@ namespace oa {
 		// create a seqs array
 		ArrayPtr seqs(MPI_Comm comm, const Shape& s, int stencil_width = 1) {
 			ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, DATA_INT);
-			BoxPtr box_ptr = ap->get_corners();
-			oa::internal::set_buffer_seqs((int*)ap->get_buffer(), box_ptr, stencil_width);
+			Box box = ap->get_corners();
+			oa::internal::set_buffer_seqs((int*)ap->get_buffer(), s, box, stencil_width);
+			return ap;
 		}
 		//transfer(ArrayPtr &A, ArrayPtr &B);
 	}

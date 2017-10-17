@@ -1,6 +1,6 @@
 class Kernel {
-    private:
+  private:
 
-    public:
-        ArrayPtr plus(vector<ArrayPtr> input);    
+  public:
+  ArrayPtr plus(vector<ArrayPtr> input);  
 };

@@ -12,7 +12,7 @@ typedef unordered_map<size_t, PartitionPtr> PartitionPoolMap;
 
 /*
  * Partition Pool:
- *      m_pool:    		use [comm, procs_size, (gx, gy, gz), stencil_width] as identicial key
+ *  m_pool:  		use [comm, procs_size, (gx, gy, gz), stencil_width] as identicial key
  *		m_pool_xyz:		use [comm, lx, ly, lz, stencil_width] as identical key
  */
 class PartitionPool {
@@ -22,10 +22,10 @@ class PartitionPool {
 
 	public:
 		// get a PartitionPtr from m_pool based on hash created by key:
-        // [comm, process_size, (gx, gy, gz), stencil_width] 
-        PartitionPtr get(MPI_Comm comm, int size, const Shape& gs, 
-        	int stencil_width = 1, size_t par_hash = 0) {
-        	PartitionPtr par_ptr;
+  // [comm, process_size, (gx, gy, gz), stencil_width] 
+  PartitionPtr get(MPI_Comm comm, int size, const Shape& gs, 
+  	int stencil_width = 1, size_t par_hash = 0) {
+  	PartitionPtr par_ptr;
 			// par_hash == 0:	should gen hash
 			// par_hash != 0:	means arraypool has already gen hash, just use it
 			

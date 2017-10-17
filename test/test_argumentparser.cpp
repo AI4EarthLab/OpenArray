@@ -12,7 +12,7 @@ public :
   int i;
 
   ~Test() {
-    std::cout<<"destructor called!"<<std::endl;
+  std::cout<<"destructor called!"<<std::endl;
   }
 };
 

@@ -12,36 +12,36 @@
 void test_Range() {
 	cout<<endl;
 	cout<<"-----------------------test_Range----------------------------"<<endl;
-    // A [0, 0)
-    Range A;
+  // A [0, 0)
+  Range A;
 	A.display("A");
-    assert(A.equal(0, -1));
-    
+  assert(A.equal(0, -1));
+  
 	// B [1, 3)
-    Range B(1, 2);
-    B.display("B");
-    cout<<"Range B's size is "<<B.size()<<endl;
-    assert(B.equal(1, 2));
-    assert(B.size() == 2);
-    assert(!A.equal(B));
+  Range B(1, 2);
+  B.display("B");
+  cout<<"Range B's size is "<<B.size()<<endl;
+  assert(B.equal(1, 2));
+  assert(B.size() == 2);
+  assert(!A.equal(B));
    	
    	// A [1, 1)
-    A.shift(1);
-    cout<<"After shift by 1: "<<endl;
-    A.display("A");
+  A.shift(1);
+  cout<<"After shift by 1: "<<endl;
+  A.display("A");
 	assert(A.is_inside(B));
-    
-    // A [2, 4)
-    Range C(2, 3);
-    C.display("C");
-    cout<<"C & B has intersection"<<endl;
-    assert(C.intersection(B));
+  
+  // A [2, 4)
+  Range C(2, 3);
+  C.display("C");
+  cout<<"C & B has intersection"<<endl;
+  assert(C.intersection(B));
 
-    // C [2, 3)
-    Range D(2, 2);
-    assert(C.get_intersection(B).equal(D));
-    cout<<"------------------------------------------------------------"<<endl;
-    cout<<endl;
+  // C [2, 3)
+  Range D(2, 2);
+  assert(C.get_intersection(B).equal(D));
+  cout<<"------------------------------------------------------------"<<endl;
+  cout<<endl;
 }
 
 void test_Box() {
@@ -88,10 +88,10 @@ void test_Partition() {
 	assert(B.size() == 4 * 4 * 4);
 	B.set_stencil(1, 1);
 	assert(!B.equal(C));
-	BoxPtr box_ptr = B.get_local_box({0, 0, 0});
-	box_ptr->display("box at [0, 0, 0]");
-	box_ptr = B.get_local_box(1);
-	box_ptr->display("box at [1, 0, 0]");
+	Box box = B.get_local_box({0, 0, 0});
+	box.display("box at [0, 0, 0]");
+	box = B.get_local_box(1);
+	box.display("box at [1, 0, 0]");
 	assert(B.get_procs_rank(0, 1, 0) == 2);
 	cout<<"-----------------------------------------------------------------"<<endl;
 	cout<<endl;
@@ -111,11 +111,18 @@ void test_Array() {
 }
 
 void test_Pool() {
-	ArrayPtr ap = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 3, 2}, 1);
+	ap->display();
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) ap->get_partition()->display("Array_Consts_m1");
-	
+	if (rank == 0) {
+		cout<<rank<<endl;
+		PartitionPtr pp = ap->get_partition();
+		cout<<"fk"<<endl;
+	}
+	if (rank == 0) ap->get_partition()->display("Array_seqs");
+	ap->display();
+	/*
 	ap = oa::funcs::consts(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4}, 1, 1);
 	if (rank == 0) ap->get_partition()->display("Array_Consts_m2");
 
@@ -124,6 +131,7 @@ void test_Pool() {
 	
 	ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1);
 	if (rank == 0) ap->get_partition()->display("Array_zeros");	
+	*/
 }
 
 #endif

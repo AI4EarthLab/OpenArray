@@ -28,7 +28,7 @@ public:
 template<class T>
 void ArgumentParser::add_option(const char* key, const char* desc){
   m_ops_desc.add_options()
-    (key, po::value<T>(), desc);
+  (key, po::value<T>(), desc);
 }
 
 void ArgumentParser::parse_cmdline(int argc,  char** argv){

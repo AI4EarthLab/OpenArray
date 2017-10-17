@@ -28,19 +28,19 @@ public:
   void display(std::string prefix){};
 
   NodePtr input(int i){
-    return m_input.at(i);
+  return m_input.at(i);
   };
   
   NodePtr output(int i){
-    return m_output.at(i);
+  return m_output.at(i);
   };
 
   void add_input(int pos, NodePtr in){
-    m_input.insert(pos, in);
+  m_input.insert(pos, in);
   };
 
   void add_output(int pos, NodePtr out){
-    m_output.push_back(out);
+  m_output.push_back(out);
   };
   
   size_t hash(){};
