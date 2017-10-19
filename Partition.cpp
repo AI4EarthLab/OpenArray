@@ -1,4 +1,5 @@
 #include "Partition.hpp"
+#include "PartitionPool.hpp"
 #include <assert.h>
 #include <math.h>
 #include <limits.h>
@@ -25,18 +26,19 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
   double tsz = pow(size * 1.0, 1.0 / 3);
 
   for (int i = 1; i <= size; i++) if (size % i == 0) {
-  int ed = size / i;
-  for (int j = 1; j <= ed; j++) if (ed % j == 0) {
-  int k = ed / j;
-  double dfx = fx - i * 1.0 / tsz;
-  double dfy = fy - j * 1.0 / tsz;
-  double dfz = fz - k * 1.0 / tsz;
-  double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
-  if (factor >= new_factor) {
-  m_procs_shape = {i, j, k};
-  factor = new_factor;
-  }
-  }
+    int ed = size / i;
+    for (int j = 1; j <= ed; j++) if (ed % j == 0) {
+      int k = ed / j;
+      double dfx = fx - i * 1.0 / tsz;
+      double dfy = fy - j * 1.0 / tsz;
+      double dfz = fz - k * 1.0 / tsz;
+      double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
+      //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
+      if (factor >= new_factor) {
+        m_procs_shape = {i, j, k};
+        factor = new_factor;
+      }
+    }
   }
   assert(m_procs_shape[0] > 0);
   
@@ -72,11 +74,11 @@ Partition::Partition(MPI_Comm comm, const vector<int> &x, const vector<int> &y,
 // check if two Partition is equal or not
 bool Partition::equal(const PartitionPtr &par_ptr) {
   if (m_comm != par_ptr->m_comm || m_stencil_type != par_ptr->m_stencil_type || 
-  m_stencil_width != par_ptr->m_stencil_width) return false;
+      m_stencil_width != par_ptr->m_stencil_width) return false;
   for (int i = 0; i < 3; i++) {
-  if (m_global_shape[i] != par_ptr->m_global_shape[i] ||
-  m_procs_shape[i] != par_ptr->m_procs_shape[i] ||
-  m_bound_type[i] != par_ptr->m_bound_type[i]) return false;
+    if (m_global_shape[i] != par_ptr->m_global_shape[i] ||
+      m_procs_shape[i] != par_ptr->m_procs_shape[i] ||
+      m_bound_type[i] != par_ptr->m_bound_type[i]) return false;
   }
   return equal_distr(par_ptr);
 }
@@ -105,6 +107,10 @@ Shape Partition::shape() {
 
 Shape Partition::procs_shape() const{
   return m_procs_shape;
+}
+
+int Partition::procs_size() const {
+  return m_procs_shape[0] * m_procs_shape[1] * m_procs_shape[2];
 }
 
 // return global size of Partition
@@ -231,46 +237,82 @@ int Partition::get_stencil_width() const {
   return m_stencil_width;
 }
 
+// splic box in each procs
+// rsx[procs_x * 3] box have procs_x processes in x dimension
+// rsy[procs_y * 3]
+// rsz[procs_z * 3]
 void Partition::split_box_procs(const Box& b,
-        int rsx[],
-        int rsy[],
-        int rsz[]) const {
+        vector<int> &rsx,
+        vector<int> &rsy,
+        vector<int> &rsz) const {
   
   int xs, ys, zs, xe, ye, ze;
-  b.get_corners(xs, ys, zs, xe, ye, ze);
+  b.get_corners(xs, xe, ys, ye, zs, ze);
+  
+  int bxs = std::lower_bound(m_clx.begin(), m_clx.end(), xs) - m_clx.begin();
+  int bxe = std::lower_bound(m_clx.begin(), m_clx.end(), xe - 1) - m_clx.begin();
+  if (xs < m_clx[bxs]) bxs--;
+  if (xe - 1 < m_clx[bxe]) bxe--;
 
-  int bxs = std::lower_bound(m_clx.begin(), m_clx.end(), xs)
-    - m_clx.begin() - 1;
-  int bxe = std::lower_bound(m_clx.begin(), m_clx.end(), xe)
-    - m_clx.begin() - 1;
+  int bys = std::lower_bound(m_cly.begin(), m_cly.end(), ys) - m_cly.begin();
+  int bye = std::lower_bound(m_cly.begin(), m_cly.end(), ye - 1) - m_cly.begin();
+  if (ys < m_cly[bys]) bys--;
+  if (ye - 1 < m_cly[bye]) bye--;
 
-  int bys = std::lower_bound(m_cly.begin(), m_cly.end(), ys)
-    - m_cly.begin() - 1;
-  int bye = std::lower_bound(m_cly.begin(), m_cly.end(), ye)
-    - m_cly.begin() - 1;
+  int bzs = std::lower_bound(m_clz.begin(), m_clz.end(), zs) - m_clz.begin();
+  int bze = std::lower_bound(m_clz.begin(), m_clz.end(), ze - 1) - m_clz.begin();
+  if (zs < m_clz[bzs]) bzs--;
+  if (ze - 1 < m_clz[bze]) bze--;
 
-  int bzs = std::lower_bound(m_clz.begin(), m_clz.end(), zs)
-    - m_clz.begin() - 1;
-  int bze = std::lower_bound(m_clz.begin(), m_clz.end(), ze)
-    - m_clz.begin() - 1;
+  //cout<<bxs<<" "<<bxe<<" "<<bys<<" "<<bye<<" "<<bzs<<" "<<bze<<endl;
 
-  for(int i = bxs; i < bxe; ++i){
-    rsx[(i-bxs)*3 + 0] = std::max(xs, m_clx[i]);
-    rsx[(i-bxs)*3 + 1] = std::min(xe, m_clx[i+1]);
-    rsx[(i-bxs)*3 + 2] = i;
+  for(int i = bxs; i <= bxe; ++i) {
+    rsx.push_back(std::max(xs, m_clx[i]));
+    rsx.push_back(std::min(xe, m_clx[i+1]));
+    rsx.push_back(i);
   }
 
-  for(int i = bys; i < bye; ++i){
-    rsx[(i-bys)*3 + 0] = std::max(ys, m_cly[i]);
-    rsx[(i-bys)*3 + 1] = std::min(ye, m_cly[i+1]);
-    rsx[(i-bys)*3 + 2] = i;
+  for(int i = bys; i <= bye; ++i) {
+    rsy.push_back(std::max(ys, m_cly[i]));
+    rsy.push_back(std::min(ye, m_cly[i+1]));
+    rsy.push_back(i);
   }
 
-  for(int i = bzs; i < bze; ++i){
-    rsx[(i-bzs)*3 + 0] = std::max(zs, m_clz[i]);
-    rsx[(i-bzs)*3 + 1] = std::min(ze, m_clz[i+1]);
-    rsx[(i-bzs)*3 + 2] = i;
+  for(int i = bzs; i <= bze; ++i) {
+    rsz.push_back(std::max(zs, m_clz[i]));
+    rsz.push_back(std::min(ze, m_clz[i+1]));
+    rsz.push_back(i);
   }
+}
+
+PartitionPtr Partition::sub(const Box& b) const {
+  vector<int> rsx, rsy, rsz;
+  split_box_procs(b, rsx, rsy, rsz);
+  //for (int i = 0; i < rsx.size(); i++) {
+  //  cout<<rsx[i]<<" ";
+  //  if (i % 3 == 2) cout<<endl;
+  //}
+  //cout<<endl;
+  //for (int i = 0; i < rsy.size(); i++) {
+  //  cout<<rsy[i]<<" ";
+  //  if (i % 3 == 2) cout<<endl;
+  //}
+  //cout<<endl;
+  //for (int i = 0; i < rsz.size(); i++) {
+  //  cout<<rsz[i]<<" ";
+  //  if (i % 3 == 2) cout<<endl;
+  //}
+  vector<int> x(m_procs_shape[0], 0), y(m_procs_shape[1], 0), z(m_procs_shape[2], 0);
+  for (int i = 0; i < rsx.size(); i += 3)
+    x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
+  for (int i = 0; i < rsy.size(); i += 3)
+    y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
+  for (int i = 0; i < rsz.size(); i += 3)
+    z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
+  
+  PartitionPtr pp = PartitionPool::global()->
+    get(m_comm, x, y, z, m_stencil_width);
+  return pp;
 }
 
 // static function, gen hash based on [comm, gs(x, y, z), stencil_width]

@@ -74,9 +74,26 @@ Box Box::get_intersection(const Box &u) {
   m_ry.get_intersection(u.m_ry), m_rz.get_intersection(u.m_rz));
 }
 
+// get the ref new box
+Box Box::ref_box(const Box &ref) const {
+  int _xs, _xe, _ys, _ye, _zs, _ze;
+  ref.get_corners(_xs, _xe, _ys, _ye, _zs, _ze);
+  Range rx = m_rx, ry = m_ry, rz = m_rz;
+  rx.shift(-_xs);
+  ry.shift(-_ys);
+  rz.shift(-_zs);
+  return Box(rx, ry, rz);
+}
+
+Box Box::boundary_box(int sw) const {
+  int xs, xe, ys, ye, zs, ze;
+  get_corners(xs, xe, ys, ye, zs, ze, sw);
+  return Box(xs, xe, ys, ye, zs, ze);
+}
+
 // return [shape_x, shape_y, shape_z]
-Shape Box::shape() const {
-  Shape s{m_rx.size(), m_ry.size(), m_rz.size()};
+Shape Box::shape(int sw) const {
+  Shape s{m_rx.size() + 2 * sw, m_ry.size() + 2 * sw, m_rz.size() + 2 * sw};
   return s; 
 }
 

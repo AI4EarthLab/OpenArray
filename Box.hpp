@@ -39,8 +39,12 @@ class Box {
   // get the intersection box
   Box get_intersection(const Box &u);
   
+  Box ref_box(const Box &u) const;
+  
+  Box boundary_box(int sw) const;
+
   // return [shape_x, shape_y, shape_z]
-  Shape shape() const;
+  Shape shape(int sw = 0) const;
 
   // return shape_x * shape_y * shape_z
   int size(int stencil_width = 0);

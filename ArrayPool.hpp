@@ -42,20 +42,20 @@ class ArrayPool{
     //  not found in ArrayPool 
     // OR found, but arraylist is empty
     if (it == m_pools.end() || it->second->size() < 1) { 
-    PartitionPtr par_ptr = PartitionPool::global()->
-      get(comm, size, gs, stencil_width, par_hash);
-    ap = new Array(par_ptr, data_type);
-    ap->set_hash(array_hash);
+      PartitionPtr par_ptr = PartitionPool::global()->
+        get(comm, size, gs, stencil_width, par_hash);
+      ap = new Array(par_ptr, data_type);
+      ap->set_hash(array_hash);
     } else {
-    ap = it->second->back();
-    it->second->pop_back();
+      ap = it->second->back();
+      it->second->pop_back();
     }
 
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
-    [](Array* arr_p) {
-      ArrayPool::global()->dispose(arr_p);
-    });
+      [](Array* arr_p) {
+        ArrayPool::global()->dispose(arr_p);
+      });
   }
 
   // get an ArrayPtr from m_pools based on hash created by key:
@@ -73,20 +73,42 @@ class ArrayPool{
     //  not found in ArrayPool 
     // OR found, but arraylist is empty
     if (it == m_pools.end() || it->second->size() < 1) { 
-    PartitionPtr par_ptr = PartitionPool::global()->
-      get(comm, x, y, z, stencil_width, par_hash);
-    ap = new Array(par_ptr, data_type);
-    ap->set_hash(array_hash);
+      PartitionPtr par_ptr = PartitionPool::global()->
+        get(comm, x, y, z, stencil_width, par_hash);
+      ap = new Array(par_ptr, data_type);
+      ap->set_hash(array_hash);
     } else {
-    ap = it->second->back();
-    it->second->pop_back();
+      ap = it->second->back();
+      it->second->pop_back();
     }
 
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
-    [](Array* arr_p) {
-      ArrayPool::global()->dispose(arr_p);
-    });
+      [](Array* arr_p) {
+        ArrayPool::global()->dispose(arr_p);
+      });
+  }
+
+  // get an ArrayPtr from m_pools based on partitionptr pp
+  ArrayPtr get(const PartitionPtr &pp, int data_type = DATA_DOUBLE) {
+    Array* ap;
+    size_t par_hash = pp->get_hash();
+    size_t array_hash = par_hash + data_type;
+
+    ArrayPoolMap::iterator it = m_pools.find(array_hash);
+
+    if (it == m_pools.end() || it->second->size() < 1) {
+      ap = new Array(pp, data_type);
+    } else {
+      ap = it->second->back();
+      it->second->pop_back();
+    }
+
+    return ArrayPtr(
+      ap, [](Array* arr_p) {
+        ArrayPool::global()->dispose(arr_p);
+      }
+    );
   }
 
   void dispose(Array* ap){

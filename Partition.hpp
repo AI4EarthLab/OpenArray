@@ -49,7 +49,7 @@ class Partition {
   Partition();
   Partition(MPI_Comm comm, int size, const Shape &gs, int stencil_width = 1);
   Partition(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
-  const vector<int> &z, int stencil_width = 1);
+    const vector<int> &z, int stencil_width = 1);
   bool equal(const PartitionPtr &par_ptr);
   bool equal(const Partition &par);
   bool equal_distr(const PartitionPtr &par_ptr);
@@ -57,6 +57,7 @@ class Partition {
   int size();
   int rank();
   Shape procs_shape() const;
+  int procs_size() const;
   void update_acc_distr();
   void set_stencil(int type, int width);
   Box get_local_box();
@@ -73,13 +74,15 @@ class Partition {
   int get_stencil_width() const;
 
   void split_box_procs(const Box& b,
-        int rsx[],
-        int rsy[],
-        int rsz[]) const;
+        vector<int> &rsx,
+        vector<int> &rsy,
+        vector<int> &rsz) const;
+
+  PartitionPtr sub(const Box& b) const;
 
   static size_t gen_hash(MPI_Comm comm, const Shape& gs, int stencil_width = 1);
   static size_t gen_hash(MPI_Comm comm, const vector<int> &x, 
-  const vector<int> &y, const vector<int> &z, int stencil_width = 1);
+    const vector<int> &y, const vector<int> &z, int stencil_width = 1);
 };
 
 

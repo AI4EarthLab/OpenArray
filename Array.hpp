@@ -36,13 +36,14 @@ class Array {
   PartitionPtr get_partition() const;
   void display(const char *prefix = "");
   void set_corners();
-  Box get_corners();
+  Box get_corners() const;
   Shape local_shape();
-  int local_size();
+  int local_size() const;
   Shape shape();
   int size();
   int rank();
   bool is_scalar();
+  bool has_local_data() const;
   void set_hash(const size_t &hash);
   size_t get_hash() const;
 };

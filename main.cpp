@@ -16,14 +16,16 @@ int main(int argc, char** argv) {
   int world_size;
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
   
-  //if (world_rank == 0) {
+  if (world_rank == 0) {
   //  test_Range();
   //  test_Box();
   //  test_Partition();
-  //}
+  }
   
-  test_Pool();
+  //test_Pool();
   //test_Array();
+  test_transfer();
+  
 
   MPI_Finalize();
   return 0;

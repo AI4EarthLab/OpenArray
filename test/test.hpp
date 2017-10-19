@@ -112,16 +112,9 @@ void test_Array() {
 
 void test_Pool() {
 	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 3, 2}, 1);
-	ap->display();
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
-		cout<<rank<<endl;
-		PartitionPtr pp = ap->get_partition();
-		cout<<"fk"<<endl;
-	}
-	if (rank == 0) ap->get_partition()->display("Array_seqs");
-	ap->display();
+	ap->display("Array seqs");
 	/*
 	ap = oa::funcs::consts(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4}, 1, 1);
 	if (rank == 0) ap->get_partition()->display("Array_Consts_m2");
@@ -132,6 +125,30 @@ void test_Pool() {
 	ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1);
 	if (rank == 0) ap->get_partition()->display("Array_zeros");	
 	*/
+}
+
+void test_sub() {
+	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
+	Box box(1, 2, 2, 3, 1, 3);
+	ap->display("======A======");
+	//PartitionPtr pp = ap->get_partition()->sub(box);
+	//if (pp->rank() == 0) pp->display("Sub Partition");
+	ArrayPtr sub_ap = oa::funcs::subarray(ap, box);
+	sub_ap->display("====sub_A=====");
+}
+
+void test_transfer() {
+	// A
+	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {12, 18, 1}, 1);
+	ap->display("======A======");
+	// sub1
+	Box box1(5, 12, 4, 6, 0, 0);
+	ArrayPtr sub_ap1 = oa::funcs::subarray(ap, box1);
+	sub_ap1->display("====sub_1=====");
+	// sub2
+	Box box2(6, 13, 8, 10, 0, 0);
+	ArrayPtr sub_ap2 = oa::funcs::subarray(ap, box2);
+	sub_ap2->display("====sub_2=====");
 }
 
 #endif
