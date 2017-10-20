@@ -24,8 +24,8 @@ int main(int argc, char** argv) {
   
   //test_Pool();
   //test_Array();
-  test_transfer();
-  
+  //test_transfer();
+  test_update_ghost();
 
   MPI_Finalize();
   return 0;

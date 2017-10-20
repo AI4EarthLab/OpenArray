@@ -52,6 +52,17 @@ namespace oa {
 
 		// get a sub Array based on Box b
 		ArrayPtr subarray(const ArrayPtr &ap, const Box &box);
+
+		/*
+     * update boundary, direction = -1, all dimension
+     * direction = 0, dimension x
+     * direction = 1, dimension y
+     * direction = 2, dimension z
+     */
+    void update_ghost_start(ArrayPtr ap, vector<int> &reqs, int direction = -1);
+		
+		void update_ghost_end(vector<int> &reqs);
+		
 	}
 }
 

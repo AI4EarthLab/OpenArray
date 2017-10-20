@@ -12,7 +12,9 @@
 
 // define boundary type
 #define BOUND_OPEN 0
+#define BOUNDARY_OPEN 0
 #define BOUND_PERIODIC 1
+#define BOUNDARY_PERIODIC 1
 
 // define basic data types
 #define DATA_INT 0

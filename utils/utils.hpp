@@ -82,6 +82,10 @@ namespace oa {
     
     MPI_Datatype mpi_datatype(int t);
     
+    void mpi_order_start(MPI_Comm comm);
+
+    void mpi_order_end(MPI_Comm comm);
+
   }  
 }
 

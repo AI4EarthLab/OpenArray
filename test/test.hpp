@@ -6,6 +6,7 @@
 #include "../Partition.hpp"
 #include "../Array.hpp"
 #include "../Function.hpp"
+#include "../Internal.hpp"
 
 #include <assert.h>
 
@@ -152,6 +153,32 @@ void test_transfer() {
 
 	ArrayPtr tf_ap = oa::funcs::transfer(sub_ap1, sub_ap2->get_partition());
 	tf_ap->display("======transfer_array======");
+}
+
+void test_update_ghost() {
+	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
+	oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 1);
+	int rk = ap->rank();
+	//int size = ap->get_corners().size(1);
+	//oa::internal::set_buffer_consts((int*)ap->get_buffer(), size, rk);
+
+	ap->display("A");
+
+	Shape sp = ap->local_shape();
+	sp[0] += 2;
+	sp[1] += 2;
+	sp[2] += 2;
+
+	ap->get_partition()->set_stencil_type(STENCIL_BOX);
+
+	vector<int> reqs;
+	oa::funcs::update_ghost_start(ap, reqs, -1);
+	oa::funcs::update_ghost_end(reqs);
+
+	oa::utils::mpi_order_start(MPI_COMM_WORLD);
+	printf("=====%d======\n", rk);
+	oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
+	oa::utils::mpi_order_end(MPI_COMM_WORLD);
 }
 
 #endif

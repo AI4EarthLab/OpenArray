@@ -46,6 +46,29 @@ namespace oa {
 
 		void set_buffer_seqs(int *buffer, const Shape& s, Box box, int sw); 
 
+		template <typename T>
+		void set_ghost_consts(T *buffer, const Shape &sp, T val, int sw = 1) {
+			int M = sp[0] + 2 * sw;
+			int N = sp[1] + 2 * sw;
+			int P = sp[2] + 2 * sw;
+
+			int cnt = 0;
+			for (int k = 0; k < P; k++) {
+				for (int j = 0; j < N; j++) {
+					for (int i = 0; i < M; i++) {
+						if ((sw <= k && k < P - sw) &&
+								(sw <= j && j < N - sw) &&
+								(sw <= i && i < M - sw)) {
+							cnt++;
+							continue;
+						}
+						buffer[cnt++] = val;
+					}
+				}
+			}
+
+
+		}
 	}
 }
 

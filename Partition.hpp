@@ -72,6 +72,9 @@ class Partition {
   size_t get_hash() const;
   MPI_Comm get_comm() const;
   int get_stencil_width() const;
+  void set_stencil_type(int st);
+  int get_stencil_type() const;
+  Shape get_bound_type() const;
 
   void split_box_procs(const Box& b,
         vector<int> &rsx,

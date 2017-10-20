@@ -239,6 +239,17 @@ int Partition::get_stencil_width() const {
   return m_stencil_width;
 }
 
+void Partition::set_stencil_type(int st) {
+  m_stencil_type = st;
+}
+int Partition::get_stencil_type() const {
+  return m_stencil_type;
+}
+
+Shape Partition::get_bound_type() const {
+  return m_bound_type;
+}
+
 // splic box in each procs
 // rsx[procs_x * 3] box have procs_x processes in x dimension
 // rsy[procs_y * 3]
