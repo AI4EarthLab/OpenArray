@@ -78,6 +78,14 @@ class Partition {
         vector<int> &rsy,
         vector<int> &rsz) const;
 
+  void get_acc_box_procs(
+    vector<int> &rsx, 
+    vector<int> &rsy, 
+    vector<int> &rsz,
+    vector<int> &acc_rsx, 
+    vector<int> &acc_rsy, 
+    vector<int> &acc_rsz) const;
+  
   PartitionPtr sub(const Box& b) const;
 
   static size_t gen_hash(MPI_Comm comm, const Shape& gs, int stencil_width = 1);

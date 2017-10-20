@@ -112,7 +112,7 @@ class ArrayPool{
   }
 
   void dispose(Array* ap){
-    cout<<"ArrayPool dispose called!\n"<<endl;
+    //cout<<"ArrayPool dispose called!\n"<<endl;
     size_t array_hash = ap->get_hash();
 
     ArrayPoolMap::iterator it = m_pools.find(array_hash);

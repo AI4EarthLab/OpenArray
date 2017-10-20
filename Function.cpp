@@ -31,6 +31,16 @@ namespace oa {
 			oa::internal::set_buffer_seqs((int*)ap->get_buffer(), s, box, stencil_width);
 			return ap;
 		}
+
+    ArrayPtr seqs(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+      const vector<int> &z, int stencil_width) {
+      ArrayPtr ap = ArrayPool::global()->get(comm, x, y, z, stencil_width, DATA_INT);
+      Box box = ap->get_corners();
+      Shape s = ap->shape();
+      oa::internal::set_buffer_seqs((int*)ap->get_buffer(), s, box, stencil_width);
+      return ap;
+    }
+
 		//transfer(ArrayPtr &A, ArrayPtr &B);
 
 		ArrayPtr subarray(const ArrayPtr &ap, const Box &b) {
@@ -50,7 +60,7 @@ namespace oa {
   		ArrayPtr arr_ptr = ArrayPool::global()->
   			get(pp->get_comm(), x, y, z, pp->get_stencil_width(), ap->get_data_type());
 
-  		if (!arr_ptr->has_local_data()) return arr_ptr; // don't have local data in the process
+  		if (!arr_ptr->has_local_data()) return arr_ptr; // don't have local data in process
   		
   		int rk = pp->rank();
   		vector<int> procs_coord = pp->get_procs_3d(rk);
@@ -96,6 +106,10 @@ namespace oa {
 
       int sw = pp->get_stencil_width();
 
+      int num_procs = pp->procs_size();
+      MPI_Request isreqs[num_procs], irreqs[num_procs];
+      int isreqs_cnt = 0, irreqs_cnt = 0;
+
       // src has local data, transfer to ap
       if (src->has_local_data()) {
         vector<int> rsx, rsy, rsz;
@@ -105,13 +119,49 @@ namespace oa {
         int xs, ys, zs, xe, ye, ze;
         src_box.get_corners(xs, xe, ys, ye, zs, ze);
 
+        /*  debug
+        src_box.display();
+        for (int i = 0; i < rsx.size(); i += 3) 
+          printf("rsx: [%d %d %d]\n", rsx[i], rsx[i + 1], rsx[i + 2]);
+        for (int i = 0; i < rsy.size(); i += 3) 
+          printf("rsy: [%d %d %d]\n", rsy[i], rsy[i + 1], rsy[i + 2]);
+        for (int i = 0; i < rsz.size(); i += 3) 
+          printf("rsz: [%d %d %d]\n", rsz[i], rsz[i + 1], rsz[i + 2]);
+        */
+
+        vector<int> acc_rsx, acc_rsy, acc_rsz;
+        pp->get_acc_box_procs(rsx, rsy, rsz,
+          acc_rsx, acc_rsy, acc_rsz);
+
         for (int i = 0; i < rsx.size(); i += 3) {
+          if (rsx[i] == rsx[i + 1]) continue; 
           for (int j = 0; j < rsy.size(); j += 3) {
+            if (rsy[j] == rsy[j + 1]) continue;
             for (int k = 0; k < rsz.size(); k += 3) {
+              if (rsz[k] == rsz[k + 1]) continue;
+
               MPI_Datatype src_subarray;
-              int starts[3]  = {sw + rsx[i], sw + rsy[j], sw + rsz[k]};
+              int starts[3]  = {
+                sw + acc_rsx[i / 3], 
+                sw + acc_rsy[j / 3], 
+                sw + acc_rsz[k / 3]};
               int bigsize[3] = {xe-xs+2*sw, ye-ys+2*sw, ze-zs+2*sw};
-              int subsize[3] = {rsx[i+1] - rsx[i], rsy[i+1] - rsy[i], rsz[i+1] - rsz[i]};
+              int subsize[3] = {
+                rsx[i + 1] - rsx[i], 
+                rsy[j + 1] - rsy[j], 
+                rsz[k + 1] - rsz[k]
+              };
+              
+              /*  debug
+              vector<int> cd = pp->get_procs_3d(pp->rank());
+              printf("====Send====\n");
+              printf("from process [%d %d %d]\n", cd[0], cd[1], cd[2]);
+              printf("to process   [%d %d %d]\n", rsx[i + 2], rsy[j + 2], rsz[k + 2]);
+              printf("starts  [%d %d %d]\n", starts[0], starts[1], starts[2]);
+              printf("bigsize [%d %d %d]\n", bigsize[0], bigsize[1], bigsize[2]);
+              printf("subsize [%d %d %d]\n\n", subsize[0], subsize[1], subsize[2]);
+              */
+
               MPI_Type_create_subarray(3, bigsize, subsize,
                 starts, MPI_ORDER_FORTRAN,
                 oa::utils::mpi_datatype(src->get_data_type()),
@@ -119,17 +169,17 @@ namespace oa {
               MPI_Type_commit(&src_subarray);
 
               int target_rank = pp->
-                get_procs_rank({rsx[i + 2], rsy[i + 2], rsz[i + 2]});
-              MPI_Send(src->get_buffer(), 
-                1, src_subarray, target_rank, 100, pp->get_comm());
+                get_procs_rank({rsx[i + 2], rsy[j + 2], rsz[k + 2]});
+              MPI_Isend(src->get_buffer(), 1, 
+                src_subarray, target_rank, 
+                100, pp->get_comm(),
+                &isreqs[isreqs_cnt++]);
               MPI_Type_free(&src_subarray);
+
             }
           }
         }
       }
-
-      MPI_Request reqs[pp->procs_size()];
-      int reqs_cnt = 0;
 
       // ap has local data, receive from other processes
       if (ap->has_local_data()) {
@@ -140,13 +190,38 @@ namespace oa {
         int xs, ys, zs, xe, ye, ze;
         dest_box.get_corners(xs, xe, ys, ye, zs, ze);
 
+        vector<int> acc_rsx, acc_rsy, acc_rsz;
+        pp->get_acc_box_procs(rsx, rsy, rsz,
+          acc_rsx, acc_rsy, acc_rsz);
+
         for (int i = 0; i < rsx.size(); i += 3) {
+          if (rsx[i] == rsx[i + 1]) continue;
           for (int j = 0; j < rsy.size(); j += 3) {
+            if (rsy[j] == rsy[j + 1]) continue;
             for (int k = 0; k < rsz.size(); k += 3) {
+              if (rsz[k] == rsz[k + 1]) continue;
               MPI_Datatype dest_subarray;
-              int starts[3]  = {sw + rsx[i], sw + rsy[j], sw + rsz[k]};
+              int starts[3]  = {
+                sw + acc_rsx[i / 3], 
+                sw + acc_rsy[j / 3], 
+                sw + acc_rsz[k / 3]};
               int bigsize[3] = {xe-xs+2*sw, ye-ys+2*sw, ze-zs+2*sw};
-              int subsize[3] = {rsx[i+1] - rsx[i], rsy[i+1] - rsy[i], rsz[i+1] - rsz[i]};
+              int subsize[3] = {
+                rsx[i + 1] - rsx[i], 
+                rsy[j + 1] - rsy[j], 
+                rsz[k + 1] - rsz[k]
+              };
+
+              /* debug
+              vector<int> cd = pp->get_procs_3d(pp->rank());
+              printf("====Receive====\n");
+              printf("to process   [%d %d %d]\n", cd[0], cd[1], cd[2]);
+              printf("from process [%d %d %d]\n", rsx[i + 2], rsy[j + 2], rsz[k + 2]);
+              printf("starts  [%d %d %d]\n", starts[0], starts[1], starts[2]);
+              printf("bigsize [%d %d %d]\n", bigsize[0], bigsize[1], bigsize[2]);
+              printf("subsize [%d %d %d]\n\n", subsize[0], subsize[1], subsize[2]);
+              */
+              
               MPI_Type_create_subarray(3, bigsize, subsize,
                 starts, MPI_ORDER_FORTRAN,
                 oa::utils::mpi_datatype(ap->get_data_type()),
@@ -154,19 +229,21 @@ namespace oa {
               MPI_Type_commit(&dest_subarray);
 
               int target_rank = src->get_partition()->
-                get_procs_rank({rsx[i + 2], rsy[i + 2], rsz[i + 2]});
+                get_procs_rank({rsx[i + 2], rsy[j + 2], rsz[k + 2]});
               MPI_Irecv(ap->get_buffer(), 1,
                 dest_subarray, target_rank, 
                 100, pp->get_comm(),
-                &reqs[reqs_cnt++]);
+                &irreqs[irreqs_cnt++]);
 
               MPI_Type_free(&dest_subarray);
+              
             }
           }
         } 
       }
 
-      MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
+      MPI_Waitall(isreqs_cnt, &isreqs[0], MPI_STATUSES_IGNORE);
+      MPI_Waitall(irreqs_cnt, &irreqs[0], MPI_STATUSES_IGNORE);
 
       return ap;
     }

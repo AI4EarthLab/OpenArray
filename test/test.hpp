@@ -139,16 +139,19 @@ void test_sub() {
 
 void test_transfer() {
 	// A
-	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {12, 18, 1}, 1);
+	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6}, {6, 6, 6}, {1}, 1);
 	ap->display("======A======");
 	// sub1
-	Box box1(5, 12, 4, 6, 0, 0);
+	Box box1(4, 6, 5, 12, 0, 0);
 	ArrayPtr sub_ap1 = oa::funcs::subarray(ap, box1);
 	sub_ap1->display("====sub_1=====");
 	// sub2
-	Box box2(6, 13, 8, 10, 0, 0);
+	Box box2(8, 10, 6, 13, 0, 0);
 	ArrayPtr sub_ap2 = oa::funcs::subarray(ap, box2);
 	sub_ap2->display("====sub_2=====");
+
+	ArrayPtr tf_ap = oa::funcs::transfer(sub_ap1, sub_ap2->get_partition());
+	tf_ap->display("======transfer_array======");
 }
 
 #endif

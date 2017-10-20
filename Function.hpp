@@ -44,6 +44,9 @@ namespace oa {
 		// create a seqs array
 		ArrayPtr seqs(MPI_Comm comm, const Shape& s, int stencil_width); 
 
+		ArrayPtr seqs(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+      const vector<int> &z, int stencil_width = 1);
+
 		// according to partiton pp, transfer B to A
 		ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp);
 
