@@ -1,16 +1,8 @@
-#ifndef __OPERATOR_HPP__
-#define __OPERATOR_HPP__ 
 
-#include "NodePool.hpp"
-#include "NodeDesc.hpp"
+#include "Operator.hpp"
 
 namespace oa{
   namespace ops{
-
-    template<class T>
-    NodePtr new_seq_scalar_node(T val){
-      return(NodePool::get_seq_scalar(val));
-    }
 
     NodePtr new_node(NodeType type, NodePtr u, NodePtr v){
       NodePtr np = NodePool::global()->get();
@@ -71,4 +63,4 @@ namespace oa{
   }
 }
 
-#endif
+

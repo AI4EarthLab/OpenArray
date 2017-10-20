@@ -6,6 +6,7 @@
 #include "../Partition.hpp"
 #include "../Array.hpp"
 #include "../Function.hpp"
+#include "../Operator.hpp"
 
 #include <assert.h>
 
@@ -151,4 +152,16 @@ void test_transfer() {
 	sub_ap2->display("====sub_2=====");
 }
 
+void test_operator(){
+  //NodePtr ap = oa::ops::new_seq_scalar_node(3);
+  std::cout<<"int size: "<<dtype<int>::size<<std::endl;
+  std::cout<<"bool size: "<<dtype<bool>::size<<std::endl;
+  std::cout<<"double size: "<<dtype<double>::size<<std::endl;
+
+  std::cout<<"int type: "<<dtype<int>::type_id<<std::endl;
+  std::cout<<"bool type: "<<dtype<bool>::type_id<<std::endl;
+  std::cout<<"double type: "<<dtype<double>::type_id<<std::endl;
+  
+  //ap->get_data()->display("======A======");
+}
 #endif

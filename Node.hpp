@@ -13,7 +13,7 @@ typedef std::vector<NodePtr> NodeList;
 class Node {
 private:
   int id;
-  ArrayPtr data;
+  ArrayPtr m_data;
   NodeList m_input;
   NodeList m_output;
   size_t m_hash;
@@ -48,12 +48,15 @@ public:
   }
 
   void set_data(const ArrayPtr& ptr){
-    data = ptr;
+    m_data = ptr;
   }
   
   size_t hash(){};
   int type(){};
 
+  ArrayPtr get_data(){
+    return m_data;
+  }
   void reset(){
     
   }

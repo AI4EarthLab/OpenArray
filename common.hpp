@@ -50,5 +50,36 @@ typedef int DATA_TYPE;
 
 #define NUM_NODE_TYPES ${len(L)}$
 
+
+template<class T>
+struct dtype {
+  const static DataType type_id = -1;
+  const static int size = -1;
+};
+
+template<>
+struct dtype<bool>{
+  const static DataType type_id = DATA_BOOL;
+  const static int size = 2;
+};
+
+template<>
+struct dtype<int>{
+  const static DataType type_id = DATA_INT;
+  const static int size = 4;
+};
+
+template<>
+struct dtype<float>{
+  const static DataType type_id = DATA_FLOAT;
+  const static int size = 4;
+};
+
+template<>
+struct dtype<double>{
+  const static DataType type_id = DATA_DOUBLE;
+  const static int size = 8;
+};
+
 #endif
 
