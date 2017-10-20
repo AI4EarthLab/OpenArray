@@ -58,6 +58,11 @@ class ArrayPool{
       });
   }
 
+  template<class T>
+  ArrayPtr get_seq_scalar(T val){
+    
+  }
+
   // get an ArrayPtr from m_pools based on hash created by key:
   // [comm, lx, ly, lz, stencil_width, buffer_data_type]
   ArrayPtr get(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
