@@ -30,4 +30,25 @@ typedef std::array<int, 3> Shape;
 typedef int DataType;
 typedef int DATA_TYPE;
 
+
+#:mute
+#:set i = 0  
+#:include "NodeType.fypp"
+#:endmute
+    //define node types
+    enum NodeType{    
+#:for i in range(len(L))
+#:if i == 0
+  ${L[i][0]}$ = 0,	  
+#:elif i == len(L) - 1
+  ${L[i][0]}$
+#:else
+      ${L[i][0]}$,
+#:endif    
+#:endfor
+};
+
+#define NUM_NODE_TYPES ${len(L)}$
+
 #endif
+

@@ -3,13 +3,14 @@
 #define __OP_DESC_HPP__
 
 #include "common.hpp"
+#include <string>
 
 struct NodeDesc{
   int type; //operator type
-  const char* name; //operator name
+  std::string name; //operator name
   bool ew; //if element-wise operation
   bool cl; //if change data layout
-  bool expr; // expression form
+  std::string expr; // expression form
 };
 
 typedef std::vector<NodeDesc> OpDescList;

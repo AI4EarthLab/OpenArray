@@ -16,14 +16,14 @@ public:
   NodePtr get(){
     Node *p = NULL;
     if(m_list.size() > 0){
-      p = m_list.back()
+      p = m_list.back();
     }else{
       p = new Node();
     }
     
     return NodePtr(p, [](Node* np){
-	NodePool::global()-dispose(np);
-      })
+	NodePool::global()->dispose(np);
+      });
   }
 
   template<class T>
@@ -40,7 +40,7 @@ public:
     m_list.push_back(n);
   }
 
-  static const NodePool* global(){
+  static NodePool* global(){
     static NodePool np;
     return &np;
   }
