@@ -1,8 +1,15 @@
 
 #include "Operator.hpp"
 
-namespace oa{
+namespace oa {
   namespace ops{
+
+    NodePtr new_node(const ArrayPtr &ap) {
+      NodePtr np = NodePool::global()->get();
+      np->set_type(TYPE_DATA);
+      np->set_data(ap);
+      return np;
+    }
 
     NodePtr new_node(NodeType type, NodePtr u, NodePtr v){
       NodePtr np = NodePool::global()->get();

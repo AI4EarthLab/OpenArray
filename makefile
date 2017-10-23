@@ -5,7 +5,9 @@ CFLAGS 		=
 
 
 OBJS 		= Range.o Box.o Partition.o Array.o \
-		  Internal.o Function.o Operator.o IO.o
+		  		Internal.o Function.o Operator.o \
+		  		Node.o IO.o \
+
 
 OBJS_UTILS	= $(addprefix ./utils/, calcTime.o gettimeofday.o \
 			      utils.o)

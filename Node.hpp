@@ -2,6 +2,7 @@
 #ifndef __NODE_HPP__
 #define __NODE_HPP__
 #include "Array.hpp"
+#include "common.hpp"
 #include <vector>
 #include <memory>
 
@@ -17,49 +18,55 @@ private:
   NodeList m_input;
   NodeList m_output;
   size_t m_hash;
-  int m_type;
+  NodeType m_type;
+  bool m_is_seqs = false;
+  bool m_is_scalar = false;
   //BoxPtr ref;
 
 public:
-  Node(){};
+  Node();
+
   Node(NodePtr u);
   //Node(ArrayPtr array);
-  ~Node(){};
-  void display(std::string prefix){};
-
-  NodePtr input(int i){
-    return m_input.at(i);
-  };
+  ~Node();
   
-  NodePtr output(int i){
-    return m_output.at(i);
-  };
+  void display(char const *prefix = "");
 
-  void add_input(int pos, NodePtr in){
-    m_input.insert(m_input.begin() + pos, in);
-  };
+  NodePtr input(int i);
 
-  void add_output(int pos, NodePtr out){
-    m_output.push_back(out);
-  };
+  NodePtr output(int i);
 
-  void set_type(NodeType type){
-    m_type = type;
-  }
+  void add_input(int pos, NodePtr in);
 
-  void set_data(const ArrayPtr& ptr){
-    m_data = ptr;
-  }
+  void add_output(int pos, NodePtr out);
+
+  void set_type(NodeType type);
+
+  void set_data(const ArrayPtr& ptr);
+
+  void set_id(int _id);
   
-  size_t hash(){};
-  int type(){};
+  size_t hash();
 
-  ArrayPtr get_data(){
-    return m_data;
-  }
-  void reset(){
-    
-  }
+  NodeType type();
+
+  ArrayPtr get_data();
+
+  void reset();
+
+  // MPI_Comm_world [1x1x1]
+  bool is_scalar() const;
+
+  void set_scalar();
+
+  // MPI_Comm_self 
+  bool is_seqs() const;
+
+  void set_seqs();
+
+  // MPI_Comm_self & [1x1x1]
+  bool is_seqs_scalar() const;
+
 };
 
 

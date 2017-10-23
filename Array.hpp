@@ -37,6 +37,8 @@ class Array {
   void display(const char *prefix = "");
   void set_corners();
   Box get_corners() const;
+  Shape buffer_shape();
+  int buffer_size();
   Shape local_shape();
   int local_size() const;
   Shape shape();
