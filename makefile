@@ -5,9 +5,11 @@ CFLAGS 		=
 
 
 OBJS 		= Range.o Box.o Partition.o Array.o \
-					Internal.o Function.o
+		  Internal.o Function.o Operator.o IO.o
+
 OBJS_UTILS	= $(addprefix ./utils/, calcTime.o gettimeofday.o \
-								utils.o)
+			      utils.o)
+
 OBJ_MAIN 	= ${OBJS} ${OBJS_UTILS} main.o
 
 .DEFAULT_GOAL := all
@@ -19,10 +21,7 @@ all:
 	@rm -rf main
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
-	@cp makefile build/ 2>/dev/null
-	@cp *.cpp *.hpp build/ 2>/dev/null
-	@cp -r test build/ 2>/dev/null
-	@cp -r utils build/ 2>/dev/null
+	@./pre.sh
 	@cd build && make clean 
 	@echo "Cleaning done."
 	@cd build && make main
