@@ -6,6 +6,8 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+
 using namespace std;
 
 // Partition has default parameters
@@ -237,6 +239,17 @@ int Partition::get_stencil_width() const {
   return m_stencil_width;
 }
 
+void Partition::set_stencil_type(int st) {
+  m_stencil_type = st;
+}
+int Partition::get_stencil_type() const {
+  return m_stencil_type;
+}
+
+Shape Partition::get_bound_type() const {
+  return m_bound_type;
+}
+
 // splic box in each procs
 // rsx[procs_x * 3] box have procs_x processes in x dimension
 // rsy[procs_y * 3]
@@ -250,17 +263,17 @@ void Partition::split_box_procs(const Box& b,
   b.get_corners(xs, xe, ys, ye, zs, ze);
   
   int bxs = std::lower_bound(m_clx.begin(), m_clx.end(), xs) - m_clx.begin();
-  int bxe = std::lower_bound(m_clx.begin(), m_clx.end(), xe - 1) - m_clx.begin();
+  int bxe = std::upper_bound(m_clx.begin(), m_clx.end(), xe - 1) - m_clx.begin();
   if (xs < m_clx[bxs]) bxs--;
   if (xe - 1 < m_clx[bxe]) bxe--;
 
   int bys = std::lower_bound(m_cly.begin(), m_cly.end(), ys) - m_cly.begin();
-  int bye = std::lower_bound(m_cly.begin(), m_cly.end(), ye - 1) - m_cly.begin();
+  int bye = std::upper_bound(m_cly.begin(), m_cly.end(), ye - 1) - m_cly.begin();
   if (ys < m_cly[bys]) bys--;
   if (ye - 1 < m_cly[bye]) bye--;
 
   int bzs = std::lower_bound(m_clz.begin(), m_clz.end(), zs) - m_clz.begin();
-  int bze = std::lower_bound(m_clz.begin(), m_clz.end(), ze - 1) - m_clz.begin();
+  int bze = std::upper_bound(m_clz.begin(), m_clz.end(), ze - 1) - m_clz.begin();
   if (zs < m_clz[bzs]) bzs--;
   if (ze - 1 < m_clz[bze]) bze--;
 
@@ -283,6 +296,20 @@ void Partition::split_box_procs(const Box& b,
     rsz.push_back(std::min(ze, m_clz[i+1]));
     rsz.push_back(i);
   }
+}
+
+void Partition::get_acc_box_procs(vector<int> &rsx, vector<int> &rsy, vector<int> &rsz,
+  vector<int> &acc_rsx, vector<int> &acc_rsy, vector<int> &acc_rsz) const {
+  acc_rsx.push_back(0);
+  acc_rsy.push_back(0);
+  acc_rsz.push_back(0);
+
+  for (int i = 0; i < rsx.size(); i += 3)
+    acc_rsx.push_back(acc_rsx[i / 3] + rsx[i + 1] - rsx[i]);
+  for (int i = 0; i < rsy.size(); i += 3)
+    acc_rsy.push_back(acc_rsy[i / 3] + rsy[i + 1] - rsy[i]);
+  for (int i = 0; i < rsz.size(); i += 3)
+    acc_rsz.push_back(acc_rsz[i / 3] + rsz[i + 1] - rsz[i]);
 }
 
 PartitionPtr Partition::sub(const Box& b) const {
@@ -314,6 +341,7 @@ PartitionPtr Partition::sub(const Box& b) const {
     get(m_comm, x, y, z, m_stencil_width);
   return pp;
 }
+
 
 // static function, gen hash based on [comm, gs(x, y, z), stencil_width]
 size_t Partition::gen_hash(MPI_Comm comm, const Shape &gs, int stencil_width) {

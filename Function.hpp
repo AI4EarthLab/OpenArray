@@ -44,11 +44,25 @@ namespace oa {
 		// create a seqs array
 		ArrayPtr seqs(MPI_Comm comm, const Shape& s, int stencil_width); 
 
+		ArrayPtr seqs(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+      const vector<int> &z, int stencil_width = 1);
+
 		// according to partiton pp, transfer B to A
 		ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp);
 
 		// get a sub Array based on Box b
 		ArrayPtr subarray(const ArrayPtr &ap, const Box &box);
+
+		/*
+     * update boundary, direction = -1, all dimension
+     * direction = 0, dimension x
+     * direction = 1, dimension y
+     * direction = 2, dimension z
+     */
+    void update_ghost_start(ArrayPtr ap, vector<int> &reqs, int direction = -1);
+		
+		void update_ghost_end(vector<int> &reqs);
+		
 	}
 }
 

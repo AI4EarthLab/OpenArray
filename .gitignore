@@ -36,3 +36,6 @@ build/*
 
 # ctags
 tags
+
+# debug
+debug/*

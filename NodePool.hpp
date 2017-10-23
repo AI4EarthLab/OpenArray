@@ -17,6 +17,7 @@ public:
     Node *p = NULL;
     if(m_list.size() > 0){
       p = m_list.back();
+      m_list.pop_back();
     }else{
       p = new Node();
     }

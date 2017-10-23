@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   //test_Pool();
   //test_Array();
   //test_transfer();
-
+  test_update_ghost();
   test_operator();
 
   MPI_Finalize();
