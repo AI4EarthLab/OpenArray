@@ -158,9 +158,9 @@ void test_operator(){
   std::cout<<"bool size: "<<dtype<bool>::size<<std::endl;
   std::cout<<"double size: "<<dtype<double>::size<<std::endl;
 
-  std::cout<<"int type: "<<dtype<int>::type_id<<std::endl;
-  std::cout<<"bool type: "<<dtype<bool>::type_id<<std::endl;
-  std::cout<<"double type: "<<dtype<double>::type_id<<std::endl;
+  std::cout<<"int type: "<<dtype<int>::type<<std::endl;
+  std::cout<<"bool type: "<<dtype<bool>::type<<std::endl;
+  std::cout<<"double type: "<<dtype<double>::type<<std::endl;
   
   //ap->get_data()->display("======A======");
 }
