@@ -1,5 +1,5 @@
 FC 			= mpif90
-CC 			= mpicc
+CC 			= mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB}
 CXX 		= mpicxx
 CFLAGS 		=
 
@@ -28,7 +28,7 @@ all:
 	cp build/main ./
 
 main: ${OBJ_MAIN}
-	-${CXX} -o main ${OBJ_MAIN} -lstdc++ 
+	-${CXX} -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf
 
 small:
 	@make all
