@@ -33,6 +33,7 @@ build/*
 *.exe
 *.out
 *.app
+main
 
 # ctags
 tags

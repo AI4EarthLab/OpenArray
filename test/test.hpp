@@ -172,7 +172,7 @@ void test_update_ghost() {
 
 	ap->get_partition()->set_stencil_type(STENCIL_BOX);
 
-	vector<int> reqs;
+	vector<MPI_Request> reqs;
 	oa::funcs::update_ghost_start(ap, reqs, -1);
 	oa::funcs::update_ghost_end(reqs);
 

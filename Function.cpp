@@ -252,7 +252,7 @@ namespace oa {
       return ap;
     }
 
-    void update_ghost_start(ArrayPtr ap, vector<int> &reqs, int direction) {
+    void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction) {
 
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();
@@ -515,7 +515,7 @@ namespace oa {
       }
     }
 
-    void update_ghost_end(vector<int> &reqs) {
+    void update_ghost_end(vector<MPI_Request> &reqs) {
       //cout<<reqs.size()<<endl;
       if (reqs.size() > 0) {
         MPI_Waitall(reqs.size(), reqs.data(), MPI_STATUSES_IGNORE);
