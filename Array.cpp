@@ -153,6 +153,16 @@ Box Array::get_corners() const{
 	return m_corners;
 }
 
+Shape Array::buffer_shape() {
+	int sw = m_par_ptr->get_stencil_width();
+	return m_corners.shape(sw);
+}
+
+int Array::buffer_size() {
+	int sw = m_par_ptr->get_stencil_width();
+	return m_corners.size(sw);
+}
+
 // return box shape in each process
 Shape Array::local_shape() {
 	Box box = get_corners();

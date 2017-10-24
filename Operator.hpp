@@ -4,14 +4,16 @@
 #include "NodePool.hpp"
 #include "NodeDesc.hpp"
 
-namespace oa{
-  namespace ops{
+namespace oa {
+  namespace ops {
 
     template<class T>
-    NodePtr new_seq_scalar_node(T val){
-      return(NodePool::global()->get_seq_scalar(val));
+    NodePtr new_seq_scalar_node(MPI_Comm comm, T val){
+      return(NodePool::global()->get_seq_scalar(comm, val));
     }
     
+    NodePtr new_node(const ArrayPtr &ap);
+
     NodePtr new_node(NodeType type, NodePtr u, NodePtr v);
 
     NodePtr new_node(NodeType type, NodePtr u);

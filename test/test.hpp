@@ -182,16 +182,21 @@ void test_update_ghost() {
 	oa::utils::mpi_order_end(MPI_COMM_WORLD);
 }
 
-void test_operator(){
-  //NodePtr ap = oa::ops::new_seq_scalar_node(3);
-  std::cout<<"int size: "<<dtype<int>::size<<std::endl;
+void test_operator() {
+  NodePtr np1 = oa::ops::new_seq_scalar_node(MPI_COMM_SELF, 3);
+  np1->display("===A===");
+  
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+  NodePtr np2 = oa::ops::new_node(ap);
+  np2->display("===B===");
+  /*std::cout<<"int size: "<<dtype<int>::size<<std::endl;
   std::cout<<"bool size: "<<dtype<bool>::size<<std::endl;
   std::cout<<"double size: "<<dtype<double>::size<<std::endl;
 
   std::cout<<"int type: "<<dtype<int>::type<<std::endl;
   std::cout<<"bool type: "<<dtype<bool>::type<<std::endl;
   std::cout<<"double type: "<<dtype<double>::type<<std::endl;
-  
+  */
   //ap->get_data()->display("======A======");
 }
 #endif
