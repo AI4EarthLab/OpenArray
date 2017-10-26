@@ -5,7 +5,7 @@ CFLAGS 		=
 
 
 OBJS 		= Range.o Box.o Partition.o Array.o \
-		  		Internal.o Function.o Operator.o \
+		  		Internal.o Function.o Kernel.o Operator.o \
 		  		Node.o IO.o \
 
 

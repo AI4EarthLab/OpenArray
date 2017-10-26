@@ -4,6 +4,10 @@
 
 #include "common.hpp"
 #include <string>
+#include <functional>
+#include <vector>
+
+typedef std::function<ArrayPtr(std::vector<ArrayPtr>&)> KernelPtr;
 
 struct NodeDesc{
   int type; //operator type
@@ -11,9 +15,11 @@ struct NodeDesc{
   bool ew; //if element-wise operation
   bool cl; //if change data layout
   std::string expr; // expression form
+  KernelPtr func;
 };
 
 typedef std::vector<NodeDesc> OpDescList;
+
 
 #endif
 

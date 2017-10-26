@@ -1,5 +1,10 @@
 
 #include "Operator.hpp"
+#include "utils/utils.hpp"
+#include "Kernel.hpp"
+#include <fstream>
+
+using namespace oa::kernel;
 
 namespace oa {
   namespace ops{
@@ -26,6 +31,8 @@ namespace oa {
       return np;
     }
 
+
+
     //! get description of an operator for a given type
     const NodeDesc& get_node_desc(NodeType type){
 
@@ -39,6 +46,7 @@ namespace oa {
 #:include "NodeType.fypp"
 #:endmute
 	  //intialize node descriptions.
+#:set id = 0
 #:for i in L
 #:mute
 #:set type = i[0]
@@ -56,17 +64,61 @@ namespace oa {
 #:set cl = 'true'
 #:endif
 #:endmute
-#:set ef = i[7]    
-         s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$"};
+#:set ef = i[7]
+#:set kernel_name = 'kernel_' + i[1]
+#:if (id > 1 and id < 6)   
+  s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
+#:else
+  s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", NULL};
+#:endif
+#:set id = id + 1
 #:endfor
 	 has_init = true;
       }
       return s.at(type);
     }
 
-    void write_graph(const NodePtr& root){
-      
+    void write_graph(const NodePtr& root, bool is_root, char const *filename) {
+      if (oa::utils::get_rank() > 0) return ;
+      static std::ofstream ofs;
+      if (is_root) {
+        ofs.open(filename);
+        ofs<<"digraph G {"<<endl;
+      }
+      int id = root->get_id();
+      ofs<<id;
+
+      const NodeDesc & nd = get_node_desc(root->type());
+      ofs<<boost::format("[label=\"[%s]\\n id=%d\"];") % nd.name % id<<endl;
+
+      for (int i = 0; i < root->input_size(); i++) {
+        write_graph(root->input(i), false, filename);
+        ofs<<id<<"->"<<root->input(i)->get_id()<<";"<<endl;
+      }
+
+      if (is_root) {
+        ofs<<"}"<<endl;
+        ofs.close();
+      }
     }
+
+    ArrayPtr eval(NodePtr A) {
+      if (A->has_data()) return A->get_data();
+
+      vector<ArrayPtr> ops_ap;
+      for (int i = 0; i < A->input_size(); i++) {
+        ops_ap.push_back(eval(A->input(i)));
+      }
+
+      const NodeDesc& nd = get_node_desc(A->type());
+      KernelPtr kernel_addr = nd.func;
+
+      ArrayPtr ap = kernel_addr(ops_ap);
+      A->set_data(ap);
+
+      return ap;
+    }
+
   }
 }
 

@@ -183,7 +183,7 @@ void test_update_ghost() {
 }
 
 void test_operator() {
-  NodePtr np1 = oa::ops::new_seq_scalar_node(MPI_COMM_SELF, 3);
+  NodePtr np1 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);
   np1->display("===A===");
   
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
@@ -199,4 +199,70 @@ void test_operator() {
   */
   //ap->get_data()->display("======A======");
 }
+
+void test_write_graph() {
+	ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
+	// ((A+B)-(C*D))/E
+	NodePtr A = oa::ops::new_node(ap1);
+	NodePtr B = oa::ops::new_node(ap2);
+	NodePtr C = oa::ops::new_node(ap3);
+	NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
+	NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);
+	NodePtr	F = oa::ops::new_node(TYPE_PLUS, A, B);
+	NodePtr G = oa::ops::new_node(TYPE_MULT, C, D);
+	NodePtr H = oa::ops::new_node(TYPE_MINUS, F, G);
+	NodePtr I = oa::ops::new_node(TYPE_DIVD, H, E);
+
+	oa::ops::write_graph(I);
+
+}
+
+void test_eval() {
+	ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3.0, 1);
+	// ((A+B)-(C*D))/E
+	NodePtr A = oa::ops::new_node(ap1);
+	NodePtr B = oa::ops::new_node(ap2);
+	NodePtr C = oa::ops::new_node(ap3);
+
+	A->display("A");
+	B->display("B");
+	C->display("C");
+
+	NodePtr	F = oa::ops::new_node(TYPE_PLUS, A, B);
+	NodePtr G = oa::ops::new_node(TYPE_PLUS, F, C);
+	ArrayPtr ans = oa::ops::eval(G);
+	ans->display("A+B+C");
+	
+	Box box1(0,2,0,2,0,0);
+	Box box2(0,2,1,3,0,0);
+	Box box3(1,3,1,3,0,0);
+	ap1 = oa::funcs::subarray(ap1, box1);
+	ap2 = oa::funcs::subarray(ap2, box2);
+	ap3 = oa::funcs::subarray(ap3, box3);
+
+	NodePtr SA = oa::ops::new_node(ap1);
+	NodePtr SB = oa::ops::new_node(ap2);
+	NodePtr SC = oa::ops::new_node(ap3);
+
+	cout<<endl;
+
+	SA->display("SA");
+	SB->display("SB");
+	SC->display("SC");
+
+	NodePtr	SF = oa::ops::new_node(TYPE_PLUS, SA, SB);
+	NodePtr SG = oa::ops::new_node(TYPE_PLUS, SF, SC);
+	ArrayPtr sans = oa::ops::eval(SG);
+	sans->display("SA+SB+SC");
+
+	//cout<<0/0<<endl;
+	//cout<<1/0<<endl;
+	cout<<0.0/0.0<<endl;
+	cout<<1.0/0.0<<endl;
+}
+
 #endif

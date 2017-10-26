@@ -47,7 +47,8 @@ namespace oa {
 		ArrayPtr seqs(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
       const vector<int> &z, int stencil_width = 1);
 
-		// according to partiton pp, transfer B to A
+		// according to partiton pp, transfer src to A
+		// A = transfer(src, pp)
 		ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp);
 
 		// get a sub Array based on Box b

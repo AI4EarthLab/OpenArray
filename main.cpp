@@ -24,9 +24,13 @@ int main(int argc, char** argv) {
   
   //test_Pool();
   //test_Array();
+
+  // mpirun -n 6 for test_transfer 
   //test_transfer();
   //test_update_ghost();
-  test_operator();
+  //test_operator();
+  //test_write_graph();
+  test_eval();
 
   MPI_Finalize();
   return 0;

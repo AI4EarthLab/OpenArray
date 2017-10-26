@@ -7,6 +7,7 @@ using namespace std;
 Node::Node() {}
 
 Node::Node(NodePtr u) {}
+
 //Node(ArrayPtr array);
 Node::~Node() {}
 
@@ -25,6 +26,10 @@ void Node::display(char const *prefix) {
     if (!m_is_seqs) m_data->display(prefix);
     else if (!rank) m_data->display(prefix);
   }
+}
+
+int Node::input_size() const {
+  return m_input.size();
 }
 
 NodePtr Node::input(int i) {
@@ -55,6 +60,10 @@ void Node::set_id(int _id) {
   id = _id;
 }
 
+int Node::get_id() const {
+  return id;
+}
+
 size_t Node::hash() {
   return m_hash;
 }
@@ -65,6 +74,10 @@ NodeType Node::type() {
 
 ArrayPtr Node::get_data() {
   return m_data;
+}
+
+bool Node::has_data() {
+  return m_data != NULL;
 }
 
 void Node::reset() {
@@ -79,12 +92,14 @@ bool Node::is_seqs() const {
   return m_is_seqs;
 }
 
-void Node::set_scalar() {
+void Node::set_scalar(void* scalar) {
   m_is_scalar = true;
+  m_data->set_scalar(scalar);
 }
 
 void Node::set_seqs() {
   m_is_seqs = true;
+  m_data->set_seqs();
 }
 
 bool Node::is_seqs_scalar() const {

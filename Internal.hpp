@@ -66,9 +66,24 @@ namespace oa {
 					}
 				}
 			}
-
-
 		}
+
+		//A = B + val
+		template<typename T1, typename T2, typename T3>
+		void buffer_plus_const(T1 *A, T2 *B, T3 val, int size) {
+			for (int i = 0; i < size; i++) {
+				A[i] = B[i] + val;
+			}
+		}
+
+		// A = U + V
+		template<typename T1, typename T2, typename T3>
+		void buffer_plus_buffer(T1 *A, T2 *U, T3 *V, int size) {
+			for (int i = 0; i < size; i++) {
+				A[i] = U[i] + V[i];
+			}
+		} 
+
 	}
 }
 

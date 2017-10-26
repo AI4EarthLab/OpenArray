@@ -187,6 +187,31 @@ int Array::rank() {
 	return m_par_ptr->rank(); 
 }
 
+bool Array::is_scalar() {
+	return m_is_scalar;
+}
+
+bool Array::is_seqs() {
+	return m_is_seqs;
+}
+
+bool Array::is_seqs_scalar() {
+	return m_is_seqs && m_is_scalar;
+}
+
+void Array::set_seqs() {
+	m_is_seqs = true;
+}
+
+void Array::set_scalar(void* scalar) {
+	m_scalar = scalar;
+	m_is_scalar = true;
+}
+
+void* Array::get_scalar() {
+	return m_scalar;
+}
+
 bool Array::has_local_data() const {
 	return local_size() > 0;
 }

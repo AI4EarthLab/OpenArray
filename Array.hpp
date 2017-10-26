@@ -24,8 +24,9 @@ class Array {
   BoxPtr m_ref_box_ptr;
   Box m_corners;
   bool m_is_scalar = false;
-  bool m_is_seq = false;
+  bool m_is_seqs = false;
   size_t m_hash;
+  void *m_scalar;
 
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
@@ -45,6 +46,11 @@ class Array {
   int size();
   int rank();
   bool is_scalar();
+  bool is_seqs();
+  bool is_seqs_scalar();
+  void set_scalar(void* scalar);
+  void* get_scalar();
+  void set_seqs();
   bool has_local_data() const;
   void set_hash(const size_t &hash);
   size_t get_hash() const;

@@ -54,7 +54,7 @@ typedef int DATA_TYPE;
 
 #include "mpi.h"
 
-template<class T>
+/*template<class T>
 struct dtype {
   const static DataType type = -1;
   const static int size = -1;
@@ -87,6 +87,41 @@ struct dtype<double>{
   const static DataType type = DATA_DOUBLE;
   const static int size = 8;
   constexpr static MPI_Datatype mpi_type = MPI_DOUBLE;
+};*/
+
+template<int N>
+struct dtype {
+  typedef int type;
+  const static int size = -1;
+  const static MPI_Datatype mpi_type = MPI_DATATYPE_NULL;
+};
+
+template<>
+struct dtype<0> {
+  typedef int type;
+  const static int size = sizeof(int);
+  const static MPI_Datatype mpi_type = MPI_INT;
+};
+
+template<>
+struct dtype<1> {
+  typedef float type;
+  const static int size = sizeof(float);
+  const static MPI_Datatype mpi_type = MPI_FLOAT;
+};
+
+template<>
+struct dtype<2> {
+  typedef double type;
+  const static int size = sizeof(double);
+  const static MPI_Datatype mpi_type = MPI_DOUBLE;
+};
+
+template<>
+struct dtype<3> {
+  typedef bool type;
+  const static int size = sizeof(bool);
+  const static MPI_Datatype mpi_type = MPI_C_BOOL;
 };
 
 #endif

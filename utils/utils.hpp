@@ -75,6 +75,8 @@ namespace oa {
       if (std::is_same<T, double>::value) return DATA_DOUBLE;
     }
 
+    DataType cast_data_type(DataType t1, DataType t2);
+
     //! display array for a buffer. 
     void print_data(void* buf, const Shape& shape, DATA_TYPE dt);
 
@@ -85,6 +87,11 @@ namespace oa {
     void mpi_order_start(MPI_Comm comm);
 
     void mpi_order_end(MPI_Comm comm);
+
+    int get_rank(MPI_Comm comm = MPI_COMM_WORLD);
+
+    int get_size(MPI_Comm comm = MPI_COMM_WORLD);
+
 
   }  
 }

@@ -32,6 +32,8 @@ public:
   
   void display(char const *prefix = "");
 
+  int input_size() const;
+  
   NodePtr input(int i);
 
   NodePtr output(int i);
@@ -45,6 +47,8 @@ public:
   void set_data(const ArrayPtr& ptr);
 
   void set_id(int _id);
+
+  int get_id() const;
   
   size_t hash();
 
@@ -52,12 +56,14 @@ public:
 
   ArrayPtr get_data();
 
+  bool has_data();
+
   void reset();
 
   // MPI_Comm_world [1x1x1]
   bool is_scalar() const;
 
-  void set_scalar();
+  void set_scalar(void* scalar);
 
   // MPI_Comm_self 
   bool is_seqs() const;
