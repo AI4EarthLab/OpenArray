@@ -36,8 +36,7 @@ public:
     ArrayPtr ap = oa::funcs::consts(comm, {1, 1, 1}, val, 0);
     p->set_type(TYPE_DATA);
     p->set_data(ap);
-    T* scalar = &val;
-    p->set_scalar((void*)scalar);
+    p->set_scalar();
     p->set_seqs();
     return p;
   }

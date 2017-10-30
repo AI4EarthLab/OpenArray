@@ -8,8 +8,8 @@ using namespace std;
 
 Array::Array(const PartitionPtr &ptr, int data_type) : 
   m_data_type(data_type), m_par_ptr(ptr) {
-	set_corners();
-	Box box = get_corners();
+	set_local_box();
+	Box box = get_local_box();
 	int sw = ptr->get_stencil_width();
 	int size = box.size(sw);		
 	switch (m_data_type) {
@@ -114,7 +114,7 @@ void Array::display(const char *prefix) {
 	}
 
 	// all process send subarray (if size > 0) to global_buf
-	Box box = get_corners();
+	Box box = get_local_box();
 	if (box.size() > 0) {
 		int xs, ys, zs, xe, ye, ze;
 		box.get_corners(xs, xe, ys, ye, zs, ze);
@@ -144,12 +144,12 @@ void Array::display(const char *prefix) {
 }
 
 // set local box in each process
-void Array::set_corners() {
+void Array::set_local_box() {
 	m_corners = m_par_ptr->get_local_box();
 }
 
 // get local box in each process
-Box Array::get_corners() const{
+Box Array::get_local_box() const{
 	return m_corners;
 }
 
@@ -165,12 +165,12 @@ int Array::buffer_size() {
 
 // return box shape in each process
 Shape Array::local_shape() {
-	Box box = get_corners();
+	Box box = get_local_box();
 	return box.shape();
 }
 
 int Array::local_size() const{
-	Box box = get_corners();
+	Box box = get_local_box();
 	return box.size();
 }
 
@@ -203,13 +203,8 @@ void Array::set_seqs() {
 	m_is_seqs = true;
 }
 
-void Array::set_scalar(void* scalar) {
-	m_scalar = scalar;
+void Array::set_scalar() {
 	m_is_scalar = true;
-}
-
-void* Array::get_scalar() {
-	return m_scalar;
 }
 
 bool Array::has_local_data() const {

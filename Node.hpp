@@ -63,7 +63,7 @@ public:
   // MPI_Comm_world [1x1x1]
   bool is_scalar() const;
 
-  void set_scalar(void* scalar);
+  void set_scalar();
 
   // MPI_Comm_self 
   bool is_seqs() const;

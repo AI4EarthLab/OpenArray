@@ -4,6 +4,7 @@
 #include "NodePool.hpp"
 #include "NodeDesc.hpp"
 #include "Function.hpp"
+#include "Internal.hpp"
 #include <vector>
 using namespace std;
 
@@ -22,8 +23,15 @@ namespace oa {
 		ArrayPtr kernel_divd(vector<ArrayPtr> &ops_ap); 
 
 		// ap = u {+ - * /} v
+#:mute
+#:include "NodeType.fypp"
+#:endmute
+#:for k in L[2:6]
+#:set name = k[1]
+#:set sy = k[2]
+		// A = U ${sy}$ V
 		template <typename T1, typename T2, typename T3>
-		ArrayPtr t_kernel_plus(vector<ArrayPtr> &ops_ap) {
+		ArrayPtr t_kernel_${name}$(vector<ArrayPtr> &ops_ap) {
 			ArrayPtr u = ops_ap[0];
 			ArrayPtr v = ops_ap[1];
 			ArrayPtr ap;
@@ -34,18 +42,20 @@ namespace oa {
 
 			if (u->is_seqs_scalar()) {
 				ap = ArrayPool::global()->get(v->get_partition(), dt);
-				oa::internal::buffer_plus_const(
+				T2 scalar = *(T2*) u->get_buffer();
+				oa::internal::buffer_${name}$_const(
 					(T1 *) ap->get_buffer(),
 					(T3 *) v->get_buffer(),
-					*(T2 *) u->get_scalar(),
+					scalar,
 					ap->buffer_size()
 				);
 			} else if (v->is_seqs_scalar()) {
 				ap = ArrayPool::global()->get(u->get_partition(), dt);
-				oa::internal::buffer_plus_const(
+				T3 scalar = *(T3*) v->get_buffer();
+				oa::internal::buffer_${name}$_const(
 					(T1 *) ap->get_buffer(),
 					(T2 *) u->get_buffer(),
-					*(T3 *) v->get_scalar(),
+					scalar,
 					ap->buffer_size()
 				);
 			} else {
@@ -55,7 +65,7 @@ namespace oa {
 
 				ap = ArrayPool::global()->get(upar, dt);
 				if (upar->equal(vpar)) {
-					oa::internal::buffer_plus_buffer(
+					oa::internal::buffer_${name}$_buffer(
 						(T1 *) ap->get_buffer(),
 						(T2 *) u->get_buffer(),
 						(T3 *) v->get_buffer(),
@@ -63,7 +73,7 @@ namespace oa {
 					);
 				} else {
 					ArrayPtr tmp = oa::funcs::transfer(v, upar);
-					oa::internal::buffer_plus_buffer(
+					oa::internal::buffer_${name}$_buffer(
 						(T1 *) ap->get_buffer(),
 						(T2 *) u->get_buffer(),
 						(T3 *) tmp->get_buffer(),
@@ -74,6 +84,7 @@ namespace oa {
 			return ap;
 		}
 
+#:endfor
 	}
 }
 

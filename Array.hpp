@@ -26,7 +26,6 @@ class Array {
   bool m_is_scalar = false;
   bool m_is_seqs = false;
   size_t m_hash;
-  void *m_scalar;
 
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
@@ -36,8 +35,8 @@ class Array {
   void set_buffer(void *buffer, int size);
   PartitionPtr get_partition() const;
   void display(const char *prefix = "");
-  void set_corners();
-  Box get_corners() const;
+  void set_local_box();
+  Box get_local_box() const;
   Shape buffer_shape();
   int buffer_size();
   Shape local_shape();
@@ -48,8 +47,7 @@ class Array {
   bool is_scalar();
   bool is_seqs();
   bool is_seqs_scalar();
-  void set_scalar(void* scalar);
-  void* get_scalar();
+  void set_scalar();
   void set_seqs();
   bool has_local_data() const;
   void set_hash(const size_t &hash);

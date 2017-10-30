@@ -92,9 +92,9 @@ bool Node::is_seqs() const {
   return m_is_seqs;
 }
 
-void Node::set_scalar(void* scalar) {
+void Node::set_scalar() {
   m_is_scalar = true;
-  m_data->set_scalar(scalar);
+  m_data->set_scalar();
 }
 
 void Node::set_seqs() {

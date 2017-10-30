@@ -1,65 +1,36 @@
-#:set L = &
-		 [["000", "int", "int", "int"] ,&
-			["001", "int", "int", "float"] ,&
-			["002", "int", "int", "double"] ,&
-			["003", "int", "int", "bool"] ,&
-			["010", "int", "float", "int"] ,&
-			["011", "int", "float", "float"] ,&
-			["012", "int", "float", "double"] ,&
-			["013", "int", "float", "bool"] ,&
-			["020", "int", "double", "int"] ,&
-			["021", "int", "double", "float"] ,&
-			["022", "int", "double", "double"] ,&
-			["023", "int", "double", "bool"] ,&
-			["030", "int", "bool", "int"] ,&
-			["031", "int", "bool", "float"] ,&
-			["032", "int", "bool", "double"] ,&
-			["033", "int", "bool", "bool"] ,&
-			["100", "float", "int", "int"] ,&
-			["101", "float", "int", "float"] ,&
-			["102", "float", "int", "double"] ,&
-			["103", "float", "int", "bool"] ,&
-			["110", "float", "float", "int"] ,&
-			["111", "float", "float", "float"] ,&
-			["112", "float", "float", "double"] ,&
-			["113", "float", "float", "bool"] ,&
-			["120", "float", "double", "int"] ,&
-			["121", "float", "double", "float"] ,&
-			["122", "float", "double", "double"] ,&
-			["123", "float", "double", "bool"] ,&
-			["130", "float", "bool", "int"] ,&
-			["131", "float", "bool", "float"] ,&
-			["132", "float", "bool", "double"] ,&
-			["133", "float", "bool", "bool"] ,&
-			["200", "double", "int", "int"] ,&
-			["201", "double", "int", "float"] ,&
-			["202", "double", "int", "double"] ,&
-			["203", "double", "int", "bool"] ,&
-			["210", "double", "float", "int"] ,&
-			["211", "double", "float", "float"] ,&
-			["212", "double", "float", "double"] ,&
-			["213", "double", "float", "bool"] ,&
-			["220", "double", "double", "int"] ,&
-			["221", "double", "double", "float"] ,&
-			["222", "double", "double", "double"] ,&
-			["223", "double", "double", "bool"] ,&
-			["230", "double", "bool", "int"] ,&
-			["231", "double", "bool", "float"] ,&
-			["232", "double", "bool", "double"] ,&
-			["233", "double", "bool", "bool"] ,&
-			["300", "bool", "int", "int"] ,&
-			["301", "bool", "int", "float"] ,&
-			["302", "bool", "int", "double"] ,&
-			["303", "bool", "int", "bool"] ,&
-			["310", "bool", "float", "int"] ,&
-			["311", "bool", "float", "float"] ,&
-			["312", "bool", "float", "double"] ,&
-			["313", "bool", "float", "bool"] ,&
-			["320", "bool", "double", "int"] ,&
-			["321", "bool", "double", "float"] ,&
-			["322", "bool", "double", "double"] ,&
-			["323", "bool", "double", "bool"] ,&
-			["330", "bool", "bool", "int"] ,&
-			["331", "bool", "bool", "float"] ,&
-			["332", "bool", "bool", "double"] ,&
-			["333", "bool", "bool", "bool"]]
+#:set T = &
+			 [[0,  'int', 		'int', 		'int'] 		,&
+				[10, 'float', 	'int', 		'float'] 	,&
+				[12, 'float', 	'float', 	'int'] 		,&
+				[13, 'float', 	'float', 	'float']	,&
+				[20, 'double', 	'int', 		'double']	,&
+				[23, 'double', 	'float', 	'double']	,&
+				[24, 'double', 	'double', 'int']		,&
+				[25, 'double', 	'double', 'float']	,&
+				[26, 'double', 	'double', 'double']]
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				

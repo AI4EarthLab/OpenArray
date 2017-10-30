@@ -117,16 +117,18 @@ void test_Pool() {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	ap->display("Array seqs");
-	/*
-	ap = oa::funcs::consts(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4}, 1, 1);
-	if (rank == 0) ap->get_partition()->display("Array_Consts_m2");
-
-	ap = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 4}, 1);
-	if (rank == 0) ap->get_partition()->display("Array_ones");
 	
-	ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1);
-	if (rank == 0) ap->get_partition()->display("Array_zeros");	
-	*/
+	ap = oa::funcs::consts(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4}, 1, 1);
+	ap->display("Array_Consts_m2");
+
+	ap = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 4}, 1, 2);
+	ap->display("Array_ones");
+	
+	ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+	ap->display("Array_zeros");	
+
+	ap = oa::funcs::rand(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+	ap->display("rand");
 }
 
 void test_sub() {
@@ -160,7 +162,7 @@ void test_update_ghost() {
 	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
 	oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 1);
 	int rk = ap->rank();
-	//int size = ap->get_corners().size(1);
+	//int size = ap->get_local_box().size(1);
 	//oa::internal::set_buffer_consts((int*)ap->get_buffer(), size, rk);
 
 	ap->display("A");
@@ -261,8 +263,15 @@ void test_eval() {
 
 	//cout<<0/0<<endl;
 	//cout<<1/0<<endl;
-	cout<<0.0/0.0<<endl;
-	cout<<1.0/0.0<<endl;
+
+	NodePtr seq_B = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
+	NodePtr seq_C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);
+
+	SF = oa::ops::new_node(TYPE_PLUS, SA, seq_B);
+	SG = oa::ops::new_node(TYPE_MINUS, SF, seq_C);
+	sans = oa::ops::eval(SG);
+	cout<<"-----------------"<<endl;
+	sans->display("SA+seq_B-seq_C");
 }
 
 #endif
