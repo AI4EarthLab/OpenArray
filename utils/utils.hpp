@@ -76,12 +76,11 @@ namespace oa {
       if (std::is_same<T, double>::value) return DATA_DOUBLE;
     }
 
-
     template<class T>
     arma::Cube<T> make_cube(const Shape& shape, void* buf = NULL){
       if(buf != NULL){
 	return arma::Cube<T>((T*)buf, shape[0], shape[1], shape[2],
-			     false, true);	
+			     false, false);	
       }
       return arma::Cube<T>(shape[0], shape[1], shape[2]);
     };
@@ -127,6 +126,9 @@ namespace oa {
       const static int size = 8;
     };
 
+    DataType cast_data_type(DataType t1, DataType t2);
+
+
     //! display array for a buffer. 
     void print_data(void* buf, const Shape& shape, DATA_TYPE dt);
 
@@ -138,7 +140,11 @@ namespace oa {
 
     void mpi_order_end(MPI_Comm comm);
 
-    
+
+    int get_rank(MPI_Comm comm = MPI_COMM_WORLD);
+
+    int get_size(MPI_Comm comm = MPI_COMM_WORLD);
+
   }  
 }
 

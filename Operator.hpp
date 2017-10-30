@@ -8,8 +8,8 @@ namespace oa {
   namespace ops {
 
     template<class T>
-    NodePtr new_seq_scalar_node(MPI_Comm comm, T val){
-      return(NodePool::global()->get_seq_scalar(comm, val));
+    NodePtr new_seqs_scalar_node(MPI_Comm comm, T val){
+      return(NodePool::global()->get_seqs_scalar(comm, val));
     }
     
     NodePtr new_node(const ArrayPtr &ap);
@@ -20,7 +20,10 @@ namespace oa {
 
     const NodeDesc& get_node_desc(NodeType type);
 
-    void write_graph(const NodePtr& root);
+    void write_graph(const NodePtr& root, bool is_root = true,
+      char const *filename = "graph.dot");
+
+    ArrayPtr eval(NodePtr A);
   }
 }
 

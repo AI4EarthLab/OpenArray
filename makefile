@@ -1,15 +1,17 @@
 
 FC = mpif90
 CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} \
-	  -I${ARMA_INC} -I${ARMA_LIB}
+	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC}
+
 
 CXX = mpicxx --std=c++0x -I${PNETCDF_INC} -L${PNETCDF_LIB} \
-		-I${ARMA_INC} -I${ARMA_LIB}
+		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC}
+
+OBJS 		= Range.o Box.o Partition.o Array.o \
+		  Internal.o Function.o Kernel.o Operator.o \
+		  Node.o IO.o \
 
 CFLAGS	=
-OBJS = Range.o Box.o Partition.o Array.o \
-       Internal.o Function.o Operator.o \
-       Node.o IO.o \
 
 
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
@@ -33,7 +35,8 @@ all:
 	cp build/main ./
 
 main: ${OBJ_MAIN}
-	-${CXX} -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf
+	-${CXX} -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf \
+	-lboost_program_options -lboost_filesystem -lboost_system
 
 small:
 	@make all

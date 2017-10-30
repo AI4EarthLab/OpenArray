@@ -59,9 +59,9 @@ namespace oa{
 
       MPI_Offset start[3], count[3];;
 
-      start[2] = A->get_corners().get_range_x().get_lower();
-      start[1] = A->get_corners().get_range_y().get_lower();
-      start[0] = A->get_corners().get_range_z().get_lower();
+      start[2] = A->get_local_box().get_range_x().get_lower();
+      start[1] = A->get_local_box().get_range_y().get_lower();
+      start[0] = A->get_local_box().get_range_z().get_lower();
       
       count[2] = A->local_shape()[0];
       count[1] = A->local_shape()[1];
@@ -100,7 +100,7 @@ namespace oa{
 	break;
       case(DATA_INT):
 	c_int = utils::make_cube<int>(A->buffer_shape(),
-				      A->get_buffer());
+				      A->get_buffer())
 	  (arma::span(sw, bsx-sw-1),
 	   arma::span(sw, bsy-sw-1),
 	   arma::span(sw, bsz-sw-1));
@@ -109,7 +109,10 @@ namespace oa{
 				     count,
 				     c_int.memptr());
 	CHECK_ERR(err);
-	// oa::utils::mpi_order_start(MPI_COMM_WORLD);
+
+	// oa::utils::mpi_order_start(MPI_COMM_WORLD);	
+	// std::cout<<c_int;
+
 	// printf("=================");
 	// oa::utils::print_data(A->get_buffer(), t2.memptr(), dt);
 	// oa::utils::mpi_order_end(MPI_COMM_WORLD);
@@ -135,7 +138,8 @@ namespace oa{
     ArrayPtr load(const std::string& filename, 
 		  const std::string& varname,
 		  const MPI_Comm& comm){
-      assert(boost::filesystem::exists(filename.c_str()));
+      
+      //assert(boost::filesystem::exists(filename.c_str()));
 
       int status;
       int ncid, varid;
@@ -174,45 +178,56 @@ namespace oa{
       MPI_Offset starts[3];
       MPI_Offset counts[3];
 
-      cube_int ci1, ci2;
-      cube_float cf1, cf2;
-      cube_double cd1, cd2;
+      cube_int c1_int, c2_int;
+      cube_float c1_float, c2_float;
+      cube_double c1_double, c2_double;
 
       void* buf;
       int bsx, bsy, bsz;
       
       switch(var_type){
-      case NC_INT:
-	A = oa::funcs::zeros(comm, {gx, gy, gz}, sw, DATA_INT);
-	A->get_corners().get_corners(xs, xe, ys, ye, zs, ze);
+#:for T in [['NC_INT', 'DATA_INT', 'int'], &
+	['NC_FLOAT', 'DATA_FLOAT', 'float'],	&
+	  ['NC_DOUBLE', 'DATA_DOUBLE', 'double']] 	  
+      case ${T[0]}$:
+	A = oa::funcs::zeros(comm, {int(gx), int(gy), int(gz)}, sw, ${T[1]}$);
+	A->get_local_box().get_corners(xs, xe, ys, ye, zs, ze);
 	
-	starts[0] = xs;
+	starts[0] = zs;
 	starts[1] = ys;
-	starts[2] = zs;
+	starts[2] = xs;
 
-	counts[0] = xe-xs;
+	counts[0] = ze-zs; 
 	counts[1] = ye-ys;
-	counts[2] = ze-zs;
+	counts[2] = xe-xs;
+
+	c1_${T[2]}$ = oa::utils::make_cube<${T[2]}$>(A->buffer_shape(),
+					A->get_buffer());
 	
-	ci1 = oa::utils::make_cube<int>(A->buffer_shape(),
-					      A->get_buffer());;
-	ci2 = oa::utils::make_cube<int>(A->local_shape());
+        c2_${T[2]}$  = oa::utils::make_cube<${T[2]}$>(A->local_shape());
 	
-	status = ncmpi_get_vars_int_all(ncid, varid,
-					starts, counts, NULL, ci2.memptr());
+	status = ncmpi_get_vara_${T[2]}$_all(ncid, varid,
+					starts, counts,
+					c2_${T[2]}$.memptr());
 
 	bsx = A->buffer_shape()[0];
 	bsy = A->buffer_shape()[1];
 	bsz = A->buffer_shape()[2];
-
-	ci1(arma::span(sw, bsx-sw-1),
+	
+	c1_${T[2]}$(arma::span(sw, bsx-sw-1),
 	    arma::span(sw, bsy-sw-1),
-	    arma::span(sw, bsz-sw-1)) = ci2;
+	    arma::span(sw, bsz-sw-1)) = c2_${T[2]}$;
+
 	CHECK_ERR(status);
 	break;
+#:endfor
       default:
 	break;
       }
+
+      ncmpi_close(ncid);
+				     //A->display("====AAAA====");
+      return A;
     };
   }
 }

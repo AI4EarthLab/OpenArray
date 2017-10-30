@@ -20,6 +20,10 @@ namespace oa {
       }
     }
 
+    DataType cast_data_type(DataType t1, DataType t2) {
+      return std::max(t1, t2);
+    }
+
     int data_size(int data_type) {
       int ds[3] = {4, 4, 8};
       return ds[data_type];
@@ -54,6 +58,18 @@ namespace oa {
       MPI_Comm_size(comm, &size);
       for (int i = rank; i < size; i++)
         MPI_Barrier(comm);
+    }
+
+    int get_rank(MPI_Comm comm) {
+      int rank;
+      MPI_Comm_rank(comm, &rank);
+      return rank;
+    }
+
+    int get_size(MPI_Comm comm) {
+      int size;
+      MPI_Comm_size(comm, &size);
+      return size;
     }
 	}
 }

@@ -59,8 +59,8 @@ class ArrayPool{
   }
 
   template<class T>
-  ArrayPtr get_seq_scalar(T val) {
-    return get(MPI_COMM_WORLD, {1,1,1}, 0, DATA_INT);
+  ArrayPtr get_seqs_scalar(T val) {
+    return get(MPI_COMM_SELF, {1,1,1}, 0, DATA_INT);
   }
 
   // get an ArrayPtr from m_pools based on hash created by key:

@@ -118,16 +118,18 @@ void test_Pool() {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	ap->display("Array seqs");
-	/*
-	ap = oa::funcs::consts(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4}, 1, 1);
-	if (rank == 0) ap->get_partition()->display("Array_Consts_m2");
-
-	ap = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 4}, 1);
-	if (rank == 0) ap->get_partition()->display("Array_ones");
 	
-	ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1);
-	if (rank == 0) ap->get_partition()->display("Array_zeros");	
-	*/
+	ap = oa::funcs::consts(MPI_COMM_WORLD, {2, 2}, {2, 2}, {4}, 1, 1);
+	ap->display("Array_Consts_m2");
+
+	ap = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 4}, 1, 2);
+	ap->display("Array_ones");
+	
+	ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+	ap->display("Array_zeros");	
+
+	ap = oa::funcs::rand(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+	ap->display("rand");
 }
 
 void test_sub() {
@@ -161,7 +163,7 @@ void test_update_ghost() {
 	ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
 	oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 1);
 	int rk = ap->rank();
-	//int size = ap->get_corners().size(1);
+	//int size = ap->get_local_box().size(1);
 	//oa::internal::set_buffer_consts((int*)ap->get_buffer(), size, rk);
 
 	ap->display("A");
@@ -184,7 +186,7 @@ void test_update_ghost() {
 }
 
 void test_operator() {
-  NodePtr np1 = oa::ops::new_seq_scalar_node(MPI_COMM_SELF, 3);
+  NodePtr np1 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);
   np1->display("===A===");
   
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
@@ -201,9 +203,86 @@ void test_operator() {
   //ap->get_data()->display("======A======");
 }
 
+
 void test_io(){
   ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {4,4,1}, 1);
-  A->display("====A===");
+  A->display("====A====");
   oa::io::save(A, "A.nc", "data");
+
+  ArrayPtr B = oa::io::load("A.nc", "data", MPI_COMM_WORLD);
+  B->display("====B====");
 }
+
+void test_write_graph() {
+	ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
+	// ((A+B)-(C*D))/E
+	NodePtr A = oa::ops::new_node(ap1);
+	NodePtr B = oa::ops::new_node(ap2);
+	NodePtr C = oa::ops::new_node(ap3);
+	NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
+	NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);
+	NodePtr	F = oa::ops::new_node(TYPE_PLUS, A, B);
+	NodePtr G = oa::ops::new_node(TYPE_MULT, C, D);
+	NodePtr H = oa::ops::new_node(TYPE_MINUS, F, G);
+	NodePtr I = oa::ops::new_node(TYPE_DIVD, H, E);
+
+	oa::ops::write_graph(I);
+
+}
+
+void test_eval() {
+	ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3.0, 1);
+	// ((A+B)-(C*D))/E
+	NodePtr A = oa::ops::new_node(ap1);
+	NodePtr B = oa::ops::new_node(ap2);
+	NodePtr C = oa::ops::new_node(ap3);
+
+	A->display("A");
+	B->display("B");
+	C->display("C");
+
+	NodePtr	F = oa::ops::new_node(TYPE_PLUS, A, B);
+	NodePtr G = oa::ops::new_node(TYPE_PLUS, F, C);
+	ArrayPtr ans = oa::ops::eval(G);
+	ans->display("A+B+C");
+	
+	Box box1(0,2,0,2,0,0);
+	Box box2(0,2,1,3,0,0);
+	Box box3(1,3,1,3,0,0);
+	ap1 = oa::funcs::subarray(ap1, box1);
+	ap2 = oa::funcs::subarray(ap2, box2);
+	ap3 = oa::funcs::subarray(ap3, box3);
+
+	NodePtr SA = oa::ops::new_node(ap1);
+	NodePtr SB = oa::ops::new_node(ap2);
+	NodePtr SC = oa::ops::new_node(ap3);
+
+	cout<<endl;
+
+	SA->display("SA");
+	SB->display("SB");
+	SC->display("SC");
+
+	NodePtr	SF = oa::ops::new_node(TYPE_PLUS, SA, SB);
+	NodePtr SG = oa::ops::new_node(TYPE_PLUS, SF, SC);
+	ArrayPtr sans = oa::ops::eval(SG);
+	sans->display("SA+SB+SC");
+
+	//cout<<0/0<<endl;
+	//cout<<1/0<<endl;
+
+	NodePtr seq_B = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
+	NodePtr seq_C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);
+
+	SF = oa::ops::new_node(TYPE_PLUS, SA, seq_B);
+	SG = oa::ops::new_node(TYPE_MINUS, SF, seq_C);
+	sans = oa::ops::eval(SG);
+	cout<<"-----------------"<<endl;
+	sans->display("SA+seq_B-seq_C");
+}
+
 #endif

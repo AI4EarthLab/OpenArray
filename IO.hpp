@@ -4,6 +4,7 @@
 
 #include "Array.hpp"
 #include <string>
+#include "mpi.h"
 
 namespace oa{
   namespace io{
@@ -12,7 +13,8 @@ namespace oa{
 	      const std::string& varname);
     
     ArrayPtr load(const std::string& filename,
-		  const std::string& varname);
+		  const std::string& varname,
+		  const MPI_Comm& comm);
   }
 }
 #endif

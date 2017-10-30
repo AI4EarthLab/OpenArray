@@ -32,6 +32,8 @@ public:
   
   void display(char const *prefix = "");
 
+  int input_size() const;
+  
   NodePtr input(int i);
 
   NodePtr output(int i);
@@ -45,12 +47,16 @@ public:
   void set_data(const ArrayPtr& ptr);
 
   void set_id(int _id);
+
+  int get_id() const;
   
   size_t hash();
 
   NodeType type();
 
   ArrayPtr get_data();
+
+  bool has_data();
 
   void reset();
 

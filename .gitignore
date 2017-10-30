@@ -40,3 +40,10 @@ tags
 
 # debug
 debug/*
+
+# png
+*.dot
+*.png
+
+# tools
+tools/*
