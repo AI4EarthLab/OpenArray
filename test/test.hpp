@@ -8,6 +8,7 @@
 #include "../Function.hpp"
 #include "../Internal.hpp"
 #include "../Operator.hpp"
+#include "../IO.hpp"
 
 #include <assert.h>
 
@@ -198,5 +199,11 @@ void test_operator() {
   std::cout<<"double type: "<<dtype<double>::type<<std::endl;
   */
   //ap->get_data()->display("======A======");
+}
+
+void test_io(){
+  ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {4,4,1}, 1);
+  A->display("====A===");
+  oa::io::save(A, "A.nc", "data");
 }
 #endif

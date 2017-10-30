@@ -52,42 +52,11 @@ typedef int DATA_TYPE;
 
 #define NUM_NODE_TYPES ${len(L)}$
 
-#include "mpi.h"
+#include <armadillo>
 
-template<class T>
-struct dtype {
-  const static DataType type = -1;
-  const static int size = -1;
-  constexpr static MPI_Datatype mpi_type = MPI_DATATYPE_NULL;
-};
-
-template<>
-struct dtype<bool>{
-  const static DataType type = DATA_BOOL;
-  const static int size = 2;
-  constexpr static MPI_Datatype mpi_type = MPI_C_BOOL;
-};
-
-template<>
-struct dtype<int>{
-  const static DataType type = DATA_INT;
-  const static int size = 4;
-  constexpr static MPI_Datatype mpi_type = MPI_INT;
-};
-
-template<>
-struct dtype<float>{
-  const static DataType type = DATA_FLOAT;
-  const static int size = 4;
-  constexpr static MPI_Datatype mpi_type = MPI_FLOAT;
-};
-
-template<>
-struct dtype<double>{
-  const static DataType type = DATA_DOUBLE;
-  const static int size = 8;
-  constexpr static MPI_Datatype mpi_type = MPI_DOUBLE;
-};
+typedef arma::Cube<int>  cube_int;
+typedef arma::Cube<float> cube_float;
+typedef arma::Cube<double> cube_double;
 
 #endif
 

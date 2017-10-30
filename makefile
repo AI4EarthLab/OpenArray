@@ -1,18 +1,21 @@
-FC 			= mpif90
-CC 			= mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB}
-CXX 		= mpicxx
-CFLAGS 		=
+
+FC = mpif90
+CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} \
+	  -I${ARMA_INC} -I${ARMA_LIB}
+
+CXX = mpicxx --std=c++0x -I${PNETCDF_INC} -L${PNETCDF_LIB} \
+		-I${ARMA_INC} -I${ARMA_LIB}
+
+CFLAGS	=
+OBJS = Range.o Box.o Partition.o Array.o \
+       Internal.o Function.o Operator.o \
+       Node.o IO.o \
 
 
-OBJS 		= Range.o Box.o Partition.o Array.o \
-		  		Internal.o Function.o Operator.o \
-		  		Node.o IO.o \
-
-
-OBJS_UTILS	= $(addprefix ./utils/, calcTime.o gettimeofday.o \
+OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
 			      utils.o)
 
-OBJ_MAIN 	= ${OBJS} ${OBJS_UTILS} main.o
+OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} main.o
 
 .DEFAULT_GOAL := all
 

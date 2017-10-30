@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <boost/format.hpp>
 #include "../common.hpp"
+#include <armadillo>
 
 namespace oa {
   namespace utils {
@@ -75,6 +76,57 @@ namespace oa {
       if (std::is_same<T, double>::value) return DATA_DOUBLE;
     }
 
+
+    template<class T>
+    arma::Cube<T> make_cube(const Shape& shape, void* buf = NULL){
+      if(buf != NULL){
+	return arma::Cube<T>((T*)buf, shape[0], shape[1], shape[2],
+			     false, true);	
+      }
+      return arma::Cube<T>(shape[0], shape[1], shape[2]);
+    };
+
+    template<class T>
+    struct dtype {
+      const static DataType type = -1;
+      const static int size = -1;
+      static MPI_Datatype mpi_type(){
+	if(std::is_same<T, int>::value){
+	  return MPI_INT;
+	}else if(std::is_same<T, float>::value){
+	  return MPI_FLOAT;
+	}else if(std::is_same<T, double>::value){
+	  return MPI_DOUBLE;
+	}else{
+	  return MPI_DATATYPE_NULL;
+	}
+      }
+    };
+
+    template<>
+    struct dtype<bool>{
+      const static DataType type = DATA_BOOL;
+      const static int size = 2;
+    };
+
+    template<>
+    struct dtype<int>{
+      const static DataType type = DATA_INT;
+      const static int size = 4;
+    };
+
+    template<>
+    struct dtype<float>{
+      const static DataType type = DATA_FLOAT;
+      const static int size = 4;
+    };
+
+    template<>
+    struct dtype<double>{
+      const static DataType type = DATA_DOUBLE;
+      const static int size = 8;
+    };
+
     //! display array for a buffer. 
     void print_data(void* buf, const Shape& shape, DATA_TYPE dt);
 
@@ -86,6 +138,7 @@ namespace oa {
 
     void mpi_order_end(MPI_Comm comm);
 
+    
   }  
 }
 
