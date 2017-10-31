@@ -39,8 +39,8 @@ namespace oa {
       static bool has_init = false;                                            
       static OpDescList s;
       
-      if(!has_init){
-	s.resize(NUM_NODE_TYPES);
+      if (!has_init) {
+        s.resize(NUM_NODE_TYPES);
 #:mute
 #:set i = 0  
 #:include "NodeType.fypp"
@@ -67,13 +67,13 @@ namespace oa {
 #:set ef = i[7]
 #:set kernel_name = 'kernel_' + i[1]
 #:if (id > 1 and id < 6)   
-  s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
+        s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
 #:else
-  s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", NULL};
+        s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", NULL};
 #:endif
 #:set id = id + 1
 #:endfor
-	 has_init = true;
+        has_init = true;
       }
       return s.at(type);
     }
