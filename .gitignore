@@ -47,3 +47,6 @@ debug/*
 
 # tools
 tools/*
+
+# nc files
+*.nc

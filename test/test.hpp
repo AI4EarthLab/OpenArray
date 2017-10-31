@@ -204,7 +204,7 @@ void test_operator() {
 }
 
 
-void test_io(){
+void test_io() {
   ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {4,4,1}, 1);
   A->display("====A====");
   oa::io::save(A, "A.nc", "data");

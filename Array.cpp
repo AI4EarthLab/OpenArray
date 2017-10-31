@@ -75,7 +75,7 @@ void Array::display(const char *prefix) {
   int reqs_cnt = 0;
 
   // rank 0 recv & others send
-  if(my_rank == 0) {
+  if (my_rank == 0) {
     global_buf = new char[gs[0] * gs[1] * gs[2] * 
 			  oa::utils::data_size(m_data_type)];
     for(int z = 0; z < npz; ++z) {
@@ -133,7 +133,7 @@ void Array::display(const char *prefix) {
     MPI_Type_free(&mysubarray);
   }
 
-  if(my_rank == 0){
+  if (my_rank == 0){
     m_par_ptr->display(prefix);
 		
     MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);

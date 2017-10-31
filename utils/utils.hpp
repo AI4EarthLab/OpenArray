@@ -20,7 +20,7 @@ namespace oa {
       const int buf_size = M * N * P;
 
       std::string frt_str;
-      if(std::is_same<T, int>::value){
+      if (std::is_same<T, int>::value) {
         frt_str = "%10d";
       } else if (std::is_same<T, float>::value
         || std::is_same<T, double>::value) {
@@ -30,24 +30,24 @@ namespace oa {
         frt_str = "%4d";
       }
 
-      static auto abs_compare = [](T a, T b){
+      static auto abs_compare = [](T a, T b) {
         return abs(a) < abs(b);
       };
 
       T val = 1;
 
-      if(std::is_same<T, float>::value ||
+      if (std::is_same<T, float>::value ||
         std::is_same<T, double>::value) {
         T max = *std::max_element(buf, buf+buf_size, abs_compare);
 
         int factor = (int)log10(max);
 
-        if(factor > 2){
+        if (factor > 2) {
           std::cout<< " * 1E"<<factor<<std::endl;
           val  = val / pow(10, factor);
         }
 
-        if(factor <= -3){
+        if (factor <= -3) {
           std::cout<< " * 1E"<<factor-1<<std::endl;
           val  = val / pow(10, factor-1);
         }
@@ -77,10 +77,10 @@ namespace oa {
     }
 
     template<class T>
-    arma::Cube<T> make_cube(const Shape& shape, void* buf = NULL){
-      if(buf != NULL){
-	return arma::Cube<T>((T*)buf, shape[0], shape[1], shape[2],
-			     false, false);	
+    arma::Cube<T> make_cube(const Shape& shape, void* buf = NULL) {
+      if (buf != NULL) {
+        return arma::Cube<T>((T*)buf, shape[0], shape[1], shape[2],
+          false, false);	
       }
       return arma::Cube<T>(shape[0], shape[1], shape[2]);
     };
@@ -89,45 +89,44 @@ namespace oa {
     struct dtype {
       const static DataType type = -1;
       const static int size = -1;
-      static MPI_Datatype mpi_type(){
-	if(std::is_same<T, int>::value){
-	  return MPI_INT;
-	}else if(std::is_same<T, float>::value){
-	  return MPI_FLOAT;
-	}else if(std::is_same<T, double>::value){
-	  return MPI_DOUBLE;
-	}else{
-	  return MPI_DATATYPE_NULL;
-	}
+      static MPI_Datatype mpi_type() {
+        if (std::is_same<T, int>::value) {
+          return MPI_INT;
+        } else if (std::is_same<T, float>::value) {
+          return MPI_FLOAT;
+        } else if (std::is_same<T, double>::value) {
+          return MPI_DOUBLE;
+        } else {
+          return MPI_DATATYPE_NULL;
+        }
       }
     };
 
     template<>
     struct dtype<bool>{
       const static DataType type = DATA_BOOL;
-      const static int size = 2;
+      const static int size = sizeof(bool);
     };
 
     template<>
     struct dtype<int>{
       const static DataType type = DATA_INT;
-      const static int size = 4;
+      const static int size = sizeof(int);
     };
 
     template<>
     struct dtype<float>{
       const static DataType type = DATA_FLOAT;
-      const static int size = 4;
+      const static int size = sizeof(float);
     };
 
     template<>
     struct dtype<double>{
       const static DataType type = DATA_DOUBLE;
-      const static int size = 8;
+      const static int size = sizeof(double);
     };
 
     DataType cast_data_type(DataType t1, DataType t2);
-
 
     //! display array for a buffer. 
     void print_data(void* buf, const Shape& shape, DATA_TYPE dt);
