@@ -21,6 +21,9 @@ private:
   NodeType m_type;
   bool m_is_seqs = false;
   bool m_is_scalar = false;
+  int m_depth = 0;
+  Shape m_global_shape = {1, 1, 1};
+  int m_data_type;
   //BoxPtr ref;
 
 public:
@@ -72,6 +75,20 @@ public:
 
   // MPI_Comm_self & [1x1x1]
   bool is_seqs_scalar() const;
+
+  void set_depth(int d);
+
+  void set_depth(int left_child, int right_child);
+
+  int get_depth() const;
+
+  void set_shape(const Shape &s);
+
+  Shape shape();
+
+  void set_data_type(int dt);
+
+  int get_data_type() const;
 
 };
 

@@ -3,6 +3,7 @@
 #include "utils/utils.hpp"
 #include "Kernel.hpp"
 #include <fstream>
+#include <sstream>
 
 using namespace oa::kernel;
 
@@ -13,6 +14,8 @@ namespace oa {
       NodePtr np = NodePool::global()->get();
       np->set_type(TYPE_DATA);
       np->set_data(ap);
+      np->set_data_type(ap->get_data_type());
+      np->set_shape(ap->shape());
       return np;
     }
 
@@ -21,6 +24,26 @@ namespace oa {
       np->set_type(type);
       np->add_input(0, u);
       np->add_input(1, v);
+      int dt = oa::utils::cast_data_type(
+        u->get_data_type(),
+        v->get_data_type());
+      
+      const NodeDesc &nd = get_node_desc(type);
+      if (nd.ew) {
+        np->set_depth(u->get_depth(), v->get_depth());
+        // U and V must have same shape
+        if (u->is_seqs_scalar()) np->set_shape(v->shape());
+        else if (v->is_seqs_scalar()) np->set_shape(u->shape());
+        else {
+          assert(oa::utils::is_equal_shape(u->shape(), v->shape()));
+          np->set_shape(u->shape());
+        }
+        np->set_data_type(dt);
+      } else {
+        // to do
+        // set data_type && shape
+        np->set_data_type(dt);
+      }
       return np;
     }
 
@@ -28,6 +51,15 @@ namespace oa {
       NodePtr np = NodePool::global()->get();
       np->set_type(type);
       np->add_input(0, u);
+
+      const NodeDesc &nd = get_node_desc(type);
+      if (nd.ew) {
+        np->set_depth(u->get_depth());
+        np->set_shape(u->shape());
+        np->set_data_type(u->get_data_type());
+      } else {
+        // to do set data_type && shape
+      }
       return np;
     }
 
@@ -51,6 +83,7 @@ namespace oa {
 #:mute
 #:set type = i[0]
 #:set name = i[1]
+#:set sy = i[2]
 #:set ew = i[5]
 #:if ew == 'F'
 #:set ew = 'false'
@@ -67,9 +100,9 @@ namespace oa {
 #:set ef = i[7]
 #:set kernel_name = 'kernel_' + i[1]
 #:if (id > 1 and id < 6)   
-        s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
+        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
 #:else
-        s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", NULL};
+        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL};
 #:endif
 #:set id = id + 1
 #:endfor
@@ -117,6 +150,79 @@ namespace oa {
       A->set_data(ap);
 
       return ap;
+    }
+
+    void gen_kernels(NodePtr A, bool is_root, MPI_Comm comm) {
+      if (oa::utils::get_rank(comm)) return ;
+      if (A->has_data()) return ;
+
+      const NodeDesc &nd = get_node_desc(A->type());
+      if (!nd.ew) {
+        for (int i = 0; i < A->input_size(); i++) {
+          gen_kernels(A->input(i), true);
+        }
+        return ;
+      }
+
+      if (is_root && A->get_depth() >= 2) {
+        stringstream ss = tree_to_string(A);
+        cout<<ss.str()<<endl;
+        stringstream hash;
+        tree_to_string_stack(A, hash);
+        cout<<hash.str()<<endl;
+      }
+
+      for (int i = 0; i < A->input_size(); i++) {
+        gen_kernels(A->input(i), false);
+      }
+    }
+
+    // example: (A1+S2)*A3
+    stringstream tree_to_string(NodePtr A) {
+      stringstream ss;
+      const NodeDesc &nd = get_node_desc(A->type());
+      
+      // only data or non-element-wise
+      if (A->has_data() || !nd.ew) {
+        if (A->is_seqs_scalar()) ss<<"S";
+        else ss<<"A";
+        ss<<A->get_data_type();
+        return ss;
+      }
+
+      stringstream child[2];
+      for (int i = 0; i < A->input_size(); i++) {
+        child[i] = tree_to_string(A->input(i));
+      }
+
+      switch(A->input_size()) {
+        case 1:
+          ss<<nd.sy<<"("<<child[0].str()<<")";
+          break;
+        case 2:
+          ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+          break;
+      }
+
+      return ss;
+    }
+
+    void tree_to_string_stack(NodePtr A, stringstream &ss) {
+      const NodeDesc &nd = get_node_desc(A->type());
+
+      if (A->has_data() || !nd.ew) {
+        if (A->is_seqs_scalar()) ss<<"S";
+        else ss<<"A";
+        ss<<A->get_data_type();
+        return ;
+      }
+
+      for (int i = 0; i < A->input_size(); i++) {
+        tree_to_string_stack(A->input(i), ss);
+      }
+      ss<<nd.sy;
+
+      return ;
     }
 
   }

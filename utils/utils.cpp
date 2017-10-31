@@ -71,5 +71,10 @@ namespace oa {
       MPI_Comm_size(comm, &size);
       return size;
     }
+
+    bool is_equal_shape(const Shape& u, const Shape& v) {
+      return u[0] == v[0] && u[1] == v[1] && u[2] == v[2];
+    }
+
 	}
 }

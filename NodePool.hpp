@@ -38,6 +38,8 @@ public:
     p->set_data(ap);
     p->set_scalar();
     p->set_seqs();
+    p->set_data_type(ap->get_data_type());
+    p->set_shape(ap->shape());
     return p;
   }
   

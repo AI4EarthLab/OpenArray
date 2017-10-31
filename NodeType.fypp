@@ -16,7 +16,7 @@
        ["TYPE_PLUS",    "plus",    "+",    	"A",	"A", "T", "F",  "A+B"],&
        ["TYPE_MINUS",   "minus",   "-",   	"A",	"A", "T", "F",  "A-B"],&
        ["TYPE_MULT",    "mult",    "*",   	"A",	"A", "T", "F",  "A*B"],&
-       ["TYPE_DIVD",    "divd",    "/",   	"A",	"A", "T", "F",  "A/B"],&
+       ["TYPE_DIVD",    "divd",    "/",   	"A",	"A", "F", "F",  "A/B"],&
        ["TYPE_GT",      "gt",      ">",   	"B",	"A", "F", "F",  "A>B"],&
        ["TYPE_GE",      "ge",      ">=",  	"B",	"A", "F", "F",  "A>=B"],&
        ["TYPE_LT",      "lt",      "<",   	"B",	"A", "F", "F",  "A<B"],&

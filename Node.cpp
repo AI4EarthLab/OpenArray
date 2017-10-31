@@ -105,3 +105,31 @@ void Node::set_seqs() {
 bool Node::is_seqs_scalar() const {
   return m_is_seqs && m_is_scalar;
 }
+
+void Node::set_depth(int child_depth) {
+  m_depth = child_depth + 1;
+}
+
+void Node::set_depth(int l, int r) {
+  m_depth = max(l, r) + 1;
+}
+
+int Node::get_depth() const {
+  return m_depth;
+}
+
+void Node::set_shape(const Shape &s) {
+  m_global_shape = s;
+}
+
+Shape Node::shape() {
+  return m_global_shape;
+}
+
+void Node::set_data_type(int dt) {
+  m_data_type = dt;
+}
+
+int Node::get_data_type() const {
+  return m_data_type;
+}

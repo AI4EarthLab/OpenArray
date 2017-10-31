@@ -63,6 +63,9 @@ namespace oa {
 				PartitionPtr vpar = v->get_partition();
 				assert(upar->get_comm() == vpar->get_comm());
 
+/*				// U and V must have same shape
+				assert(oa::utils::is_equal_shape(upar->shape(), vpar->shape()));
+*/
 				ap = ArrayPool::global()->get(upar, dt);
 				if (upar->equal(vpar)) {
 					oa::internal::buffer_${name}$_buffer(

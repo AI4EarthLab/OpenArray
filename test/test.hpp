@@ -286,7 +286,7 @@ void test_eval() {
 }
 
 void test_kernel_fusion() {
-	ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	/*ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
 	ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
 	ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
 	// ((A+B)-(C*D))/E
@@ -300,12 +300,42 @@ void test_kernel_fusion() {
 	NodePtr H = oa::ops::new_node(TYPE_MINUS, F, G);
 	NodePtr I = oa::ops::new_node(TYPE_DIVD, H, E);
 
+	oa::ops::gen_kernels(I);
+
 	ArrayPtr ans = oa::ops::eval(I);
 	A->display("A");
 	B->display("B");
 	C->display("C");
 	D->display("D");
 	E->display("E");
-	ans->display("((A+B)-(C*D)) / E");
+	ans->display("((A+B)-(C*D)) / E");*/
+
+
+	ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+	ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
+	// (A+B)*C
+	NodePtr A = oa::ops::new_node(ap1);
+	NodePtr B = oa::ops::new_node(ap2);
+	NodePtr C = oa::ops::new_node(ap3);
+	NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1.0);
+	NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
+	NodePtr F = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, float(1.0));
+	
+	NodePtr	G = oa::ops::new_node(TYPE_PLUS, A, B);
+	NodePtr H = oa::ops::new_node(TYPE_MULT, G, C);
+	NodePtr I = oa::ops::new_node(TYPE_DIVD, H, D);
+	NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
+	NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
+
+	oa::ops::gen_kernels(K);
+
+/*	ArrayPtr ans = oa::ops::eval(I);
+	A->display("A");
+	B->display("B");
+	C->display("C");
+	D->display("D");
+	E->display("E");
+	ans->display("((A+B)-(C*D)) / E");*/
 }
 #endif

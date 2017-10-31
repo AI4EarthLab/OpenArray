@@ -144,6 +144,7 @@ namespace oa {
 
     int get_size(MPI_Comm comm = MPI_COMM_WORLD);
 
+    bool is_equal_shape(const Shape& u, const Shape& v);
   }  
 }
 
