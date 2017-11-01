@@ -134,7 +134,8 @@ void Array::display(const char *prefix) {
   }
 
   if (my_rank == 0){
-    m_par_ptr->display(prefix);
+    printf("%s\n", prefix);
+    m_par_ptr->display(NULL, true);
 		
     MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
     oa::utils::print_data((void*)global_buf, gs, m_data_type);

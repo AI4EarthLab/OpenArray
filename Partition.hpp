@@ -66,8 +66,8 @@ class Partition {
   int get_procs_rank(int x, int y, int z);
   int get_procs_rank(const vector<int> &coord);
   vector<int> get_procs_3d(int rank);
-  void display(const char *prefix = "", bool all = true); 
-  void display_distr(const char *prefix = "");
+  void display(const char *prefix = NULL, bool all = true); 
+  void display_distr(const char *prefix = NULL);
   void set_hash(const size_t &hash);
   size_t get_hash() const;
   MPI_Comm get_comm() const;

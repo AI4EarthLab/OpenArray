@@ -206,11 +206,11 @@ void test_operator() {
 
 void test_io() {
   ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {4,4,1}, 1);
-  A->display("====A====");
+  A->display("A:");
   oa::io::save(A, "A.nc", "data");
 
   ArrayPtr B = oa::io::load("A.nc", "data", MPI_COMM_WORLD);
-  B->display("====B====");
+  B->display("B:");
 }
 
 void test_write_graph() {
