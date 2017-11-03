@@ -185,7 +185,9 @@ vector<int> Partition::get_procs_3d(int rank) {
 
 // display Partition information, default display all information
 void Partition::display(const char *prefix, bool all) {
-  printf("Partition %s:\n", prefix);
+  if(prefix != NULL)
+    printf("Partition %s:\n", prefix);    
+
   printf("\tglobal_shape = [%d, %d, %d]\n", 
   m_global_shape[0], m_global_shape[1], m_global_shape[2]);
   printf("\tprocs_shape = [%d, %d, %d]\n", 
@@ -195,12 +197,14 @@ void Partition::display(const char *prefix, bool all) {
   printf("\tstencil_type = %d\n", m_stencil_type);
   printf("\tstencil_width = %d\n", m_stencil_width);
 
-  if (all) display_distr(prefix);
+  if (all) display_distr(NULL);
 }
 
 // display distribution information
 void Partition::display_distr(const char *prefix) {
-  printf("%s distr info\n", prefix);
+  if(prefix != NULL)
+    printf("%s distr info\n", prefix);
+  
   printf("\tlx = [%d", m_lx[0]);
   for (int i = 1; i < m_lx.size(); i++) printf(", %d", m_lx[i]);
   printf("]\n");
