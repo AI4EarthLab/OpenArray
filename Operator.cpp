@@ -4,6 +4,9 @@
 #include "Kernel.hpp"
 #include <fstream>
 #include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <dlfcn.h>
 
 using namespace oa::kernel;
 
@@ -111,7 +114,7 @@ namespace oa {
       return s.at(type);
     }
 
-    void write_graph(const NodePtr& root, bool is_root, char const *filename) {
+    void write_graph(const NodePtr& root, bool is_root, const char *filename) {
       if (oa::utils::get_rank() > 0) return ;
       static std::ofstream ofs;
       if (is_root) {
@@ -152,6 +155,60 @@ namespace oa {
       return ap;
     }
 
+    const KernelPtr get_kernel_dict(size_t hash, const char *filename) {
+      static bool has_init = false;
+      static unordered_map<size_t, KernelPtr> kernel_dict;
+      if (!has_init) {
+        has_init = true;
+
+        void *handle;
+        char *error;
+
+        // open dynamic library
+        handle = dlopen(LIB_KERNEL_PATH, RTLD_LAZY);
+        if (!handle) {
+          fprintf(stderr, "%s\n", error);
+          exit(EXIT_FAILURE);
+        }
+
+        // clean up the error before
+        dlerror();
+
+        // open kernel_dict and get kernel name as function signature
+        std::ifstream ifs;
+        ifs.open(filename);
+        size_t key;
+        string value;
+        typedef ArrayPtr (*FUNC)(vector<ArrayPtr>&);
+        KernelPtr func;
+
+        while(ifs>>key) {
+          ifs>>value;
+          stringstream ss;
+          ss<<"kernel_"<<key;
+          func = (FUNC)(dlsym(handle, ss.str().c_str()));
+          if ((error = dlerror()) != NULL) {
+            fprintf(stderr, "%s\n", error);
+            func = NULL;
+          }
+          kernel_dict[key] = func;
+        }
+
+        ifs.close();
+        dlclose(handle);
+      }
+      if (kernel_dict.find(hash) == kernel_dict.end()) return NULL;
+      return kernel_dict[hash];
+    }
+
+    void insert_kernel_dict(size_t hash, const stringstream &s,
+      const char *filename) {
+      std::ofstream ofs;
+      ofs.open(filename, std::ofstream::out | std::ofstream::app);
+      ofs<<hash<<" "<<s.str()<<endl;
+      ofs.close();
+    }
+
     void gen_kernels(NodePtr A, bool is_root, MPI_Comm comm) {
       if (oa::utils::get_rank(comm)) return ;
       if (A->has_data()) return ;
@@ -165,11 +222,18 @@ namespace oa {
       }
 
       if (is_root && A->get_depth() >= 2) {
+        // fusion kernel
         stringstream ss = tree_to_string(A);
-        cout<<ss.str()<<endl;
-        stringstream hash;
-        tree_to_string_stack(A, hash);
-        cout<<hash.str()<<endl;
+        // fusion kernel hash
+        stringstream ss1;
+        tree_to_string_stack(A, ss1);
+        std::hash<string> str_hash;
+        size_t hash = str_hash(ss1.str());
+        
+        const KernelPtr func = get_kernel_dict(hash);
+        if (func == NULL) {
+          insert_kernel_dict(hash, ss);
+        }
       }
 
       for (int i = 0; i < A->input_size(); i++) {

@@ -35,8 +35,8 @@ all:
 	cp build/main ./
 
 main: ${OBJ_MAIN}
-	-${CXX} -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system
+	-${CXX} -rdynamic -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf \
+	-lboost_program_options -lboost_filesystem -lboost_system -ldl
 
 small:
 	@make all

@@ -285,7 +285,7 @@ void test_eval() {
 	sans->display("SA+seq_B-seq_C");
 }
 
-void test_kernel_fusion() {
+void test_fusion_kernel() {
 	/*ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
 	ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
 	ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);

@@ -24,7 +24,6 @@
 
 // define basic data size
 #define DATA_SIZE(i) ((int[]{4, 4, 8})[i])
-  
 
 // define shape dimension [x, y, z]
 typedef std::array<int, 3> Shape;

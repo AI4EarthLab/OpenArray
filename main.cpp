@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
   //test_operator();
   //test_write_graph();
   //test_eval();
-  test_kernel_fusion();
+  test_fusion_kernel();
 
   MPI_Finalize();
   return 0;

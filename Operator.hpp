@@ -4,6 +4,8 @@
 #include "NodePool.hpp"
 #include "NodeDesc.hpp"
 
+#define LIB_KERNEL_PATH "./libkernel.so"
+
 namespace oa {
   namespace ops {
 
@@ -21,9 +23,15 @@ namespace oa {
     const NodeDesc& get_node_desc(NodeType type);
 
     void write_graph(const NodePtr& root, bool is_root = true,
-      char const *filename = "graph.dot");
+      const char *filename = "graph.dot");
 
     ArrayPtr eval(NodePtr A);
+
+    const KernelPtr get_kernel_dict(size_t hash, 
+      const char *filename = "fusion-kernels");
+
+    void insert_kernel_dict(size_t hash, const stringstream &s,
+      const char *filename = "fusion-kernels");
 
     void gen_kernels(NodePtr A, bool is_root = true, MPI_Comm = MPI_COMM_WORLD);
 
