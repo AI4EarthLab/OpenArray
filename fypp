@@ -85,12 +85,24 @@ _ALL_DIRECTIVES_PATTERN = r'''
 (?:^[ \t]*\#!.*\n)+
 |
 # line directive (with optional continuation lines)
-^[ \t]*(?P<ldirtype>[\#\$@]):[ \t]*
+^[ \t]*(?P<ldirtype>((\/\/\/)|\$|\@)):[ \t]*
 (?P<ldir>.+?(?:&[ \t]*\n(?:[ \t]*&)?.*?)*)?[ \t]*\n
 |
 # inline eval directive
-(?P<idirtype>[$\#@])\{[ \t]*(?P<idir>.+?)?[ \t]*\}(?P=idirtype)
+(?P<idirtype>[$#/@])\{[ \t]*(?P<idir>.+?)?[ \t]*\}(?P=idirtype)
 '''
+
+# _ALL_DIRECTIVES_PATTERN = r'''
+# # comment block
+# (?:^[ \t]*\#!.*\n)+
+# |
+# # line directive (with optional continuation lines)
+# ^[ \t]*(?P<ldirtype>[\#\$@]):[ \t]*
+# (?P<ldir>.+?(?:&[ \t]*\n(?:[ \t]*&)?.*?)*)?[ \t]*\n
+# |
+# # inline eval directive
+# (?P<idirtype>[$\#@])\{[ \t]*(?P<idir>.+?)?[ \t]*\}(?P=idirtype)
+# '''
 
 _ALL_DIRECTIVES_REGEXP = re.compile(
     _ALL_DIRECTIVES_PATTERN, re.VERBOSE | re.MULTILINE)
@@ -571,7 +583,13 @@ class Parser:
 
     def _parse(self, txt, linenr=0, directcall=False):
         pos = 0
+
+        #print(txt);
+        #print("xxxxxxxxxxx");
         for match in _ALL_DIRECTIVES_REGEXP.finditer(txt):
+            # print("yyyyyyyyyyy");
+            # print(match.groups())
+            # continue;
             start, end = match.span()
             if start > pos:
                 endlinenr = linenr + txt.count('\n', pos, start)
@@ -579,7 +597,8 @@ class Parser:
                 linenr = endlinenr
             endlinenr = linenr + txt.count('\n', start, end)
             span = (linenr, endlinenr)
-            ldirtype, ldir, idirtype, idir = match.groups()
+            # print(match.groups())
+            ldirtype, t1, t2, ldir, idirtype, idir = match.groups()
             if directcall and (idirtype is None or idirtype != '$'):
                 msg = 'only inline eval directives allowed in direct calls'
                 raise FyppFatalError(msg, self._curfile, span)
@@ -600,7 +619,7 @@ class Parser:
                 dirtype = None
             if dirtype == '$':
                 self.handle_eval(span, content)
-            elif dirtype == '#':
+            elif dirtype == '///':
                 self._process_control_dir(content, span)
             elif dirtype == '@':
                 self._process_direct_call(content, span)

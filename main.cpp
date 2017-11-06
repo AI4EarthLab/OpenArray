@@ -30,11 +30,11 @@ int main(int argc, char** argv) {
   //test_update_ghost();
 
   //test_operator();
-  test_io();
+  //test_io();
 
   //test_operator();
   //test_write_graph();
-  //test_eval();
+  test_eval();
   //test_kernel_fusion();
 
   MPI_Finalize();

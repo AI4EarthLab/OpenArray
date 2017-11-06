@@ -48,6 +48,9 @@ class Box {
 
   // return shape_x * shape_y * shape_z
   int size(int stencil_width = 0);
+
+  int3 starts() const;
+  int3 counts() const;
   
 };
 

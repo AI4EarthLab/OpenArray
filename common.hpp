@@ -28,26 +28,33 @@
 
 // define shape dimension [x, y, z]
 typedef std::array<int, 3> Shape;
+typedef std::array<int, 3> int3;
+
+// void operator= (int* a, const int3& b){
+//   a[0] = b[0];
+//   a[1] = b[1];
+//   a[2] = b[2];
+// }
 
 typedef int DataType;
 typedef int DATA_TYPE;
 
 
-#:mute
-#:set i = 0  
-#:include "NodeType.fypp"
-#:endmute
+///:mute
+///:set i = 0  
+///:include "NodeType.fypp"
+///:endmute
     //define node types
     enum NodeType{    
-#:for i in range(len(L))
-#:if i == 0
+///:for i in range(len(L))
+///:if i == 0
   ${L[i][0]}$ = 0,	  
-#:elif i == len(L) - 1
+///:elif i == len(L) - 1
   ${L[i][0]}$
-#:else
-      ${L[i][0]}$,
-#:endif    
-#:endfor
+///:else
+  ${L[i][0]}$,
+///:endif    
+///:endfor
 };
 
 #define NUM_NODE_TYPES ${len(L)}$
@@ -59,6 +66,7 @@ typedef arma::Cube<int>  cube_int;
 typedef arma::Cube<float> cube_float;
 typedef arma::Cube<double> cube_double;
 
+#define SCALAR_SHAPE Shape({1,1,1})
 
 template<int N>
 struct datatype {

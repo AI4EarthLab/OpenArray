@@ -41,38 +41,38 @@ namespace oa {
       
       if (!has_init) {
         s.resize(NUM_NODE_TYPES);
-#:mute
-#:set i = 0  
-#:include "NodeType.fypp"
-#:endmute
-	  //intialize node descriptions.
-#:set id = 0
-#:for i in L
-#:mute
-#:set type = i[0]
-#:set name = i[1]
-#:set ew = i[5]
-#:if ew == 'F'
-#:set ew = 'false'
-#:else
-#:set ew = 'true'
-#:endif
-#:set cl = i[6]
-#:if cl == 'F'
-#:set cl = 'false'
-#:else
-#:set cl = 'true'
-#:endif
-#:endmute
-#:set ef = i[7]
-#:set kernel_name = 'kernel_' + i[1]
-#:if (id > 1 and id < 6)   
+	///:mute
+	///:set i = 0  
+	///:include "NodeType.fypp"
+	///:endmute
+	//intialize node descriptions.
+	///:set id = 0
+	///:for i in L
+	///:mute
+	///:set type = i[0]
+	///:set name = i[1]
+	///:set ew = i[5]
+	///:if ew == 'F'
+	///:set ew = 'false'
+	///:else
+	///:set ew = 'true'
+	///:endif
+	///:set cl = i[6]
+	///:if cl == 'F'
+	///:set cl = 'false'
+	///:else
+	///:set cl = 'true'
+	///:endif
+	///:endmute
+	///:set ef = i[7]
+	///:set kernel_name = 'kernel_' + i[1]
+	///:if (id > 1 and id < 6)   
         s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
-#:else
+	///:else
         s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", NULL};
-#:endif
-#:set id = id + 1
-#:endfor
+	///:endif
+	///:set id = id + 1
+	///:endfor
         has_init = true;
       }
       return s.at(type);

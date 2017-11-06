@@ -178,7 +178,7 @@ namespace oa {
       int bsx, bsy, bsz;
       
       switch(var_type) {
-#:for T in [['NC_INT', 'DATA_INT', 'int'], &
+	///:for T in [['NC_INT', 'DATA_INT', 'int'], &
 	['NC_FLOAT', 'DATA_FLOAT', 'float'],	&
 	  ['NC_DOUBLE', 'DATA_DOUBLE', 'double']] 	  
       case ${T[0]}$:
@@ -212,7 +212,7 @@ namespace oa {
         
         CHECK_ERR(status);
         break;
-#:endfor
+	///:endfor
       default:
         break;
       }
