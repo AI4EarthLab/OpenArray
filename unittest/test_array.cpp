@@ -29,7 +29,7 @@ protected:
   }
 
   virtual void TearDown() {
-    
+
   }
 
   MPI_Comm comm;
