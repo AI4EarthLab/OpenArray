@@ -4,14 +4,18 @@ CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
 	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
 
 
+
+OBJS	= Range.o Box.o Partition.o Array.o \
+	  Internal.o Function.o Kernel.o Operator.o \
+	  Node.o IO.o 
+
+
 CXX = mpicxx --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
 		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
 
-OBJS 		= Range.o Box.o Partition.o Array.o \
-		  Internal.o Function.o Kernel.o Operator.o \
-		  Node.o IO.o \
 
-CFLAGS	=
+CXXFLAGS= --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
+	  -L${PNETCDF_LIB} -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC}
 
 
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
@@ -28,6 +32,9 @@ OBJ_TEST = ${OBJS} ${OBJS_UTILS} \
 .DEFAULT_GOAL := all
 
 %.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+%.o: %.c
 	$(CXX) -c $(CFLAGS) $< -o $@
 
 all:

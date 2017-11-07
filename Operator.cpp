@@ -106,6 +106,7 @@ namespace oa {
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
         ///:else
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL};
+
         ///:endif
         ///:set id = id + 1
         ///:endfor
