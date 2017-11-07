@@ -66,7 +66,7 @@ namespace oa {
 	///:endmute
 	///:set ef = i[7]
 	///:set kernel_name = 'kernel_' + i[1]
-	///:if (id > 1 and id < 6)   
+	///:if (i[3] == 'A')
         s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
 	///:else
         s[${type}$] = {${type}$, "${name}$", ${ew}$, ${cl}$, "${ef}$", NULL};
@@ -112,7 +112,7 @@ namespace oa {
 
       const NodeDesc& nd = get_node_desc(A->type());
       KernelPtr kernel_addr = nd.func;
-
+      //printf("kernel : %p\n", kernel_addr.target< kernel_rawptr* >());
       ArrayPtr ap = kernel_addr(ops_ap);
       A->set_data(ap);
 

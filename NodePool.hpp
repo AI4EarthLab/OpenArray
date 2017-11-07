@@ -24,7 +24,7 @@ public:
       p = new Node();
     }
     p->set_id(NodePool::global_id());
-    
+
     return NodePtr(p, [](Node* np) {
 	NodePool::global()->dispose(np);
       });
@@ -34,6 +34,7 @@ public:
   NodePtr get_seqs_scalar(MPI_Comm comm, T val) {
     NodePtr p = NodePool::global()->get();
     ArrayPtr ap = oa::funcs::consts(comm, {1, 1, 1}, val, 0);
+    p->clear_input();
     p->set_type(TYPE_DATA);
     p->set_data(ap);
     p->set_scalar();

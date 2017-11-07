@@ -126,7 +126,6 @@ namespace oa {
       const static int size = sizeof(double);
     };
 
-
     DataType cast_data_type(DataType t1, DataType t2);
 
     //! display array for a buffer. 

@@ -1,5 +1,4 @@
 
-
 #include <armadillo>
 #include "../Array.hpp"
 #include "../Function.hpp"
@@ -18,7 +17,7 @@ class MPITest : public gt::TestWithParam
 <std::tr1::tuple<MPI_Comm, int, int, int> > {
 protected:
   virtual void SetUp() {
-    printf("SetUP MPITest!!!\n");
+
     comm = std::tr1::get<0>(GetParam());
 
     m  = std::tr1::get<1>(GetParam());
@@ -59,11 +58,14 @@ arma::Cube<T> make_seqs(int m, int n, int p){
   return v1;
 }
 
+///:set dtypes = ['int', 'float', 'double']
+
+
 namespace{
 
   TEST_P(MPITest, ArrayCreation){
 
-    ///:for t in ['int', 'float', 'double']
+    ///:for t in dtypes
     {
       ArrayPtr A1 = oa::funcs::to_rank0(oa::funcs::seqs(comm, {m, n, p}, 1,
 							oa::utils::dtype<${t}$>::type));
@@ -87,46 +89,29 @@ namespace{
 
   TEST_P(MPITest, BasicMath){
 
-    ///:for t in ['int', 'float', 'double']
+    ///:for t1 in dtypes
+    ///:for t2 in dtypes
     {
-
-      typedef arma::Cube<${t}$> cube_t;
+      DataType dt1  = oa::utils::dtype<${t1}$>::type;
+      DataType dt2  = oa::utils::dtype<${t2}$>::type;
       
-      DataType dt  = oa::utils::dtype<${t}$>::type;
-      NodePtr N1 = oa::ops::new_node(oa::funcs::seqs(comm, {m, n, p}, 1, dt));
-      NodePtr N2 = oa::ops::new_node(oa::funcs::ones(comm, {m, n, p}, 1, dt));
-      NodePtr N3 = oa::ops::new_node(oa::funcs::consts(comm, {m, n, p}, ${t}$(3.0), 1));
+      NodePtr N1 = oa::ops::new_node(oa::funcs::seqs(comm, {m, n, p}, 1, dt1));
+      NodePtr N2 = oa::ops::new_node(oa::funcs::consts(comm, {m, n, p}, ${t2}$(2.0), 1));
 
-      {
-	NodePtr F = oa::ops::new_node(TYPE_MINUS, N1, N2);
-	oa::ops::eval(F)->display("TYPE_MINUS(${t}$):");
-      }
+      arma::Cube<${t1}$> C1 = make_seqs<${t1}$>(m, n, p);
+      arma::Cube<${t2}$> C2(m,n,p);  C2.fill(${t2}$(2));
+      arma::Cube<otype<${t1}$, ${t2}$>::value> C3;
       
-      // oa::ops::eval(F)->display("TYPE_PLUS :");
-      // F = oa::ops::new_node(TYPE_MINUS, N1, N2);
-      // X1 = oa::funcs::to_rank0(oa::ops::eval(F));
-      //oa::ops::eval(F)->display("TYPE_MINUS :");
-      
-      // cube_t B1 = make_seqs<${t}$>(m, n, p);
-      // cube_t B2 = arma::ones<cube_t>(m, n, p);	
-
       ///:for o in [['+','PLUS'], ['-', 'MINUS'], ['%','MULT'], ['/', 'DIVD']]
       {
-	// NodePtr F = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
+      	NodePtr N3 = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
+	ArrayPtr A3 = oa::funcs::to_rank0(oa::ops::eval(N3));
 
-	// oa::ops::eval(F)->display("TYPE_${o[1]}$1 :");
-			    
-	// ArrayPtr X1 = oa::funcs::to_rank0(oa::ops::eval(F));
-	
-	// if(rank == 0){
-	//   X1->display("TYPE_${o[1]}$ :");
-	// cube_t Y1 = B1 ${o[0]}$ B2;
-	// std::cout<< "B1:" <<std::endl<< B1 << std::endl;
-	// std::cout<< "B2:" <<std::endl<< B2 << std::endl;	  
-	// std::cout<< "B1 ${o[0]}$ B2:" <<std::endl<< B1 ${o[0]}$ B2 << std::endl;
-	  
-	//EXPECT_TRUE(oa::funcs::is_equal(X1, Y1));
-	//}
+	C3 = C1 ${o[0]}$ C2;
+
+	if(rank == 0){
+	  EXPECT_TRUE(oa::funcs::is_equal(A3, C3));
+	}
       }
       ///:endfor
 		
@@ -138,21 +123,8 @@ namespace{
       // NodePtr F = oa::ops::new_node(TYPE_PLUS, A, B);
       // NodePtr G = oa::ops::new_node(TYPE_PLUS, F, C);
       // ArrayPtr ans = oa::funcs::to_rank0(oa::ops::eval(G));
-
-      // if(rank == 0){
-      // 	// arma::Cube<${t}$> A1(m, n, p);
-      // 	// arma::Cube<${t}$> A2(m, n, p);	
-      // 	arma::Cube<${t}$> ans1 = make_seqs<${t}$>(m, n, p)
-      // 			       + arma::ones<arma::Cube<${t}$> >(m, n, p) * 4;
-
-      // 	// std::cout<<ans1<<std::endl;
-      // 	// ans->display("A+B+C");
-	
-      // 	EXPECT_TRUE(oa::funcs::is_equal(ans, ans1));
-	
-      // }
-      //ans->display("A+B+C");
     }
+    ///:endfor
     ///:endfor
   }
 

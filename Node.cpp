@@ -16,10 +16,16 @@ void Node::display(char const *prefix) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   
   if (rank == 0) {
-    printf("Node %s, id = %d\n", prefix, id);
+    printf("%s \n", prefix);
+    printf("    id : %d\n", id);
+    const NodeDesc& nd = oa::ops::get_node_desc(m_type);    
+    printf("  type : %s\n", nd.name.c_str());
+    printf("  hash : %d\n", m_hash);
 
-    const NodeDesc& nd = oa::ops::get_node_desc(m_type);
-    printf("Node type is %s\n", nd.name.c_str());
+    printf(" input : \n");
+    for(int i = 0; i < m_input.size(); ++i)
+      printf("     %p : %s\n", m_input[i].get(),
+	     oa::ops::get_node_desc(m_input[i]->type()).name.c_str());
   }
 
   if (m_type == TYPE_DATA) {
@@ -46,6 +52,14 @@ void Node::add_input(int pos, NodePtr in) {
 
 void Node::add_output(int pos, NodePtr out) {
   m_output.push_back(out);
+}
+
+void Node::clear_input(){
+  m_input.clear();
+}
+
+void Node::clear_output(){
+  m_output.clear();
 }
 
 void Node::set_type(NodeType type) {
@@ -80,8 +94,16 @@ bool Node::has_data() {
   return m_data != NULL;
 }
 
+void Node::clear_data(){
+  m_data = NULL;
+}
+
 void Node::reset() {
-  
+  clear_data();
+  clear_input();
+  m_type = TYPE_UNKNOWN;
+  m_hash = -1;
+  id = -1;
 }
 
 bool Node::is_scalar() const {

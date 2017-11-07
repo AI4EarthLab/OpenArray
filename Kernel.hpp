@@ -26,7 +26,7 @@ namespace oa {
     ///:mute
     ///:include "NodeType.fypp"
     ///:endmute
-    ///:for k in L[2:6]
+    ///:for k in [i for i in L if i[3] == 'A']
     ///:set name = k[1]
     ///:set sy = k[2]
     // A = U ${sy}$ V
