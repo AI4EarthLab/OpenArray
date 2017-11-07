@@ -26,7 +26,7 @@ public:
     p->set_id(NodePool::global_id());
     
     return NodePtr(p, [](Node* np) {
-	NodePool::global()->dispose(np);
+  NodePool::global()->dispose(np);
       });
   }
 

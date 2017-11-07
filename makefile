@@ -17,7 +17,9 @@ CFLAGS	=
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
 			      utils.o)
 
-OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} main.o
+OBJS_C_INTERFACE = $(addprefix ./c-interface/, c_oa_type.o)
+
+OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} main.o
 
 .DEFAULT_GOAL := all
 

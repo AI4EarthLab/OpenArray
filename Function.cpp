@@ -5,12 +5,12 @@
 #include <mpi.h>
 
 namespace oa {
-	namespace funcs {
+  namespace funcs {
 
-		// create a ones array
-		ArrayPtr ones(MPI_Comm comm, const Shape& s, 
+    // create a ones array
+    ArrayPtr ones(MPI_Comm comm, const Shape& s, 
       int stencil_width, int data_type) {
-			ArrayPtr ap;
+      ArrayPtr ap;
       switch(data_type) {
         case DATA_INT:
           ap = consts(comm, s, (int)1, stencil_width);
@@ -22,13 +22,13 @@ namespace oa {
           ap = consts(comm, s, (double)1, stencil_width);
           break;
       }   
-			return ap;
-		}
+      return ap;
+    }
 
-		// create a zeros array
-		ArrayPtr zeros(MPI_Comm comm, const Shape& s, 
+    // create a zeros array
+    ArrayPtr zeros(MPI_Comm comm, const Shape& s, 
       int stencil_width, int data_type) {
-			ArrayPtr ap;
+      ArrayPtr ap;
       switch(data_type) {
         case DATA_INT:
           ap = consts(comm, s, (int)0, stencil_width);
@@ -41,14 +41,14 @@ namespace oa {
           break;
       }  
       return ap;
-		}
+    }
 
-		// create a rand array
-		ArrayPtr rand(MPI_Comm comm, const Shape& s, 
+    // create a rand array
+    ArrayPtr rand(MPI_Comm comm, const Shape& s, 
       int stencil_width, int data_type) {
-			ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, data_type);
-			Box box = ap->get_local_box();
-			int size = box.size(stencil_width);
+      ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, data_type);
+      Box box = ap->get_local_box();
+      int size = box.size(stencil_width);
       switch(data_type) {
         case DATA_INT:
           oa::internal::set_buffer_rand((int*)ap->get_buffer(), size);
@@ -60,15 +60,15 @@ namespace oa {
           oa::internal::set_buffer_rand((double*)ap->get_buffer(), size);
           break;
       }
-			return ap;
-		}
+      return ap;
+    }
 
-		// create a seqs array
-		ArrayPtr seqs(MPI_Comm comm, const Shape& s, 
+    // create a seqs array
+    ArrayPtr seqs(MPI_Comm comm, const Shape& s, 
       int stencil_width, int data_type) {
-			ArrayPtr ap = ArrayPool::global()->
+      ArrayPtr ap = ArrayPool::global()->
         get(comm, s, stencil_width, data_type);
-			Box box = ap->get_local_box();
+      Box box = ap->get_local_box();
       switch(data_type) {
         case DATA_INT:
           oa::internal::set_buffer_seqs(
@@ -83,8 +83,8 @@ namespace oa {
             (double*)ap->get_buffer(), s, box, stencil_width);
           break;
       }
-			return ap;
-		}
+      return ap;
+    }
 
     ArrayPtr seqs(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
       const vector<int> &z, int stencil_width, int data_type) {
@@ -109,65 +109,65 @@ namespace oa {
       return ap;
     }
 
-		//transfer(ArrayPtr &A, ArrayPtr &B);
+    //transfer(ArrayPtr &A, ArrayPtr &B);
 
-		ArrayPtr subarray(const ArrayPtr &ap, const Box &b) {
-			vector<int> rsx, rsy, rsz;
-  		PartitionPtr pp = ap->get_partition();
-  		Shape ps = pp->procs_shape();
-  		pp->split_box_procs(b, rsx, rsy, rsz);
-  		
-  		vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
-  		for (int i = 0; i < rsx.size(); i += 3)
-  		  x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
-  		for (int i = 0; i < rsy.size(); i += 3)
-  		  y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
-  		for (int i = 0; i < rsz.size(); i += 3)
-  		  z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
-  		
-  		ArrayPtr arr_ptr = ArrayPool::global()->
-  			get(pp->get_comm(), x, y, z, pp->get_stencil_width(), ap->get_data_type());
+    ArrayPtr subarray(const ArrayPtr &ap, const Box &b) {
+      vector<int> rsx, rsy, rsz;
+      PartitionPtr pp = ap->get_partition();
+      Shape ps = pp->procs_shape();
+      pp->split_box_procs(b, rsx, rsy, rsz);
+      
+      vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
+      for (int i = 0; i < rsx.size(); i += 3)
+        x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
+      for (int i = 0; i < rsy.size(); i += 3)
+        y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
+      for (int i = 0; i < rsz.size(); i += 3)
+        z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
+      
+      ArrayPtr arr_ptr = ArrayPool::global()->
+        get(pp->get_comm(), x, y, z, pp->get_stencil_width(), ap->get_data_type());
 
-  		if (!arr_ptr->has_local_data()) return arr_ptr; // don't have local data in process
-  		
-  		int rk = pp->rank();
-  		vector<int> procs_coord = pp->get_procs_3d(rk);
+      if (!arr_ptr->has_local_data()) return arr_ptr; // don't have local data in process
+      
+      int rk = pp->rank();
+      vector<int> procs_coord = pp->get_procs_3d(rk);
 
-  		int idx = procs_coord[0] - rsx[2];
-  		int idy = procs_coord[1] - rsy[2];
-  		int idz = procs_coord[2] - rsz[2];
+      int idx = procs_coord[0] - rsx[2];
+      int idy = procs_coord[1] - rsy[2];
+      int idz = procs_coord[2] - rsz[2];
 
-  		Box box = ap->get_local_box();
-  		Box sub_box(
-  			rsx[idx * 3], rsx[idx * 3 + 1] - 1,
-  			rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
-  			rsz[idz * 3], rsz[idz * 3 + 1] - 1
-  		);
+      Box box = ap->get_local_box();
+      Box sub_box(
+        rsx[idx * 3], rsx[idx * 3 + 1] - 1,
+        rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
+        rsz[idz * 3], rsz[idz * 3 + 1] - 1
+      );
 
-  		// different data_type
-  		switch(ap->get_data_type()) {
-  			case DATA_INT:
-  				oa::internal::set_buffer_subarray<int>(
-  					(int*) arr_ptr->get_buffer(), (int*) ap->get_buffer(), 
-  					sub_box, box, pp->get_stencil_width()
-  				);
-  				break;
-  			case DATA_FLOAT:
-  				oa::internal::set_buffer_subarray<float>(
-  					(float*) arr_ptr->get_buffer(), (float*) ap->get_buffer(), 
-  					sub_box, box, pp->get_stencil_width()
-  				);
-  				break;
-  			case DATA_DOUBLE:
-  				oa::internal::set_buffer_subarray<double>(
-  					(double*) arr_ptr->get_buffer(), (double*) ap->get_buffer(), 
-  					sub_box, box, pp->get_stencil_width()
-  				);
-  				break;
-  		}
-  		
-  		return arr_ptr;
-		}
+      // different data_type
+      switch(ap->get_data_type()) {
+        case DATA_INT:
+          oa::internal::set_buffer_subarray<int>(
+            (int*) arr_ptr->get_buffer(), (int*) ap->get_buffer(), 
+            sub_box, box, pp->get_stencil_width()
+          );
+          break;
+        case DATA_FLOAT:
+          oa::internal::set_buffer_subarray<float>(
+            (float*) arr_ptr->get_buffer(), (float*) ap->get_buffer(), 
+            sub_box, box, pp->get_stencil_width()
+          );
+          break;
+        case DATA_DOUBLE:
+          oa::internal::set_buffer_subarray<double>(
+            (double*) arr_ptr->get_buffer(), (double*) ap->get_buffer(), 
+            sub_box, box, pp->get_stencil_width()
+          );
+          break;
+      }
+      
+      return arr_ptr;
+    }
 
     ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp) {
       ArrayPtr ap = ArrayPool::global()->get(pp, src->get_data_type());
@@ -586,5 +586,5 @@ namespace oa {
       }
     }
     
-	}
+  }
 }

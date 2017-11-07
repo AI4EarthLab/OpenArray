@@ -1,8 +1,8 @@
 #include "utils.hpp"
 
 namespace oa {
-	namespace utils {
-		//! display array for a buffer. 
+  namespace utils {
+    //! display array for a buffer. 
     void print_data(void* buf, const Shape& shape, DATA_TYPE dt) {
       switch(dt){
         case DATA_BOOL:
@@ -76,5 +76,5 @@ namespace oa {
       return u[0] == v[0] && u[1] == v[1] && u[2] == v[2];
     }
     
-	}
+  }
 }

@@ -10,11 +10,11 @@
 typedef std::function<ArrayPtr(std::vector<ArrayPtr>&)> KernelPtr;
 
 struct NodeDesc{
-  int type; 				// operator type
+  int type;         // operator type
   std::string name; // operator name
-  std::string sy;		// operator symbol
-  bool ew; 					// if element-wise operation
-  bool cl; 					// if change data layout
+  std::string sy;   // operator symbol
+  bool ew;          // if element-wise operation
+  bool cl;          // if change data layout
   std::string expr; // expression form
   KernelPtr func;
 };

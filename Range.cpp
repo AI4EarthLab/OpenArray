@@ -47,12 +47,12 @@ void Range::shift(int num) {
 
 // check if Range has intersection with Range u
 bool Range::intersection(const Range &u) {
-	if (m_lower >= u.m_upper || u.m_lower >= m_upper) return false;
-	return true;
+  if (m_lower >= u.m_upper || u.m_lower >= m_upper) return false;
+  return true;
 }
 
 // get intersection Range with Range u
 Range Range::get_intersection(const Range &u) {
-	if (!intersection(u)) return Range();
-	return Range(max(m_lower, u.m_lower), min(m_upper, u.m_upper) - 1);
+  if (!intersection(u)) return Range();
+  return Range(max(m_lower, u.m_lower), min(m_upper, u.m_upper) - 1);
 }

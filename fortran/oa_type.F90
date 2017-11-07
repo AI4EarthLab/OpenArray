@@ -13,6 +13,67 @@ module oa_type
      final :: destroy_node
   end type Node
   
+  interface
+    subroutine c_destroy_array(A) bind(C, name = 'destroy_array')
+      type(c_ptr), intent(in) :: ptr
+    end subroutine
+  end interface
+
+  interface
+    subroutine c_destroy_node(A) bind(C, name = 'destroy_node')
+      type(c_ptr), intent(in) :: ptr
+    end subroutine
+  end interface
+
+#:mute
+#:set NAME = [['ones'], ['zeros'], ['rands'], ['seqs']]
+#:endmute
+#:for t in NAME
+  interface
+    subroutine ${t[0]}$(m, n, k, st, dt, comm, ap) bind(C, name = '${t[0]}$')
+      type(c_ptr), intent(in) :: ptr
+    end subroutine
+  end interface
+
+#:endfor
+
+#:mute
+#:set TYPE = [['int', 'integer'], &
+       ['float',  'real'], &
+       ['double', 'real(kind=8)']]
+#:endmute
+#:for t in TYPE
+  interface
+    subroutine 
+      use iso_c_binding
+    end subroutine
+  end interface
+
+  interface
+    subroutine 
+      use iso_c_binding
+    end subroutine
+  end interface
+
+  interface
+    subroutine 
+      use iso_c_binding
+    end subroutine
+  end interface
+
+  interface
+    subroutine 
+      use iso_c_binding
+    end subroutine
+  end interface
+
+  interface
+    subroutine 
+      use iso_c_binding
+    end subroutine
+  end interface
+
+
 contains
 
   subroutine destroy_array(A)
@@ -39,6 +100,6 @@ contains
 
     !call c function to create a node
   end subroutine
-#:endif
+#:endfor
   
 end module
