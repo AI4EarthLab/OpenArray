@@ -10,8 +10,9 @@
 #! EF : expresson form             7
 
 #! [   TN,              NA,        SY,           LT,    ET,  EW,  CL,  EF]      
-#:set L = &
-      [["TYPE_DATA",    "data",    "data",       "",    "",  "T", "F",  ""],&    
+///:set L = &
+      [["TYPE_UNKNOWN", "unknown", "unknown",    "",    "",  "T", "F",  ""],&
+       ["TYPE_DATA",    "data",    "data",       "",    "",  "T", "F",  ""],&    
        ["TYPE_REF",     "ref",     "ref",        "",    "",  "F", "F",  ""],&
        ["TYPE_PLUS",    "plus",    "+",          "A",   "A", "T", "F",  "A+B"],&
        ["TYPE_MINUS",   "minus",   "-",          "A",   "A", "T", "F",  "A-B"],&

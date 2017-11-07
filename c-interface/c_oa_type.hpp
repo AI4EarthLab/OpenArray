@@ -26,24 +26,24 @@ extern "C" {
     int data_type = DATA_DOUBLE,
     MPI_Comm comm = MPI_COMM_WORLD);
     
-  #:mute
-  #:set TYPE = [['int'], &
+  ///:mute
+  ///:set TYPE = [['int'], &
                 ['float'], &
                 ['double']]
-  #:endmute
+  ///:endmute
 
-  #:for t in TYPE
+  ///:for t in TYPE
   void* consts_${t[0]}$(int m, int n, int k, ${t[0]}$ val, 
     int stencil_width = 1, 
     MPI_Comm comm = MPI_COMM_WORLD);
 
-  #:endfor
+  ///:endfor
 
-  #:for t in TYPE
+  ///:for t in TYPE
   void* new_seqs_scalar_node_${t[0]}$(${t[0]}$ val, 
     MPI_Comm comm = MPI_COMM_SELF);
 
-  #:endfor
+  ///:endfor
 
   void* new_node_array(void* ap);
 

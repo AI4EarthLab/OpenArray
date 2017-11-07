@@ -21,7 +21,7 @@ namespace oa {
       int M = sp[0];
       int N = sp[1];
       int P = sp[2];
-      
+			
       Box bd_box = box.boundary_box(sw);
       Box ref_box = sub_box.ref_box(bd_box);
       int xs, xe, ys, ye, zs, ze;
@@ -95,12 +95,12 @@ namespace oa {
       }
     }
 
-#:mute
-#:include "NodeType.fypp"
-#:endmute
-#:for k in L[2:6]
-#:set name = k[1]
-#:set sy = k[2]
+    ///:mute
+    ///:include "NodeType.fypp"
+    ///:endmute
+    ///:for k in [i for i in L if i[3] == 'A']
+    ///:set name = k[1]
+    ///:set sy = k[2]
     // A = B ${sy}$ val
     template<typename T1, typename T2, typename T3>
     void buffer_${name}$_const(T1 *A, T2 *B, T3 val, int size) {
@@ -117,7 +117,7 @@ namespace oa {
       }
     }
 
-#:endfor 
+    ///:endfor 
 
   }
 }

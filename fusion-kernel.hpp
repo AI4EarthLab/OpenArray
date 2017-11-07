@@ -5,15 +5,15 @@
 #include "Internal.hpp"
 #include "ArrayPool.hpp"
 
-#:set kernel_file = "fusion-kernels"
-#:if os.path.isfile(kernel_file)
-#:set lines = io.open(kernel_file).read().split('\n')
-#:for i in lines[:-1]
-#:set line = i.split(' ')
-#:set key = line[0]
-#:set expr = line[1]
+///:set kernel_file = "fusion-kernels"
+///:if os.path.isfile(kernel_file)
+///:set lines = io.open(kernel_file).read().split('\n')
+///:for i in lines[:-1]
+///:set line = i.split(' ')
+///:set key = line[0]
+///:set expr = line[1]
 ArrayPtr kernel_${key}$(vector<ArrayPtr> &ops, int dt, int size);
-#:endfor
-#:endif
+///:endfor
+///:endif
 
 #endif

@@ -23,19 +23,19 @@ namespace oa {
     ArrayPtr kernel_divd(vector<ArrayPtr> &ops_ap); 
 
     // ap = u {+ - * /} v
-#:mute
-#:include "NodeType.fypp"
-#:endmute
-#:for k in L[2:6]
-#:set name = k[1]
-#:set sy = k[2]
+    ///:mute
+    ///:include "NodeType.fypp"
+    ///:endmute
+    ///:for k in [i for i in L if i[3] == 'A']
+    ///:set name = k[1]
+    ///:set sy = k[2]
     // A = U ${sy}$ V
     template <typename T1, typename T2, typename T3>
     ArrayPtr t_kernel_${name}$(vector<ArrayPtr> &ops_ap) {
       ArrayPtr u = ops_ap[0];
       ArrayPtr v = ops_ap[1];
       ArrayPtr ap;
-      
+
       int u_dt = u->get_data_type();
       int v_dt = v->get_data_type();
       int dt = oa::utils::cast_data_type(u_dt, v_dt);
@@ -87,7 +87,7 @@ namespace oa {
       return ap;
     }
 
-#:endfor
+    ///:endfor
   }
 }
 

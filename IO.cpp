@@ -178,9 +178,9 @@ namespace oa {
       int bsx, bsy, bsz;
       
       switch(var_type) {
-#:for T in [['NC_INT', 'DATA_INT', 'int'], &
-  ['NC_FLOAT', 'DATA_FLOAT', 'float'],  &
-    ['NC_DOUBLE', 'DATA_DOUBLE', 'double']]     
+	///:for T in [['NC_INT', 'DATA_INT', 'int'], &
+	['NC_FLOAT', 'DATA_FLOAT', 'float'],	&
+	  ['NC_DOUBLE', 'DATA_DOUBLE', 'double']] 	  
       case ${T[0]}$:
         A = oa::funcs::zeros(comm, {int(gx), int(gy), int(gz)}, sw, ${T[1]}$);
         A->get_local_box().get_corners(xs, xe, ys, ye, zs, ze);
@@ -212,7 +212,7 @@ namespace oa {
         
         CHECK_ERR(status);
         break;
-#:endfor
+	///:endfor
       default:
         break;
       }

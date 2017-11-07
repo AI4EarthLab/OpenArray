@@ -7,7 +7,11 @@
 #include <functional>
 #include <vector>
 
-typedef std::function<ArrayPtr(std::vector<ArrayPtr>&)> KernelPtr;
+typedef ArrayPtr kernel_rawptr (std::vector<ArrayPtr>&);
+
+typedef std::function<kernel_rawptr> KernelPtr;
+
+//typedef std::function<ArrayPtr(std::vector<ArrayPtr>&)> KernelPtr;
 
 struct NodeDesc{
   int type;         // operator type
@@ -23,5 +27,4 @@ typedef std::vector<NodeDesc> OpDescList;
 
 
 #endif
-
 

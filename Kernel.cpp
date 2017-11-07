@@ -6,12 +6,12 @@
 
 namespace oa {
   namespace kernel {
-#:mute
-#:include "NodeType.fypp"
-#:endmute
-#:for k in L[2:6]
-#:set name = k[1]
-#:set sy = k[2]
+    ///:mute
+    ///:include "NodeType.fypp"
+    ///:endmute
+    ///:for k in [i for i in L if i[3] == 'A']
+    ///:set name = k[1]
+    ///:set sy = k[2]
     // crate kernel_${name}$
     // A = U ${sy}$ V
     ArrayPtr kernel_${name}$(vector<ArrayPtr> &ops_ap) {
@@ -27,19 +27,19 @@ namespace oa {
       static KernelPtr kernel_table[27];
 
       if (!has_init) {
-#:mute
-#:set i = 0
-#:include "kernel_type.fypp"
-#:endmute
-      //create kernel_table
-#:for i in T
-#:set id = i[0]
-#:set type1 = i[1]
-#:set type2 = i[2]
-#:set type3 = i[3]
-        kernel_table[${id}$] = t_kernel_${name}$<${type1}$, ${type2}$, ${type3}$>;
-#:endfor
-        has_init = true;
+	///:mute
+	///:set i = 0
+	///:include "kernel_type.fypp"
+	///:endmute
+	//create kernel_table
+	///:for i in T
+	///:set id = i[0]
+	///:set type1 = i[1]
+	///:set type2 = i[2]
+	///:set type3 = i[3]
+	      kernel_table[${id}$] = t_kernel_${name}$<${type1}$, ${type2}$, ${type3}$>;
+	///:endfor
+	      has_init = true;
       }
 
       int case_num = dt * 9 + u_dt * 3 + v_dt;
@@ -47,7 +47,7 @@ namespace oa {
       return ap;
     }
 
-#:endfor
-    
+  ///:endfor
+		
   }
 }

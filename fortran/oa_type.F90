@@ -25,24 +25,25 @@ module oa_type
     end subroutine
   end interface
 
-#:mute
-#:set NAME = [['ones'], ['zeros'], ['rands'], ['seqs']]
-#:endmute
-#:for t in NAME
+///:mute
+///:set NAME = [['ones'], ['zeros'], ['rands'], ['seqs']]
+///:endmute
+///:for t in NAME
   interface
     subroutine ${t[0]}$(m, n, k, st, dt, comm, ap) bind(C, name = '${t[0]}$')
       type(c_ptr), intent(in) :: ptr
     end subroutine
   end interface
 
-#:endfor
+///:endfor
 
-#:mute
-#:set TYPE = [['int', 'integer'], &
+///:mute
+///:set TYPE = [['int', 'integer'], &
        ['float',  'real'], &
        ['double', 'real(kind=8)']]
-#:endmute
-#:for t in TYPE
+///:endmute
+///:for t in TYPE
+///:endfor
   interface
     subroutine 
       use iso_c_binding
@@ -90,7 +91,7 @@ contains
     A%ptr = C_NULL_PTR
   end subroutine
 
-#:for t in [['int', 'integer'], &
+///:for t in [['int', 'integer'], &
        ['real',  'real'], &
        ['real8', 'real(kind=8)'], &
        ['array', 'type(array)']]
@@ -100,6 +101,6 @@ contains
 
     !call c function to create a node
   end subroutine
-#:endfor
+///:endfor
   
 end module

@@ -48,13 +48,13 @@ extern "C" {
     return A;
   }
 
-  #:mute
-  #:set TYPE = [['int'], &
+  ///:mute
+  ///:set TYPE = [['int'], &
                 ['float'], &
                 ['double']]
-  #:endmute
+  ///:endmute
 
-  #:for t in TYPE
+  ///:for t in TYPE
   void* consts_${t[0]}$(int m, int n, int k, ${t[0]}$ val, 
     int stencil_width, MPI_Comm comm) {
     Shape s = {m, n, k};
@@ -64,9 +64,9 @@ extern "C" {
     return A;
   }
 
-  #:endfor
+  ///:endfor
 
-  #:for t in TYPE
+  ///:for t in TYPE
   void* new_seqs_scalar_node_${t[0]}$(${t[0]}$ val, 
     MPI_Comm comm) {
     NodePtr np = oa::ops::new_seqs_scalar_node(comm, val);
@@ -75,7 +75,7 @@ extern "C" {
     return A;
   }
     
-  #:endfor
+  ///:endfor
 
   void* new_node_array(void* ap) {
     NodePtr np = oa::ops::new_node(*(ArrayPtr*)ap);

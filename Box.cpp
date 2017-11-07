@@ -102,3 +102,13 @@ int Box::size(int sw) {
   return (m_rx.size() + 2 * sw) * (m_ry.size() + 2 * sw) * 
   (m_rz.size() + 2 * sw);
 }
+
+int3 Box::starts() const{
+  return {m_rx.get_lower(),
+      m_ry.get_lower(),
+      m_rz.get_lower()};
+}
+
+int3 Box::counts() const{
+  return {m_rx.size(), m_ry.size(), m_rz.size()};
+}

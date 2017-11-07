@@ -34,6 +34,7 @@ build/*
 *.out
 *.app
 main
+test_main
 
 # ctags
 tags

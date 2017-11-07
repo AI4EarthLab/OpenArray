@@ -63,6 +63,12 @@ public:
 
   void reset();
 
+  void clear_input();
+
+  void clear_output();
+
+  void clear_data();
+  
   // MPI_Comm_world [1x1x1]
   bool is_scalar() const;
 

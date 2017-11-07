@@ -1,10 +1,10 @@
 
-#:mute 
-#:set TYPE_EXCEPT_NODE = [['int', 'integer'], &
+///:mute 
+///:set TYPE_EXCEPT_NODE = [['int', 'integer'], &
        ['real',  'real'], &
        ['real8', 'real(kind=8)'], &
        ['array', 'type(array)']]
-#:endmute       
+///:endmute       
 module oa_type
   use instrict :: iso_c_binding
   type Array
@@ -20,9 +20,9 @@ module oa_type
   end type Node
 
   interface create_node
-#:for t in TYPE_EXCEPT_NODE
+///:for t in TYPE_EXCEPT_NODE
      module procedure create_node_${t[0]}$
-#:endfor
+///:endfor
      module procedure create_node_op1
      module procedure create_node_op2     
   end interface create_node
@@ -45,7 +45,7 @@ contains
     A%ptr = C_NULL_PTR
   end subroutine
 
-#:for t in TYPE_EXCEPT_NODE
+///:for t in TYPE_EXCEPT_NODE
   subroutine create_node_${t[0]}$(B, A)
     type(node), intent(out) :: B
     ${t[1]}$ :: A
@@ -54,7 +54,7 @@ contains
     print*, "create node : ${t[1]}$"
   end subroutine
   
-#:endfor
+///:endfor
 
   subroutine create_node_op1(B, OP, A)
     type(node), intent(out) :: B
