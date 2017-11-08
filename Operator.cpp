@@ -19,6 +19,8 @@ namespace oa {
       np->set_data(ap);
       np->set_data_type(ap->get_data_type());
       np->set_shape(ap->shape());
+      np->set_scalar(ap->is_scalar());
+      np->set_seqs(ap->is_seqs());
       return np;
     }
 

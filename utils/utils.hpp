@@ -86,6 +86,14 @@ namespace oa {
     };
 
     template<class T>
+    arma::Col<T> make_vec(int size, T* buf = NULL) {
+      if (buf != NULL) {
+        return arma::Col<T>((T*)buf, size, false, false);	
+      }
+      return arma::Col<T>(size);
+    };
+    
+    template<class T>
     struct dtype {
       const static DataType type = -1;
       const static int size = -1;

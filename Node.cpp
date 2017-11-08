@@ -114,14 +114,14 @@ bool Node::is_seqs() const {
   return m_is_seqs;
 }
 
-void Node::set_scalar() {
-  m_is_scalar = true;
-  m_data->set_scalar();
+void Node::set_scalar(bool value) {
+  m_is_scalar = value;
+  //m_data->set_scalar();
 }
 
-void Node::set_seqs() {
-  m_is_seqs = true;
-  m_data->set_seqs();
+void Node::set_seqs(bool value) {
+  m_is_seqs = value;
+  //m_data->set_seqs();
 }
 
 bool Node::is_seqs_scalar() const {

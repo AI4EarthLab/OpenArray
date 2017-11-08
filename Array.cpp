@@ -189,24 +189,24 @@ int Array::rank() {
 }
 
 bool Array::is_scalar() {
-  return m_is_scalar;
+  return (m_par_ptr->shape() == Shape({1,1,1}));
 }
 
 bool Array::is_seqs() {
-  return m_is_seqs;
+  return (m_par_ptr->get_comm() == MPI_COMM_SELF);
 }
 
 bool Array::is_seqs_scalar() {
-  return m_is_seqs && m_is_scalar;
+  return is_scalar() && is_seqs();
 }
 
-void Array::set_seqs() {
-  m_is_seqs = true;
-}
+// void Array::set_seqs() {
+//   m_is_seqs = true;
+// }
 
-void Array::set_scalar() {
-  m_is_scalar = true;
-}
+// void Array::set_scalar() {
+//   m_is_scalar = true;
+// }
 
 bool Array::has_local_data() const {
   return local_size() > 0;

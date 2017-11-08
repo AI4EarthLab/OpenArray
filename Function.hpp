@@ -17,8 +17,8 @@ namespace oa {
       Box box = ap->get_local_box();
       int size = box.size(stencil_width);
       oa::internal::set_buffer_consts((T*)ap->get_buffer(), size, val);
-      if(comm == MPI_COMM_SELF) ap->set_seqs();
-      if(ap->shape() == SCALAR_SHAPE) ap->set_scalar();
+      // if(comm == MPI_COMM_SELF) ap->set_seqs();
+      // if(ap->shape() == SCALAR_SHAPE) ap->set_scalar();
       return ap;
     }
 
@@ -31,8 +31,8 @@ namespace oa {
       Box box = ap->get_local_box();
       int size = box.size(stencil_width);
       oa::internal::set_buffer_consts((T*)ap->get_buffer(), size, val);
-      if(comm == MPI_COMM_SELF) ap->set_seqs();
-      if(ap->shape() == SCALAR_SHAPE) ap->set_scalar();
+      // if(comm == MPI_COMM_SELF) ap->set_seqs();
+      // if(ap->shape() == SCALAR_SHAPE) ap->set_scalar();
       return ap;
     }
 

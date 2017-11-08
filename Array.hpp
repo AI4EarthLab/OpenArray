@@ -47,8 +47,8 @@ class Array {
   bool is_scalar();
   bool is_seqs();
   bool is_seqs_scalar();
-  void set_scalar();
-  void set_seqs();
+  // void set_scalar();
+  // void set_seqs();
   bool has_local_data() const;
   void set_hash(const size_t &hash);
   size_t get_hash() const;
