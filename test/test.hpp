@@ -341,7 +341,7 @@ void test_fusion_kernel() {
 }
 
 void test_c_interface() {
-  void* ap1 = seqs(4,4,1,1);
+/*  void* ap1 = seqs(4,4,1,1);
   void* ap2 = ones(4,4,1,1);
   void* ap3 = consts_int(4,4,1,3,1);
   
@@ -356,6 +356,11 @@ void test_c_interface() {
   void* I = new_node_op2(TYPE_DIVD, H, E);
 
   ArrayPtr ans = oa::ops::eval(*(NodePtr*)I);
-  ans->display();
+  ans->display();*/
+  void* A = NULL;
+  ones(A, 4, 4, 1, 1);
+  (*(ArrayPtr*)A)->display();
+  destroy_array(A);
+  cout<<"after "<<A<<endl;
 }
 #endif

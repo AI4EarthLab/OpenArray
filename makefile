@@ -17,7 +17,10 @@ CFLAGS	=
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
 			      utils.o)
 
-OBJS_C_INTERFACE = $(addprefix ./c-interface/, c_oa_type.o)
+OBJS_C_INTERFACE = $(addprefix ./c-interface/, c_oa_type.o c_oa_utils.o)
+
+OBJ_FORTRAN = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} \
+		$(addprefix ./fortran/, oa_type.o oa_utils.o fortran_main.o)
 
 OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} main.o
 
@@ -29,6 +32,9 @@ OBJ_TEST = ${OBJS} ${OBJS_UTILS} \
 
 %.o: %.cpp
 	$(CXX) -c $(CFLAGS) $< -o $@
+
+%.o: %.F90
+	$(FC) -c $< -o $@
 
 all:
 	@rm -rf main
@@ -58,8 +64,23 @@ testall:
 test_main : ${OBJ_TEST}
 	-${CXX} -o test_main ${OBJ_TEST} -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem -lboost_system \
-        -lgtest 
+        -lgtest
 
+testfortran:
+	@rm -rf fortran_main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean 
+	@echo "Cleaning done."
+	@cd build && make fortran_main
+	@cp build/fortran_main ./
+	@mpirun -n 4 ./fortran_main
+
+fortran_main : ${OBJ_FORTRAN}
+	-${CXX} -o fortran_main ${OBJ_FORTRAN} -lstdc++ -lpnetcdf \
+	-lboost_program_options -lboost_filesystem -lboost_system \
+  
 small:
 	@make all
 	@mpirun -n 4 ./main 4 3 2
