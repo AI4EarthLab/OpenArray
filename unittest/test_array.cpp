@@ -4,8 +4,9 @@
 #include "../Function.hpp"
 #include "../NodePool.hpp"
 #include "../Operator.hpp"
+#include "../IO.hpp"
 #include "gtest/gtest.h"
-
+#include <boost/filesystem.hpp>
 
 namespace gt=::testing;
 
@@ -101,6 +102,24 @@ namespace{
       EXPECT_EQ(A4->shape(), Shape({1,1,1}));
     }
 
+  }
+
+  TEST_P(MPITest, InputAndOutput){
+    ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {m,n,p}, 1);
+    oa::io::save(A, "/tmp/A.nc", "data");
+
+    if(rank == 0){
+      EXPECT_TRUE(boost::filesystem::exists("/tmp/A.nc"));      
+    }
+      
+    ArrayPtr B = oa::io::load("/tmp/A.nc", "data", MPI_COMM_WORLD);
+
+    ArrayPtr A1 = to_rank0(A);
+    ArrayPtr B1 = to_rank0(B);
+    
+    if(rank == 0){
+      EXPECT_TRUE(oa::funcs::is_equal(A1, B1));
+    }
   }
   
   TEST_P(MPITest, ArrayCreation){

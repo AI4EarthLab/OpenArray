@@ -110,6 +110,8 @@ namespace oa {
       return true;
     }
 
+    bool is_equal(const ArrayPtr& A, const ArrayPtr& B);
+
   }
 }
 
