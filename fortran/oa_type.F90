@@ -1,37 +1,52 @@
+#include "config.h"
 
 module oa_type
-  use instrict :: iso_c_binding
+  use iso_c_binding
+  use mpi
   type Array
-     C_PTR :: ptr = C_NULL_PTR
+     type(c_ptr) :: ptr = C_NULL_PTR
    contains
      final :: destroy_array
   end type Array
 
   type Node
-     C_PTR :: ptr = C_NULL_PTR
+     type(c_ptr) :: ptr = C_NULL_PTR
    contains
      final :: destroy_node
   end type Node
   
   interface
     subroutine c_destroy_array(A) bind(C, name = 'destroy_array')
-      type(c_ptr), intent(in) :: ptr
+      use iso_c_binding
+      type(c_ptr), intent(in), VALUE :: A
     end subroutine
   end interface
 
   interface
     subroutine c_destroy_node(A) bind(C, name = 'destroy_node')
-      type(c_ptr), intent(in) :: ptr
+      use iso_c_binding
+      type(c_ptr), intent(in) :: A
     end subroutine
   end interface
 
+  interface
+    subroutine display_array(A) bind(C, name = 'display_array')
+      use iso_c_binding
+      type(c_ptr), intent(in), VALUE :: A
+    end subroutine
+  end interface
+
+
 ///:mute
-///:set NAME = [['ones'], ['zeros'], ['rands'], ['seqs']]
+!///:set NAME = [['ones'], ['zeros'], ['rands'], ['seqs']]
+///:set NAME = [['ones']]
 ///:endmute
 ///:for t in NAME
   interface
-    subroutine ${t[0]}$(m, n, k, st, dt, comm, ap) bind(C, name = '${t[0]}$')
-      type(c_ptr), intent(in) :: ptr
+    subroutine c_${t[0]}$(ptr, m, n, k, st, dt, comm) bind(C, name = '${t[0]}$')
+      use iso_c_binding
+      type(c_ptr), intent(inout) :: ptr
+      integer(c_int), intent(in), VALUE :: m, n, k, st, dt, comm
     end subroutine
   end interface
 
@@ -44,44 +59,17 @@ module oa_type
 ///:endmute
 ///:for t in TYPE
 ///:endfor
-  interface
-    subroutine 
-      use iso_c_binding
-    end subroutine
-  end interface
-
-  interface
-    subroutine 
-      use iso_c_binding
-    end subroutine
-  end interface
-
-  interface
-    subroutine 
-      use iso_c_binding
-    end subroutine
-  end interface
-
-  interface
-    subroutine 
-      use iso_c_binding
-    end subroutine
-  end interface
-
-  interface
-    subroutine 
-      use iso_c_binding
-    end subroutine
-  end interface
 
 
 contains
 
   subroutine destroy_array(A)
+    use iso_c_binding
     type(Array), intent(inout) :: A
-
-    !call c function to destroy array here.
-    A%ptr = C_NULL_PTR
+    !if (A%ptr /= C_NULL_PTR) then
+      call c_destroy_array(A%ptr)
+      A%ptr = C_NULL_PTR
+    !endif
   end subroutine
 
   subroutine destroy_node(A)
@@ -91,16 +79,45 @@ contains
     A%ptr = C_NULL_PTR
   end subroutine
 
+  function ones(m, n, k, op_st, op_dt, op_comm) result(A)
+    integer(c_int) :: m, n, k, st, dt, comm
+    integer(c_int), optional :: op_st, op_dt, op_comm
+    type(Array) :: A
+
+    if (present(op_st)) then
+      st = op_st
+    else
+      st = STENCIL_WIDTH
+    endif
+
+    if (present(op_dt)) then
+      dt = op_dt
+    else
+      dt = DATA_TYPE
+    endif
+
+    if (present(op_comm)) then
+      comm = op_comm
+    else
+      comm = MPI_COMM_WORLD
+    endif
+
+    call c_ones(A%ptr, m, n, k, st, dt, comm)
+
+  end function
+
+
 ///:for t in [['int', 'integer'], &
        ['real',  'real'], &
        ['real8', 'real(kind=8)'], &
        ['array', 'type(array)']]
-  subroutine create_node_${t}$(B, A)
+  subroutine create_node_${t[0]}$(B, A)
     type(node), intent(out) :: B
     type(array) :: A
 
     !call c function to create a node
   end subroutine
+
 ///:endfor
   
 end module

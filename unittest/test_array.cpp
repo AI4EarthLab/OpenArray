@@ -50,8 +50,8 @@ arma::Cube<T> make_seqs(int m, int n, int p){
   for(int k = 0; k < p; ++k){
     for(int j = 0; j < n; ++j){
       for(int i = 0; i < m; ++i){
-	v1(i, j, k) = cnt;
-	cnt++;
+        v1(i, j, k) = cnt;
+        cnt++;
       }
     }
   }
@@ -145,19 +145,19 @@ namespace{
     ///:for t in dtypes
     {
       ArrayPtr A1 = oa::funcs::to_rank0(oa::funcs::seqs(comm, {m, n, p}, 1,
-							oa::utils::dtype<${t}$>::type));
+              oa::utils::dtype<${t}$>::type));
       arma::Cube<${t}$> B1 = make_seqs<${t}$>(m, n, p);
 
       ArrayPtr A2 =
-	oa::funcs::to_rank0(oa::funcs::consts<${t}$>(comm, {m, n, p},
-						     ${t}$(2),
-						     oa::utils::dtype<${t}$>::type));
+        oa::funcs::to_rank0(oa::funcs::consts<${t}$>(comm, {m, n, p},
+                 ${t}$(2),
+                 oa::utils::dtype<${t}$>::type));
       arma::Cube<${t}$> B2(m, n, p);
       B2.fill(${t}$(2));
 
       if(rank == 0){
-	EXPECT_TRUE(oa::funcs::is_equal(A1, B1));
-	EXPECT_TRUE(oa::funcs::is_equal(A2, B2));
+        EXPECT_TRUE(oa::funcs::is_equal(A1, B1));
+        EXPECT_TRUE(oa::funcs::is_equal(A2, B2));
       }
     }
     ///:endfor
@@ -181,17 +181,17 @@ namespace{
       
       ///:for o in [['+','PLUS'], ['-', 'MINUS'], ['%','MULT'], ['/', 'DIVD']]
       {
-      	NodePtr N3 = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
-	ArrayPtr A3 = oa::funcs::to_rank0(oa::ops::eval(N3));
+        NodePtr N3 = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
+        ArrayPtr A3 = oa::funcs::to_rank0(oa::ops::eval(N3));
 
-	C3 = C1 ${o[0]}$ C2;
+        C3 = C1 ${o[0]}$ C2;
 
-	if(rank == 0){
-	  EXPECT_TRUE(oa::funcs::is_equal(A3, C3));
-	}
+        if(rank == 0){
+          EXPECT_TRUE(oa::funcs::is_equal(A3, C3));
+        }
       }
       ///:endfor
-		
+    
       // // ((A+B)-(C*D))/E
       // NodePtr A = oa::ops::new_node(ap1);
       // NodePtr B = oa::ops::new_node(ap2);
@@ -239,8 +239,8 @@ namespace{
   }
 
   INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
-			  gt::Combine(gt::Values(MPI_COMM_WORLD),
-				      MRange, NRange, PRange));
+        gt::Combine(gt::Values(MPI_COMM_WORLD),
+              MRange, NRange, PRange));
 
   
 }

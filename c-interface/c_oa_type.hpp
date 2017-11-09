@@ -9,9 +9,11 @@ extern "C" {
 
   void destroy_node(void* A);
 
-  void* ones(int m, int n, int k, int stencil_width = 1, 
+  void display_array(void* A);
+
+  void ones(void* & ptr, int m, int n, int k, int stencil_width = 1, 
     int data_type = DATA_DOUBLE, 
-    MPI_Comm comm = MPI_COMM_WORLD);
+    MPI_Fint fcomm = 0);
 
   void* zeros(int m, int n, int k, int stencil_width = 1, 
     int data_type = DATA_DOUBLE,

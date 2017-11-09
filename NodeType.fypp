@@ -17,7 +17,7 @@
        ["TYPE_PLUS",    "plus",    "+",          "A",   "A", "T", "F",  "A+B"],&
        ["TYPE_MINUS",   "minus",   "-",          "A",   "A", "T", "F",  "A-B"],&
        ["TYPE_MULT",    "mult",    "*",          "A",   "A", "T", "F",  "A*B"],&
-       ["TYPE_DIVD",    "divd",    "/",          "A",   "A", "F", "F",  "A/B"],&
+       ["TYPE_DIVD",    "divd",    "/",          "A",   "A", "", "F",  "A/B"],&
        ["TYPE_GT",      "gt",      ">",          "B",   "A", "F", "F",  "A>B"],&
        ["TYPE_GE",      "ge",      ">=",         "B",   "A", "F", "F",  "A>=B"],&
        ["TYPE_LT",      "lt",      "<",          "B",   "A", "F", "F",  "A<B"],&
@@ -25,7 +25,7 @@
        ["TYPE_EQ",      "eq",      "==",         "B",   "A", "F", "F",  "A==B"],&
        ["TYPE_NE",      "ne",      "/=",         "B",   "A", "F", "F",  "A/=B"],&
        ["TYPE_MIN",     "min",     "min",        "",    "",  "F", "F",  "min"],&
-       ["TYPE_MAX",     "max",     "max",        "",    "",  "F", "F",  "max"],&      
+       ["TYPE_MAX",     "max",     "max",        "",    "",  "F", "F",  "max"],&
        ["TYPE_POW",     "pow",     "pow",        "",    "",  "T", "F",  "(A)**M"],&
        ["TYPE_EXP",     "exp",     "exp",        "C",   "B", "T", "F",  "exp(A)"],&
        ["TYPE_SIN",     "sin",     "sin",        "C",   "B", "T", "F",  "sin(A)"],&

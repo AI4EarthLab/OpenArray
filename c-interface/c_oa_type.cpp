@@ -12,13 +12,19 @@ extern "C" {
     delete((NodePtr*) A);
   }
 
-  void* ones(int m, int n, int k, int stencil_width, 
-    int data_type, MPI_Comm comm) {
+  void display_array(void* A) {
+    (*(ArrayPtr*) A)->display();
+  }
+
+  void ones(void* & ptr, int m, int n, int k, int stencil_width, 
+    int data_type, MPI_Fint fcomm) {
+    MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
     ArrayPtr ap = oa::funcs::ones(comm, s, stencil_width, data_type);
+
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
-    return A;
+    ptr = (void*) A;
   }
 
   void* zeros(int m, int n, int k, int stencil_width, 
