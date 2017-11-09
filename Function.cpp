@@ -9,102 +9,96 @@ namespace oa {
 
     // create a ones array
     ArrayPtr ones(MPI_Comm comm, const Shape& s, 
-      int stencil_width, int data_type) {
+                  int stencil_width, int data_type) {
       ArrayPtr ap;
       switch(data_type) {
       case DATA_INT:
-	ap = consts(comm, s, (int)1, stencil_width);
-	break;
+        ap = consts(comm, s, (int)1, stencil_width);
+        break;
       case DATA_FLOAT:
-	ap = consts(comm, s, (float)1, stencil_width);
-	break;
+        ap = consts(comm, s, (float)1, stencil_width);
+        break;
       case DATA_DOUBLE:
-	ap = consts(comm, s, (double)1, stencil_width);
-	break;
+        ap = consts(comm, s, (double)1, stencil_width);
+        break;
       }   
       return ap;
     }
 
     // create a zeros array
     ArrayPtr zeros(MPI_Comm comm, const Shape& s, 
-      int stencil_width, int data_type) {
+                   int stencil_width, int data_type) {
       ArrayPtr ap;
       switch(data_type) {
       case DATA_INT:
-	ap = consts(comm, s, (int)0, stencil_width);
-	break;
+        ap = consts(comm, s, (int)0, stencil_width);
+        break;
       case DATA_FLOAT:
-	ap = consts(comm, s, (float)0, stencil_width);
-	break;
+        ap = consts(comm, s, (float)0, stencil_width);
+        break;
       case DATA_DOUBLE:
-	ap = consts(comm, s, (double)0, stencil_width);
-	break;
-      }  
+        ap = consts(comm, s, (double)0, stencil_width);
+        break;
+      }
       return ap;
     }
 
     // create a rand array
     ArrayPtr rand(MPI_Comm comm, const Shape& s, 
-      int stencil_width, int data_type) {
+                  int stencil_width, int data_type) {
       ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, data_type);
       Box box = ap->get_local_box();
       int size = box.size(stencil_width);
       switch(data_type) {
       case DATA_INT:
-	oa::internal::set_buffer_rand((int*)ap->get_buffer(), size);
-	break;
+        oa::internal::set_buffer_rand((int*)ap->get_buffer(), size);
+        break;
       case DATA_FLOAT:
-	oa::internal::set_buffer_rand((float*)ap->get_buffer(), size);
-	break;
+        oa::internal::set_buffer_rand((float*)ap->get_buffer(), size);
+        break;
       case DATA_DOUBLE:
-	oa::internal::set_buffer_rand((double*)ap->get_buffer(), size);
-	break;
+        oa::internal::set_buffer_rand((double*)ap->get_buffer(), size);
+        break;
       }
       return ap;
     }
 
     // create a seqs array
     ArrayPtr seqs(MPI_Comm comm, const Shape& s, 
-      int stencil_width, int data_type) {
+                  int stencil_width, int data_type) {
       ArrayPtr ap = ArrayPool::global()->
         get(comm, s, stencil_width, data_type);
       Box box = ap->get_local_box();
       switch(data_type) {
       case DATA_INT:
-	oa::internal::set_buffer_seqs(
-				      (int*)ap->get_buffer(), s, box, stencil_width);
-	break;
+        oa::internal::set_buffer_seqs((int*)ap->get_buffer(), s, box, stencil_width);
+        break;
       case DATA_FLOAT:
-	oa::internal::set_buffer_seqs(
-				      (float*)ap->get_buffer(), s, box, stencil_width);
-	break;
+        oa::internal::set_buffer_seqs((float*)ap->get_buffer(), s, box, stencil_width);
+        break;
       case DATA_DOUBLE:
-	oa::internal::set_buffer_seqs(
-				      (double*)ap->get_buffer(), s, box, stencil_width);
-	break;
+        oa::internal::set_buffer_seqs((double*)ap->get_buffer(), s, box, stencil_width);
+        break;
       }
       return ap;
     }
 
     ArrayPtr seqs(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
-		  const vector<int> &z, int stencil_width, int data_type) {
+                  const vector<int> &z, int stencil_width, int data_type) {
       ArrayPtr ap = ArrayPool::global()->
         get(comm, x, y, z, stencil_width, data_type);
       Box box = ap->get_local_box();
       Shape s = ap->shape();
       switch(data_type) {
       case DATA_INT:
-	oa::internal::set_buffer_seqs(
-				      (int*)ap->get_buffer(), s, box, stencil_width);
-	break;
+        oa::internal::set_buffer_seqs((int*)ap->get_buffer(), s, box, stencil_width);
+        break;
       case DATA_FLOAT:
-	oa::internal::set_buffer_seqs(
-				      (float*)ap->get_buffer(), s, box, stencil_width);
-	break;
+        oa::internal::set_buffer_seqs((float*)ap->get_buffer(), s, box, stencil_width);
+        break;
       case DATA_DOUBLE:
-	oa::internal::set_buffer_seqs(
-				      (double*)ap->get_buffer(), s, box, stencil_width);
-	break;
+        oa::internal::set_buffer_seqs((double*)ap->get_buffer(), s, box, stencil_width);
+        break;
       }
       return ap;
     }
@@ -139,35 +133,33 @@ namespace oa {
 
       Box box = ap->get_local_box();
       Box sub_box(
-        rsx[idx * 3], rsx[idx * 3 + 1] - 1,
-        rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
-        rsz[idz * 3], rsz[idz * 3 + 1] - 1
-      );
+                  rsx[idx * 3], rsx[idx * 3 + 1] - 1,
+                  rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
+                  rsz[idz * 3], rsz[idz * 3 + 1] - 1
+                  );
 
       // different data_type
       switch(ap->get_data_type()) {
-        case DATA_INT:
-          oa::internal::set_buffer_subarray<int>(
-            (int*) arr_ptr->get_buffer(), (int*) ap->get_buffer(), 
-            sub_box, box, pp->get_stencil_width()
-          );
-          break;
-        case DATA_FLOAT:
-          oa::internal::set_buffer_subarray<float>(
-            (float*) arr_ptr->get_buffer(), (float*) ap->get_buffer(), 
-            sub_box, box, pp->get_stencil_width()
-          );
-          break;
-        case DATA_DOUBLE:
-          oa::internal::set_buffer_subarray<double>(
-            (double*) arr_ptr->get_buffer(), (double*) ap->get_buffer(), 
-            sub_box, box, pp->get_stencil_width()
-          );
-          break;
+      case DATA_INT:
+        oa::internal::set_buffer_subarray<int>((int*) arr_ptr->get_buffer(),
+                                               (int*) ap->get_buffer(),
+                                               sub_box, box,
+                                               pp->get_stencil_width());
+        break;
+      case DATA_FLOAT:
+        oa::internal::set_buffer_subarray<float>((float*) arr_ptr->get_buffer(),
+                                                 (float*) ap->get_buffer(),
+                                                 sub_box, box, pp->get_stencil_width());
+        break;
+      case DATA_DOUBLE:
+        oa::internal::set_buffer_subarray<double>((double*) arr_ptr->get_buffer(),
+                                                  (double*) ap->get_buffer(), 
+                                                  sub_box, box, pp->get_stencil_width());
+        break;
       }
       return arr_ptr;
     }
-
+    
     ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp) {
       ArrayPtr ap = ArrayPool::global()->get(pp, src->get_data_type());
 
@@ -187,18 +179,18 @@ namespace oa {
         src_box.get_corners(xs, xe, ys, ye, zs, ze);
 
         /*  debug
-	    src_box.display();
-	    for (int i = 0; i < rsx.size(); i += 3) 
-	    printf("rsx: [%d %d %d]\n", rsx[i], rsx[i + 1], rsx[i + 2]);
-	    for (int i = 0; i < rsy.size(); i += 3) 
-	    printf("rsy: [%d %d %d]\n", rsy[i], rsy[i + 1], rsy[i + 2]);
-	    for (int i = 0; i < rsz.size(); i += 3) 
-	    printf("rsz: [%d %d %d]\n", rsz[i], rsz[i + 1], rsz[i + 2]);
+            src_box.display();
+            for (int i = 0; i < rsx.size(); i += 3) 
+            printf("rsx: [%d %d %d]\n", rsx[i], rsx[i + 1], rsx[i + 2]);
+            for (int i = 0; i < rsy.size(); i += 3) 
+            printf("rsy: [%d %d %d]\n", rsy[i], rsy[i + 1], rsy[i + 2]);
+            for (int i = 0; i < rsz.size(); i += 3) 
+            printf("rsz: [%d %d %d]\n", rsz[i], rsz[i + 1], rsz[i + 2]);
         */
 
         vector<int> acc_rsx, acc_rsy, acc_rsz;
         pp->get_acc_box_procs(rsx, rsy, rsz,
-			      acc_rsx, acc_rsy, acc_rsz);
+                              acc_rsx, acc_rsy, acc_rsz);
 
         for (int i = 0; i < rsx.size(); i += 3) {
           if (rsx[i] == rsx[i + 1]) continue; 
@@ -220,27 +212,27 @@ namespace oa {
               };
               
               /*  debug
-		  vector<int> cd = pp->get_procs_3d(pp->rank());
-		  printf("====Send====\n");
-		  printf("from process [%d %d %d]\n", cd[0], cd[1], cd[2]);
-		  printf("to process   [%d %d %d]\n", rsx[i + 2], rsy[j + 2], rsz[k + 2]);
-		  printf("starts  [%d %d %d]\n", starts[0], starts[1], starts[2]);
-		  printf("bigsize [%d %d %d]\n", bigsize[0], bigsize[1], bigsize[2]);
-		  printf("subsize [%d %d %d]\n\n", subsize[0], subsize[1], subsize[2]);
+                  vector<int> cd = pp->get_procs_3d(pp->rank());
+                  printf("====Send====\n");
+                  printf("from process [%d %d %d]\n", cd[0], cd[1], cd[2]);
+                  printf("to process   [%d %d %d]\n", rsx[i + 2], rsy[j + 2], rsz[k + 2]);
+                  printf("starts  [%d %d %d]\n", starts[0], starts[1], starts[2]);
+                  printf("bigsize [%d %d %d]\n", bigsize[0], bigsize[1], bigsize[2]);
+                  printf("subsize [%d %d %d]\n\n", subsize[0], subsize[1], subsize[2]);
               */
 
               MPI_Type_create_subarray(3, bigsize, subsize,
-				       starts, MPI_ORDER_FORTRAN,
-				       oa::utils::mpi_datatype(src->get_data_type()),
-				       &src_subarray);
+                                       starts, MPI_ORDER_FORTRAN,
+                                       oa::utils::mpi_datatype(src->get_data_type()),
+                                       &src_subarray);
               MPI_Type_commit(&src_subarray);
 
               int target_rank = pp->
                 get_procs_rank({rsx[i + 2], rsy[j + 2], rsz[k + 2]});
               MPI_Isend(src->get_buffer(), 1, 
-			src_subarray, target_rank, 
-			100, pp->get_comm(),
-			&isreqs[isreqs_cnt++]);
+                        src_subarray, target_rank, 
+                        100, pp->get_comm(),
+                        &isreqs[isreqs_cnt++]);
               MPI_Type_free(&src_subarray);
 
             }
@@ -259,7 +251,7 @@ namespace oa {
 
         vector<int> acc_rsx, acc_rsy, acc_rsz;
         pp->get_acc_box_procs(rsx, rsy, rsz,
-			      acc_rsx, acc_rsy, acc_rsz);
+                              acc_rsx, acc_rsy, acc_rsz);
 
         for (int i = 0; i < rsx.size(); i += 3) {
           if (rsx[i] == rsx[i + 1]) continue;
@@ -280,27 +272,27 @@ namespace oa {
               };
 
               /* debug
-		 vector<int> cd = pp->get_procs_3d(pp->rank());
-		 printf("====Receive====\n");
-		 printf("to process   [%d %d %d]\n", cd[0], cd[1], cd[2]);
-		 printf("from process [%d %d %d]\n", rsx[i + 2], rsy[j + 2], rsz[k + 2]);
-		 printf("starts  [%d %d %d]\n", starts[0], starts[1], starts[2]);
-		 printf("bigsize [%d %d %d]\n", bigsize[0], bigsize[1], bigsize[2]);
-		 printf("subsize [%d %d %d]\n\n", subsize[0], subsize[1], subsize[2]);
+                 vector<int> cd = pp->get_procs_3d(pp->rank());
+                 printf("====Receive====\n");
+                 printf("to process   [%d %d %d]\n", cd[0], cd[1], cd[2]);
+                 printf("from process [%d %d %d]\n", rsx[i + 2], rsy[j + 2], rsz[k + 2]);
+                 printf("starts  [%d %d %d]\n", starts[0], starts[1], starts[2]);
+                 printf("bigsize [%d %d %d]\n", bigsize[0], bigsize[1], bigsize[2]);
+                 printf("subsize [%d %d %d]\n\n", subsize[0], subsize[1], subsize[2]);
               */
               
               MPI_Type_create_subarray(3, bigsize, subsize,
-				       starts, MPI_ORDER_FORTRAN,
-				       oa::utils::mpi_datatype(ap->get_data_type()),
-				       &dest_subarray);
+                                       starts, MPI_ORDER_FORTRAN,
+                                       oa::utils::mpi_datatype(ap->get_data_type()),
+                                       &dest_subarray);
               MPI_Type_commit(&dest_subarray);
 
               int target_rank = src->get_partition()->
                 get_procs_rank({rsx[i + 2], rsy[j + 2], rsz[k + 2]});
               MPI_Irecv(ap->get_buffer(), 1,
-			dest_subarray, target_rank, 
-			100, pp->get_comm(),
-			&irreqs[irreqs_cnt++]);
+                        dest_subarray, target_rank, 
+                        100, pp->get_comm(),
+                        &irreqs[irreqs_cnt++]);
 
               MPI_Type_free(&dest_subarray);
               
@@ -372,18 +364,18 @@ namespace oa {
 
       switch (direction) {
       case 0:
-	st_x = -1, ed_x = 1;
-	break;
+        st_x = -1, ed_x = 1;
+        break;
       case 1:
-	st_y = -1, ed_y = 1;
-	break;
+        st_y = -1, ed_y = 1;
+        break;
       case 2:
-	st_z = -1, ed_z = 1;
-	break;
+        st_z = -1, ed_z = 1;
+        break;
       case -1:
-	st_x = st_y = st_z = -1;
-	ed_x = ed_y = ed_z = 1;
-	break;
+        st_x = st_y = st_z = -1;
+        ed_x = ed_y = ed_z = 1;
+        break;
       }
 
       for (int z = st_z; z <= ed_z; ++z) {
@@ -507,26 +499,26 @@ namespace oa {
         auto coutbuf = cout.rdbuf(out.rdbuf());
 
         vector<int> cd = pp->get_procs_3d(pp->rank());
-        cout<<"====Send====\n";
-        cout<<boost::format("from process [%d %d %d]\n") % cd[0] % cd[1] % cd[2];
-        cout<<boost::format("to process   [%d %d %d]\n") % ipx % ipy % ipz;
-        cout<<boost::format("starts  [%d %d %d]\n") % starts[0] % starts[1] % starts[2];
-        cout<<boost::format("bigsize [%d %d %d]\n") % bigsize[0] % bigsize[1] % bigsize[2];
-        cout<<boost::format("subsize [%d %d %d]\n") % subsize[0] % subsize[1] % subsize[2];
-        cout<<target_rank<<endl;
 
-        cout.rdbuf(coutbuf);        
+        // cout<<"====Send====\n";
+        // cout<<boost::format("from process [%d %d %d]\n") % cd[0] % cd[1] % cd[2];
+        // cout<<boost::format("to process   [%d %d %d]\n") % ipx % ipy % ipz;
+        // cout<<boost::format("starts  [%d %d %d]\n") % starts[0] % starts[1] % starts[2];
+        // cout<<boost::format("bigsize [%d %d %d]\n") % bigsize[0] % bigsize[1] % bigsize[2];
+        // cout<<boost::format("subsize [%d %d %d]\n") % subsize[0] % subsize[1] % subsize[2];
+        // cout<<target_rank<<endl;
+        // cout.rdbuf(coutbuf);        
 
         MPI_Datatype target_sub_array;
         MPI_Type_create_subarray(3, bigsize, subsize, starts,
-				 MPI_ORDER_FORTRAN,
-				 oa::utils::mpi_datatype(ap->get_data_type()),
-				 &target_sub_array);
+                                 MPI_ORDER_FORTRAN,
+                                 oa::utils::mpi_datatype(ap->get_data_type()),
+                                 &target_sub_array);
         MPI_Type_commit(&target_sub_array);
 
         MPI_Request req;
         MPI_Isend(ap->get_buffer(), 1, target_sub_array, target_rank, 100,
-		  pp->get_comm(), &req);
+                  pp->get_comm(), &req);
         reqs.push_back(req);
         MPI_Type_free(&target_sub_array);
       }
@@ -553,26 +545,26 @@ namespace oa {
         auto coutbuf = cout.rdbuf(out.rdbuf());
 
         vector<int> cd = pp->get_procs_3d(pp->rank());
-        cout<<"====Receive====\n";
-        cout<<boost::format("to process   [%d %d %d]\n") % cd[0] % cd[1] % cd[2];
-        cout<<boost::format("from process [%d %d %d]\n") % ipx % ipy % ipz;
-        cout<<boost::format("starts  [%d %d %d]\n") % starts[0] % starts[1] % starts[2];
-        cout<<boost::format("bigsize [%d %d %d]\n") % bigsize[0] % bigsize[1] % bigsize[2];
-        cout<<boost::format("subsize [%d %d %d]\n") % subsize[0] % subsize[1] % subsize[2];
-        cout<<target_rank<<endl;
 
-        cout.rdbuf(coutbuf);
+        // cout<<"====Receive====\n";
+        // cout<<boost::format("to process   [%d %d %d]\n") % cd[0] % cd[1] % cd[2];
+        // cout<<boost::format("from process [%d %d %d]\n") % ipx % ipy % ipz;
+        // cout<<boost::format("starts  [%d %d %d]\n") % starts[0] % starts[1] % starts[2];
+        // cout<<boost::format("bigsize [%d %d %d]\n") % bigsize[0] % bigsize[1] % bigsize[2];
+        // cout<<boost::format("subsize [%d %d %d]\n") % subsize[0] % subsize[1] % subsize[2];
+        // cout<<target_rank<<endl;
+        // cout.rdbuf(coutbuf);
 
         MPI_Datatype target_sub_array;
         MPI_Type_create_subarray(3, bigsize, subsize, starts,
-				 MPI_ORDER_FORTRAN,
-				 oa::utils::mpi_datatype(ap->get_data_type()),
-				 &target_sub_array);
+                                 MPI_ORDER_FORTRAN,
+                                 oa::utils::mpi_datatype(ap->get_data_type()),
+                                 &target_sub_array);
         MPI_Type_commit(&target_sub_array);
 
         MPI_Request req;
         MPI_Irecv(ap->get_buffer(), 1, target_sub_array, target_rank, 100,
-		  pp->get_comm(), &req);
+                  pp->get_comm(), &req);
         reqs.push_back(req);
         MPI_Type_free(&target_sub_array);
       }
@@ -590,7 +582,7 @@ namespace oa {
       assert(A->get_partition() != NULL);
       
       if(A->is_seqs())
-	return A;
+        return A;
 
       ArrayPtr B = zeros(MPI_COMM_SELF, A->shape(), 0, A->get_data_type());
 
@@ -603,78 +595,78 @@ namespace oa {
       int npz = ps[2];
       
       int my_rank = A->rank();
-	
+        
       int num_procs = npx * npy * npz;
 
       Shape gs = A->shape();
       char* global_buf = (char*)B->get_buffer();
-	
+        
       MPI_Request reqs[num_procs];
       int reqs_cnt = 0;
 
       // rank 0 recv & others send
       if (my_rank == 0) {
-	for(int z = 0; z < npz; ++z) {
-	  for(int y = 0; y < npy; ++y) {
-	    for(int x = 0; x < npx; ++x) {
-		
-	      Box box = A->get_partition()->get_local_box({x, y, z});
-	      if (box.size() <= 0) continue;
+        for(int z = 0; z < npz; ++z) {
+          for(int y = 0; y < npy; ++y) {
+            for(int x = 0; x < npx; ++x) {
+                
+              Box box = A->get_partition()->get_local_box({x, y, z});
+              if (box.size() <= 0) continue;
 
-	      // int xs, ys, zs, xe, ye, ze;
-	      // box.get_corners(xs, xe, ys, ye, zs, ze);
-					
-	      MPI_Datatype target_sub_array;
-	      int bigsize[3] = {gs[0], gs[1], gs[2]};
-	      
-	      MPI_Type_create_subarray(3, bigsize,
-				       box.counts().data(),
-				       box.starts().data(),
-				       MPI_ORDER_FORTRAN,
-				       oa::utils::mpi_datatype(dt),
-				       &target_sub_array);
-					
-	      MPI_Type_commit(&target_sub_array);
-	      int target_rank = A->get_partition()->get_procs_rank({x, y, z});
-	      MPI_Irecv(global_buf, 1,
-			target_sub_array,
-			target_rank, 100,
-			A->get_partition()->get_comm(),
-			&reqs[reqs_cnt++]);
-					
-	      MPI_Type_free(&target_sub_array);
-	    }
-	  }
-	}
+              // int xs, ys, zs, xe, ye, ze;
+              // box.get_corners(xs, xe, ys, ye, zs, ze);
+                                        
+              MPI_Datatype target_sub_array;
+              int bigsize[3] = {gs[0], gs[1], gs[2]};
+              
+              MPI_Type_create_subarray(3, bigsize,
+                                       box.counts().data(),
+                                       box.starts().data(),
+                                       MPI_ORDER_FORTRAN,
+                                       oa::utils::mpi_datatype(dt),
+                                       &target_sub_array);
+                                        
+              MPI_Type_commit(&target_sub_array);
+              int target_rank = A->get_partition()->get_procs_rank({x, y, z});
+              MPI_Irecv(global_buf, 1,
+                        target_sub_array,
+                        target_rank, 100,
+                        A->get_partition()->get_comm(),
+                        &reqs[reqs_cnt++]);
+                                        
+              MPI_Type_free(&target_sub_array);
+            }
+          }
+        }
       }
 
       // all process send subarray (if size > 0) to global_buf
       Box box = A->get_local_box();
       if (box.size() > 0) {
-	int xs, ys, zs, xe, ye, ze;
-	box.get_corners(xs, xe, ys, ye, zs, ze);
-	int sw = A->get_partition()->get_stencil_width();  
-		
-	MPI_Datatype mysubarray;
-	int starts[3]  = {sw, sw, sw};
-	int bigsize[3] = {xe-xs+2*sw, ye-ys+2*sw, ze-zs+2*sw};
-	int subsize[3] = {xe-xs, ye-ys, ze-zs};
-	MPI_Type_create_subarray(3, bigsize, subsize,
-				 starts, MPI_ORDER_FORTRAN,
-				 oa::utils::mpi_datatype(dt),
-				 &mysubarray);
-	MPI_Type_commit(&mysubarray);
-	MPI_Send(A->get_buffer(), 1, mysubarray, 0, 100,
-		 A->get_partition()->get_comm());
-	MPI_Type_free(&mysubarray);
+        int xs, ys, zs, xe, ye, ze;
+        box.get_corners(xs, xe, ys, ye, zs, ze);
+        int sw = A->get_partition()->get_stencil_width();  
+                
+        MPI_Datatype mysubarray;
+        int starts[3]  = {sw, sw, sw};
+        int bigsize[3] = {xe-xs+2*sw, ye-ys+2*sw, ze-zs+2*sw};
+        int subsize[3] = {xe-xs, ye-ys, ze-zs};
+        MPI_Type_create_subarray(3, bigsize, subsize,
+                                 starts, MPI_ORDER_FORTRAN,
+                                 oa::utils::mpi_datatype(dt),
+                                 &mysubarray);
+        MPI_Type_commit(&mysubarray);
+        MPI_Send(A->get_buffer(), 1, mysubarray, 0, 100,
+                 A->get_partition()->get_comm());
+        MPI_Type_free(&mysubarray);
       }
 
       if (my_rank == 0){
-	//m_par_ptr->display(NULL, true);
-		
-	MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
-	//oa::utils::print_data((void*)global_buf, gs, A->get_data_type());
-	//delete(global_buf);
+        //m_par_ptr->display(NULL, true);
+                
+        MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
+        //oa::utils::print_data((void*)global_buf, gs, A->get_data_type());
+        //delete(global_buf);
       }
 
       return B;
