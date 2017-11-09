@@ -121,6 +121,24 @@ namespace{
       EXPECT_TRUE(oa::funcs::is_equal(A1, B1));
     }
   }
+
+  TEST_P(MPITest, GhostUpdate){
+    ///:for t in dtypes
+    ArrayPtr A1 =
+      oa::funcs::seqs(comm,{m, n, p}, 1, oa::utils::dtype<${t}$>::type);
+
+    ArrayPtr A2 =
+      oa::funcs::seqs(comm,{m, n, p}, 2, oa::utils::dtype<${t}$>::type);
+
+    ArrayPtr A3 =
+      oa::funcs::seqs(comm,{m, n, p}, 3, oa::utils::dtype<${t}$>::type);
+
+    if(A->local_size() > 0){
+      arma::Cube<${t}$> C1 = make_cube(A1->buffer_shape(), A1->get_bffuer());
+      
+    }
+    ///:endfor
+  }
   
   TEST_P(MPITest, ArrayCreation){
 
