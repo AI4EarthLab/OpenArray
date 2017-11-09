@@ -587,6 +587,8 @@ namespace oa {
 
     
     ArrayPtr to_rank0(ArrayPtr A){
+      assert(A->get_partition() != NULL);
+      
       if(A->is_seqs())
 	return A;
 
@@ -676,6 +678,43 @@ namespace oa {
       }
 
       return B;
+    }
+
+    bool is_equal(const ArrayPtr& A, const ArrayPtr& B){
+
+      if(!A->is_seqs()) return false;
+
+      if(A->shape() != B->shape()) return false;
+      
+      int A_size = A->size();
+
+      if(A->get_data_type() == DATA_INT){
+        int* A_buf = (int*)A->get_buffer();
+        int* B_buf = (int*)B->get_buffer();
+        for(int i = 0; i < A_size; ++ i){
+          if(abs(A_buf[i] - B_buf[i]) > 1E-8){
+            return false;
+          }
+        }        
+      }else if(A->get_data_type() == DATA_FLOAT){
+        float* A_buf = (float*)A->get_buffer();
+        float* B_buf = (float*)B->get_buffer();
+        for(int i = 0; i < A_size; ++ i){
+          if(abs(A_buf[i] - B_buf[i]) > 1E-8){
+            return false;
+          }
+        }        
+      }else if(A->get_data_type() == DATA_DOUBLE){
+        double* A_buf = (double*)A->get_buffer();
+        double* B_buf = (double*)B->get_buffer();
+        for(int i = 0; i < A_size; ++ i){
+          if(abs(A_buf[i] - B_buf[i]) > 1E-8){
+            return false;
+          }
+        }        
+      }
+
+      return true;
     }
   }
 }

@@ -1,5 +1,6 @@
 #include<iostream>
 #include "Range.hpp"
+#include  <algorithm>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ bool Range::equal(const Range &rg) const {
 }
 
 int Range::size() const{
-  return m_upper - m_lower;
+  return std::max(m_upper - m_lower, 0);
 }
 
 void Range::display(char const *prefix) {
