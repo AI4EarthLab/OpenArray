@@ -35,7 +35,7 @@ namespace oa {
 
     void gen_kernels(NodePtr A, bool is_root = true, MPI_Comm = MPI_COMM_WORLD);
 
-    stringstream tree_to_string(NodePtr A);
+    void tree_to_string(NodePtr A, stringstream &ss);
 
     void tree_to_string_stack(NodePtr A, stringstream &ss);
   }

@@ -329,7 +329,7 @@ void test_fusion_kernel() {
   NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
   NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
 
-  oa::ops::gen_kernels(K);
+  oa::ops::gen_kernels(K,true,MPI_COMM_WORLD);
 
 /*  ArrayPtr ans = oa::ops::eval(I);
   A->display("A");
