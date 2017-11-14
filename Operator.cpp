@@ -226,9 +226,11 @@ namespace oa {
 
       if (is_root && A->get_depth() >= 2) {
         // fusion kernel
-        stringstream ss = tree_to_string(A);
+        //stringstream ss = tree_to_string(A);
         // fusion kernel hash
+        stringstream ss;
         stringstream ss1;
+        tree_to_string(A,ss);
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
@@ -245,8 +247,8 @@ namespace oa {
     }
 
     // example: (A1+S2)*A3
-    stringstream tree_to_string(NodePtr A) {
-      stringstream ss;
+    
+    void tree_to_string(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());
       
       // only data or non-element-wise
@@ -254,12 +256,13 @@ namespace oa {
         if (A->is_seqs_scalar()) ss<<"S";
         else ss<<"A";
         ss<<A->get_data_type();
-        return ss;
+        return;
       }
 
       stringstream child[2];
       for (int i = 0; i < A->input_size(); i++) {
-        child[i] = tree_to_string(A->input(i));
+        tree_to_string(A->input(i), child[i]);
+        //child[i] = tree_to_string(A->input(i));
       }
 
       switch(A->input_size()) {
@@ -271,8 +274,9 @@ namespace oa {
           break;
       }
 
-      return ss;
+      return;
     }
+    
 
     void tree_to_string_stack(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());
@@ -291,6 +295,7 @@ namespace oa {
 
       return ;
     }
+    
 
   }
 }

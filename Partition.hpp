@@ -28,9 +28,9 @@ typedef std::shared_ptr<Partition> PartitionPtr;
 class Partition {
   public:
   MPI_Comm m_comm = MPI_COMM_SELF;
-  Shape m_global_shape = {1, 1, 1};
-  Shape m_procs_shape = {1, 1, 1};
-  Shape m_bound_type = {0, 0, 0};
+  Shape m_global_shape = { {1, 1, 1} };
+  Shape m_procs_shape = {{1, 1, 1}};
+  Shape m_bound_type = {{0, 0, 0}};
   int m_stencil_type = STENCIL_STAR;
   int m_stencil_width = 1;
   size_t m_hash;

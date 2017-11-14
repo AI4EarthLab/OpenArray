@@ -22,7 +22,7 @@ private:
   bool m_is_seqs = false;
   bool m_is_scalar = false;
   int m_depth = 0;
-  Shape m_global_shape = {1, 1, 1};
+  Shape m_global_shape = {{1, 1, 1}};
   int m_data_type;
   //BoxPtr ref;
 

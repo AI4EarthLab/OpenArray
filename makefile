@@ -82,7 +82,7 @@ testall:
 test_main : ${OBJ_TEST}
 	-${CXX} -o test_main ${OBJ_TEST} -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem -lboost_system \
-        -lgtest
+        -lgtest -ldl
 
 testfortran:
 	@rm -rf fortran_main
