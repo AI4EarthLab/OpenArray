@@ -4,7 +4,13 @@
 #include "../ArrayPool.hpp"
 #include "../NodePool.hpp"
 
+#define L 0
+#define R 1
+
 extern "C" {
+
+  void array_assign_array(void* &A, void* &B, int & pa, int & pb);
+
   void destroy_array(void* A);
 
   void destroy_node(void* A);
@@ -15,25 +21,21 @@ extern "C" {
     int data_type = DATA_DOUBLE, 
     MPI_Fint fcomm = 0);
 
-  void* zeros(int m, int n, int k, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE,
-    MPI_Comm comm = MPI_COMM_WORLD);
+  void zeros(void* & ptr, int m, int n, int k, int stencil_width = 1, 
+    int data_type = DATA_DOUBLE, 
+    MPI_Fint fcomm = 0);
 
-  void* rands(int m, int n, int k, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE,
-    MPI_Comm comm = MPI_COMM_WORLD);
+  void rands(void* & ptr, int m, int n, int k, int stencil_width = 1, 
+    int data_type = DATA_DOUBLE, 
+    MPI_Fint fcomm = 0);
 
-
-  void* seqs(int m, int n, int k, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE,
-    MPI_Comm comm = MPI_COMM_WORLD);
+  void seqs(void* & ptr, int m, int n, int k, int stencil_width = 1, 
+    int data_type = DATA_DOUBLE, 
+    MPI_Fint fcomm = 0);
     
   ///:mute
-  ///:set TYPE = [['int'], &
-                ['float'], &
-                ['double']]
+  ///:set TYPE = [['int'], ['float'], ['double']]
   ///:endmute
-
   ///:for t in TYPE
   void* consts_${t[0]}$(int m, int n, int k, ${t[0]}$ val, 
     int stencil_width = 1, 

@@ -35,6 +35,7 @@ build/*
 *.app
 main
 test_main
+fortran_main
 
 # ctags
 tags

@@ -120,6 +120,14 @@ namespace oa {
 
     ///:endfor 
 
+    // A = B
+    template<typename T>
+    void copy_buffer(T *A, T *B, int size) {
+      for (int i = 0; i < size; i++) {
+        A[i] = B[i];
+      }
+    }
+
   }
 }
 

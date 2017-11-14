@@ -48,10 +48,21 @@ all:
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
 	@./pre.sh
-	@cd build && make clean 
+	@cd build && make clean
 	@echo "Cleaning done."
-	@cd build && make main
+	@cd build && make main 2>/dev/null
 	cp build/main ./
+
+quick:
+	@rm -rf fortran_main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./test.sh
+	@cd build
+	@echo "Cleaning done."
+	@cd build && make fortran_main
+	@cp build/fortran_main ./
+	@mpirun -n 4 ./fortran_main 4 4 4
 
 main: ${OBJ_MAIN}
 	-${CXX} -rdynamic -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf \

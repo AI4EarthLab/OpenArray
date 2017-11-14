@@ -3,9 +3,50 @@
 #include "../Operator.hpp"
 
 extern "C" {
+
+  void array_assign_array(void* &A, void* &B, int & pa, int & pb) {
+    destroy_array(A);
+    if (pb == R) {
+      A = B;
+      B = NULL;
+    } else {
+      int dt = (*(ArrayPtr*) B)->get_data_type();
+      ArrayPtr ap = ArrayPool::global()->get(
+        (*(ArrayPtr*) B)->get_partition(), dt
+      );
+      switch(dt) {
+        case DATA_INT:
+          oa::internal::copy_buffer(
+            (int*) (ap->get_buffer()),
+            (int*) ((*(ArrayPtr*) B)->get_buffer()),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_FLOAT:
+          oa::internal::copy_buffer(
+            (float*) (ap->get_buffer()),
+            (float*) ((*(ArrayPtr*) B)->get_buffer()),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_DOUBLE:
+          oa::internal::copy_buffer(
+            (double*) (ap->get_buffer()),
+            (double*) ((*(ArrayPtr*) B)->get_buffer()),
+            ap->buffer_size()
+          );
+          break;
+      }
+      ArrayPtr* tmp = new ArrayPtr();
+      *tmp = ap;
+      A = (void*) tmp;
+    }
+    pa = L;
+  }
+
   void destroy_array(void* A) {
     //cout<<"destroy_array called"<<endl;
-    delete((ArrayPtr*) A);
+    if (A != NULL) delete((ArrayPtr*) A);
   }
 
   void destroy_node(void* A) {
@@ -24,34 +65,48 @@ extern "C" {
 
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
+
+    if (ptr != NULL) destroy_array(ptr);
     ptr = (void*) A;
   }
 
-  void* zeros(int m, int n, int k, int stencil_width, 
-    int data_type, MPI_Comm comm) {
+  void zeros(void* & ptr, int m, int n, int k, int stencil_width, 
+    int data_type, MPI_Fint fcomm) {
+    MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
     ArrayPtr ap = oa::funcs::zeros(comm, s, stencil_width, data_type);
+    
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
-    return A; 
+
+    if (ptr != NULL) destroy_array(ptr);
+    ptr = (void*) A;
   }
 
-  void* rands(int m, int n, int k, int stencil_width, 
-    int data_type, MPI_Comm comm) {
+  void rands(void* & ptr, int m, int n, int k, int stencil_width, 
+    int data_type, MPI_Fint fcomm) {
+    MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
     ArrayPtr ap = oa::funcs::rand(comm, s, stencil_width, data_type);
+    
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
-    return A;
+
+    if (ptr != NULL) destroy_array(ptr);
+    ptr = (void*) A;
   }
 
-  void* seqs(int m, int n, int k, int stencil_width, 
-    int data_type, MPI_Comm comm) {
+  void seqs(void* & ptr, int m, int n, int k, int stencil_width, 
+    int data_type, MPI_Fint fcomm) {
+    MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
     ArrayPtr ap = oa::funcs::seqs(comm, s, stencil_width, data_type);
+
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
-    return A;
+
+    if (ptr != NULL) destroy_array(ptr);
+    ptr = (void*) A;
   }
 
   ///:mute
