@@ -126,18 +126,28 @@ namespace{
     ///:for t in dtypes
     {
       ArrayPtr A1 =
-        oa::funcs::seqs(comm,{m, n, p}, 1, oa::utils::dtype<${t}$>::type);
+        oa::funcs::seqs(comm,{m*5, n*5, p*5}, 1, oa::utils::dtype<${t}$>::type);
 
       ArrayPtr A2 =
-        oa::funcs::seqs(comm,{m, n, p}, 2, oa::utils::dtype<${t}$>::type);
+        oa::funcs::seqs(comm,{m*5, n*5, p*5}, 2, oa::utils::dtype<${t}$>::type);
 
-      ArrayPtr A3 =
-        oa::funcs::seqs(comm,{m, n, p}, 3, oa::utils::dtype<${t}$>::type);
+      std::vector<MPI_Request> reqs; 
+      update_ghost_start(A1, reqs, -1);
+      update_ghost_end(reqs);
+      reqs.clear();
 
-      if(A1->local_size() > 0){
-        arma::Cube<${t}$> C1 = oa::utils::make_cube<${t}$>(A1->buffer_shape(),
-                                                           A1->get_buffer());
-      }
+      // update_ghost_start(A2, reqs, -1);
+      // update_ghost_end(reqs);
+      // reqs.clear();
+
+      // update_ghost_start(A3, reqs, -1);
+      // update_ghost_end(reqs);
+      // reqs.clear();
+      
+      // if(A1->local_size() > 0){
+      //   arma::Cube<${t}$> C1 = oa::utils::make_cube<${t}$>(A1->buffer_shape(),
+      //                                                      A1->get_buffer());
+      // }
     }
     ///:endfor
   }
