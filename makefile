@@ -4,22 +4,26 @@ CC = mpicc -O3 -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
 	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
 
 
-
 OBJS	= Range.o Box.o Partition.o Array.o \
 	  Internal.o Function.o Kernel.o Operator.o \
 	  Node.o IO.o 
 
 
 CXX = mpicxx -O3 --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
-		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
+		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST} \
+		-L${LAPACK}
 
+LIBS = -lstdc++ -lpnetcdf \
+	-lboost_program_options -lboost_filesystem \
+	-lboost_system -ldl -llapack -lblas \
+	-lgtest
 
 CXXFLAGS= --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
-	  -L${PNETCDF_LIB} -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC}
+	  -L${PNETCDF_LIB} -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -L${LAPACK}
 
 
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
-			      utils.o)
+	      utils.o)
 
 OBJS_C_INTERFACE = $(addprefix ./c-interface/, c_oa_type.o c_oa_utils.o)
 
@@ -56,8 +60,7 @@ all:
 	cp build/main ./
 
 main: ${OBJ_MAIN}
-	-${CXX} -rdynamic -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system -ldl
+	-${CXX} -rdynamic -o main ${OBJ_MAIN} ${LIBS}
 
 testall:
 	@rm -rf main
@@ -68,12 +71,10 @@ testall:
 	@echo "Cleaning done."
 	@cd build && make testall_main
 	@cp build/testall_main ./
-	@mpirun -np 2 ./test_main 
+	@mpirun -np 2 ./testall_main 
 
 testall_main : ${OBJ_TEST}
-	-${CXX} -o testall_main ${OBJ_TEST} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system \
-        -lgtest
+	-${CXX} -o testall_main ${OBJ_TEST} ${LIBS}
 
 testperf:
 	@rm -rf main
@@ -87,9 +88,7 @@ testperf:
 	@mpirun -np 1 ./test_perf_main
 
 test_perf_main : ${OBJ_TEST_PERF}
-	-${CXX} -o test_perf_main ${OBJ_TEST_PERF} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system \
-        -lgtest
+	-${CXX} -o test_perf_main ${OBJ_TEST_PERF} ${LIBS}
 
 testfortran:
 	@rm -rf fortran_main
@@ -103,9 +102,8 @@ testfortran:
 	@mpirun -n 4 ./fortran_main
 
 fortran_main : ${OBJ_FORTRAN}
-	-${CXX} -o fortran_main ${OBJ_FORTRAN} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system \
-  
+	-${CXX} -o fortran_main ${OBJ_FORTRAN} ${LIBS}
+
 small:
 	@make all
 	@mpirun -n 4 ./main 4 3 2

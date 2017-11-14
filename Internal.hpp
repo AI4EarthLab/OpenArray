@@ -125,14 +125,18 @@ namespace oa {
       arma::Col<T2> CU = oa::utils::make_vec<T2>(size, U);
       arma::Col<T3> CV = oa::utils::make_vec<T3>(size, V);
 
-      CA = CU + CV;
+      ///:set a = sy
+      ///:if a == '*'
+      ///:set a = '%'
+      ///:endif
+       CA = CU ${a}$ CV;
       
       //std::cout<<CA(arma::span(1, 10))<<std::endl;
       
-// #pragma GCC ivdep
-//       for (int i = 0; i < size; i++) {
-//         A[i] = U[i] ${sy}$ V[i];
-//       }
+      //#pragma GCC ivdep
+      // for (int i = 0; i < size; i++) {
+      //   A[i] = U[i] ${sy}$ V[i];
+      // }
     }
 
     ///:endfor 
