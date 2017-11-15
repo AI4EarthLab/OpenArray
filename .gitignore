@@ -36,6 +36,7 @@ build/*
 main
 test_main
 fortran_main
+testall_main
 
 # ctags
 tags
