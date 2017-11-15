@@ -74,6 +74,7 @@ namespace oa {
       if (std::is_same<T, int>::value) return DATA_INT;
       if (std::is_same<T, float>::value) return DATA_FLOAT;
       if (std::is_same<T, double>::value) return DATA_DOUBLE;
+      return DATA_UNKNOWN;
     }
 
     template<class T>

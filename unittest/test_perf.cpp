@@ -14,27 +14,33 @@ extern "C"{
 }
 
 void test_sample_math(){
-  int m = 512, n = 512, p = 512;
+  int m = 512, n = 512, p = 256;
 
   MPI_Comm comm = MPI_COMM_WORLD;
-  
-  ArrayPtr A =
-    oa::funcs::ones(comm,{m, n, p}, 1, oa::utils::dtype<double>::type);
-  ArrayPtr B =
-    oa::funcs::ones(comm,{m, n, p}, 1, oa::utils::dtype<double>::type);
-  ArrayPtr C =
-    oa::funcs::ones(comm,{m, n, p}, 1, oa::utils::dtype<double>::type);
 
-  ///:for op in ['DIVD', 'MINUS', 'MULT', 'PLUS']
-  tic("${op}$");    
-  for(int i = 0; i < 10; ++i){
-    NodePtr X = oa::ops::new_node(A);
-    NodePtr Y = oa::ops::new_node(B);
+  ///:for dt in ['float', 'double']
+  {
+    ArrayPtr A =
+      oa::funcs::seqs(comm,{m, n, p}, 1, oa::utils::dtype<${dt}$>::type);
+    ArrayPtr B =
+      oa::funcs::seqs(comm,{m, n, p}, 1, oa::utils::dtype<${dt}$>::type);
+    ArrayPtr C =
+      oa::funcs::ones(comm,{m, n, p}, 1, oa::utils::dtype<${dt}$>::type);
 
-    NodePtr Z = oa::ops::new_node(TYPE_${op}$, X, Y);
-    ArrayPtr T = oa::ops::eval(Z);
+    ///:for op in ['PLUS', 'MINUS', 'MULT', 'DIVD']
+    tic("${op}$(${dt}$)");    
+    for(int i = 0; i < 10; ++i){
+      NodePtr X = oa::ops::new_node(A);
+      NodePtr Y = oa::ops::new_node(B);
+
+      NodePtr Z = oa::ops::new_node(TYPE_${op}$, X, Y);
+      ArrayPtr T = oa::ops::eval(Z);
+      //printf("%p\n", T->get_buffer());
+      //T->display("T : ");
+    }
+    toc("${op}$(${dt}$)");
+    ///:endfor
   }
-  toc("${op}$");  
   ///:endfor
 }
 
