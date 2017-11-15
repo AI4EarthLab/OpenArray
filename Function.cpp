@@ -494,11 +494,11 @@ namespace oa {
         int bigsize[3] = {xe-xs+2*sw, ye-ys+2*sw, ze-zs+2*sw};
         
         // debug
-        string str = "debug/" + to_string(pp->rank()) + ".out";
-        std::ofstream out(str, std::fstream::app);
-        auto coutbuf = cout.rdbuf(out.rdbuf());
+        // string str = "debug/" + to_string(pp->rank()) + ".out";
+        // std::ofstream out(str, std::fstream::app);
+        // auto coutbuf = cout.rdbuf(out.rdbuf());
 
-        vector<int> cd = pp->get_procs_3d(pp->rank());
+        // vector<int> cd = pp->get_procs_3d(pp->rank());
 
         // cout<<"====Send====\n";
         // cout<<boost::format("from process [%d %d %d]\n") % cd[0] % cd[1] % cd[2];
@@ -540,11 +540,11 @@ namespace oa {
         int bigsize[3] = {xe-xs+2*sw,ye-ys+2*sw,ze-zs+2*sw};
 
         // debug
-        string str = "debug/" + to_string(pp->rank()) + ".out";
-        std::ofstream out(str, std::fstream::app);
-        auto coutbuf = cout.rdbuf(out.rdbuf());
+        // string str = "debug/" + to_string(pp->rank()) + ".out";
+        // std::ofstream out(str, std::fstream::app);
+        // auto coutbuf = cout.rdbuf(out.rdbuf());
 
-        vector<int> cd = pp->get_procs_3d(pp->rank());
+        // vector<int> cd = pp->get_procs_3d(pp->rank());
 
         // cout<<"====Receive====\n";
         // cout<<boost::format("to process   [%d %d %d]\n") % cd[0] % cd[1] % cd[2];

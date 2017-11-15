@@ -111,4 +111,14 @@ small:
 clean:
 	@rm -rf *.o 2>/dev/null
 
+quick:
+	@rm -rf testall_main 2>/dev/null
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./test.sh
+	@cd build
+	@echo "Cleaning done."
+	@cd build && make testall_main -f makefile.intel
+	@cp build/testall_main ./
+	@mpirun -n 2 ./testall_main
 

@@ -3,13 +3,6 @@ FC = mpif90
 CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
 	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
 
-
-
-OBJS	= Range.o Box.o Partition.o Array.o \
-	  Internal.o Function.o Kernel.o Operator.o \
-	  Node.o IO.o 
-
-
 CXX = mpicxx --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
 		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
 
@@ -17,6 +10,15 @@ CXX = mpicxx --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
 CXXFLAGS= --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
 	  -L${PNETCDF_LIB} -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC}
 
+LIBS = -lstdc++ -lpnetcdf \
+	-lboost_program_options -lboost_filesystem \
+	-lboost_system -ldl -llapack -lblas \
+	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST}
+
+
+OBJS	= Range.o Box.o Partition.o Array.o \
+	  Internal.o Function.o Kernel.o Operator.o \
+	  Node.o IO.o 
 
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
 			      utils.o)
@@ -30,6 +32,9 @@ OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} main.o
 
 OBJ_TEST = ${OBJS} ${OBJS_UTILS} \
 	   $(addprefix ./unittest/, test_array.o gtest_main.o)
+
+OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
+	   $(addprefix ./unittest/, test_perf.o)
 
 
 .DEFAULT_GOAL := all
@@ -75,14 +80,12 @@ testall:
 	@./pre.sh
 	@cd build && make clean 
 	@echo "Cleaning done."
-	@cd build && make test_main
-	@cp build/test_main ./
-	@mpirun -n 2 ./test_main 
+	@cd build && make testall_main
+	@cp build/testall_main ./
+	@mpirun -np 2 ./testall_main 
 
-test_main : ${OBJ_TEST}
-	-${CXX} -o test_main ${OBJ_TEST} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system \
-        -lgtest -ldl
+testall_main : ${OBJ_TEST}
+	-${CXX} -o testall_main ${OBJ_TEST} ${LIBS}
 
 testfortran:
 	@rm -rf fortran_main
