@@ -44,17 +44,26 @@ extern "C" {
     pa = L;
   }
 
+  void node_assign_node(void* &A, void* &B) {
+    destroy_node(A);
+    A = B;
+  }
+
   void destroy_array(void* A) {
     //cout<<"destroy_array called"<<endl;
     if (A != NULL) delete((ArrayPtr*) A);
   }
 
   void destroy_node(void* A) {
-    delete((NodePtr*) A);
+    if (A != NULL) delete((NodePtr*) A);
   }
 
   void display_array(void* A) {
     (*(ArrayPtr*) A)->display();
+  }
+
+  void display_node(void* A) {
+    (*(NodePtr*) A)->display();
   }
 
   void ones(void* & ptr, int m, int n, int k, int stencil_width, 
@@ -116,47 +125,59 @@ extern "C" {
   ///:endmute
 
   ///:for t in TYPE
-  void* consts_${t[0]}$(int m, int n, int k, ${t[0]}$ val, 
-    int stencil_width, MPI_Comm comm) {
+  void consts_${t[0]}$(void* &ptr, int m, int n, int k, ${t[0]}$ val, 
+    int stencil_width, MPI_Fint fcomm) {
+    MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
     ArrayPtr ap = oa::funcs::consts(comm, s, val, stencil_width);
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
-    return A;
+
+    if (ptr != NULL) destroy_array(ptr);
+    ptr = (void*) A;
   }
 
   ///:endfor
 
   ///:for t in TYPE
-  void* new_seqs_scalar_node_${t[0]}$(${t[0]}$ val, 
-    MPI_Comm comm) {
+  void new_seqs_scalar_node_${t[0]}$(void* &ptr, ${t[0]}$ val, 
+    MPI_Fint fcomm) {
+    MPI_Comm comm = MPI_Comm_f2c(fcomm);
     NodePtr np = oa::ops::new_seqs_scalar_node(comm, val);
     NodePtr* A = new NodePtr();
     *A = np;
-    return A;
+
+    if (ptr != NULL) destroy_array(ptr);
+    ptr = (void*) A;
   }
     
   ///:endfor
 
-  void* new_node_array(void* ap) {
+  void new_node_array(void* &ptr, void* &ap) {
     NodePtr np = oa::ops::new_node(*(ArrayPtr*)ap);
     NodePtr* A = new NodePtr();
     *A = np;
-    return A;
+
+    if (ptr != NULL) destroy_node(ptr);
+    ptr = (void*) A;
   }
 
-  void* new_node_op2(int nodetype, void* u, void* v) {
+  void new_node_op2(void* &ptr, int nodetype, void* &u, void* &v) {
     NodePtr np = oa::ops::new_node((NodeType)nodetype, *(NodePtr*)u, *(NodePtr*)v);
     NodePtr* A = new NodePtr();
     *A = np;
-    return A;
+
+    if (ptr != NULL) destroy_node(ptr);
+    ptr = (void*) A;
   }
 
-  void* new_node_op1(int nodetype, void* u) {
+  void new_node_op1(void* &ptr, int nodetype, void* &u) {
     NodePtr np = oa::ops::new_node((NodeType)nodetype, *(NodePtr*)u);
     NodePtr* A = new NodePtr();
     *A = np;
-    return A;
+
+    if (ptr != NULL) destroy_node(ptr);
+    ptr = (void*) A;
   }
 }
 
