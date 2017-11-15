@@ -6,6 +6,13 @@
 #include "Box.hpp"
 #include "utils/utils.hpp"
 
+extern "C"{
+  void tic(const char* s);
+  void toc(const char* s);
+  void show_time(const char* s);
+  void show_all();
+}
+
 namespace oa {
   namespace internal {
     template <typename T>
@@ -113,9 +120,26 @@ namespace oa {
     // A = U ${sy}$ V
     template<typename T1, typename T2, typename T3>
     void buffer_${name}$_buffer(T1 *A, T2 *U, T3 *V, int size) {
+
+      // arma::Col<T1> CA = oa::utils::make_vec<T1>(size, A);
+      // arma::Col<T2> CU = oa::utils::make_vec<T2>(size, U);
+      // arma::Col<T3> CV = oa::utils::make_vec<T3>(size, V);
+
+      ///:set a = sy
+      ///:if a == '*'
+      ///:set a = '%'
+      ///:endif
+       // CA = CU ${a}$ CV;
+      
+      //std::cout<<CA(arma::span(1, 10))<<std::endl;
+      
+      //tic("kernel");
+      
+#pragma omp parallel for
       for (int i = 0; i < size; i++) {
         A[i] = U[i] ${sy}$ V[i];
       }
+      //toc("kernel");
     }
 
     ///:endfor 

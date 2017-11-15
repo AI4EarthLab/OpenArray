@@ -1,4 +1,3 @@
-
 #include "Operator.hpp"
 #include "utils/utils.hpp"
 #include "Kernel.hpp"
@@ -30,8 +29,8 @@ namespace oa {
       np->add_input(0, u);
       np->add_input(1, v);
       int dt = oa::utils::cast_data_type(
-        u->get_data_type(),
-        v->get_data_type());
+                                         u->get_data_type(),
+                                         v->get_data_type());
       
       const NodeDesc &nd = get_node_desc(type);
       if (nd.ew) {
@@ -205,7 +204,7 @@ namespace oa {
     }
 
     void insert_kernel_dict(size_t hash, const stringstream &s,
-      const char *filename) {
+                            const char *filename) {
       std::ofstream ofs;
       ofs.open(filename, std::ofstream::out | std::ofstream::app);
       ofs<<hash<<" "<<s.str()<<endl;
@@ -266,12 +265,12 @@ namespace oa {
       }
 
       switch(A->input_size()) {
-        case 1:
-          ss<<nd.sy<<"("<<child[0].str()<<")";
-          break;
-        case 2:
-          ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
-          break;
+      case 1:
+        ss<<nd.sy<<"("<<child[0].str()<<")";
+        break;
+      case 2:
+        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        break;
       }
 
       return;
@@ -299,5 +298,3 @@ namespace oa {
 
   }
 }
-
-

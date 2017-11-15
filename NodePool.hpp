@@ -26,7 +26,7 @@ public:
     p->set_id(NodePool::global_id());
 
     return NodePtr(p, [](Node* np) {
-  NodePool::global()->dispose(np);
+        NodePool::global()->dispose(np);
       });
   }
 
@@ -48,6 +48,7 @@ public:
   void dispose(Node* n) {
     n -> reset();
     m_list.push_back(n);
+    //printf("node dispose called.\n");
   }
 
   static NodePool* global() {

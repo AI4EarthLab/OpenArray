@@ -106,4 +106,3 @@ small:
 clean:
 	@rm -rf *.o 2>/dev/null
 
-

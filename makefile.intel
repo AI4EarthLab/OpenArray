@@ -1,0 +1,114 @@
+
+#FC = mpiifort
+
+#CC = /usr/lib64/openmpi/bin/mpicc  
+CC=mpiicc
+CC_FLAGS = -g -O3 -I${PNETCDF_INC}  -Werror=return-type \
+	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} 
+
+
+CXX = mpiicpc
+#CXX = /usr/lib64/openmpi/bin/mpicxx  
+
+CXXFLAGS= -g -O3 --std=c++0x -Werror=return-type -I${PNETCDF_INC}  \
+		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC}  \
+
+LIBS = -lstdc++ -lpnetcdf \
+	-lboost_program_options -lboost_filesystem \
+	-lboost_system -ldl -llapack -lblas \
+	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST}
+
+OBJS	= Range.o Box.o Partition.o Array.o \
+	  Internal.o Function.o Kernel.o Operator.o \
+	  Node.o IO.o 
+
+OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
+	      utils.o)
+
+OBJS_C_INTERFACE = $(addprefix ./c-interface/, c_oa_type.o c_oa_utils.o)
+
+OBJ_FORTRAN = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} \
+		$(addprefix ./fortran/, oa_type.o oa_utils.o fortran_main.o)
+
+OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} main.o
+
+OBJ_TEST = ${OBJS} ${OBJS_UTILS} \
+	   $(addprefix ./unittest/, test_array.o gtest_main.o)
+
+OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
+	   $(addprefix ./unittest/, test_perf.o)
+
+.DEFAULT_GOAL := all
+
+%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+%.o: %.c
+	$(CC) -c $(CCFLAGS) $< -o $@
+
+%.o: %.F90
+	$(FC) -c $< -o $@
+
+all:
+	@rm -rf main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean 
+	@echo "Cleaning done."
+	@cd build && make main
+	cp build/main ./
+
+main: ${OBJ_MAIN}
+	-${CXX} -rdynamic -o main ${OBJ_MAIN} ${LIBS}
+
+testall:
+	@rm -rf main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean 
+	@echo "Cleaning done."
+	@cd build && make testall_main
+	@cp build/testall_main ./
+	@mpirun -np 2 ./testall_main 
+
+testall_main : ${OBJ_TEST}
+	-${CXX} -o testall_main ${OBJ_TEST} ${LIBS}
+
+testperf:
+	@rm -rf main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean 
+	@echo "Cleaning done."
+	@cd build && make test_perf_main
+	@cp build/test_perf_main ./
+	@mpirun -np 1 ./test_perf_main
+
+test_perf_main : ${OBJ_TEST_PERF}
+	-${CXX} -o test_perf_main ${OBJ_TEST_PERF} ${LIBS}
+
+testfortran:
+	@rm -rf fortran_main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean 
+	@echo "Cleaning done."
+	@cd build && make fortran_main
+	@cp build/fortran_main ./
+	@mpirun -n 4 ./fortran_main
+
+fortran_main : ${OBJ_FORTRAN}
+	-${CXX} -o fortran_main ${OBJ_FORTRAN} ${LIBS}
+
+small:
+	@make all
+	@mpirun -n 4 ./main 4 3 2
+
+clean:
+	@rm -rf *.o 2>/dev/null
+
+
