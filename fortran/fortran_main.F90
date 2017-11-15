@@ -18,18 +18,14 @@ contains
     fcomm = MPI_COMM_WORLD
     call get_rank(rank, fcomm)
 
-    !A = ones(4, 4, 1)
-    !call display_array(A%ptr)
-!   call display_array(A%ptr)
-!   if (rank == 0) print *, rank, A%ptr
-
-!   A = seqs(4,4,1,1,0)
-!   call display_array(A%ptr)
-!   if (rank == 0) print *, rank, A%ptr
-
-!   A = rands(4,4,1)
-!   call display_array(A%ptr)
-!   if (rank == 0) print *, rank, A%ptr
+    A = ones(4, 4, 1)
+    call display_array(A%ptr)
+ 
+    A = seqs(4,4,1,1,0)
+    call display_array(A%ptr)
+ 
+    A = rands(4,4,1)
+    call display_array(A%ptr)
 
     B = rands(4,4,1)
     call display_array(B%ptr)

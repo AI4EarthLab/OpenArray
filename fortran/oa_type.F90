@@ -12,6 +12,7 @@ module oa_type
 
   type Node
      type(c_ptr) :: ptr = C_NULL_PTR
+     integer :: pos
    contains
      final :: destroy_node
   end type Node
