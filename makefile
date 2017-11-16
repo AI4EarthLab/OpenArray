@@ -1,3 +1,4 @@
+name = main
 
 FC = mpif90
 CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
@@ -59,15 +60,15 @@ all:
 	cp build/main ./
 
 quick:
-	@rm -rf fortran_main
+	@rm -rf ${name}
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
 	@./test.sh
 	@cd build
 	@echo "Cleaning done."
-	@cd build && make fortran_main
-	@cp build/fortran_main ./
-	@mpirun -n 4 ./fortran_main 4 4 4
+	@cd build && make ${name}
+	@cp build/${name} ./
+	@mpirun -n 4 ./${name} 4 4 4
 
 main: ${OBJ_MAIN}
 	-${CXX} -rdynamic -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf \

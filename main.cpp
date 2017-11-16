@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
   //test_operator();
   //test_write_graph();
   //test_eval();
-  //test_fusion_kernel();
+  test_fusion_kernel();
   //test_c_interface();
   
 

@@ -50,6 +50,7 @@ debug/*
 
 # tools
 tools/*
+test.cpp
 
 # nc files
 *.nc

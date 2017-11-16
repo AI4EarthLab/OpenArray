@@ -229,7 +229,12 @@ namespace oa {
         // fusion kernel hash
         stringstream ss;
         stringstream ss1;
-        tree_to_string(A,ss);
+        stringstream code;
+        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
+        int id = 0;
+        tree_to_code(A, code, id);
+        cout<<code.str()<<endl;
+        tree_to_string(A, ss);
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
@@ -261,6 +266,47 @@ namespace oa {
       stringstream child[2];
       for (int i = 0; i < A->input_size(); i++) {
         tree_to_string(A->input(i), child[i]);
+        //child[i] = tree_to_string(A->input(i));
+      }
+
+      switch(A->input_size()) {
+      case 1:
+        ss<<nd.sy<<"("<<child[0].str()<<")";
+        break;
+      case 2:
+        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        break;
+      }
+
+      return;
+    }
+
+    void tree_to_code(NodePtr A, stringstream &ss, int &id) {
+      const NodeDesc &nd = get_node_desc(A->type());
+
+      if (A->has_data() || !nd.ew) {
+        ss<<"(";
+        switch(A->get_data_type()) {
+          case DATA_INT:
+            ss<<"(int*)";
+            break;
+          case DATA_FLOAT:
+            ss<<"(float*)";
+            break;
+          case DATA_DOUBLE:
+            ss<<"(double*)";
+            break;
+        }
+        ss<<"(list["<<id<<"]))";
+        if (A->is_seqs_scalar()) ss<<"[0]";
+        else ss<<"[i]";
+        id++;
+        return ;
+      }
+
+      stringstream child[2];
+      for (int i = 0; i < A->input_size(); i++) {
+        tree_to_code(A->input(i), child[i], id);
         //child[i] = tree_to_string(A->input(i));
       }
 
