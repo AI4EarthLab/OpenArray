@@ -40,7 +40,7 @@ namespace oa {
         std::is_same<T, double>::value) {
         T max = *std::max_element(buf, buf+buf_size, abs_compare);
 
-        int factor = (int)log10(max);
+        int factor = (int)log10(abs(max));
 
         if (factor > 2) {
           std::cout<< " * 1E"<<factor<<std::endl;

@@ -103,7 +103,7 @@ namespace oa {
         ///:endmute
         ///:set ef = i[7]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (i[3] == 'A')
+        ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C')
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
         ///:else
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL};

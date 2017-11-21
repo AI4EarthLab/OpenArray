@@ -363,4 +363,121 @@ void test_c_interface() {
   destroy_array(A);
   cout<<"after "<<A<<endl;
 }
+
+void test_logic_operator() {
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+  ArrayPtr ap2 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3.0, 1);
+  
+  NodePtr A = oa::ops::new_node(ap1);
+  NodePtr B = oa::ops::new_node(ap2);
+  NodePtr C = oa::ops::new_node(TYPE_GT, A, B);
+
+  ArrayPtr ans = oa::ops::eval(C);
+  ap1->display("A");
+  ap2->display("B");
+  ans->display("A>B");
+
+  C = oa::ops::new_node(TYPE_GE, A, B);
+  ans = oa::ops::eval(C);
+  ans->display("A>=B");
+
+  C = oa::ops::new_node(TYPE_LT, A, B);
+  ans = oa::ops::eval(C);
+  ans->display("A<B");
+
+  C = oa::ops::new_node(TYPE_LE, A, B);
+  ans = oa::ops::eval(C);
+  ans->display("A<=B");
+
+  C = oa::ops::new_node(TYPE_EQ, A, B);
+  ans = oa::ops::eval(C);
+  ans->display("A==B");
+
+  C = oa::ops::new_node(TYPE_NE, A, B);
+  ans = oa::ops::eval(C);
+  ans->display("A!=B");
+
+  C = oa::ops::new_node(TYPE_OR, A, B);
+  ans = oa::ops::eval(C);
+  ans->display("A||B");
+
+  C = oa::ops::new_node(TYPE_AND, A, B);
+  ans = oa::ops::eval(C);
+  ans->display("A&&B");
+}
+
+void test_math_operator() {
+  ArrayPtr ap1 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 0.5, 1);
+
+  NodePtr A = oa::ops::new_node(ap1);
+  NodePtr B = oa::ops::new_node(TYPE_EXP, A);
+
+  ArrayPtr ans = oa::ops::eval(B);
+  ap1->display("A");
+  ans->display("exp(A)");
+
+  B = oa::ops::new_node(TYPE_SIN, A);
+  ans = oa::ops::eval(B);
+  ans->display("sin(A)");
+
+  B = oa::ops::new_node(TYPE_COS, A);
+  ans = oa::ops::eval(B);
+  ans->display("cos(A)");
+
+  B = oa::ops::new_node(TYPE_TAN, A);
+  ans = oa::ops::eval(B);
+  ans->display("tan(A)");
+
+  B = oa::ops::new_node(TYPE_RCP, A);
+  ans = oa::ops::eval(B);
+  ans->display("rcp(A)");
+
+  B = oa::ops::new_node(TYPE_SQRT, A);
+  ans = oa::ops::eval(B);
+  ans->display("sqrt(A)");
+
+  B = oa::ops::new_node(TYPE_ASIN, A);
+  ans = oa::ops::eval(B);
+  ans->display("asin(A)");
+
+  B = oa::ops::new_node(TYPE_ACOS, A);
+  ans = oa::ops::eval(B);
+  ans->display("acos(A)");
+
+  B = oa::ops::new_node(TYPE_ATAN, A);
+  ans = oa::ops::eval(B);
+  ans->display("atan(A)");
+
+  B = oa::ops::new_node(TYPE_ABS, A);
+  ans = oa::ops::eval(B);
+  ans->display("abs(A)");
+
+  B = oa::ops::new_node(TYPE_LOG, A);
+  ans = oa::ops::eval(B);
+  ans->display("log(A)");
+
+  B = oa::ops::new_node(TYPE_LOG10, A);
+  ans = oa::ops::eval(B);
+  ans->display("log10(A)");
+
+  B = oa::ops::new_node(TYPE_TANH, A);
+  ans = oa::ops::eval(B);
+  ans->display("tanh(A)");
+
+  B = oa::ops::new_node(TYPE_SINH, A);
+  ans = oa::ops::eval(B);
+  ans->display("sinh(A)");
+
+  B = oa::ops::new_node(TYPE_COSH, A);
+  ans = oa::ops::eval(B);
+  ans->display("cosh(A)");
+
+  B = oa::ops::new_node(TYPE_UPLUS, A);
+  ans = oa::ops::eval(B);
+  ans->display("+(A)");
+
+  B = oa::ops::new_node(TYPE_UMINUS, A);
+  ans = oa::ops::eval(B);
+  ans->display("-(A)");
+}
 #endif

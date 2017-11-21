@@ -6,6 +6,8 @@
 
 namespace oa {
   namespace kernel {
+
+
     ///:mute
     ///:include "NodeType.fypp"
     ///:endmute
@@ -27,19 +29,19 @@ namespace oa {
       static KernelPtr kernel_table[27];
 
       if (!has_init) {
-	///:mute
-	///:set i = 0
-	///:include "kernel_type.fypp"
-	///:endmute
-	//create kernel_table
-	///:for i in T
-	///:set id = i[0]
-	///:set type1 = i[1]
-	///:set type2 = i[2]
-	///:set type3 = i[3]
-	      kernel_table[${id}$] = t_kernel_${name}$<${type1}$, ${type2}$, ${type3}$>;
-	///:endfor
-	      has_init = true;
+        ///:mute
+        ///:set i = 0
+        ///:include "kernel_type.fypp"
+        ///:endmute
+        //create kernel_table
+        ///:for i in T
+        ///:set id = i[0]
+        ///:set type1 = i[1]
+        ///:set type2 = i[2]
+        ///:set type3 = i[3]
+        kernel_table[${id}$] = t_kernel_${name}$<${type1}$, ${type2}$, ${type3}$>;
+        ///:endfor
+        has_init = true;
       }
 
       int case_num = dt * 9 + u_dt * 3 + v_dt;
@@ -47,7 +49,138 @@ namespace oa {
       return ap;
     }
 
-  ///:endfor
-		
+    ///:endfor
+    
+    ///:mute
+    ///:set K = [['gt','>'], ['ge', '>='], ['lt', '<'],['le', '<='], &
+                 ['eq','=='], ['ne','/='],['and','&&'],['or','||']]
+    ///:endmute
+    ///:for t in K
+    ///:set name = t[0]
+    ///:set sy = t[1]
+    // crate kernel_${name}$
+    // A = U ${sy}$ V
+    ArrayPtr kernel_${name}$(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr v = ops_ap[1];
+      ArrayPtr ap;
+
+      int u_dt = u->get_data_type();
+      int v_dt = v->get_data_type();
+      int dt = oa::utils::cast_data_type(u_dt, v_dt);
+
+      static bool has_init = false;
+      static KernelPtr kernel_table[27];
+
+      if (!has_init) {
+        ///:mute
+        ///:set i = 0
+        ///:include "kernel_type.fypp"
+        ///:endmute
+        //create kernel_table
+        ///:for i in T
+        ///:set id = i[0]
+        ///:set type1 = i[1]
+        ///:set type2 = i[2]
+        ///:set type3 = i[3]
+        kernel_table[${id}$] = t_kernel_${name}$<int, ${type2}$, ${type3}$>;
+        ///:endfor
+        has_init = true;
+      }
+
+      int case_num = dt * 9 + u_dt * 3 + v_dt;
+      ap = kernel_table[case_num](ops_ap);
+      return ap;
+    }
+
+    ///:endfor
+
+    ///:mute
+    ///:include "NodeType.fypp"
+    ///:endmute
+    ///:for k in [i for i in L if (i[3] == 'C' and i[2] != '+' and i[2] != '-')]
+    ///:set name = k[1]
+    ///:set sy = k[2]
+    ///:set ef = k[7]
+    // crate kernel_${name}$
+    // A = ${ef}$
+    ArrayPtr kernel_${name}$(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr ap;
+      
+      int u_dt = u->get_data_type();
+      int dt = DATA_DOUBLE;
+
+      ap = ArrayPool::global()->get(u->get_partition(), dt);
+      
+      switch(u_dt) {
+        case DATA_INT:
+          oa::internal::buffer_${name}$(
+            (double *) ap->get_buffer(),
+            (int *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_FLOAT:
+          oa::internal::buffer_${name}$(
+            (double *) ap->get_buffer(),
+            (float *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_DOUBLE:
+          oa::internal::buffer_${name}$(
+            (double *) ap->get_buffer(),
+            (double *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+      }
+      return ap;
+    }
+
+    ///:endfor
+
+    ///:for k in [['uplus','+'], ['uminus','-']]
+    ///:set name = k[0]
+    ///:set sy = k[1]
+    // crate kernel_${name}$
+    // A = ${sy}$(A)
+    ArrayPtr kernel_${name}$(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr ap;
+      
+      int u_dt = u->get_data_type();
+      int dt = u_dt;
+
+      ap = ArrayPool::global()->get(u->get_partition(), dt);
+      
+      switch(u_dt) {
+        case DATA_INT:
+          oa::internal::buffer_${name}$(
+            (int *) ap->get_buffer(),
+            (int *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_FLOAT:
+          oa::internal::buffer_${name}$(
+            (float *) ap->get_buffer(),
+            (float *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_DOUBLE:
+          oa::internal::buffer_${name}$(
+            (double *) ap->get_buffer(),
+            (double *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+      }
+      return ap;
+    }
+
+    ///:endfor
   }
 }

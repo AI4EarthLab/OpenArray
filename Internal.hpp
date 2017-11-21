@@ -106,7 +106,7 @@ namespace oa {
     ///:mute
     ///:include "NodeType.fypp"
     ///:endmute
-    ///:for k in [i for i in L if i[3] == 'A']
+    ///:for k in [i for i in L if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F')]
     ///:set name = k[1]
     ///:set sy = k[2]
     // A = B ${sy}$ val
@@ -151,6 +151,27 @@ namespace oa {
         A[i] = B[i];
       }
     }
+
+    ///:mute
+    ///:include "NodeType.fypp"
+    ///:endmute
+    ///:for k in [i for i in L if (i[3] == 'C')]
+    ///:set name = k[1]
+    ///:set sy = k[2]
+    ///:set ef = k[7]
+    // ans = ${ef}$
+    template<typename T1, typename T2>
+    void buffer_${name}$(T1 *A, T2 *B, int size) {
+      for (int i = 0; i < size; i++) {
+        ///:if name != 'rcp'
+        A[i] = ${sy}$(B[i]);
+        ///:else
+        A[i] = 1.0 / B[i];
+        ///:endif
+      }
+    }
+
+    ///:endfor
 
   }
 }
