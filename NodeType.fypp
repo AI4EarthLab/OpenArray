@@ -63,7 +63,7 @@
        ["TYPE_CSUM",    "csum",    "csum",       "",    "",  "F", "F",  "csum(A)"], &
        ["TYPE_OR",      "or",      "||",         "F",   "A", "F", "F",  "A.or.B"],&
        ["TYPE_AND",     "and",     "&&",         "F",   "A", "F", "F",  "A.and.B"],& 
-       ["TYPE_NOT",     "not",     ".not.",      "G",   "B", "F", "F",  ".not.B"], &
+       ["TYPE_NOT",     "not",     "!",          "G",   "B", "F", "F",  ".not.B"], &
        ["TYPE_REP",     "rep",     "rep",        "",    "",  "F", "T",  "rep(A)"], &
        ["TYPE_SHIFT",   "shift",   "shift",      "",    "",  "F", "F",  "shift(A)"]]    
 

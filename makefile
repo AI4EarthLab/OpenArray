@@ -5,7 +5,8 @@ CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
 	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
 
 CXX = mpicxx --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
-		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
+		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST} \
+		-I${JIT_INC} 
 
 
 CXXFLAGS= --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
@@ -14,7 +15,7 @@ CXXFLAGS= --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
 LIBS = -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem \
 	-lboost_system -ldl -llapack -lblas \
-	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST}
+	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} jit.so
 
 
 OBJS	= Range.o Box.o Partition.o Array.o \
@@ -71,8 +72,8 @@ quick:
 	@mpirun -n 4 ./${name} 4 4 4
 
 main: ${OBJ_MAIN}
-	-${CXX} -rdynamic -o main ${OBJ_MAIN} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system -ldl
+	-${CXX} -rdynamic -o main ${OBJ_MAIN} jit.so -lstdc++ -lpnetcdf \
+	-lboost_program_options -lboost_filesystem -lboost_system -ldl 
 
 testall:
 	@rm -rf main

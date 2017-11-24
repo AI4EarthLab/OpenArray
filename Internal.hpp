@@ -173,6 +173,20 @@ namespace oa {
 
     ///:endfor
 
+    template<typename T>
+    void buffer_pow(double *A, T *B, double m, int size) {
+      for (int i = 0; i < size; i++) {
+        A[i] = pow(B[i], m);
+      }
+    }
+
+    template<typename T>
+    void buffer_not(int *A, T *B, int size) {
+      for (int i = 0; i < size; i++) {
+        A[i] = !(B[i]);
+      }
+    }  
+      
   }
 }
 

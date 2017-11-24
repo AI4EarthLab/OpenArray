@@ -1,6 +1,7 @@
 #include "Operator.hpp"
 #include "utils/utils.hpp"
 #include "Kernel.hpp"
+#include "Jit_Driver.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -103,7 +104,7 @@ namespace oa {
         ///:endmute
         ///:set ef = i[7]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C')
+        ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C' or name == 'pow' or name == 'not')
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
         ///:else
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL};
@@ -247,6 +248,55 @@ namespace oa {
 
       for (int i = 0; i < A->input_size(); i++) {
         gen_kernels(A->input(i), false);
+      }
+    }
+
+    void gen_kernels_JIT(NodePtr A, bool is_root, MPI_Comm comm) {
+      if (oa::utils::get_rank(comm)) return ;
+      if (A->has_data()) return ;
+
+      const NodeDesc &nd = get_node_desc(A->type());
+      if (!nd.ew) {
+        for (int i = 0; i < A->input_size(); i++) {
+          gen_kernels_JIT(A->input(i), true);
+        }
+        return ;
+      }
+
+      if (is_root && A->get_depth() >= 2) {
+        stringstream ss1;
+        stringstream code;
+        stringstream __code;
+        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
+        int id = 1;
+        tree_to_code(A, __code, id);
+        tree_to_string_stack(A, ss1);
+        std::hash<string> str_hash;
+        size_t hash = str_hash(ss1.str());
+        
+        code<<"extern \"C\" {\nvoid kernel_"<<hash;
+        code<<"(void** &list, int size) {\n";
+        code<<"  for (int i = 0; i < size; i++) {\n";
+        switch(A->get_data_type()) {
+          case DATA_INT:
+            code<<"    ((int*)(list[0]))[i] = ";
+            break;
+          case DATA_FLOAT:
+            code<<"    ((float*)(list[0]))[i] = ";
+            break;
+          case DATA_DOUBLE:
+            code<<"    ((double*)(list[0]))[i] = ";
+            break;    
+        }
+        code<<__code.str()<<";\n  }\n  return ;\n}}";
+
+        cout<<code.str()<<endl;
+        // Add fusion kernel into JIT map
+        Jit_Driver::global()->insert(hash, code);
+      }
+
+      for (int i = 0; i < A->input_size(); i++) {
+        gen_kernels_JIT(A->input(i), false);
       }
     }
 

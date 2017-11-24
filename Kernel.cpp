@@ -182,5 +182,95 @@ namespace oa {
     }
 
     ///:endfor
+
+    
+    ArrayPtr kernel_pow(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr v = ops_ap[1];
+      ArrayPtr ap;
+      
+      int u_dt = u->get_data_type();
+      int v_dt = v->get_data_type();
+      int dt = DATA_DOUBLE;
+
+      ap = ArrayPool::global()->get(u->get_partition(), dt);
+
+      // (u)**v, v must be a scalar
+      assert(v->is_seqs_scalar());
+
+      double m;
+      switch(v_dt) {
+        case DATA_INT:
+          m = ((int*)v->get_buffer())[0];
+          break;
+        case DATA_FLOAT:
+          m = ((float*)v->get_buffer())[0];
+          break;
+        case DATA_DOUBLE:
+          m = ((double*)v->get_buffer())[0];
+          break;
+      }
+
+      switch(u_dt) {
+        case DATA_INT:
+          oa::internal::buffer_pow(
+            (double *) ap->get_buffer(),
+            (int *) u->get_buffer(),
+            m, ap->buffer_size()
+          );
+          break;
+        case DATA_FLOAT:
+          oa::internal::buffer_pow(
+            (double *) ap->get_buffer(),
+            (float *) u->get_buffer(),
+            m, ap->buffer_size()
+          );
+          break;
+        case DATA_DOUBLE:
+          oa::internal::buffer_pow(
+            (double *) ap->get_buffer(),
+            (double *) u->get_buffer(),
+            m, ap->buffer_size()
+          );
+          break;
+      }
+      return ap;
+    }
+    
+    ArrayPtr kernel_not(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr ap;
+      
+      int u_dt = u->get_data_type();
+      int dt = DATA_INT;
+
+      ap = ArrayPool::global()->get(u->get_partition(), dt);
+
+      switch(u_dt) {
+        case DATA_INT:
+          oa::internal::buffer_not(
+            (int *) ap->get_buffer(),
+            (int *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_FLOAT:
+          oa::internal::buffer_not(
+            (int *) ap->get_buffer(),
+            (float *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+        case DATA_DOUBLE:
+          oa::internal::buffer_not(
+            (int *) ap->get_buffer(),
+            (double *) u->get_buffer(),
+            ap->buffer_size()
+          );
+          break;
+      }
+      return ap;
+    }
+
   }
 }

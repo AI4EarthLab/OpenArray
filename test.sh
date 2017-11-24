@@ -50,6 +50,7 @@ do
     
         cp makefile  ${build_dir}/makefile
         cp makefile.intel  ${build_dir}/makefile.intel
+        cp jit.so ${build_dir}/jit.so
 
     #echo ./${build_dir}/$f
         #echo $f | cut -d '\.\/' -f 2

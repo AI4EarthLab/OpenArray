@@ -404,11 +404,15 @@ void test_logic_operator() {
   C = oa::ops::new_node(TYPE_AND, A, B);
   ans = oa::ops::eval(C);
   ans->display("A&&B");
+
+  C = oa::ops::new_node(TYPE_NOT, A);
+  ans = oa::ops::eval(C);
+  ans->display("!A");
 }
 
 void test_math_operator() {
   ArrayPtr ap1 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 0.5, 1);
-
+  
   NodePtr A = oa::ops::new_node(ap1);
   NodePtr B = oa::ops::new_node(TYPE_EXP, A);
 
@@ -479,5 +483,34 @@ void test_math_operator() {
   B = oa::ops::new_node(TYPE_UMINUS, A);
   ans = oa::ops::eval(B);
   ans->display("-(A)");
+
+  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
+  B = oa::ops::new_node(TYPE_POW, A, C);
+  ans = oa::ops::eval(B);
+  ans->display("pow(B,A)");
+
 }
+
+void test_gen_kernel_JIT() {
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+  ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+  ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
+  // (A+B)*C
+  NodePtr A = oa::ops::new_node(ap1);
+  NodePtr B = oa::ops::new_node(ap2);
+  NodePtr C = oa::ops::new_node(ap3);
+  NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1.0);
+  NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
+  NodePtr F = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, float(1.0));
+  
+  NodePtr G = oa::ops::new_node(TYPE_PLUS, A, B);
+  NodePtr H = oa::ops::new_node(TYPE_MULT, G, C);
+  NodePtr I = oa::ops::new_node(TYPE_DIVD, H, D);
+  NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
+  NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
+
+  oa::ops::gen_kernels_JIT(K,true,MPI_COMM_WORLD);
+}
+
+
 #endif
