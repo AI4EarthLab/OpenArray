@@ -41,12 +41,26 @@ public:
     ss<<"kernel_"<<hash;
     //char kernel_name[] = ss.str().c_str();
 
-    Jit ji(fack_argc, fake_argv, (char*)ss.str().c_str(), 
-      (char*)code.str().c_str());
+	const string& scode = code.str();  
+	const char* cccode = scode.c_str(); 
+	//printf("code=\n-> \n%s \n<-\n",cccode);
+	const string& sname = ss.str();  
+	const char* ccname = sname.c_str(); 
+	//printf("name=\n-> \n%s \n<-\n",ccname);
+
+	char *ccode = new char[strlen(cccode)+1];
+	char *cname = new char[strlen(ccname)+1];
+	strcpy(ccode, cccode);
+	strcpy(cname, ccname);
+
+    Jit ji(fack_argc, fake_argv, cname, ccode);
     uint64_t Entry = ji.compile();
     
     fk_ptr = (kernel_func)Entry;
     kernel_dict[hash] = fk_ptr;
+
+	delete []ccode;
+	delete []cname;
 
     return ;
   }
