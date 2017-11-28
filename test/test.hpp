@@ -509,7 +509,15 @@ void test_gen_kernel_JIT() {
   NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
   NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
 
-  oa::ops::gen_kernels_JIT(K,true,MPI_COMM_WORLD);
+  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
+
+  G = oa::ops::new_node(TYPE_PLUS, A, B);
+  H = oa::ops::new_node(TYPE_MULT, G, C);
+  I = oa::ops::new_node(TYPE_DIVD, H, D);
+  J = oa::ops::new_node(TYPE_MINUS, E, F);
+  K = oa::ops::new_node(TYPE_PLUS, I, J);
+  
+  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
 }
 
 

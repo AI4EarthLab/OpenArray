@@ -254,7 +254,7 @@ namespace oa {
     void gen_kernels_JIT(NodePtr A, bool is_root, MPI_Comm comm) {
       if (oa::utils::get_rank(comm)) return ;
       if (A->has_data()) return ;
-
+      
       const NodeDesc &nd = get_node_desc(A->type());
       if (!nd.ew) {
         for (int i = 0; i < A->input_size(); i++) {
