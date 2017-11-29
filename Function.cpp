@@ -103,8 +103,23 @@ namespace oa {
       return ap;
     }
 
-    //transfer(ArrayPtr &A, ArrayPtr &B);
+    template<class T>
+    ArrayPtr get_seq_scalar(T val) {
+      return consts<T>(MPI_COMM_SELF,SCALAR_SHAPE, val, 0);
+    }
 
+    template<class T>
+    ArrayPtr get_seq_array(T* val, const Shape& s){
+      ArrayPtr a = consts<T>(MPI_COMM_SELF, s, 0, 0);
+      T* src = (T*)a->get_buffer();
+      assert(a.shape() == s);
+      const int size = s[0] * s[1] * s[2];
+      for(int i = 0; i < size; ++i){
+        src[i] = val[i];
+      }
+    }
+    
+    //transfer(ArrayPtr &A, ArrayPtr &B);
     ArrayPtr subarray(const ArrayPtr &ap, const Box &b) {
       vector<int> rsx, rsy, rsz;
       PartitionPtr pp = ap->get_partition();
