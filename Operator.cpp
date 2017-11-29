@@ -29,11 +29,16 @@ namespace oa {
       np->set_type(type);
       np->add_input(0, u);
       np->add_input(1, v);
-      int dt = oa::utils::cast_data_type(
-                                         u->get_data_type(),
-                                         v->get_data_type());
       
       const NodeDesc &nd = get_node_desc(type);
+      // set dt for ans, ans = u type v
+      int dt = nd.rt;
+      if (TYPE_PLUS <= type && type <= TYPE_DIVD) {
+        dt = oa::utils::cast_data_type(
+                                     u->get_data_type(),
+                                     v->get_data_type());
+      }
+
       if (nd.ew) {
         np->set_depth(u->get_depth(), v->get_depth());
         // U and V must have same shape
@@ -45,8 +50,10 @@ namespace oa {
         }
         np->set_data_type(dt);
       } else {
+
         // to do
         // set data_type && shape
+        
         np->set_data_type(dt);
       }
       return np;
@@ -56,14 +63,21 @@ namespace oa {
       NodePtr np = NodePool::global()->get();
       np->set_type(type);
       np->add_input(0, u);
-
+      
       const NodeDesc &nd = get_node_desc(type);
+      int dt = u->get_data_type();
+      if (TYPE_EXP <= type && type <= TYPE_DZF) dt = nd.rt;
+      if (type == TYPE_UPLUS or type == TYPE_UMINUS) dt = u->get_data_type();
+      if (type == TYPE_NOT) dt = nd.rt;
+
       if (nd.ew) {
         np->set_depth(u->get_depth());
         np->set_shape(u->shape());
-        np->set_data_type(u->get_data_type());
+
+        np->set_data_type(dt);
       } else {
         // to do set data_type && shape
+        np->set_data_type(dt);
       }
       return np;
     }
@@ -103,11 +117,12 @@ namespace oa {
         ///:endif
         ///:endmute
         ///:set ef = i[7]
+        ///:set rt = i[8]
         ///:set kernel_name = 'kernel_' + i[1]
         ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C' or name == 'pow' or name == 'not')
-        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
+        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$, ${rt}$};
         ///:else
-        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL};
+        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL, ${rt}$};
 
         ///:endif
         ///:set id = id + 1
@@ -293,6 +308,8 @@ namespace oa {
         cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
+
+        A->set_hash(hash);
       }
 
       for (int i = 0; i < A->input_size(); i++) {

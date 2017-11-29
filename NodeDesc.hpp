@@ -20,7 +20,8 @@ struct NodeDesc{
   bool ew;          // if element-wise operation
   bool cl;          // if change data layout
   std::string expr; // expression form
-  KernelPtr func;
+  KernelPtr func;   // operator function address
+  int rt;           // result type
 };
 
 typedef std::vector<NodeDesc> OpDescList;

@@ -55,6 +55,8 @@ public:
   
   size_t hash();
 
+  void set_hash(size_t);
+
   NodeType type();
 
   ArrayPtr get_data();

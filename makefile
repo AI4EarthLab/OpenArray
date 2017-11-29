@@ -1,10 +1,10 @@
 name = main
 
 FC = mpif90
-CC = mpicc -g -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
+CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
 	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
 
-CXX = mpicxx -g -fPIC --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
+CXX = mpicxx -fPIC --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
 		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST} \
 		-I${JIT_INC} 
 
