@@ -15,10 +15,12 @@ typedef void (*kernel_func)(void**&, int);
 typedef std::function<fusion_kernel_rawptr> FusionKernelPtr;
 
 typedef unordered_map<size_t, FusionKernelPtr> FKPtrMap;
+typedef unordered_map<size_t, JitPtr> JitPoolMap;
 
 class Jit_Driver{
 private:
   FKPtrMap kernel_dict;
+  JitPoolMap m_jit_pool;
 
 public:
   FusionKernelPtr get(size_t hash) {
@@ -35,32 +37,41 @@ public:
     char arg1[] = "-O3";
     char arg2[] = "-O3";
     char arg3[]= ""; //"-I/home/wangdong/comp/llvm.debug/lib/clang/6.0.0/include";
-    char **fake_argv = new char *[fack_argc+1]{arg0, arg1, arg2, arg3};
-    //char code_char[] = code.str().c_str();
+    //char **fake_argv = new char *[fack_argc+1]{arg0, arg1, arg2, arg3};
+    char **fake_argv = new char*[fack_argc];
+    for (int i = 0; i < fack_argc; i++) {
+        fake_argv[i] = new char[256];
+    }
+    strcpy(fake_argv[0], arg0);
+    strcpy(fake_argv[1], arg1);
+    strcpy(fake_argv[2], arg2);
+    strcpy(fake_argv[3], arg3);
+    
     stringstream ss;
     ss<<"kernel_"<<hash;
-    //char kernel_name[] = ss.str().c_str();
+    
+    const string& scode = code.str();  
+    const char* cccode = scode.c_str(); 
+    const string& sname = ss.str();  
+    const char* ccname = sname.c_str(); 
+    
+    char *ccode = new char[strlen(cccode)+1];
+    char *cname = new char[strlen(ccname)+1];
+    strcpy(ccode, cccode);
+    strcpy(cname, ccname);
 
-	const string& scode = code.str();  
-	const char* cccode = scode.c_str(); 
-	//printf("code=\n-> \n%s \n<-\n",cccode);
-	const string& sname = ss.str();  
-	const char* ccname = sname.c_str(); 
-	//printf("name=\n-> \n%s \n<-\n",ccname);
+    JitPtr jit_ptr = JitPtr(new Jit(fack_argc, fake_argv, cname, ccode));
+    m_jit_pool[hash] = jit_ptr;
 
-	char *ccode = new char[strlen(cccode)+1];
-	char *cname = new char[strlen(ccname)+1];
-	strcpy(ccode, cccode);
-	strcpy(cname, ccname);
-
-    Jit ji(fack_argc, fake_argv, cname, ccode);
-    uint64_t Entry = ji.compile();
+    uint64_t Entry = jit_ptr->compile();
     
     fk_ptr = (kernel_func)Entry;
     kernel_dict[hash] = fk_ptr;
 
-	delete []ccode;
-	delete []cname;
+    delete []ccode;
+    delete []cname;
+    for (int i = 0; i < fack_argc; i++) delete[] fake_argv[i];
+    delete[] fake_argv;
 
     return ;
   }
