@@ -23,7 +23,7 @@
        ["TYPE_LT",      "lt",      "<",          "B",   "A", "F", "F",  "A<B"],&
        ["TYPE_LE",      "le",      "<=",         "B",   "A", "F", "F",  "A<=B"],&
        ["TYPE_EQ",      "eq",      "==",         "B",   "A", "F", "F",  "A==B"],&
-       ["TYPE_NE",      "ne",      "!=",         "B",   "A", "F", "F",  "A/=B"],&
+       ["TYPE_NE",      "ne",      "/=",         "B",   "A", "F", "F",  "A/=B"],&
        ["TYPE_MIN",     "min",     "min",        "",    "",  "F", "F",  "min"],&
        ["TYPE_MAX",     "max",     "max",        "",    "",  "F", "F",  "max"],&
        ["TYPE_POW",     "pow",     "pow",        "",    "",  "T", "F",  "(A)**M"],&
@@ -61,9 +61,9 @@
        ["TYPE_DZF",     "dzf",     "dzf",        "D",   "B", "F", "F",  "DZF(A)"],&
        ["TYPE_SUM",     "sum",     "sum",        "",    "",  "F", "T",  "sum(A)"],&
        ["TYPE_CSUM",    "csum",    "csum",       "",    "",  "F", "F",  "csum(A)"], &
-       ["TYPE_OR",      "or",      "||",         "F",   "A", "F", "F",  "A.or.B"],&
-       ["TYPE_AND",     "and",     "&&",         "F",   "A", "F", "F",  "A.and.B"],& 
-       ["TYPE_NOT",     "not",     "!",          "G",   "B", "F", "F",  ".not.B"], &
+       ["TYPE_OR",      "or",      ".or.",       "F",   "A", "F", "F",  "A.or.B"],&
+       ["TYPE_AND",     "and",     ".and.",      "F",   "A", "F", "F",  "A.and.B"],& 
+       ["TYPE_NOT",     "not",     ".not.",      "G",   "B", "F", "F",  ".not.B"], &
        ["TYPE_REP",     "rep",     "rep",        "",    "",  "F", "T",  "rep(A)"], &
        ["TYPE_SHIFT",   "shift",   "shift",      "",    "",  "F", "F",  "shift(A)"]]    
 

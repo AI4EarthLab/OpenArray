@@ -1,7 +1,7 @@
-
 #include "Operator.hpp"
 #include "utils/utils.hpp"
 #include "Kernel.hpp"
+#include "Jit_Driver.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -30,8 +30,8 @@ namespace oa {
       np->add_input(0, u);
       np->add_input(1, v);
       int dt = oa::utils::cast_data_type(
-        u->get_data_type(),
-        v->get_data_type());
+                                         u->get_data_type(),
+                                         v->get_data_type());
       
       const NodeDesc &nd = get_node_desc(type);
       if (nd.ew) {
@@ -104,7 +104,7 @@ namespace oa {
         ///:endmute
         ///:set ef = i[7]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (i[3] == 'A')
+        ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C' or name == 'pow' or name == 'not')
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$};
         ///:else
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL};
@@ -205,7 +205,7 @@ namespace oa {
     }
 
     void insert_kernel_dict(size_t hash, const stringstream &s,
-      const char *filename) {
+                            const char *filename) {
       std::ofstream ofs;
       ofs.open(filename, std::ofstream::out | std::ofstream::app);
       ofs<<hash<<" "<<s.str()<<endl;
@@ -226,9 +226,16 @@ namespace oa {
 
       if (is_root && A->get_depth() >= 2) {
         // fusion kernel
-        stringstream ss = tree_to_string(A);
+        //stringstream ss = tree_to_string(A);
         // fusion kernel hash
+        stringstream ss;
         stringstream ss1;
+        stringstream code;
+        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
+        int id = 0;
+        tree_to_code(A, code, id);
+        cout<<code.str()<<endl;
+        tree_to_string(A, ss);
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
@@ -244,9 +251,58 @@ namespace oa {
       }
     }
 
+    void gen_kernels_JIT(NodePtr A, bool is_root, MPI_Comm comm) {
+      if (oa::utils::get_rank(comm)) return ;
+      if (A->has_data()) return ;
+
+      const NodeDesc &nd = get_node_desc(A->type());
+      if (!nd.ew) {
+        for (int i = 0; i < A->input_size(); i++) {
+          gen_kernels_JIT(A->input(i), true);
+        }
+        return ;
+      }
+
+      if (is_root && A->get_depth() >= 2) {
+        stringstream ss1;
+        stringstream code;
+        stringstream __code;
+        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
+        int id = 1;
+        tree_to_code(A, __code, id);
+        tree_to_string_stack(A, ss1);
+        std::hash<string> str_hash;
+        size_t hash = str_hash(ss1.str());
+        
+        code<<"extern \"C\" {\nvoid kernel_"<<hash;
+        code<<"(void** &list, int size) {\n";
+        code<<"  for (int i = 0; i < size; i++) {\n";
+        switch(A->get_data_type()) {
+          case DATA_INT:
+            code<<"    ((int*)(list[0]))[i] = ";
+            break;
+          case DATA_FLOAT:
+            code<<"    ((float*)(list[0]))[i] = ";
+            break;
+          case DATA_DOUBLE:
+            code<<"    ((double*)(list[0]))[i] = ";
+            break;    
+        }
+        code<<__code.str()<<";\n  }\n  return ;\n}}";
+
+        cout<<code.str()<<endl;
+        // Add fusion kernel into JIT map
+        Jit_Driver::global()->insert(hash, code);
+      }
+
+      for (int i = 0; i < A->input_size(); i++) {
+        gen_kernels_JIT(A->input(i), false);
+      }
+    }
+
     // example: (A1+S2)*A3
-    stringstream tree_to_string(NodePtr A) {
-      stringstream ss;
+    
+    void tree_to_string(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());
       
       // only data or non-element-wise
@@ -254,25 +310,68 @@ namespace oa {
         if (A->is_seqs_scalar()) ss<<"S";
         else ss<<"A";
         ss<<A->get_data_type();
-        return ss;
+        return;
       }
 
       stringstream child[2];
       for (int i = 0; i < A->input_size(); i++) {
-        child[i] = tree_to_string(A->input(i));
+        tree_to_string(A->input(i), child[i]);
+        //child[i] = tree_to_string(A->input(i));
       }
 
       switch(A->input_size()) {
-        case 1:
-          ss<<nd.sy<<"("<<child[0].str()<<")";
-          break;
-        case 2:
-          ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
-          break;
+      case 1:
+        ss<<nd.sy<<"("<<child[0].str()<<")";
+        break;
+      case 2:
+        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        break;
       }
 
-      return ss;
+      return;
     }
+
+    void tree_to_code(NodePtr A, stringstream &ss, int &id) {
+      const NodeDesc &nd = get_node_desc(A->type());
+
+      if (A->has_data() || !nd.ew) {
+        ss<<"(";
+        switch(A->get_data_type()) {
+          case DATA_INT:
+            ss<<"(int*)";
+            break;
+          case DATA_FLOAT:
+            ss<<"(float*)";
+            break;
+          case DATA_DOUBLE:
+            ss<<"(double*)";
+            break;
+        }
+        ss<<"(list["<<id<<"]))";
+        if (A->is_seqs_scalar()) ss<<"[0]";
+        else ss<<"[i]";
+        id++;
+        return ;
+      }
+
+      stringstream child[2];
+      for (int i = 0; i < A->input_size(); i++) {
+        tree_to_code(A->input(i), child[i], id);
+        //child[i] = tree_to_string(A->input(i));
+      }
+
+      switch(A->input_size()) {
+      case 1:
+        ss<<nd.sy<<"("<<child[0].str()<<")";
+        break;
+      case 2:
+        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        break;
+      }
+
+      return;
+    }
+    
 
     void tree_to_string_stack(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());
@@ -291,8 +390,7 @@ namespace oa {
 
       return ;
     }
+    
 
   }
 }
-
-

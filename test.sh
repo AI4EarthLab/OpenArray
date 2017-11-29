@@ -50,14 +50,28 @@ do
     
         cp makefile  ${build_dir}/makefile
         cp makefile.intel  ${build_dir}/makefile.intel
+        cp jit.so ${build_dir}/jit.so
 
     #echo ./${build_dir}/$f
         #echo $f | cut -d '\.\/' -f 2
     
-    ./fypp -p -m re -m string -m io -m os --create-parents \
+    if [ ! -f "$dst_filename" ]; then
+      ./fypp -p -m re -m string -m io -m os --create-parents \
            $src_filename > $dst_filename
-    
-    echo " >>>processing file $src_filename" 
-         
+
+      echo " >>>processing file $src_filename" 
+    else
+      src_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $src_filename)
+      dst_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $dst_filename)
+
+      if [[ "$src_time" > "$dst_time" ]]; then
+        ./fypp -p -m re -m string -m io -m os --create-parents \
+           $src_filename > $dst_filename
+        
+        echo " >>>processing file $src_filename"
+      fi
+    fi
+
     done
 done
+

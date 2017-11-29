@@ -1,29 +1,29 @@
-name = main
 
-FC = mpif90
-CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
-	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
+#FC = mpiifort
 
-CXX = mpicxx --std=c++0x -Werror=return-type -I${PNETCDF_INC} -L${PNETCDF_LIB} \
-		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST} \
-		-I${JIT_INC} 
+#CC = /usr/lib64/openmpi/bin/mpicc  
+CC=mpiicc
+CC_FLAGS = -g -O3 -I${PNETCDF_INC}  -Werror=return-type \
+	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} 
 
 
-CXXFLAGS= --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
-	  -L${PNETCDF_LIB} -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC}
+CXX = mpiicpc
+#CXX = /usr/lib64/openmpi/bin/mpicxx  
+
+CXXFLAGS= -g -O3 --std=c++0x -Werror=return-type -I${PNETCDF_INC}  \
+		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC}  \
 
 LIBS = -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem \
 	-lboost_system -ldl -llapack -lblas \
-	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} jit.so
-
+	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST}
 
 OBJS	= Range.o Box.o Partition.o Array.o \
 	  Internal.o Function.o Kernel.o Operator.o \
 	  Node.o IO.o 
 
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
-			      utils.o)
+	      utils.o)
 
 OBJS_C_INTERFACE = $(addprefix ./c-interface/, c_oa_type.o c_oa_utils.o)
 
@@ -38,14 +38,13 @@ OBJ_TEST = ${OBJS} ${OBJS_UTILS} \
 OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
 	   $(addprefix ./unittest/, test_perf.o)
 
-
 .DEFAULT_GOAL := all
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 %.o: %.c
-	$(CXX) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CCFLAGS) $< -o $@
 
 %.o: %.F90
 	$(FC) -c $< -o $@
@@ -55,25 +54,13 @@ all:
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
 	@./pre.sh
-	@cd build && make clean
+	@cd build && make clean 
 	@echo "Cleaning done."
-	@cd build && make main 2>/dev/null
+	@cd build && make main
 	cp build/main ./
 
-quick:
-	@rm -rf ${name}
-	@echo "Cleaning..."
-	@mkdir -p build 2>/dev/null
-	@./test.sh
-	@cd build
-	@echo "Cleaning done."
-	@cd build && make ${name}
-	@cp build/${name} ./
-	@mpirun -n 4 ./${name} 4 4 4
-
 main: ${OBJ_MAIN}
-	-${CXX} -rdynamic -o main ${OBJ_MAIN} jit.so -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system -ldl 
+	-${CXX} -rdynamic -o main ${OBJ_MAIN} ${LIBS}
 
 testall:
 	@rm -rf main
@@ -89,6 +76,20 @@ testall:
 testall_main : ${OBJ_TEST}
 	-${CXX} -o testall_main ${OBJ_TEST} ${LIBS}
 
+testperf:
+	@rm -rf main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean 
+	@echo "Cleaning done."
+	@cd build && make test_perf_main
+	@cp build/test_perf_main ./
+	@mpirun -np 1 ./test_perf_main
+
+test_perf_main : ${OBJ_TEST_PERF}
+	-${CXX} -o test_perf_main ${OBJ_TEST_PERF} ${LIBS}
+
 testfortran:
 	@rm -rf fortran_main
 	@echo "Cleaning..."
@@ -101,13 +102,23 @@ testfortran:
 	@mpirun -n 4 ./fortran_main
 
 fortran_main : ${OBJ_FORTRAN}
-	-${CXX} -o fortran_main ${OBJ_FORTRAN} -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem -lboost_system \
-  
+	-${CXX} -o fortran_main ${OBJ_FORTRAN} ${LIBS}
+
 small:
 	@make all
 	@mpirun -n 4 ./main 4 3 2
 
 clean:
 	@rm -rf *.o 2>/dev/null
+
+quick:
+	@rm -rf testall_main 2>/dev/null
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./test.sh
+	@cd build
+	@echo "Cleaning done."
+	@cd build && make testall_main -f makefile.intel
+	@cp build/testall_main ./
+	@mpirun -n 2 ./testall_main
 

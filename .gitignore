@@ -35,6 +35,8 @@ build/*
 *.app
 main
 test_main
+fortran_main
+testall_main
 
 # ctags
 tags
@@ -48,6 +50,7 @@ debug/*
 
 # tools
 tools/*
+test.cpp
 
 # nc files
 *.nc

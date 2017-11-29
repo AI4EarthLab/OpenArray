@@ -106,7 +106,7 @@ namespace oa {
     ///:mute
     ///:include "NodeType.fypp"
     ///:endmute
-    ///:for k in [i for i in L if i[3] == 'A']
+    ///:for k in [i for i in L if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F')]
     ///:set name = k[1]
     ///:set sy = k[2]
     // A = B ${sy}$ val
@@ -121,22 +121,72 @@ namespace oa {
     template<typename T1, typename T2, typename T3>
     void buffer_${name}$_buffer(T1 *A, T2 *U, T3 *V, int size) {
 
-      arma::Col<T1> CA = oa::utils::make_vec<T1>(size, A);
-      arma::Col<T2> CU = oa::utils::make_vec<T2>(size, U);
-      arma::Col<T3> CV = oa::utils::make_vec<T3>(size, V);
+      // arma::Col<T1> CA = oa::utils::make_vec<T1>(size, A);
+      // arma::Col<T2> CU = oa::utils::make_vec<T2>(size, U);
+      // arma::Col<T3> CV = oa::utils::make_vec<T3>(size, V);
 
-      CA = CU + CV;
+      ///:set a = sy
+      ///:if a == '*'
+      ///:set a = '%'
+      ///:endif
+       // CA = CU ${a}$ CV;
       
       //std::cout<<CA(arma::span(1, 10))<<std::endl;
       
-// #pragma GCC ivdep
-//       for (int i = 0; i < size; i++) {
-//         A[i] = U[i] ${sy}$ V[i];
-//       }
+      //tic("kernel");
+      
+#pragma omp parallel for
+      for (int i = 0; i < size; i++) {
+        A[i] = U[i] ${sy}$ V[i];
+      }
+      //toc("kernel");
     }
 
     ///:endfor 
 
+    // A = B
+    template<typename T>
+    void copy_buffer(T *A, T *B, int size) {
+      for (int i = 0; i < size; i++) {
+        A[i] = B[i];
+      }
+    }
+
+    ///:mute
+    ///:include "NodeType.fypp"
+    ///:endmute
+    ///:for k in [i for i in L if (i[3] == 'C')]
+    ///:set name = k[1]
+    ///:set sy = k[2]
+    ///:set ef = k[7]
+    // ans = ${ef}$
+    template<typename T1, typename T2>
+    void buffer_${name}$(T1 *A, T2 *B, int size) {
+      for (int i = 0; i < size; i++) {
+        ///:if name != 'rcp'
+        A[i] = ${sy}$(B[i]);
+        ///:else
+        A[i] = 1.0 / B[i];
+        ///:endif
+      }
+    }
+
+    ///:endfor
+
+    template<typename T>
+    void buffer_pow(double *A, T *B, double m, int size) {
+      for (int i = 0; i < size; i++) {
+        A[i] = pow(B[i], m);
+      }
+    }
+
+    template<typename T>
+    void buffer_not(int *A, T *B, int size) {
+      for (int i = 0; i < size; i++) {
+        A[i] = !(B[i]);
+      }
+    }  
+      
   }
 }
 

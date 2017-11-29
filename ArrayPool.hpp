@@ -20,14 +20,14 @@ typedef unordered_map<size_t, ArrayList*> ArrayPoolMap;
  */
 
 class ArrayPool{
-  private:
+private:
   ArrayPoolMap m_pools;
   
-  public:
+public:
   // get an ArrayPtr from m_pools based on hash created by key:
   // [comm, process_size, (gx, gy, gz), stencil_width, buffer_data_type]
   ArrayPtr get(MPI_Comm comm, const Shape& gs, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE) {
+               int data_type = DATA_DOUBLE) {
     Array* ap;
     size_t par_hash = Partition::gen_hash(comm, gs, stencil_width);
     
@@ -35,7 +35,7 @@ class ArrayPool{
     size_t array_hash = par_hash + data_type;
 
     ArrayPoolMap::iterator it = m_pools.find(array_hash);
-    
+
     int size;
     MPI_Comm_size(comm, &size);
 
@@ -53,9 +53,9 @@ class ArrayPool{
 
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
-      [](Array* arr_p) {
-        ArrayPool::global()->dispose(arr_p);
-      });
+                    [](Array* arr_p) {
+                      ArrayPool::global()->dispose(arr_p);
+                    });
   }
 
   template<class T>
@@ -66,7 +66,7 @@ class ArrayPool{
   // get an ArrayPtr from m_pools based on hash created by key:
   // [comm, lx, ly, lz, stencil_width, buffer_data_type]
   ArrayPtr get(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
-    const vector<int> &z, int stencil_width = 1, int data_type = DATA_DOUBLE) {
+               const vector<int> &z, int stencil_width = 1, int data_type = DATA_DOUBLE) {
     Array* ap;
     size_t par_hash = Partition::gen_hash(comm, x, y, z, stencil_width);
     
@@ -89,9 +89,9 @@ class ArrayPool{
 
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
-      [](Array* arr_p) {
-        ArrayPool::global()->dispose(arr_p);
-      });
+                    [](Array* arr_p) {
+                      ArrayPool::global()->dispose(arr_p);
+                    });
   }
 
   // get an ArrayPtr from m_pools based on partitionptr pp
@@ -102,18 +102,19 @@ class ArrayPool{
 
     ArrayPoolMap::iterator it = m_pools.find(array_hash);
 
+    //printf("array get called. hash : %d\n", array_hash);
+
     if (it == m_pools.end() || it->second->size() < 1) {
       ap = new Array(pp, data_type);
+      ap->set_hash(array_hash);
     } else {
       ap = it->second->back();
       it->second->pop_back();
     }
 
-    return ArrayPtr(
-      ap, [](Array* arr_p) {
-        ArrayPool::global()->dispose(arr_p);
-      }
-    );
+    return ArrayPtr(ap, [](Array* arr_p) {
+                      ArrayPool::global()->dispose(arr_p);
+                    });
   }
 
   void dispose(Array* ap){
@@ -122,12 +123,14 @@ class ArrayPool{
 
     ArrayPoolMap::iterator it = m_pools.find(array_hash);
     if (it == m_pools.end()){
-    ArrayList* al = new ArrayList();
-    al->push_back(ap);
-    m_pools[array_hash] = al;
+      ArrayList* al = new ArrayList();
+      al->push_back(ap);
+      m_pools[array_hash] = al;
     } else{
-    it->second->push_back(ap);  
+      it->second->push_back(ap);  
     }
+
+    //printf("array disposed called. hash:%d\n", array_hash);
   }
   
   // only need one Array Pool in each process, make it static 

@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 extern "C"{
+  
+
   void gettimeofday1(int *ierr2, long long* val)
   {
     struct timeval time1;
@@ -18,4 +20,5 @@ extern "C"{
     /* tim[1] = time1.tv_usec; */
     *val = (time1.tv_sec * 1000000 + time1.tv_usec);
   }
+
 }

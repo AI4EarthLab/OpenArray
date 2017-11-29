@@ -11,4 +11,12 @@ module oa_utils
     end subroutine
   end interface
 
+  interface
+    subroutine get_rank(rank, fcomm) bind(C, name = 'get_rank')
+      use iso_c_binding
+      integer(c_int) :: rank
+      integer(c_int), intent(in), VALUE :: fcomm
+    end subroutine
+  end interface
+
 end module
