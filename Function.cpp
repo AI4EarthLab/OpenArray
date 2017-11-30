@@ -112,7 +112,7 @@ namespace oa {
     ArrayPtr get_seq_array(T* val, const Shape& s){
       ArrayPtr a = consts<T>(MPI_COMM_SELF, s, 0, 0);
       T* src = (T*)a->get_buffer();
-      assert(a.shape() == s);
+      assert(a->shape() == s);
       const int size = s[0] * s[1] * s[2];
       for(int i = 0; i < size; ++i){
         src[i] = val[i];

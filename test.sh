@@ -8,6 +8,9 @@ if [ ! -d "$build_dir" ]; then
     mkdir ${build_dir}
 fi
 
+        cp makefile  ${build_dir}/makefile
+        cp makefile.intel  ${build_dir}/makefile.intel
+        cp jit.so  ${build_dir}/jit.so
 for d in `find . -maxdepth 2 -type d`
 do
 
@@ -48,9 +51,6 @@ do
         #./fypp ${filename}.${extension} > \
     #  ${build_dir}/$filename.${extension} -m re
     
-        cp makefile  ${build_dir}/makefile
-        cp makefile.intel  ${build_dir}/makefile.intel
-        cp jit.so ${build_dir}/jit.so
 
     #echo ./${build_dir}/$f
         #echo $f | cut -d '\.\/' -f 2
@@ -61,8 +61,8 @@ do
 
       echo " >>>processing file $src_filename" 
     else
-      src_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $src_filename)
-      dst_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $dst_filename)
+      src_time=$(date +'%y%m%d%H%M' -r $src_filename)
+      dst_time=$(date +'%y%m%d%H%M' -r $dst_filename)
 
       if [[ "$src_time" > "$dst_time" ]]; then
         ./fypp -p -m re -m string -m io -m os --create-parents \
