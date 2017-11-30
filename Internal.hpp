@@ -185,7 +185,44 @@ namespace oa {
       for (int i = 0; i < size; i++) {
         A[i] = !(B[i]);
       }
-    }  
+    }
+
+    ///:for k in [['max', '>'], ['min', '<']]
+    ///:set name = k[0]
+    ///:set sy = k[1]
+    template<typename T>
+    int3 buffer_${name}$_const(T &val, T *A, Box box, int sw, int size) {
+      int x = 0, y = 0, z = 0;
+      int xs, xe, ys, ye, zs, ze;
+      box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+
+      int M = xe - xs;
+      int N = ye - ys;
+      int K = ze - zs;
+      val = A[sw * M * N + sw + M + sw];
+
+      int3 pos = {sw, sw, sw};
+
+      int cnt = 0;
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              if (A[cnt] ${sy}$ val) {
+                val = A[cnt];
+                pos = {i, j, k};  
+              }
+            }
+            cnt++;
+          }
+        }
+      }
+      return pos;
+    }
+
+    ///:endfor
       
   }
 }
