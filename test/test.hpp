@@ -233,7 +233,7 @@ void test_write_graph() {
 
 }
 
-void test_eval() {
+void test_force_eval() {
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
   ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
   ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3.0, 1);
@@ -248,7 +248,7 @@ void test_eval() {
 
   NodePtr F = oa::ops::new_node(TYPE_PLUS, A, B);
   NodePtr G = oa::ops::new_node(TYPE_PLUS, F, C);
-  ArrayPtr ans = oa::ops::eval(G);
+  ArrayPtr ans = oa::ops::force_eval(G);
   ans->display("A+B+C");
   
   Box box1(0,2,0,2,0,0);
@@ -270,7 +270,7 @@ void test_eval() {
 
   NodePtr SF = oa::ops::new_node(TYPE_PLUS, SA, SB);
   NodePtr SG = oa::ops::new_node(TYPE_PLUS, SF, SC);
-  ArrayPtr sans = oa::ops::eval(SG);
+  ArrayPtr sans = oa::ops::force_eval(SG);
   sans->display("SA+SB+SC");
 
   //cout<<0/0<<endl;
@@ -281,7 +281,7 @@ void test_eval() {
 
   SF = oa::ops::new_node(TYPE_PLUS, SA, seq_B);
   SG = oa::ops::new_node(TYPE_MINUS, SF, seq_C);
-  sans = oa::ops::eval(SG);
+  sans = oa::ops::force_eval(SG);
   cout<<"-----------------"<<endl;
   sans->display("SA+seq_B-seq_C");
 }
@@ -326,11 +326,17 @@ void test_fusion_kernel() {
   NodePtr G = oa::ops::new_node(TYPE_PLUS, A, B);
   NodePtr H = oa::ops::new_node(TYPE_MULT, G, C);
   NodePtr I = oa::ops::new_node(TYPE_DIVD, H, D);
+  oa::ops::force_eval(I)->display("I");
+
   NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
+
+  oa::ops::force_eval(J)->display("J");
   NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
 
-  oa::ops::gen_kernels(K,true,MPI_COMM_WORLD);
+  //oa::ops::gen_kernels(K,true,MPI_COMM_WORLD);
 
+  ArrayPtr ans = oa::ops::force_eval(K);
+  ans->display("force_eval");
 /*  ArrayPtr ans = oa::ops::eval(I);
   A->display("A");
   B->display("B");
@@ -538,6 +544,36 @@ void test_sum() {
 
   ArrayPtr esans2 = oa::ops::eval(EC2);
   esans2->display("sum(EA2)");
+}
+void test_eval() {
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
+  ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+  ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
+  // (A+B)*C
+  NodePtr A = oa::ops::new_node(ap1);
+  NodePtr B = oa::ops::new_node(ap2);
+  NodePtr C = oa::ops::new_node(ap3);
+  NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1.0);
+  NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
+  NodePtr F = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, float(1.0));
+  
+  NodePtr G = oa::ops::new_node(TYPE_PLUS, A, B);
+  NodePtr H = oa::ops::new_node(TYPE_MULT, G, C);
+  NodePtr I = oa::ops::new_node(TYPE_DIVD, H, D);
+  NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
+  NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
+
+  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
+
+  A->display("A");
+  B->display("B");
+  C->display("C");
+  D->display("D");
+  E->display("E");
+  F->display("F");
+
+  ArrayPtr ans = oa::ops::eval(K);
+  ans->display("eval");
 }
 
 #endif

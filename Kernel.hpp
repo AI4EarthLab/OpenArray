@@ -44,10 +44,10 @@ namespace oa {
       if (u->is_seqs_scalar()) {
         ap = ArrayPool::global()->get(v->get_partition(), dt);
         T2 scalar = *(T2*) u->get_buffer();
-        oa::internal::buffer_${name}$_const(
+        oa::internal::const_${name}$_buffer(
           (T1 *) ap->get_buffer(),
-          (T3 *) v->get_buffer(),
           scalar,
+          (T3 *) v->get_buffer(),
           ap->buffer_size()
         );
       } else if (v->is_seqs_scalar()) {
@@ -111,10 +111,10 @@ namespace oa {
       if (u->is_seqs_scalar()) {
         ap = ArrayPool::global()->get(v->get_partition(), dt);
         T2 scalar = *(T2*) u->get_buffer();
-        oa::internal::buffer_${name}$_const(
+        oa::internal::const_${name}$_buffer(
           (T1 *) ap->get_buffer(),
-          (T3 *) v->get_buffer(),
           scalar,
+          (T3 *) v->get_buffer(),
           ap->buffer_size()
         );
       } else if (v->is_seqs_scalar()) {
@@ -252,7 +252,7 @@ namespace oa {
         u->buffer_size()
       );
 
-      std::cout<<"mpi"<<rankID<<" local_sum ="<<*local_sum<<std::endl;
+      //std::cout<<"mpi"<<rankID<<" local_sum ="<<*local_sum<<std::endl;
 	  MPI_Datatype mpidt;
 
       switch(u_dt) {
@@ -270,10 +270,8 @@ namespace oa {
       }
 
       MPI_Allreduce(local_sum, all_sum, 1, mpidt, MPI_SUM, comm);
-
       ArrayPtr ap = oa::funcs::get_seq_scalar(*all_sum);
-
-	  std::cout << "The sum is: " << *all_sum << std::endl;
+	  //std::cout << "The sum is: " << *all_sum << std::endl;
 	  return ap;
 	}
 

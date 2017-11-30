@@ -155,17 +155,85 @@ namespace oa {
       }
     }
 
-    ArrayPtr eval(NodePtr A) {
+    ArrayPtr force_eval(NodePtr A) {
       if (A->has_data()) return A->get_data();
 
       vector<ArrayPtr> ops_ap;
+      for (int i = 0; i < A->input_size(); i++) {
+        ops_ap.push_back(force_eval(A->input(i)));
+      }
+
+      const NodeDesc& nd = get_node_desc(A->type());
+      KernelPtr kernel_addr = nd.func;
+      //printf("kernel : %p\n", kernel_addr.target< kernel_rawptr* >());
+      ArrayPtr ap = kernel_addr(ops_ap);
+      A->set_data(ap);
+
+      return ap;
+    }
+
+    void get_kernel_parameter(NodePtr A, vector<void*> &list, 
+      PartitionPtr &ptr) {
+      ArrayPtr ap;
+      // data
+      if (A->has_data()) {
+        ap = A->get_data();
+        list.push_back(ap->get_buffer());
+        if (ptr == NULL && !(ap->is_seqs_scalar())) {
+          ptr = ap->get_partition();
+        }
+        return ;
+      }
+
+      // not element wise, need eval
+      const NodeDesc &nd = get_node_desc(A->type());
+      if (!nd.ew) {
+        ArrayPtr ap = eval(A);
+        list.push_back(ap->get_buffer());
+        if (ptr == NULL && !(ap->is_seqs_scalar())) {
+          ptr = ap->get_partition();
+        }
+        return ;
+      }
+
+      // tree
+      for (int i = 0; i < A->input_size(); i++) {
+        get_kernel_parameter(A->input(i), list, ptr);
+      }
+    }
+
+    ArrayPtr eval(NodePtr A) {
+      // fusion kernel
+      if (A->hash()) {
+        FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
+        if (fkptr != NULL) {
+          vector<void*> list;
+          PartitionPtr par_ptr;
+          get_kernel_parameter(A, list, par_ptr);
+          ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
+
+          list.push_back(ap->get_buffer());
+          void** list_pointer = list.data();
+          fkptr(list_pointer, ap->buffer_size());
+          cout<<"fusion-kernel called"<<endl;
+          
+          A->set_data(ap);
+          return ap;
+        }
+      }
+
+      // data
+      if (A->has_data()) return A->get_data();
+
+      // tree
+      vector<ArrayPtr> ops_ap;
+
       for (int i = 0; i < A->input_size(); i++) {
         ops_ap.push_back(eval(A->input(i)));
       }
 
       const NodeDesc& nd = get_node_desc(A->type());
       KernelPtr kernel_addr = nd.func;
-      //printf("kernel : %p\n", kernel_addr.target< kernel_rawptr* >());
       ArrayPtr ap = kernel_addr(ops_ap);
       A->set_data(ap);
 
@@ -282,7 +350,7 @@ namespace oa {
         stringstream code;
         stringstream __code;
         //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
-        int id = 1;
+        int id = 0;
         tree_to_code(A, __code, id);
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
@@ -293,13 +361,13 @@ namespace oa {
         code<<"  for (int i = 0; i < size; i++) {\n";
         switch(A->get_data_type()) {
           case DATA_INT:
-            code<<"    ((int*)(list[0]))[i] = ";
+            code<<"    ((int*)(list["<<id<<"]))[i] = ";
             break;
           case DATA_FLOAT:
-            code<<"    ((float*)(list[0]))[i] = ";
+            code<<"    ((float*)(list["<<id<<"]))[i] = ";
             break;
           case DATA_DOUBLE:
-            code<<"    ((double*)(list[0]))[i] = ";
+            code<<"    ((double*)(list["<<id<<"]))[i] = ";
             break;    
         }
         code<<__code.str()<<";\n  }\n  return ;\n}}";

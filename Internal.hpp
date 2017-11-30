@@ -117,6 +117,13 @@ namespace oa {
       }
     }
 
+    template<typename T1, typename T2, typename T3>
+    void const_${name}$_buffer(T1 *A, T2 val, T3 *B, int size) {
+      for (int i = 0; i < size; i++) {
+        A[i] = val ${sy}$ B[i];
+      }
+    }
+
     // A = U ${sy}$ V
     template<typename T1, typename T2, typename T3>
     void buffer_${name}$_buffer(T1 *A, T2 *U, T3 *V, int size) {
