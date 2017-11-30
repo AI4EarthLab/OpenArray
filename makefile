@@ -41,7 +41,7 @@ OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
 
 .DEFAULT_GOAL := all
 
-%.o: %.cpp
+%.o: %.cpp %.hpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 %.o: %.c
