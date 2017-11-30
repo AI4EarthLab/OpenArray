@@ -229,7 +229,54 @@ namespace oa {
     }
 
     ///:endfor
+
+	// salar = sum(A) 
+    template <typename T>
+	ArrayPtr t_kernel_sum(vector<ArrayPtr> &ops_ap) {
+	  ArrayPtr u = ops_ap[0];
+	  int u_dt = u->get_data_type();
+      int sw = u->get_partition()->get_stencil_width();
+
+      MPI_Comm comm = u->get_partition()->get_comm();
+      int rankID = oa::utils::get_rank(comm);
+	  int mpisize =  oa::utils::get_size(comm);
+
+	  T temp1,temp2;
+      T *local_sum = &temp1;
+      T *all_sum = &temp2;
+      oa::internal::buffer_sum_const(
+        (T*) local_sum, 
+        (T*) u->get_buffer(),
+        u->get_local_box(),
+        sw,
+        u->buffer_size()
+      );
+
+      std::cout<<"mpi"<<rankID<<" local_sum ="<<*local_sum<<std::endl;
+	  MPI_Datatype mpidt;
+
+      switch(u_dt) {
+        case DATA_INT:
+		  mpidt = MPI_INT;
+          break;
+        case DATA_FLOAT:
+		  mpidt = MPI_FLOAT;
+          break;
+        case DATA_DOUBLE:
+		  mpidt = MPI_DOUBLE;
+          break;
+		default:
+		  std::cout<<"error"<<std::endl;
+      }
+
+      MPI_Allreduce(local_sum, all_sum, 1, mpidt, MPI_SUM, comm);
+
+      ArrayPtr ap = oa::funcs::get_seq_scalar(*all_sum);
+
+	  std::cout << "The sum is: " << *all_sum << std::endl;
+	  return ap;
+	}
+
   }
 }
-
 #endif

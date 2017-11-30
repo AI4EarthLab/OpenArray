@@ -296,5 +296,28 @@ namespace oa {
     }
 
     ///:endfor
+
+    // crate kernel_sum
+    // A = U > V
+	ArrayPtr kernel_sum(vector<ArrayPtr> &ops_ap) {
+	  ArrayPtr u = ops_ap[0];
+	  ArrayPtr ap; 
+	  int u_dt = u->get_data_type();
+      switch(u_dt) {
+        case DATA_INT:
+		  ap = t_kernel_sum<int>(ops_ap);
+          break;
+        case DATA_FLOAT:
+		  ap = t_kernel_sum<float>(ops_ap);
+          break;
+        case DATA_DOUBLE:
+		  ap = t_kernel_sum<double>(ops_ap);
+          break;
+		default:
+		  std::cout<<"error"<<std::endl;
+      }
+      return ap;
+	}
+
   }
 }

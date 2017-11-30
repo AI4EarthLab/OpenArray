@@ -223,7 +223,32 @@ namespace oa {
     }
 
     ///:endfor
-      
+
+    template<typename T>
+    void buffer_sum_const(T *val, T *A, Box box, int sw, int size) {
+      int x = 0, y = 0, z = 0;
+      int xs, xe, ys, ye, zs, ze;
+      box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+
+      int M = xe - xs;
+      int N = ye - ys;
+      int K = ze - zs;
+      *val = 0;
+
+	  int cnt = 0;
+	  for (int k = zs; k < ze; k++) {
+		for (int j = ys; j < ye; j++) {
+		  for (int i = xs; i < xe; i++) {
+			if ((xs + sw <= i && i < xe - sw) &&
+				(ys + sw <= j && j < ye - sw) &&
+				(zs + sw <= k && k < ze - sw)) {
+			  *val += A[cnt];
+			}
+			cnt++;
+		  }
+		}
+	  }
+	}
   }
 }
 

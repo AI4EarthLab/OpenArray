@@ -530,4 +530,14 @@ void test_min_max() {
   esans2->display("max(EA2)");
 }
 
+void test_sum() {
+  ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {3, 3, 3}, 1);
+  NodePtr EA2 = oa::ops::new_node(eap2);
+  EA2->display("EA2");
+  NodePtr EC2 = oa::ops::new_node(TYPE_SUM, EA2);
+
+  ArrayPtr esans2 = oa::ops::eval(EC2);
+  esans2->display("sum(EA2)");
+}
+
 #endif
