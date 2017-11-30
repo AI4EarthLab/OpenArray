@@ -25,8 +25,8 @@
        ["TYPE_LE",      "le",      "<=",         "B",   "A", "F", "F",  "A<=B",       "0"],&
        ["TYPE_EQ",      "eq",      "==",         "B",   "A", "F", "F",  "A==B",       "0"],&
        ["TYPE_NE",      "ne",      "!=",         "B",   "A", "F", "F",  "A/=B",       "0"],&
-       ["TYPE_MIN",     "min",     "min",        "",    "",  "F", "F",  "min",        "0"],&
-       ["TYPE_MAX",     "max",     "max",        "",    "",  "F", "F",  "max",        "0"],&
+       ["TYPE_MIN",     "min",     "MIN",        "E",   "",  "F", "F",  "min",        "0"],&
+       ["TYPE_MAX",     "max",     "MAX",        "E",   "",  "F", "F",  "max",        "0"],&
        ["TYPE_POW",     "pow",     "pow",        "",    "",  "T", "F",  "(A)**M",     "2"],&
        ["TYPE_EXP",     "exp",     "exp",        "C",   "B", "T", "F",  "exp(A)",     "2"],&
        ["TYPE_SIN",     "sin",     "sin",        "C",   "B", "T", "F",  "sin(A)",     "2"],&

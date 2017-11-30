@@ -39,7 +39,8 @@ int main(int argc, char** argv) {
   //test_c_interface();
   //test_logic_operator();
   //test_math_operator();
-  test_gen_kernel_JIT();
+  //test_gen_kernel_JIT();
+  test_min_max();
 
   MPI_Finalize();
   return 0;

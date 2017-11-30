@@ -157,6 +157,78 @@ namespace oa {
 
     ///:endfor
 
+    // ap = {max/min}u 
+    ///:mute
+    ///:include "NodeType.fypp"
+    ///:endmute
+    ///:for k in [i for i in L if i[3] == 'E']
+    ///:set name = k[1]
+    ///:set sy = k[2]
+    // A = ${sy}$ U
+    template<typename T>
+    ArrayPtr t_kernel_${name}$(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      int u_dt = u->get_data_type();
+      int dt = u_dt;
+      int sw = u->get_partition()->get_stencil_width();
+
+      // part_val, total_val;
+      struct {
+          T value;
+          int thread_id;
+          int x;
+          int y;
+          int z;
+      } local, global;
+
+      int3 pos = oa::internal::buffer_${name}$_const(
+        local.value, 
+        (T*) u->get_buffer(),
+        u->get_local_box(),
+        sw,
+        u->buffer_size()
+      );
+
+      MPI_Comm comm = u->get_partition()->get_comm();
+      int rankID = oa::utils::get_rank(comm);
+
+      local.x = pos[0];
+      local.y = pos[1];
+      local.z = pos[2];
+      local.thread_id = rankID;
+
+      MPI_Reduce(&local, &global, 1, MPI_DOUBLE_INT, MPI_${sy}$LOC, 0, comm);
+
+      int answer_thread;
+      if (rankID == 0) {
+        std::cout<<"the root received:"<<global.value<<" @"<<global.thread_id<<std::endl;
+        answer_thread = global.thread_id;
+      }
+
+      MPI_Bcast(&answer_thread, 1, MPI_INT, 0, comm);
+
+      if (rankID == answer_thread) {
+        std::cout<<"\nanswer is on rank"<<rankID<<",my value="<<local.value<<" and local postion=["<<local.x<<","<<local.y<<","<<local.z<<"]"<<std::endl;
+        global.value = local.value;
+        global.x = local.x;
+        global.y = local.y;
+        global.z = local.z;
+      }
+
+      MPI_Bcast(&global.value, 1, MPI_INT, answer_thread, comm);
+      MPI_Bcast(&global.x, 1, MPI_INT, answer_thread, comm);
+      MPI_Bcast(&global.y, 1, MPI_INT, answer_thread, comm);
+      MPI_Bcast(&global.z, 1, MPI_INT, answer_thread, comm);
+
+      
+      std::cout<<"\nfinish by rank"<<rankID<<"my value="<<local.value<<" and local postion=["<<local.x<<","<<local.y<<","<<local.z<<"]"<<std::endl;
+
+      ArrayPtr ap = oa::funcs::get_seq_scalar(global.value);
+      return ap;
+
+    }
+
+    ///:endfor
   }
 }
 

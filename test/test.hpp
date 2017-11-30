@@ -520,5 +520,14 @@ void test_gen_kernel_JIT() {
   oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
 }
 
+void test_min_max() {
+  ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 7, 3}, 3);
+  NodePtr EA2 = oa::ops::new_node(eap2);
+  EA2->display("EA2");
+  NodePtr EC2 = oa::ops::new_node(TYPE_MAX, EA2);
+
+  ArrayPtr esans2 = oa::ops::eval(EC2);
+  esans2->display("max(EA2)");
+}
 
 #endif
