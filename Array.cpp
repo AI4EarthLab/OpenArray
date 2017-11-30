@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 Array::Array(const PartitionPtr &ptr, int data_type) : 
   m_data_type(data_type), m_par_ptr(ptr) {
   set_local_box();
