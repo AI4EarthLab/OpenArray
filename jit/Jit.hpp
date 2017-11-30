@@ -32,22 +32,25 @@ using namespace clang::driver;
 using namespace std;
 using namespace llvm;
 */
+
+class Jit;
+typedef std::shared_ptr<Jit> JitPtr;
+
 std::string GetExecutablePath(const char *Argv0); 
 class Jit{
-        private:
-                char * funcname;
-                char * code;
-                int argc;
-                char **argv;
-                uint64_t Entry;
-                std::unique_ptr<llvm::ExecutionEngine> JEE;
-                llvm::ExecutionEngine * createExecutionEngine(std::unique_ptr<llvm::Module> M, std::string *ErrorStr) ;
-                std::unique_ptr<llvm::ExecutionEngine> GetAddress(std::unique_ptr<llvm::Module> Mod); 
+  private:
+    char * funcname;
+    char * code;
+    int argc;
+    char **argv;
+    uint64_t Entry;
+    std::unique_ptr<llvm::ExecutionEngine> JEE;
+    llvm::ExecutionEngine * createExecutionEngine(std::unique_ptr<llvm::Module> M, std::string *ErrorStr) ;
+    std::unique_ptr<llvm::ExecutionEngine> GetAddress(std::unique_ptr<llvm::Module> Mod); 
 
-
-        public:
-                Jit(int argcin, char **argvin,char * fnin,char * codein);
-                ~Jit();
-                uint64_t compile();
+  public:
+    Jit(int argcin, char **argvin, char * fnin, char * codein);
+    ~Jit();
+    uint64_t compile();
 };
 #endif

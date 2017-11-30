@@ -69,7 +69,7 @@ namespace oa {
      * direction = 2, dimension z
      */
     void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction = -1);
-		
+    
     void update_ghost_end(vector<MPI_Request> &reqs);
 
     // convert a mpi array to sequential array
@@ -82,36 +82,48 @@ namespace oa {
 
       //std::cout<<"is_seqs : " << A->is_seqs() << std::endl;
       
-      if(!A->is_seqs())
-	return false;
+      if (!A->is_seqs()) return false;
 
       int A_size = A->size();
 
       // std::cout<<"A_size : "<<A_size;
 
       // std::cout<<"B_size : "<<arma::size(B)[0]
-      // 	* arma::size(B)[1] * arma::size(B)[2];
+      //  * arma::size(B)[1] * arma::size(B)[2];
 
-      if(arma::size(B)[0]
-	 * arma::size(B)[1]
-	 * arma::size(B)[2] != A_size){
-	return false;
+      if (arma::size(B)[0]
+          * arma::size(B)[1]
+          * arma::size(B)[2] != A_size) {
+            return false;
       }
 
       T* A_buf = (T*)A->get_buffer();
       T* B_buf = (T*)B.memptr();
-      for(int i = 0; i < A_size; ++ i){
-	if(abs(A_buf[i] - B_buf[i]) > 1E-8){
-	  std::cout<<A_buf[i]<<std::endl;
-	  std::cout<<B_buf[i]<<std::endl;	  
-	  return false;
-	}
+      for(int i = 0; i < A_size; ++ i) {
+        if(abs(A_buf[i] - B_buf[i]) > 1E-8) {
+          std::cout<<A_buf[i]<<std::endl;
+          std::cout<<B_buf[i]<<std::endl;   
+          return false;
+        }
       }
       return true;
     }
 
     bool is_equal(const ArrayPtr& A, const ArrayPtr& B);
 
+    template<class T>
+    ArrayPtr get_seq_scalar(T val) {
+      return consts<T>(MPI_COMM_SELF,SCALAR_SHAPE, val, 0);
+    }
+
+    template<class T>
+    ArrayPtr get_seq_array(T* val, const Shape& s){
+      ArrayPtr a = consts<T>(MPI_COMM_SELF, s, 0, 0);
+      const int size = s[0] * s[1] * s[2];
+      oa::internal::copy_buffer((T*)a->get_buffer(), val, size);
+      return a;
+    }
+    
   }
 }
 

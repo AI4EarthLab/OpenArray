@@ -82,6 +82,10 @@ size_t Node::hash() {
   return m_hash;
 }
 
+void Node::set_hash(size_t hash) {
+  m_hash = hash;
+}
+
 NodeType Node::type() {
   return m_type;
 }
@@ -102,7 +106,7 @@ void Node::reset() {
   clear_data();
   clear_input();
   m_type = TYPE_UNKNOWN;
-  m_hash = -1;
+  m_hash = 0;
   id = -1;
 }
 

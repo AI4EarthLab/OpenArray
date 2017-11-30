@@ -102,9 +102,8 @@ namespace oa {
       }
       return ap;
     }
-
+    
     //transfer(ArrayPtr &A, ArrayPtr &B);
-
     ArrayPtr subarray(const ArrayPtr &ap, const Box &b) {
       vector<int> rsx, rsy, rsz;
       PartitionPtr pp = ap->get_partition();

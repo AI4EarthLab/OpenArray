@@ -509,8 +509,25 @@ void test_gen_kernel_JIT() {
   NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
   NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
 
-  oa::ops::gen_kernels_JIT(K,true,MPI_COMM_WORLD);
+  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
+
+  G = oa::ops::new_node(TYPE_PLUS, A, B);
+  H = oa::ops::new_node(TYPE_MULT, G, C);
+  I = oa::ops::new_node(TYPE_DIVD, H, D);
+  J = oa::ops::new_node(TYPE_MINUS, E, F);
+  K = oa::ops::new_node(TYPE_PLUS, I, J);
+  
+  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
 }
 
+void test_min_max() {
+  ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 7, 3}, 3);
+  NodePtr EA2 = oa::ops::new_node(eap2);
+  EA2->display("EA2");
+  NodePtr EC2 = oa::ops::new_node(TYPE_MAX, EA2);
+
+  ArrayPtr esans2 = oa::ops::eval(EC2);
+  esans2->display("max(EA2)");
+}
 
 #endif
