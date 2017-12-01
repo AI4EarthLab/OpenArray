@@ -10,7 +10,7 @@ fi
 
         cp makefile  ${build_dir}/makefile
         cp makefile.intel  ${build_dir}/makefile.intel
-        cp jit.so  ${build_dir}/jit.so
+        cp libjit.so  ${build_dir}/libjit.so
 for d in `find . -maxdepth 2 -type d`
 do
 

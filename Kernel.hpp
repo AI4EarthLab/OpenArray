@@ -230,51 +230,104 @@ namespace oa {
 
     ///:endfor
 
-	// salar = sum(A) 
+    // salar = sum(A) 
     template <typename T>
-	ArrayPtr t_kernel_sum(vector<ArrayPtr> &ops_ap) {
-	  ArrayPtr u = ops_ap[0];
-	  int u_dt = u->get_data_type();
+    ArrayPtr t_kernel_sum_scalar(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      int u_dt = u->get_data_type();
       int sw = u->get_partition()->get_stencil_width();
 
       MPI_Comm comm = u->get_partition()->get_comm();
       int rankID = oa::utils::get_rank(comm);
-	  int mpisize =  oa::utils::get_size(comm);
+      int mpisize =  oa::utils::get_size(comm);
 
-	  T temp1,temp2;
+      T temp1,temp2;
       T *local_sum = &temp1;
       T *all_sum = &temp2;
       oa::internal::buffer_sum_const(
-        (T*) local_sum, 
-        (T*) u->get_buffer(),
-        u->get_local_box(),
-        sw,
-        u->buffer_size()
-      );
+          (T*) local_sum, 
+          (T*) u->get_buffer(),
+          u->get_local_box(),
+          sw,
+          u->buffer_size()
+          );
 
       //std::cout<<"mpi"<<rankID<<" local_sum ="<<*local_sum<<std::endl;
-	  MPI_Datatype mpidt;
-
-      switch(u_dt) {
-        case DATA_INT:
-		  mpidt = MPI_INT;
-          break;
-        case DATA_FLOAT:
-		  mpidt = MPI_FLOAT;
-          break;
-        case DATA_DOUBLE:
-		  mpidt = MPI_DOUBLE;
-          break;
-		default:
-		  std::cout<<"error"<<std::endl;
-      }
-
+      MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
       MPI_Allreduce(local_sum, all_sum, 1, mpidt, MPI_SUM, comm);
       ArrayPtr ap = oa::funcs::get_seq_scalar(*all_sum);
-	  //std::cout << "The sum is: " << *all_sum << std::endl;
-	  return ap;
-	}
+      //std::cout << "The sum is: " << *all_sum << std::endl;
+      return ap;
+    }
 
+    //sum to x 
+    template <typename T>
+    ArrayPtr t_kernel_sum_x(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr ap;
+      ArrayPtr u = ops_ap[0];
+      int u_dt = u->get_data_type();
+      int sw = u->get_partition()->get_stencil_width();
+
+      MPI_Comm comm = u->get_partition()->get_comm();
+      int rankID = oa::utils::get_rank(comm);
+      int mpisize = oa::utils::get_size(comm);
+
+      PartitionPtr upar = u->get_partition();
+      ap = ArrayPool::global()->get(upar, u_dt);
+      oa::internal::buffer_sum_x_const(
+          (T*) ap->get_buffer(),
+          (T*) u->get_buffer(),
+          u->get_local_box(),
+          sw,
+          u->buffer_size()
+          );
+      Shape sp = upar->procs_shape();
+      //cout<<"sp:"<<sp[0]<<","<<sp[1]<<","<<sp[2]<<std::endl;
+
+      vector<int> vi = upar->get_procs_3d(rankID);
+      //cout<<rankID<<":"<<vi[0]<<","<<vi[1]<<","<<vi[2]<<endl;
+/*
+      int buffersize = 
+
+      T *buffer = new T[buffersize];
+
+      for(int i = sp[0]-1; i > 0; i--)
+      {
+      //cout <<"===================="<<endl;
+        MPI_Barrier(comm);
+        for(int j = 0; j < sp[1]; j++)
+          for(int k = 0; k < sp[2]; k++)
+          {
+            int sendid = upar->get_procs_rank(i, j, k);
+            int receid = upar->get_procs_rank(i-1, j, k);
+            //if(rankID == sendid) cout<<sendid<<" -> "<<receid<<endl;
+            if(rankID == sendid)
+            {
+              MPI_Send(greeting,strlen(greeting)+1,MPI_CHAR,0,0,MPI_COMM_WORLD);
+            }
+          }
+        MPI_Barrier(comm);
+      //cout <<"********************"<<endl;
+      }
+      delete []buffer;
+*/
+      return ap;
+    }
+
+    //sum to y
+    template <typename T>
+    ArrayPtr t_kernel_sum_y(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr ap;
+      return ap;
+    }
+
+
+    //sum to z
+    template <typename T>
+    ArrayPtr t_kernel_sum_z(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr ap;
+      return ap;
+    }
   }
 }
 #endif

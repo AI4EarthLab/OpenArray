@@ -302,20 +302,80 @@ namespace oa {
 	ArrayPtr kernel_sum(vector<ArrayPtr> &ops_ap) {
 	  ArrayPtr u = ops_ap[0];
 	  ArrayPtr ap; 
+      ArrayPtr v = ops_ap[1];
+      int type = ((int*)v->get_buffer())[0];
+
 	  int u_dt = u->get_data_type();
-      switch(u_dt) {
-        case DATA_INT:
-		  ap = t_kernel_sum<int>(ops_ap);
-          break;
-        case DATA_FLOAT:
-		  ap = t_kernel_sum<float>(ops_ap);
-          break;
-        case DATA_DOUBLE:
-		  ap = t_kernel_sum<double>(ops_ap);
-          break;
+
+	  switch(type){
+		case 0://sum to scalar
+		  switch(u_dt) {
+			case DATA_INT:
+			  ap = t_kernel_sum_scalar<int>(ops_ap);
+			  break;
+			case DATA_FLOAT:
+			  ap = t_kernel_sum_scalar<float>(ops_ap);
+			  break;
+			case DATA_DOUBLE:
+			  ap = t_kernel_sum_scalar<double>(ops_ap);
+			  break;
+			default:
+			  std::cout<<"error"<<std::endl;
+			  break;
+		  }
+		  break;
+		case 1://sum to x
+		  switch(u_dt) {
+			case DATA_INT:
+			  ap = t_kernel_sum_x<int>(ops_ap);
+			  break;
+			case DATA_FLOAT:
+			  ap = t_kernel_sum_x<float>(ops_ap);
+			  break;
+			case DATA_DOUBLE:
+			  ap = t_kernel_sum_x<double>(ops_ap);
+			  break;
+			default:
+			  std::cout<<"error"<<std::endl;
+			  break;
+		  }
+		  break;
+		case 2://sum to y
+		  switch(u_dt) {
+			case DATA_INT:
+			  ap = t_kernel_sum_y<int>(ops_ap);
+			  break;
+			case DATA_FLOAT:
+			  ap = t_kernel_sum_y<float>(ops_ap);
+			  break;
+			case DATA_DOUBLE:
+			  ap = t_kernel_sum_y<double>(ops_ap);
+			  break;
+			default:
+			  std::cout<<"error"<<std::endl;
+			  break;
+		  }
+		  break;
+		case 3://sum to z
+		  switch(u_dt) {
+			case DATA_INT:
+			  ap = t_kernel_sum_z<int>(ops_ap);
+			  break;
+			case DATA_FLOAT:
+			  ap = t_kernel_sum_z<float>(ops_ap);
+			  break;
+			case DATA_DOUBLE:
+			  ap = t_kernel_sum_z<double>(ops_ap);
+			  break;
+			default:
+			  std::cout<<"error"<<std::endl;
+			  break;
+		  }
+		  break;
 		default:
 		  std::cout<<"error"<<std::endl;
-      }
+		  break;
+	  }
       return ap;
 	}
 

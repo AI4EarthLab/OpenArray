@@ -15,7 +15,7 @@ CXXFLAGS= -fPIC --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
 LIBS = -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem \
 	-lboost_system -ldl -llapack -lblas \
-	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} jit.so
+	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} libjit.so
 
 
 OBJS	= Range.o Box.o Partition.o Array.o \
@@ -57,7 +57,7 @@ all:
 	@./pre.sh
 	@cd build && make clean
 	@echo "Cleaning done."
-	@cd build && make main 2>/dev/null
+	@cd build && make main  2>/dev/null
 	cp build/main ./
 
 quick:
@@ -67,12 +67,12 @@ quick:
 	@./test.sh
 	@cd build
 	@echo "Cleaning done."
-	@cd build && make ${name}
+	@cd build && make ${name} -j8
 	@cp build/${name} ./
-	@mpirun -n 4 ./${name} 4 4 4
+	@mpirun -n 8 ./${name} 4 4 4
 
 main: ${OBJ_MAIN}
-	-${CXX} -rdynamic -o main ${OBJ_MAIN} jit.so -lstdc++ -lpnetcdf \
+	-${CXX} -rdynamic -o main ${OBJ_MAIN} libjit.so -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem -lboost_system -ldl 
 
 testall:

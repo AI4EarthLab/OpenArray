@@ -537,10 +537,11 @@ void test_min_max() {
 }
 
 void test_sum() {
-  ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {3, 3, 3}, 1);
+  ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
   NodePtr EA2 = oa::ops::new_node(eap2);
   EA2->display("EA2");
-  NodePtr EC2 = oa::ops::new_node(TYPE_SUM, EA2);
+  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
+  NodePtr EC2 = oa::ops::new_node(TYPE_SUM, EA2, C);
 
   ArrayPtr esans2 = oa::ops::eval(EC2);
   esans2->display("sum(EA2)");

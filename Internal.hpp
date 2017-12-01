@@ -242,20 +242,88 @@ namespace oa {
       int K = ze - zs;
       *val = 0;
 
-	  int cnt = 0;
-	  for (int k = zs; k < ze; k++) {
-		for (int j = ys; j < ye; j++) {
-		  for (int i = xs; i < xe; i++) {
-			if ((xs + sw <= i && i < xe - sw) &&
-				(ys + sw <= j && j < ye - sw) &&
-				(zs + sw <= k && k < ze - sw)) {
-			  *val += A[cnt];
-			}
-			cnt++;
-		  }
-		}
-	  }
-	}
+      int cnt = 0;
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              *val += A[cnt];
+            }
+            cnt++;
+          }
+        }
+      }
+    }
+    template<typename T>
+    void buffer_sum_x_const(T *ap, T *A, Box box, int sw, int size) {
+      int x = 0, y = 0, z = 0;
+      int xs, xe, ys, ye, zs, ze;
+      box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+
+      int M = xe - xs;
+      int N = ye - ys;
+      int K = ze - zs;
+
+      int cnt = 0;
+      int dcnt = 0;
+/*
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          int find = 0;
+          for (int i = xs; i < xe; i++) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              if(find == 0){
+                find = 1;
+                dcnt = cnt;
+                ap[dcnt] = A[cnt];
+              }
+              else{
+                ap[dcnt] += A[cnt];
+                ap[cnt]=0;
+              }
+            }
+            cnt++;
+          }
+        }
+      }
+*/
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
+              ap[temp1]=0;
+            }
+          }
+        }
+      }
+
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          int find = 0;
+          for (int i = xe-1; i >= xs; i--) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+
+              int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
+              int temp2 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs-1);
+              ap[temp1]+=A[temp1];
+              if(i-1 >= xs + sw)
+                ap[temp2]+=ap[temp1];
+
+            }
+          }
+        }
+      }
+    }
+
   }
 }
 
