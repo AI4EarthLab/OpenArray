@@ -34,13 +34,14 @@ int main(int argc, char** argv) {
 
   //test_operator();
   //test_write_graph();
-  //test_eval();
-  //test_fusion_kernel();
+  //test_force_eval();
+  test_fusion_kernel();
   //test_c_interface();
   //test_logic_operator();
   //test_math_operator();
   //test_gen_kernel_JIT();
-  test_min_max();
+  //test_min_max();
+  test_eval();
 
   MPI_Finalize();
   return 0;

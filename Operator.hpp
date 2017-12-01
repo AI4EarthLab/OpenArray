@@ -27,6 +27,11 @@ namespace oa {
 
     ArrayPtr eval(NodePtr A);
 
+    ArrayPtr force_eval(NodePtr A);
+
+    void get_kernel_parameter(NodePtr A, vector<void*> &list, 
+      PartitionPtr &ptr);
+    
     const KernelPtr get_kernel_dict(size_t hash, 
                                     const char *filename = "fusion-kernels");
 
