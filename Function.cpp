@@ -710,6 +710,7 @@ namespace oa {
       return true;
     }
 
+    // sub(A) = A(A_box) and set sub(A) = B
     void set(ArrayPtr& A, const Box& A_box, ArrayPtr& B) {
       // sub(A)'shape must equal B's shape
       assert(B->shape() == A_box.shape());
@@ -774,11 +775,15 @@ namespace oa {
 
     }
     
-    void set(ArrayPtr& A, const Box& box_a, 
-        const ArrayPtr& B, const Box& box_b) {
+    // sub(A) = A(A_box), sub(B) = B(B_box) && set sub(A) = sub(B)
+    void set(ArrayPtr& A, const Box& A_box, 
+        const ArrayPtr& B, const Box& B_box) {
+      
+      // make sure sub(A).shape == sub(B).shape
+      assert(A_box.shape() == B_box.shape());
 
-
-
+      ArrayPtr subB = subarray(B, B_box);
+      set(A, A_box, subB);
 
     }
   }

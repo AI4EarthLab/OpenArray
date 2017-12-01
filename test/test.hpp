@@ -143,6 +143,7 @@ void test_sub() {
   sub_ap->display("====sub_A=====");
 }
 
+// need 6 mpi_process
 void test_transfer() {
   // A
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6}, {6, 6, 6}, {1}, 1);
@@ -568,6 +569,7 @@ void test_eval() {
 
 }
 
+// need 6 mpi_process
 void test_set() {
   // A
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6}, {6, 6, 6}, {1}, 1);
@@ -580,7 +582,10 @@ void test_set() {
   ArrayPtr sub_ap2 = oa::funcs::subarray(ap, box2);
   sub_ap2->display("====sub_2=====");
 
-  oa::funcs::set(ap, box1, sub_ap2);
+  //oa::funcs::set(ap, box1, sub_ap2);
+  //ap->display("======after_set======");
+
+  oa::funcs::set(ap, box1, ap, box2);
   ap->display("======after_set======");
 }
 
