@@ -587,6 +587,9 @@ void test_set() {
 
   oa::funcs::set(ap, box1, ap, box2);
   ap->display("======after_set======");
+
+  oa::funcs::set(ap, box1, 0);
+  ap->display("======after_set======");
 }
 
 

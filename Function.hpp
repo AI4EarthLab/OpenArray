@@ -124,10 +124,64 @@ namespace oa {
       return a;
     }
 
+    // set sub(A) = B
     void set(ArrayPtr& A, const Box& A_box, ArrayPtr& B);
 
+    // set sub(A) = sub(B)
     void set(ArrayPtr& A, const Box& box_a, 
         const ArrayPtr& B, const Box& box_b);
+
+    // set sub(A) = const
+    template<typename T>
+    void set(ArrayPtr& A, const Box& A_box, T val) {
+      // sub(A)'s partition
+      vector<int> rsx, rsy, rsz;
+      PartitionPtr pp = A->get_partition();
+      Shape ps = pp->procs_shape();
+      pp->split_box_procs(A_box, rsx, rsy, rsz);
+      
+      vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
+      for (int i = 0; i < rsx.size(); i += 3)
+        x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
+      for (int i = 0; i < rsy.size(); i += 3)
+        y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
+      for (int i = 0; i < rsz.size(); i += 3)
+        z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
+
+      int rk = pp->rank();
+      vector<int> procs_coord = pp->get_procs_3d(rk);
+
+      int idx = procs_coord[0] - rsx[2];
+      int idy = procs_coord[1] - rsy[2];
+      int idz = procs_coord[2] - rsz[2];
+
+      // check whether there is local data in process
+      if (x[idx] * y[idy] * z[idz] == 0) return ;
+      
+      Box box = A->get_local_box();
+      Box sub_box(
+                  rsx[idx * 3], rsx[idx * 3 + 1] - 1,
+                  rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
+                  rsz[idz * 3], rsz[idz * 3 + 1] - 1
+                  );
+
+      // different data_type
+
+      ///:set TYPE = [['DATA_INT', 'int'], ['DATA_FLOAT', 'float'], ['DATA_DOUBLE', 'double']]
+      ///:for i in TYPE
+      if (A->get_data_type() == ${i[0]}$) {
+        oa::internal::set_buffer_subarray_const<${i[1]}$, T>(
+          (${i[1]}$*) A->get_buffer(),
+          val,
+          box,
+          sub_box,
+          pp->get_stencil_width()
+        );
+      }
+
+      ///:endfor
+      
+    }
     
   }
 }

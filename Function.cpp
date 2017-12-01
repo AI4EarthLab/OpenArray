@@ -760,12 +760,12 @@ namespace oa {
       ///:set TYPE = [['DATA_INT', 'int'], ['DATA_FLOAT', 'float'], ['DATA_DOUBLE', 'double']]
       ///:for i in TYPE
       ///:for j in TYPE
-      if (ap->get_data_type() == ${i[0]}$ && A->get_data_type() == ${j[0]}$) {
+      if (A->get_data_type() == ${i[0]}$ && ap->get_data_type() == ${j[0]}$) {
         oa::internal::set_buffer_subarray<${i[1]}$, ${j[1]}$>(
-          (${i[1]}$*) ap->get_buffer(),
-          (${j[1]}$*) A->get_buffer(),
-          sub_box,
+          (${i[1]}$*) A->get_buffer(),
+          (${j[1]}$*) ap->get_buffer(),
           box,
+          sub_box,
           pp->get_stencil_width()
         );
       }
