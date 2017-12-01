@@ -48,9 +48,9 @@ do
         #./fypp ${filename}.${extension} > \
     #  ${build_dir}/$filename.${extension} -m re
     
-        cp makefile  ${build_dir}/makefile
-        cp makefile.intel  ${build_dir}/makefile.intel
-
+    cp -rf makefile*  ${build_dir}/
+    #    cp makefile.intel  ${build_dir}/makefile.intel
+        
     #echo ./${build_dir}/$f
         #echo $f | cut -d '\.\/' -f 2
     
