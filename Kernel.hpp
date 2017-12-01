@@ -271,63 +271,81 @@ namespace oa {
       MPI_Comm comm = u->get_partition()->get_comm();
       int rankID = oa::utils::get_rank(comm);
       int mpisize = oa::utils::get_size(comm);
+      MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
 
       PartitionPtr upar = u->get_partition();
       ap = ArrayPool::global()->get(upar, u_dt);
-      oa::internal::buffer_sum_x_const(
-          (T*) ap->get_buffer(),
-          (T*) u->get_buffer(),
-          u->get_local_box(),
-          sw,
-          u->buffer_size()
-          );
       Shape sp = upar->procs_shape();
-      //cout<<"sp:"<<sp[0]<<","<<sp[1]<<","<<sp[2]<<std::endl;
 
       vector<int> vi = upar->get_procs_3d(rankID);
-      //cout<<rankID<<":"<<vi[0]<<","<<vi[1]<<","<<vi[2]<<endl;
-/*
-      int buffersize = 
 
-      T *buffer = new T[buffersize];
+      int xs, xe, ys, ye, zs, ze;
+      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      int buffersize = (ye-ys-2*sw)*(ze-zs-2*sw);
+      T * buffer = new T[buffersize];
 
-      for(int i = sp[0]-1; i > 0; i--)
+      for(int i = sp[0]-1; i >= 0; i--)
       {
-      //cout <<"===================="<<endl;
-        MPI_Barrier(comm);
+        int type;
+        //type:   top 2  mid 1  bottom 0
+        if(i == sp[0]-1) 
+          type = 2;
+        else if(i == 0) 
+          type = 0;
+        else
+          type = 1;
+
         for(int j = 0; j < sp[1]; j++)
-          for(int k = 0; k < sp[2]; k++)
-          {
+          for(int k = 0; k < sp[2]; k++){
             int sendid = upar->get_procs_rank(i, j, k);
             int receid = upar->get_procs_rank(i-1, j, k);
             //if(rankID == sendid) cout<<sendid<<" -> "<<receid<<endl;
-            if(rankID == sendid)
-            {
-              MPI_Send(greeting,strlen(greeting)+1,MPI_CHAR,0,0,MPI_COMM_WORLD);
+            if(rankID == sendid){
+              oa::internal::buffer_sum_x_const(
+                  (T*) ap->get_buffer(),
+                  (T*) u->get_buffer(),
+                  u->get_local_box(),
+                  sw,
+                  u->buffer_size(),
+                  buffer,
+                  type
+                  );
+
+              //cout << "cal:"<<rankID<<endl; 
+              //for(int l=0;l<buffersize;l++)
+              //  cout<<buffer[l]<<" ";
+              if(i != 0)
+                MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
             }
+            if(rankID == receid )
+            {
+              //cout << "cal:"<<rankID<<endl; 
+              if(i != 0)
+                MPI_Recv(buffer, buffersize, mpidt, sendid, 0, comm, MPI_STATUS_IGNORE);
+            }
+
           }
         MPI_Barrier(comm);
-      //cout <<"********************"<<endl;
       }
+
       delete []buffer;
-*/
       return ap;
     }
 
     //sum to y
     template <typename T>
-    ArrayPtr t_kernel_sum_y(vector<ArrayPtr> &ops_ap) {
-      ArrayPtr ap;
-      return ap;
-    }
+      ArrayPtr t_kernel_sum_y(vector<ArrayPtr> &ops_ap) {
+        ArrayPtr ap;
+        return ap;
+      }
 
 
     //sum to z
     template <typename T>
-    ArrayPtr t_kernel_sum_z(vector<ArrayPtr> &ops_ap) {
-      ArrayPtr ap;
-      return ap;
-    }
+      ArrayPtr t_kernel_sum_z(vector<ArrayPtr> &ops_ap) {
+        ArrayPtr ap;
+        return ap;
+      }
   }
 }
 #endif
