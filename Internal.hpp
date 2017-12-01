@@ -23,7 +23,7 @@ namespace oa {
 
     //sub_A = sub(A, box)
     template <typename T>
-    void set_buffer_subarray(T *sub_buffer, T *buffer, const Box &sub_box,
+    void get_buffer_subarray(T *sub_buffer, T *buffer, const Box &sub_box,
       const Box &box, int sw) {
       
       Shape sp = box.shape(sw);
@@ -50,6 +50,67 @@ namespace oa {
         //cout<<endl;
       }
     }
+
+    // set sub(A) = B
+    template<typename T1, typename T2>
+    void set_buffer_subarray(T1* buffer, T2* sub_buffer, const Box &box,
+      const Box &sub_box, int sw) {
+
+      Shape sp = box.shape(sw);
+      int M = sp[0];
+      int N = sp[1];
+      int P = sp[2];
+      
+      Box bd_box = box.boundary_box(sw);
+      Box ref_box = sub_box.ref_box(bd_box);
+      int xs, xe, ys, ye, zs, ze;
+      ref_box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+      
+      //ref_box.display("ref_box");
+
+      int cnt = 0;
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            buffer[k * M * N + j * M + i] = sub_buffer[cnt++];
+            //cout<<buffer[cnt-1]<<" ";
+          }
+          //cout<<endl;
+        }
+        //cout<<endl;
+      }
+    }
+
+    // set sub(A) = const
+    template<typename T1, typename T2>
+    void set_buffer_subarray_const(T1* buffer, T2 val, const Box &box, 
+      const Box &sub_box, int sw) {
+
+      Shape sp = box.shape(sw);
+      int M = sp[0];
+      int N = sp[1];
+      int P = sp[2];
+      
+      Box bd_box = box.boundary_box(sw);
+      Box ref_box = sub_box.ref_box(bd_box);
+      int xs, xe, ys, ye, zs, ze;
+      ref_box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+      
+      //ref_box.display("ref_box");
+
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            buffer[k * M * N + j * M + i] = val;
+            //cout<<buffer[cnt-1]<<" ";
+          }
+          //cout<<endl;
+        }
+        //cout<<endl;
+      }
+    }
+
+
 
     template<typename T>
     void set_buffer_rand(T *buffer, int size) {
