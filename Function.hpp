@@ -99,7 +99,7 @@ namespace oa {
 
       T* A_buf = (T*)A->get_buffer();
       T* B_buf = (T*)B.memptr();
-      for(int i = 0; i < A_size; ++ i) {
+      for(int i = 0; i < A_size; ++i) {
         if(abs(A_buf[i] - B_buf[i]) > 1E-8) {
           std::cout<<A_buf[i]<<std::endl;
           std::cout<<B_buf[i]<<std::endl;   
@@ -123,6 +123,11 @@ namespace oa {
       oa::internal::copy_buffer((T*)a->get_buffer(), val, size);
       return a;
     }
+
+    void set(ArrayPtr& A, const Box& A_box, ArrayPtr& B);
+
+    void set(ArrayPtr& A, const Box& box_a, 
+        const ArrayPtr& B, const Box& box_b);
     
   }
 }

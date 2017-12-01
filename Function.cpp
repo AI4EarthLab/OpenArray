@@ -140,18 +140,18 @@ namespace oa {
       // different data_type
       switch(ap->get_data_type()) {
       case DATA_INT:
-        oa::internal::set_buffer_subarray<int>((int*) arr_ptr->get_buffer(),
+        oa::internal::get_buffer_subarray<int>((int*) arr_ptr->get_buffer(),
                                                (int*) ap->get_buffer(),
                                                sub_box, box,
                                                pp->get_stencil_width());
         break;
       case DATA_FLOAT:
-        oa::internal::set_buffer_subarray<float>((float*) arr_ptr->get_buffer(),
+        oa::internal::get_buffer_subarray<float>((float*) arr_ptr->get_buffer(),
                                                  (float*) ap->get_buffer(),
                                                  sub_box, box, pp->get_stencil_width());
         break;
       case DATA_DOUBLE:
-        oa::internal::set_buffer_subarray<double>((double*) arr_ptr->get_buffer(),
+        oa::internal::get_buffer_subarray<double>((double*) arr_ptr->get_buffer(),
                                                   (double*) ap->get_buffer(), 
                                                   sub_box, box, pp->get_stencil_width());
         break;
@@ -159,6 +159,7 @@ namespace oa {
       return arr_ptr;
     }
     
+    //transfer src to dest based on dest's partition pp
     ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp) {
       ArrayPtr ap = ArrayPool::global()->get(pp, src->get_data_type());
 
@@ -707,6 +708,78 @@ namespace oa {
       
 
       return true;
+    }
+
+    void set(ArrayPtr& A, const Box& A_box, ArrayPtr& B) {
+      // sub(A)'shape must equal B's shape
+      assert(B->shape() == A_box.shape());
+
+      // sub(A)'s partition
+      vector<int> rsx, rsy, rsz;
+      PartitionPtr pp = A->get_partition();
+      Shape ps = pp->procs_shape();
+      pp->split_box_procs(A_box, rsx, rsy, rsz);
+      
+      vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
+      for (int i = 0; i < rsx.size(); i += 3)
+        x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
+      for (int i = 0; i < rsy.size(); i += 3)
+        y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
+      for (int i = 0; i < rsz.size(); i += 3)
+        z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
+
+      PartitionPtr subA_par_ptr = PartitionPool::global()->
+        get(pp->get_comm(), x, y, z, pp->get_stencil_width());
+
+      ArrayPtr ap = B;
+      // if sub(A)'s partition doesn't equal to B's partition, needs transfer
+      if (!subA_par_ptr->equal(B->get_partition())) {
+        ap = transfer(B, subA_par_ptr);
+      }
+
+      // don't have local data in process
+      if (!ap->has_local_data()) return ;
+
+      int rk = pp->rank();
+      vector<int> procs_coord = pp->get_procs_3d(rk);
+
+      int idx = procs_coord[0] - rsx[2];
+      int idy = procs_coord[1] - rsy[2];
+      int idz = procs_coord[2] - rsz[2];
+
+      Box box = A->get_local_box();
+      Box sub_box(
+                  rsx[idx * 3], rsx[idx * 3 + 1] - 1,
+                  rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
+                  rsz[idz * 3], rsz[idz * 3 + 1] - 1
+                  );
+
+      // different data_type
+
+      ///:set TYPE = [['DATA_INT', 'int'], ['DATA_FLOAT', 'float'], ['DATA_DOUBLE', 'double']]
+      ///:for i in TYPE
+      ///:for j in TYPE
+      if (ap->get_data_type() == ${i[0]}$ && A->get_data_type() == ${j[0]}$) {
+        oa::internal::set_buffer_subarray<${i[1]}$, ${j[1]}$>(
+          (${i[1]}$*) ap->get_buffer(),
+          (${j[1]}$*) A->get_buffer(),
+          sub_box,
+          box,
+          pp->get_stencil_width()
+        );
+      }
+
+      ///:endfor
+      ///:endfor
+
+    }
+    
+    void set(ArrayPtr& A, const Box& box_a, 
+        const ArrayPtr& B, const Box& box_b) {
+
+
+
+
     }
   }
 }
