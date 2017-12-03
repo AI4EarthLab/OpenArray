@@ -387,11 +387,12 @@ namespace oa {
       int type = ((int*)v->get_buffer())[0];
       ArrayPtr sub_ap;
       int xs, xe, ys, ye, zs, ze, sw;
-      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
-      Box box_x( 0,  0, ys, ye, zs, ze);
-      Box box_y(xs, xe,  0,  0, zs, ze);
-      Box box_z(xs, xe, ys, ye,  0,  0);
-
+      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze);
+      Shape s = u->shape();
+      
+      Box box_x(0, 0, 0, s[1]-1, 0, s[2]-1);
+      Box box_y(0, s[0]-1, 0, 0, 0, s[2]-1);
+      Box box_z(0, s[0]-1, 0, s[1]-1, 0, 0);
       switch(type){
         case 0:
           return ap;
@@ -406,7 +407,7 @@ namespace oa {
             sub_ap = oa::funcs::subarray(ap, box_y);
             break;
           }
-        case 4:
+        case 3:
           {
             sub_ap = oa::funcs::subarray(ap, box_z);
             break;
@@ -418,7 +419,6 @@ namespace oa {
       }
 
       return sub_ap;
-      //return ap;
     }
   }
 }
