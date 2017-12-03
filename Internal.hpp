@@ -294,7 +294,7 @@ namespace oa {
     ///:endfor
 
     template<typename T>
-    void buffer_sum_const(T *val, T *A, Box box, int sw, int size) {
+    void buffer_sum_scalar_const(T *val, T *A, Box box, int sw, int size) {
       int x = 0, y = 0, z = 0;
       int xs, xe, ys, ye, zs, ze;
       box.get_corners(xs, xe, ys, ye, zs, ze, sw);
@@ -319,7 +319,7 @@ namespace oa {
       }
     }
     template<typename T>
-    void buffer_sum_x_const(T *ap, T *A, Box box, int sw, int size, T *buffer, int type) {
+    void buffer_csum_x_const(T *ap, T *A, Box box, int sw, int size, T *buffer, int type) {
     //type:   top 2  mid 1  bottom 0
       int x = 0, y = 0, z = 0;
       int xs, xe, ys, ye, zs, ze;

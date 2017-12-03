@@ -297,9 +297,9 @@ namespace oa {
 
     ///:endfor
 
-    // crate kernel_sum
+    // crate kernel_csum
     // A = U > V
-	ArrayPtr kernel_sum(vector<ArrayPtr> &ops_ap) {
+	ArrayPtr kernel_csum(vector<ArrayPtr> &ops_ap) {
 	  ArrayPtr u = ops_ap[0];
 	  ArrayPtr ap; 
       ArrayPtr v = ops_ap[1];
@@ -324,48 +324,48 @@ namespace oa {
 			  break;
 		  }
 		  break;
-		case 1://sum to x
+		case 1://csum to x
 		  switch(u_dt) {
 			case DATA_INT:
-			  ap = t_kernel_sum_x<int>(ops_ap);
+			  ap = t_kernel_csum_x<int>(ops_ap);
 			  break;
 			case DATA_FLOAT:
-			  ap = t_kernel_sum_x<float>(ops_ap);
+			  ap = t_kernel_csum_x<float>(ops_ap);
 			  break;
 			case DATA_DOUBLE:
-			  ap = t_kernel_sum_x<double>(ops_ap);
+			  ap = t_kernel_csum_x<double>(ops_ap);
 			  break;
 			default:
 			  std::cout<<"error"<<std::endl;
 			  break;
 		  }
 		  break;
-		case 2://sum to y
+		case 2://csum to y
 		  switch(u_dt) {
 			case DATA_INT:
-			  ap = t_kernel_sum_y<int>(ops_ap);
+			  ap = t_kernel_csum_y<int>(ops_ap);
 			  break;
 			case DATA_FLOAT:
-			  ap = t_kernel_sum_y<float>(ops_ap);
+			  ap = t_kernel_csum_y<float>(ops_ap);
 			  break;
 			case DATA_DOUBLE:
-			  ap = t_kernel_sum_y<double>(ops_ap);
+			  ap = t_kernel_csum_y<double>(ops_ap);
 			  break;
 			default:
 			  std::cout<<"error"<<std::endl;
 			  break;
 		  }
 		  break;
-		case 3://sum to z
+		case 3://csum to z
 		  switch(u_dt) {
 			case DATA_INT:
-			  ap = t_kernel_sum_z<int>(ops_ap);
+			  ap = t_kernel_csum_z<int>(ops_ap);
 			  break;
 			case DATA_FLOAT:
-			  ap = t_kernel_sum_z<float>(ops_ap);
+			  ap = t_kernel_csum_z<float>(ops_ap);
 			  break;
 			case DATA_DOUBLE:
-			  ap = t_kernel_sum_z<double>(ops_ap);
+			  ap = t_kernel_csum_z<double>(ops_ap);
 			  break;
 			default:
 			  std::cout<<"error"<<std::endl;

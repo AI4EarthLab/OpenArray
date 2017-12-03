@@ -537,15 +537,15 @@ void test_min_max() {
   esans2->display("max(EA2)");
 }
 
-void test_sum() {
+void test_csum() {
   ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
   NodePtr EA2 = oa::ops::new_node(eap2);
   EA2->display("EA2");
   NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
-  NodePtr EC2 = oa::ops::new_node(TYPE_SUM, EA2, C);
+  NodePtr EC2 = oa::ops::new_node(TYPE_CSUM, EA2, C);
 
   ArrayPtr esans2 = oa::ops::eval(EC2);
-  esans2->display("sum(EA2)");
+  esans2->display("csum(EA2)");
 }
 void test_eval() {
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);

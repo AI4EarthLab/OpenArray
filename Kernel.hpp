@@ -230,7 +230,7 @@ namespace oa {
 
     ///:endfor
 
-    // salar = sum(A) 
+    // salar = sum_scalar(A) 
     template <typename T>
     ArrayPtr t_kernel_sum_scalar(vector<ArrayPtr> &ops_ap) {
       ArrayPtr u = ops_ap[0];
@@ -244,7 +244,7 @@ namespace oa {
       T temp1,temp2;
       T *local_sum = &temp1;
       T *all_sum = &temp2;
-      oa::internal::buffer_sum_const(
+      oa::internal::buffer_sum_scalar_const(
           (T*) local_sum, 
           (T*) u->get_buffer(),
           u->get_local_box(),
@@ -262,7 +262,7 @@ namespace oa {
 
     //sum to x 
     template <typename T>
-    ArrayPtr t_kernel_sum_x(vector<ArrayPtr> &ops_ap) {
+    ArrayPtr t_kernel_csum_x(vector<ArrayPtr> &ops_ap) {
       ArrayPtr ap;
       ArrayPtr u = ops_ap[0];
       int u_dt = u->get_data_type();
@@ -301,7 +301,7 @@ namespace oa {
             int receid = upar->get_procs_rank(i-1, j, k);
             //if(rankID == sendid) cout<<sendid<<" -> "<<receid<<endl;
             if(rankID == sendid){
-              oa::internal::buffer_sum_x_const(
+              oa::internal::buffer_csum_x_const(
                   (T*) ap->get_buffer(),
                   (T*) u->get_buffer(),
                   u->get_local_box(),
@@ -332,17 +332,17 @@ namespace oa {
       return ap;
     }
 
-    //sum to y
+    //csum to y
     template <typename T>
-      ArrayPtr t_kernel_sum_y(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr t_kernel_csum_y(vector<ArrayPtr> &ops_ap) {
         ArrayPtr ap;
         return ap;
       }
 
 
-    //sum to z
+    //csum to z
     template <typename T>
-      ArrayPtr t_kernel_sum_z(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr t_kernel_csum_z(vector<ArrayPtr> &ops_ap) {
         ArrayPtr ap;
         return ap;
       }

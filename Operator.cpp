@@ -119,7 +119,7 @@ namespace oa {
         ///:set ef = i[7]
         ///:set rt = i[8]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C' or name == 'pow' or name == 'sum' or name == 'not' or i[3] == 'E')
+        ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C' or name == 'pow' or name == 'csum' or name == 'not' or i[3] == 'E')
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$, ${rt}$};
         ///:else
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL, ${rt}$};
