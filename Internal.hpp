@@ -344,10 +344,7 @@ namespace oa {
                 (zs + sw <= k && k < ze - sw)) {
               int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
               if((i == xe - sw -1) && (type == 1 || type == 0))
-              {
                 ap[temp1] = buffer[index++];
-                //std::cout<<"here!!!!!!"<<std::endl;
-              }
               else 
                 ap[temp1] = 0;
             }
@@ -368,24 +365,124 @@ namespace oa {
               if(i > xs + sw){
                 ap[temp2] += ap[temp1];
               }
-              if(i == xs + sw){
-                //std::cout<<"index="<<index++<<std::endl;
-                if(type == 1 || type == 2)
-                {
-                  //std::cout<<"index="<<index<<std::endl;
-                  //if(index>(ye-2*sw)*(ze-2*sw)) std::cout <<"!!!!!!!!!!!!!!!!!!!!!!!"<<index<<","<<(ye-2*sw)*(ze-2*sw)<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
-                  buffer[index++] = ap[temp1];
-                  //std::cout<<"ap[temp2]= "<<ap[temp2]<<std::endl;
-                }
-              }
+              if((i == xs + sw) && (type == 1 || type == 2))
+                buffer[index++] = ap[temp1];
             }
           }
         }
       }
-      
-
-
     }
+
+
+    template<typename T>
+    void buffer_csum_y_const(T *ap, T *A, Box box, int sw, int size, T *buffer, int type) {
+    //type:   top 2  mid 1  bottom 0
+      int x = 0, y = 0, z = 0;
+      int xs, xe, ys, ye, zs, ze;
+      box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+
+      int M = xe - xs;
+      int N = ye - ys;
+      int K = ze - zs;
+
+      int cnt = 0;
+      int dcnt = 0;
+      if(type == 2) 
+        for(int i = 0; i < (xe-xs-2*sw)*(ze-zs-2*sw); i++)
+          buffer[i] = 0;
+
+      int index = 0;
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
+              if((j == ye - sw -1) && (type == 1 || type == 0))
+                ap[temp1] = buffer[index++];
+              else 
+                ap[temp1] = 0;
+            }
+          }
+        }
+      }
+      index = 0;
+      for (int k = zs; k < ze; k++) {
+        for (int i = xs; i < xe; i++) {
+          int find = 0;
+          for (int j = ye-1; j >= ys; j--) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
+              int temp2 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-1-ys)+(i-xs);
+              ap[temp1]+=A[temp1];
+              if(j > ys + sw){
+                ap[temp2] += ap[temp1];
+              }
+              if((j == ys + sw) && (type == 1 || type == 2))
+                buffer[index++] = ap[temp1];
+            }
+          }
+        }
+      }
+    }
+    template<typename T>
+    void buffer_csum_z_const(T *ap, T *A, Box box, int sw, int size, T *buffer, int type) {
+    //type:   top 2  mid 1  bottom 0
+      int x = 0, y = 0, z = 0;
+      int xs, xe, ys, ye, zs, ze;
+      box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+
+      int M = xe - xs;
+      int N = ye - ys;
+      int K = ze - zs;
+
+      int cnt = 0;
+      int dcnt = 0;
+      if(type == 2) 
+        for(int i = 0; i < (ye-ys-2*sw)*(ze-zs-2*sw); i++)
+          buffer[i] = 0;
+
+      int index = 0;
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
+              if((k == ze - sw -1) && (type == 1 || type == 0))
+                ap[temp1] = buffer[index++];
+              else 
+                ap[temp1] = 0;
+            }
+          }
+        }
+      }
+      index = 0;
+      for (int j = ys; j < ye; j++) {
+        for (int i = xs; i < xe; i++) {
+          int find = 0;
+          for (int k = ze-1; k >= zs; k--) {
+            if ((xs + sw <= i && i < xe - sw) &&
+                (ys + sw <= j && j < ye - sw) &&
+                (zs + sw <= k && k < ze - sw)) {
+              int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
+              int temp2 = (xe-xs)*(ye-ys)*(k-1-zs)+(xe-xs)*(j-ys)+(i-xs);
+              ap[temp1]+=A[temp1];
+              if(k > zs + sw){
+                ap[temp2] += ap[temp1];
+              }
+              if((k == zs + sw) && (type == 1 || type == 2))
+                buffer[index++] = ap[temp1];
+            }
+          }
+        }
+      }
+    }
+
 
   }
 }

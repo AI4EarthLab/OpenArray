@@ -299,85 +299,85 @@ namespace oa {
 
     // crate kernel_csum
     // A = U > V
-	ArrayPtr kernel_csum(vector<ArrayPtr> &ops_ap) {
-	  ArrayPtr u = ops_ap[0];
-	  ArrayPtr ap; 
+    ArrayPtr kernel_csum(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr ap; 
       ArrayPtr v = ops_ap[1];
       int type = ((int*)v->get_buffer())[0];
 
-	  int u_dt = u->get_data_type();
+      int u_dt = u->get_data_type();
 
-	  switch(type){
-		case 0://sum to scalar
-		  switch(u_dt) {
-			case DATA_INT:
-			  ap = t_kernel_sum_scalar<int>(ops_ap);
-			  break;
-			case DATA_FLOAT:
-			  ap = t_kernel_sum_scalar<float>(ops_ap);
-			  break;
-			case DATA_DOUBLE:
-			  ap = t_kernel_sum_scalar<double>(ops_ap);
-			  break;
-			default:
-			  std::cout<<"error"<<std::endl;
-			  break;
-		  }
-		  break;
-		case 1://csum to x
-		  switch(u_dt) {
-			case DATA_INT:
-			  ap = t_kernel_csum_x<int>(ops_ap);
-			  break;
-			case DATA_FLOAT:
-			  ap = t_kernel_csum_x<float>(ops_ap);
-			  break;
-			case DATA_DOUBLE:
-			  ap = t_kernel_csum_x<double>(ops_ap);
-			  break;
-			default:
-			  std::cout<<"error"<<std::endl;
-			  break;
-		  }
-		  break;
-		case 2://csum to y
-		  switch(u_dt) {
-			case DATA_INT:
-			  ap = t_kernel_csum_y<int>(ops_ap);
-			  break;
-			case DATA_FLOAT:
-			  ap = t_kernel_csum_y<float>(ops_ap);
-			  break;
-			case DATA_DOUBLE:
-			  ap = t_kernel_csum_y<double>(ops_ap);
-			  break;
-			default:
-			  std::cout<<"error"<<std::endl;
-			  break;
-		  }
-		  break;
-		case 3://csum to z
-		  switch(u_dt) {
-			case DATA_INT:
-			  ap = t_kernel_csum_z<int>(ops_ap);
-			  break;
-			case DATA_FLOAT:
-			  ap = t_kernel_csum_z<float>(ops_ap);
-			  break;
-			case DATA_DOUBLE:
-			  ap = t_kernel_csum_z<double>(ops_ap);
-			  break;
-			default:
-			  std::cout<<"error"<<std::endl;
-			  break;
-		  }
-		  break;
-		default:
-		  std::cout<<"error"<<std::endl;
-		  break;
-	  }
+      switch(type){
+        case 0://sum to scalar
+          switch(u_dt) {
+            case DATA_INT:
+              ap = t_kernel_sum_scalar<int>(ops_ap);
+              break;
+            case DATA_FLOAT:
+              ap = t_kernel_sum_scalar<float>(ops_ap);
+              break;
+            case DATA_DOUBLE:
+              ap = t_kernel_sum_scalar<double>(ops_ap);
+              break;
+            default:
+              std::cout<<"error"<<std::endl;
+              break;
+          }
+          break;
+        case 1://csum to x
+          switch(u_dt) {
+            case DATA_INT:
+              ap = t_kernel_csum_x<int>(ops_ap);
+              break;
+            case DATA_FLOAT:
+              ap = t_kernel_csum_x<float>(ops_ap);
+              break;
+            case DATA_DOUBLE:
+              ap = t_kernel_csum_x<double>(ops_ap);
+              break;
+            default:
+              std::cout<<"error"<<std::endl;
+              break;
+          }
+          break;
+        case 2://csum to y
+          switch(u_dt) {
+            case DATA_INT:
+              ap = t_kernel_csum_y<int>(ops_ap);
+              break;
+            case DATA_FLOAT:
+              ap = t_kernel_csum_y<float>(ops_ap);
+              break;
+            case DATA_DOUBLE:
+              ap = t_kernel_csum_y<double>(ops_ap);
+              break;
+            default:
+              std::cout<<"error"<<std::endl;
+              break;
+          }
+          break;
+        case 3://csum to z
+          switch(u_dt) {
+            case DATA_INT:
+              ap = t_kernel_csum_z<int>(ops_ap);
+              break;
+            case DATA_FLOAT:
+              ap = t_kernel_csum_z<float>(ops_ap);
+              break;
+            case DATA_DOUBLE:
+              ap = t_kernel_csum_z<double>(ops_ap);
+              break;
+            default:
+              std::cout<<"error"<<std::endl;
+              break;
+          }
+          break;
+        default:
+          std::cout<<"error"<<std::endl;
+          break;
+      }
       return ap;
-	}
+    }
 
   }
 }
