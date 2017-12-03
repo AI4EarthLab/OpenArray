@@ -42,7 +42,9 @@ int main(int argc, char** argv) {
   //test_gen_kernel_JIT();
   //test_min_max();
   //test_eval();
-  test_csum();
+  //test_csum();
+  test_sum();
+  //test_sub();
   //test_set();
 
   MPI_Finalize();

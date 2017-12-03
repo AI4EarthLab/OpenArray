@@ -379,5 +379,46 @@ namespace oa {
       return ap;
     }
 
+    ArrayPtr kernel_sum(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr ap; 
+      ap = kernel_csum(ops_ap);
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr v = ops_ap[1];
+      int type = ((int*)v->get_buffer())[0];
+      ArrayPtr sub_ap;
+      int xs, xe, ys, ye, zs, ze, sw;
+      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      Box box_x( 0,  0, ys, ye, zs, ze);
+      Box box_y(xs, xe,  0,  0, zs, ze);
+      Box box_z(xs, xe, ys, ye,  0,  0);
+
+      switch(type){
+        case 0:
+          return ap;
+          break;
+        case 1:
+          {
+            sub_ap = oa::funcs::subarray(ap, box_x);
+            break;
+          }
+        case 2:
+          {
+            sub_ap = oa::funcs::subarray(ap, box_y);
+            break;
+          }
+        case 4:
+          {
+            sub_ap = oa::funcs::subarray(ap, box_z);
+            break;
+          }
+        default:
+          std::cout<<"error"<<std::endl;
+          break;
+
+      }
+
+      return sub_ap;
+      //return ap;
+    }
   }
 }
