@@ -84,7 +84,17 @@ c_oa_type.o: c-interface/c_oa_type.cpp c-interface/c_oa_type.hpp \
  c-interface/../Function.hpp c-interface/../Operator.hpp \
  c-interface/../NodePool.hpp c-interface/../NodeDesc.hpp
 c_oa_utils.o: c-interface/c_oa_utils.cpp c-interface/c_oa_utils.hpp
-main.o: test/test.hpp
+main.o: main.cpp test/test.hpp test/../Range.hpp test/../Box.hpp \
+ test/../common.hpp test/../otype.hpp \
+ test/../Range.hpp test/../Partition.hpp test/../Box.hpp \
+ test/../Array.hpp test/../Partition.hpp test/../Function.hpp \
+ test/../utils/utils.hpp \
+ test/../utils/../common.hpp test/../Internal.hpp test/../ArrayPool.hpp \
+ test/../Array.hpp test/../PartitionPool.hpp test/../Internal.hpp \
+ test/../Operator.hpp test/../NodePool.hpp test/../Node.hpp \
+ test/../Function.hpp test/../NodeDesc.hpp test/../IO.hpp \
+ test/../c-interface/c_oa_type.hpp test/../c-interface/../ArrayPool.hpp \
+ test/../c-interface/../NodePool.hpp
 
 %.o: %.cpp %.hpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
