@@ -611,6 +611,14 @@ void test_set() {
   oa::funcs::set(ap, box1, 0);
   ap->display("======after_set======");
 }
+/*
+void test_set_l2g() {
+  // A
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_SELF, {4, 4, 4}, 1);
+  ap->display("======A======");
+ 
+}
+*/
 
 void test_rep() {
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);

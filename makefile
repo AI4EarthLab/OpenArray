@@ -1,5 +1,5 @@
 name = main
-
+compile_thread = -j8
 FC = mpif90
 CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
 	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}
@@ -40,6 +40,51 @@ OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
 
 
 .DEFAULT_GOAL := all
+Range.o: Range.cpp Range.hpp
+Box.o: Box.cpp common.hpp otype.hpp \
+ Box.hpp Range.hpp
+Partition.o: Partition.cpp Partition.hpp common.hpp otype.hpp \
+ Box.hpp Range.hpp PartitionPool.hpp
+Array.o: Array.cpp Array.hpp Partition.hpp common.hpp otype.hpp \
+ Box.hpp Range.hpp utils/utils.hpp \
+ utils/../common.hpp ArrayPool.hpp PartitionPool.hpp
+Internal.o: Internal.cpp Internal.hpp common.hpp otype.hpp \
+ Box.hpp Range.hpp utils/utils.hpp \
+ utils/../common.hpp
+Function.o: Function.cpp Function.hpp common.hpp otype.hpp \
+ utils/../common.hpp Internal.hpp Box.hpp Range.hpp ArrayPool.hpp \
+ Array.hpp Partition.hpp PartitionPool.hpp
+Kernel.o: Kernel.cpp Kernel.hpp NodePool.hpp common.hpp otype.hpp \
+ Node.hpp Array.hpp Partition.hpp Box.hpp Range.hpp ArrayPool.hpp \
+ PartitionPool.hpp Function.hpp utils/utils.hpp \
+ utils/../common.hpp Internal.hpp NodeDesc.hpp
+Operator.o: Operator.cpp Operator.hpp NodePool.hpp common.hpp otype.hpp \
+ Node.hpp Array.hpp Partition.hpp Box.hpp Range.hpp ArrayPool.hpp \
+ PartitionPool.hpp Function.hpp utils/utils.hpp \
+ utils/../common.hpp Internal.hpp NodeDesc.hpp Kernel.hpp Jit_Driver.hpp \
+ jit/Jit.hpp
+Node.o: Node.cpp Node.hpp Array.hpp Partition.hpp common.hpp otype.hpp \
+ Box.hpp Range.hpp NodeDesc.hpp Operator.hpp NodePool.hpp ArrayPool.hpp \
+ PartitionPool.hpp Function.hpp utils/utils.hpp \
+ utils/../common.hpp Internal.hpp
+IO.o: IO.cpp IO.hpp Array.hpp Partition.hpp common.hpp otype.hpp \
+ Box.hpp Range.hpp utils/utils.hpp \
+ Function.hpp Internal.hpp ArrayPool.hpp PartitionPool.hpp
+utils.o: utils/utils.cpp utils/utils.hpp \
+ utils/../common.hpp utils/../otype.hpp 
+c_oa_type.o: c-interface/c_oa_type.cpp c-interface/c_oa_type.hpp \
+ c-interface/../ArrayPool.hpp c-interface/../common.hpp \
+ c-interface/../otype.hpp \
+ c-interface/../Array.hpp c-interface/../Partition.hpp \
+ c-interface/../Box.hpp c-interface/../Range.hpp \
+ c-interface/../PartitionPool.hpp c-interface/../NodePool.hpp \
+ c-interface/../Node.hpp c-interface/../ArrayPool.hpp \
+ c-interface/../Function.hpp c-interface/../utils/utils.hpp \
+ c-interface/../utils/../common.hpp c-interface/../Internal.hpp \
+ c-interface/../Function.hpp c-interface/../Operator.hpp \
+ c-interface/../NodePool.hpp c-interface/../NodeDesc.hpp
+c_oa_utils.o: c-interface/c_oa_utils.cpp c-interface/c_oa_utils.hpp
+main.o: test/test.hpp
 
 %.o: %.cpp %.hpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
@@ -57,7 +102,7 @@ all:
 	@./pre.sh
 	@cd build && make clean
 	@echo "Cleaning done."
-	@cd build && make main  2>/dev/null
+	@cd build && make main ${compile_thread} 2>/dev/null
 	cp build/main ./
 
 quick:
@@ -67,7 +112,7 @@ quick:
 	@./test.sh
 	@cd build
 	@echo "Cleaning done."
-	@cd build && make ${name} -j8
+	@cd build && make ${name} ${compile_thread}
 	@cp build/${name} ./
 	@mpirun -n 8 ./${name} 4 4 4
 

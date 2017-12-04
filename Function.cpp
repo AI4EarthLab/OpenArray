@@ -787,6 +787,32 @@ namespace oa {
 
     }
 
+/*
+    // sub(A) = B (MPI_COMM_SELF)
+    void set_l2g(ArrayPtr& A, const Box& A_box, ArrayPtr& B) {
+      // sub(A)'shape must equal B's shape
+      assert(B->shape() == A_box.shape());
+
+      // sub(A)'s partition
+      vector<int> rsx, rsy, rsz;
+      PartitionPtr pp = A->get_partition();
+      Shape ps = pp->procs_shape();
+      pp->split_box_procs(A_box, rsx, rsy, rsz);
+      
+      vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
+      for (int i = 0; i < rsx.size(); i += 3)
+        x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
+      for (int i = 0; i < rsy.size(); i += 3)
+        y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
+      for (int i = 0; i < rsz.size(); i += 3)
+        z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
+
+      PartitionPtr subA_par_ptr = PartitionPool::global()->
+        get(pp->get_comm(), x, y, z, pp->get_stencil_width());
+    }
+*/
+
+
     ArrayPtr rep(ArrayPtr& A, int x, int y, int z)
     {
       ArrayPtr ap;
@@ -811,7 +837,7 @@ namespace oa {
           for(int k = 0; k < z; k++){
             Box box(xs, xe, ys, ye, zs, ze);
             oa::funcs::set(ap, box, A);
-            box.display();
+            //box.display();
             zs += s[2];
             ze += s[2];
           }

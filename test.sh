@@ -8,11 +8,12 @@ if [ ! -d "$build_dir" ]; then
     mkdir ${build_dir}
 fi
 
-        cp makefile  ${build_dir}/makefile
-        cp makefile.intel  ${build_dir}/makefile.intel
-        if [ ! -d "${build_dir}/libjit.so" ]; then 
-           cp libjit.so  ${build_dir}/libjit.so
-        fi
+cp makefile  ${build_dir}/makefile
+cp makefile.intel  ${build_dir}/makefile.intel
+if [ ! -d "${build_dir}/libjit.so" ]; then 
+   cp libjit.so  ${build_dir}/libjit.so
+fi
+
 for d in `find . -maxdepth 2 -type d`
 do
 
@@ -60,7 +61,6 @@ do
     if [ ! -f "$dst_filename" ]; then
       ./fypp -p -m re -m string -m io -m os --create-parents \
            $src_filename > $dst_filename
-
       echo " >>>processing file $src_filename" 
     else
       src_time=$(date +'%y%m%d%H%M' -r $src_filename)
