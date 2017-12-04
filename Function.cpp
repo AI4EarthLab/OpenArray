@@ -102,7 +102,7 @@ namespace oa {
       }
       return ap;
     }
-    
+   
     //transfer(ArrayPtr &A, ArrayPtr &B);
     ArrayPtr subarray(const ArrayPtr &ap, const Box &b) {
       vector<int> rsx, rsy, rsz;
@@ -785,6 +785,69 @@ namespace oa {
       ArrayPtr subB = subarray(B, B_box);
       set(A, A_box, subB);
 
+    }
+
+/*
+    // sub(A) = B (MPI_COMM_SELF)
+    void set_l2g(ArrayPtr& A, const Box& A_box, ArrayPtr& B) {
+      // sub(A)'shape must equal B's shape
+      assert(B->shape() == A_box.shape());
+
+      // sub(A)'s partition
+      vector<int> rsx, rsy, rsz;
+      PartitionPtr pp = A->get_partition();
+      Shape ps = pp->procs_shape();
+      pp->split_box_procs(A_box, rsx, rsy, rsz);
+      
+      vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
+      for (int i = 0; i < rsx.size(); i += 3)
+        x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
+      for (int i = 0; i < rsy.size(); i += 3)
+        y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
+      for (int i = 0; i < rsz.size(); i += 3)
+        z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
+
+      PartitionPtr subA_par_ptr = PartitionPool::global()->
+        get(pp->get_comm(), x, y, z, pp->get_stencil_width());
+    }
+*/
+
+
+    ArrayPtr rep(ArrayPtr& A, int x, int y, int z)
+    {
+      ArrayPtr ap;
+      Shape s = A->shape();
+      int sw = A->get_partition()->get_stencil_width();
+      //std::cout<<"s0:2:"<<s[0]<<","<<s[1]<<","<<s[2]<<","<<std::endl;
+      ap = oa::funcs::zeros(MPI_COMM_WORLD, {s[0]*x, s[1]*y, s[2]*z}, sw);
+      int xs, xe, ys, ye, zs, ze;
+      //std::cout<<"sw="<<sw<<std::endl;
+      xs = ys = zs = 0;
+      xe = s[0] - 1;
+      ye = s[1] - 1;
+      ze = s[2] - 1;
+      for(int i = 0; i < x; i++){
+        ys = 0;
+        zs = 0;
+        ye = s[1] - 1;
+        ze = s[2] - 1;
+        for(int j = 0; j < y; j++){
+          zs = 0;
+          ze = s[2] - 1;
+          for(int k = 0; k < z; k++){
+            Box box(xs, xe, ys, ye, zs, ze);
+            oa::funcs::set(ap, box, A);
+            //box.display();
+            zs += s[2];
+            ze += s[2];
+          }
+          ys += s[1];
+          ye += s[1];
+        }
+        xs += s[0];
+        xe += s[0];
+      }
+      return ap;
     }
   }
 }

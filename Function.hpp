@@ -183,6 +183,8 @@ namespace oa {
       
     }
     
+    // rep arry_B = rep_A(arryA, 1, 2, 3)
+    ArrayPtr rep(ArrayPtr& A, int x, int y, int z);
   }
 }
 

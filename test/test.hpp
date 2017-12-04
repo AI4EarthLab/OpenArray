@@ -537,6 +537,27 @@ void test_min_max() {
   esans2->display("max(EA2)");
 }
 
+void test_csum() {
+  ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
+  NodePtr EA2 = oa::ops::new_node(eap2);
+  EA2->display("EA2");
+  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+  NodePtr EC2 = oa::ops::new_node(TYPE_CSUM, EA2, C);
+
+  ArrayPtr esans2 = oa::ops::eval(EC2);
+  esans2->display("csum(EA2)");
+}
+void test_sum() {
+  ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
+  NodePtr EA2 = oa::ops::new_node(eap2);
+  EA2->display("EA2");
+  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+  NodePtr EC2 = oa::ops::new_node(TYPE_SUM, EA2, C);
+
+  ArrayPtr esans2 = oa::ops::eval(EC2);
+  esans2->display("sum(EA2)");
+}
+
 void test_eval() {
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
   ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
@@ -566,7 +587,6 @@ void test_eval() {
 
   ArrayPtr ans = oa::ops::eval(K);
   ans->display("eval");
-
 }
 
 // need 6 mpi_process
@@ -591,6 +611,22 @@ void test_set() {
   oa::funcs::set(ap, box1, 0);
   ap->display("======after_set======");
 }
+/*
+void test_set_l2g() {
+  // A
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_SELF, {4, 4, 4}, 1);
+  ap->display("======A======");
+ 
+}
+*/
 
+void test_rep() {
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
+  ap->display("======A======");
+
+  ArrayPtr repA = oa::funcs::rep(ap, 2, 2, 2);
+  repA->display("======after_rep======");
+  ap->display("======A======");
+}
 
 #endif

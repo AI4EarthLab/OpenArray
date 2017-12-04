@@ -60,7 +60,7 @@
        ["TYPE_DYF",     "dyf",     "dyf",        "D",   "B", "F", "F",  "DYF(A)",     "2"],&
        ["TYPE_DZB",     "dzb",     "dzb",        "D",   "B", "F", "F",  "DZB(A)",     "2"],&
        ["TYPE_DZF",     "dzf",     "dzf",        "D",   "B", "F", "F",  "DZF(A)",     "2"],&
-       ["TYPE_SUM",     "sum",     "sum",        "",    "",  "F", "T",  "sum(A)",     "0"],&
+       ["TYPE_SUM",     "sum",     "sum",        "",    "",  "F", "F",  "sum",     "0"],&
        ["TYPE_CSUM",    "csum",    "csum",       "",    "",  "F", "F",  "csum(A)",    "0"],&
        ["TYPE_OR",      "or",      "||",         "F",   "A", "F", "F",  "A.or.B",     "0"],&
        ["TYPE_AND",     "and",     "&&",         "F",   "A", "F", "F",  "A.and.B",    "0"],& 

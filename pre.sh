@@ -8,6 +8,10 @@ if [ ! -d "$build_dir" ]; then
     mkdir ${build_dir}
 fi
 
+cp makefile  ${build_dir}/makefile
+cp makefile.intel  ${build_dir}/makefile.intel
+cp libjit.so  ${build_dir}/libjit.so
+
 for d in `find . -maxdepth 2 -type d`
 do
 
@@ -48,8 +52,6 @@ do
         #./fypp ${filename}.${extension} > \
     #  ${build_dir}/$filename.${extension} -m re
     
-        cp makefile  ${build_dir}/makefile
-        cp makefile.intel  ${build_dir}/makefile.intel
 
     #echo ./${build_dir}/$f
         #echo $f | cut -d '\.\/' -f 2
