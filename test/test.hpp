@@ -589,7 +589,6 @@ void test_eval() {
   ans->display("eval");
 }
 
-
 // need 6 mpi_process
 void test_set() {
   // A
@@ -613,5 +612,12 @@ void test_set() {
   ap->display("======after_set======");
 }
 
+void test_rep() {
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
+  ap->display("======A======");
+
+  ArrayPtr repA = oa::funcs::rep(ap, 2, 2, 2);
+  repA->display("======after_rep======");
+}
 
 #endif

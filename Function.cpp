@@ -786,5 +786,12 @@ namespace oa {
       set(A, A_box, subB);
 
     }
+
+    ArrayPtr rep(ArrayPtr& A, int x, int y, int z)
+    {
+      ArrayPtr ap;
+      ap = oa::funcs::seqs(MPI_COMM_WORLD, {x, y, z}, 0);
+      return ap;
+    }
   }
 }

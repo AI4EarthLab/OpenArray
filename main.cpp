@@ -43,9 +43,10 @@ int main(int argc, char** argv) {
   //test_min_max();
   //test_eval();
   //test_csum();
-  test_sum();
+  //test_sum();
   //test_sub();
   //test_set();
+  test_rep();
 
   MPI_Finalize();
   return 0;
