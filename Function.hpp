@@ -156,7 +156,7 @@ namespace oa {
       int idz = procs_coord[2] - rsz[2];
 
       // check whether there is local data in process
-      if (x[idx] * y[idy] * z[idz] == 0) return ;
+      if (x[procs_coord[0]] * y[procs_coord[1]] * z[procs_coord[2]] == 0) return ;
       
       Box box = A->get_local_box();
       Box sub_box(
