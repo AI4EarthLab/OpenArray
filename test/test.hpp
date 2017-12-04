@@ -613,11 +613,12 @@ void test_set() {
 }
 
 void test_rep() {
-  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
   ap->display("======A======");
 
   ArrayPtr repA = oa::funcs::rep(ap, 2, 2, 2);
   repA->display("======after_rep======");
+  ap->display("======A======");
 }
 
 #endif
