@@ -71,7 +71,12 @@ namespace oa {
       for (int k = zs; k < ze; k++) {
         for (int j = ys; j < ye; j++) {
           for (int i = xs; i < xe; i++) {
-            buffer[k * M * N + j * M + i] = sub_buffer[cnt++];
+            if (zs + sw <= k && k < ze - sw &&
+                ys + sw <= j && j < ye - sw &&
+                xs + sw <= i && i < xe - sw) {
+              buffer[k * M * N + j * M + i] = sub_buffer[cnt];
+            }
+            cnt++;
             //cout<<buffer[cnt-1]<<" ";
           }
           //cout<<endl;
@@ -100,7 +105,11 @@ namespace oa {
       for (int k = zs; k < ze; k++) {
         for (int j = ys; j < ye; j++) {
           for (int i = xs; i < xe; i++) {
-            buffer[k * M * N + j * M + i] = val;
+            if (zs + sw <= k && k < ze - sw &&
+                ys + sw <= j && j < ye - sw &&
+                xs + sw <= i && i < xe - sw) {
+              buffer[k * M * N + j * M + i] = val;
+            }
             //cout<<buffer[cnt-1]<<" ";
           }
           //cout<<endl;
