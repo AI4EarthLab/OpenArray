@@ -787,7 +787,7 @@ namespace oa {
 
     }
 
-/*
+
     // sub(A) = B (MPI_COMM_SELF)
     void set_l2g(ArrayPtr& A, const Box& A_box, ArrayPtr& B) {
       // sub(A)'shape must equal B's shape
@@ -810,7 +810,7 @@ namespace oa {
       PartitionPtr subA_par_ptr = PartitionPool::global()->
         get(pp->get_comm(), x, y, z, pp->get_stencil_width());
     }
-*/
+
 
 
     ArrayPtr rep(ArrayPtr& A, int x, int y, int z)
