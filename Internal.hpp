@@ -142,7 +142,6 @@ namespace oa {
       
       //tic("kernel");
       
-#pragma omp parallel for
       for (int i = 0; i < size; i++) {
         A[i] = U[i] ${sy}$ V[i];
       }

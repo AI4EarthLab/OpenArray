@@ -100,7 +100,7 @@ namespace oa {
       T* A_buf = (T*)A->get_buffer();
       T* B_buf = (T*)B.memptr();
       for(int i = 0; i < A_size; ++ i) {
-        if(abs(A_buf[i] - B_buf[i]) > 1E-8) {
+        if(abs(A_buf[i] - B_buf[i]) > 1E-6) {
           std::cout<<A_buf[i]<<std::endl;
           std::cout<<B_buf[i]<<std::endl;   
           return false;
