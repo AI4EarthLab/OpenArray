@@ -535,21 +535,21 @@ namespace oa {
     ///:elif name == "ayf"
     ///:set func = '0.5 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j + 1, k, S)])'
     ///:elif name == "azb"
-    ///:set func = '0.5 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j, k + 1, S)])'
+    ///:set func = '0.5 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j, k - 1, S)])'
     ///:elif name == "azf"
     ///:set func = '0.5 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j, k + 1, S)])'
     ///:elif name == "dxb"
     ///:set func = '1.0 * (b[calc_id(i, j, k, S)] - b[calc_id(i - 1, j, k, S)]) / 1.0'
     ///:elif name == "dxf"
-    ///:set func = '1.0 * (b[calc_id(i, j, k, S)] + b[calc_id(i + 1, j, k, S)]) / 1.0'
+    ///:set func = '1.0 * (-b[calc_id(i, j, k, S)] + b[calc_id(i + 1, j, k, S)]) / 1.0'
     ///:elif name == "dyb"
-    ///:set func = '1.0 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j - 1, k, S)]) / 1.0'
+    ///:set func = '1.0 * (b[calc_id(i, j, k, S)] - b[calc_id(i, j - 1, k, S)]) / 1.0'
     ///:elif name == "dyf"
-    ///:set func = '1.0 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j + 1, k, S)]) / 1.0'
+    ///:set func = '1.0 * (-b[calc_id(i, j, k, S)] + b[calc_id(i, j + 1, k, S)]) / 1.0'
     ///:elif name == "dzb"
-    ///:set func = '1.0 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j, k + 1, S)]) / 1.0'
+    ///:set func = '1.0 * (b[calc_id(i, j, k, S)] - b[calc_id(i, j, k - 1, S)]) / 1.0'
     ///:elif name == "dzf"
-    ///:set func = '1.0 * (b[calc_id(i, j, k, S)] + b[calc_id(i, j, k + 1, S)]) / 1.0'
+    ///:set func = '1.0 * (-b[calc_id(i, j, k, S)] + b[calc_id(i, j, k + 1, S)]) / 1.0'
     ///:endif
 
     // crate kernel_${name}$
@@ -578,7 +578,7 @@ namespace oa {
 
       // update outside one surface (contains boundary, doesn't care)
 
-      ///:if name[1:] == 'xb'
+      ///:if name[1:] == 'zb'
       for (int k = sw; k < sw + lbound[2]; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = 0; i < M; i++) {
@@ -587,7 +587,7 @@ namespace oa {
         }
       }
 
-      ///:elif name[1:] == 'xf'
+      ///:elif name[1:] == 'zf'
       for (int k = sw + sp[2] - rbound[2]; k < sw + sp[2]; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = 0; i < M; i++) {
@@ -614,7 +614,7 @@ namespace oa {
         }
       }
 
-      ///:elif name[1:] == 'zb'
+      ///:elif name[1:] == 'xb'
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = sw; i < sw + lbound[0]; i++) {
@@ -623,7 +623,7 @@ namespace oa {
         }
       }
 
-      ///:elif name[1:] == 'zf'
+      ///:elif name[1:] == 'xf'
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = sw + sp[0] - rbound[0]; i < sw + sp[0]; i++) {
