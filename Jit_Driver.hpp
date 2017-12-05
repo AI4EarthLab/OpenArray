@@ -6,7 +6,9 @@
 #include <iostream>
 #include <sstream>
 #include <functional>
-#include "jit/Jit.hpp"
+#include "Jit.hpp"
+
+typedef std::shared_ptr<Jit> JitPtr;
 
 using namespace std;
 

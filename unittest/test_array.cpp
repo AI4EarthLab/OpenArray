@@ -1,5 +1,6 @@
 
-#include <armadillo>
+
+#include <armadillo/armadillo>
 #include "../Array.hpp"
 #include "../Function.hpp"
 #include "../NodePool.hpp"
@@ -60,6 +61,7 @@ arma::Cube<T> make_seqs(int m, int n, int p){
 }
 
 ///:set dtypes = ['int', 'float', 'double']
+///:set fdtypes = ['float', 'double']
 
 using namespace oa::funcs;
 
@@ -104,12 +106,20 @@ namespace{
 
   }
 
+
+  //test save and load function
   TEST_P(MPITest, InputAndOutput){
     ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {m,n,p}, 1);
     oa::io::save(A, "/tmp/A.nc", "data");
 
+    // const boost::filesystem::path fileName("/tmp/A.nc");
+
+    // bool b = boost::filesystem::exists(boost::filesystem::status(fileName));
+    // std::cout<<b<<std::endl;
+    
     if(rank == 0){
-      EXPECT_TRUE(boost::filesystem::exists("/tmp/A.nc"));      
+      std::ifstream infile("/tmp/A.nc");
+      EXPECT_TRUE(infile.good());      
     }
       
     ArrayPtr B = oa::io::load("/tmp/A.nc", "data", MPI_COMM_WORLD);
@@ -121,6 +131,116 @@ namespace{
       EXPECT_TRUE(oa::funcs::is_equal(A1, B1));
     }
   }
+  
+  TEST_P(MPITest, ArrayCreation){
+    ///:for t in dtypes
+    {
+      ArrayPtr A1 = oa::funcs::to_rank0(oa::funcs::seqs(comm, {m, n, p}, 1,
+                                                        oa::utils::dtype<${t}$>::type));
+      arma::Cube<${t}$> B1 = make_seqs<${t}$>(m, n, p);
+
+      ArrayPtr A2 =
+        oa::funcs::to_rank0(oa::funcs::consts<${t}$>(comm, {m, n, p},
+                                                     ${t}$(2),
+                                                     oa::utils::dtype<${t}$>::type));
+      arma::Cube<${t}$> B2(m, n, p);
+      B2.fill(${t}$(2));
+
+      if(rank == 0){
+        EXPECT_TRUE(oa::funcs::is_equal(A1, B1));
+        EXPECT_TRUE(oa::funcs::is_equal(A2, B2));
+      }
+    }
+    ///:endfor
+  }
+
+
+  TEST_P(MPITest, BasicMath_Arrray_Array){
+    ///:for t1 in dtypes
+    ///:for t2 in dtypes
+    {
+      DataType dt1  = oa::utils::dtype<${t1}$>::type;
+      DataType dt2  = oa::utils::dtype<${t2}$>::type;
+      
+      NodePtr N1 = oa::ops::new_node(oa::funcs::seqs(comm, {m, n, p}, 0, dt1));
+      NodePtr N2 = oa::ops::new_node(oa::funcs::consts(comm,
+                                                       {m, n, p},
+                                                       ${t2}$(2.0), 0));
+
+      
+      typedef otype<${t1}$, ${t2}$>::value result_type;
+      arma::Cube<result_type> C3;
+      arma::Cube<result_type> C1 = make_seqs<result_type>(m, n, p);
+      arma::Cube<result_type> C2(m,n,p);
+      C2.fill(result_type(2));
+      
+      ///:for o in [['+','PLUS'], ['-', 'MINUS'], ['%','MULT'], ['/', 'DIVD']]
+      {
+        NodePtr N3 = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
+        ArrayPtr A3 = oa::funcs::to_rank0(oa::ops::eval(N3));
+
+        C3 = C1 ${o[0]}$ C2;
+
+        // N1->get_data()->display("A1");
+        // N2->get_data()->display("A2");
+
+        if(rank == 0){
+          // A3->display("A3");
+          // std::cout<<"C3"<<std::endl<<C3<<std::endl;
+          // std::cout<<"Operation:${o[1]}$"<<std::endl;
+          
+          EXPECT_TRUE(oa::funcs::is_equal(A3, C3));
+        }
+      }
+      ///:endfor
+    }
+    ///:endfor
+    ///:endfor
+  }
+
+  TEST_P(MPITest, BasicMath_Arrray_Scalar){
+    ///:for t1 in dtypes
+    ///:for t2 in dtypes
+    {
+      DataType dt1  = oa::utils::dtype<${t1}$>::type;
+      DataType dt2  = oa::utils::dtype<${t2}$>::type;
+      
+      NodePtr N1 = oa::ops::new_node(oa::funcs::consts(comm, {m, n, p},
+                                                       ${t1}$(3.0), 0));
+      NodePtr N2 = oa::ops::new_node(oa::funcs::consts(MPI_COMM_SELF,
+                                                       {1, 1, 1}, ${t2}$(2), 0));
+
+      typedef otype<${t1}$, ${t2}$>::value result_type;
+      arma::Cube<result_type> C3, C4;
+      arma::Cube<result_type> C1 = arma::ones<arma::Cube<result_type> >(m, n, p) * 3.0;
+      result_type  C2 = result_type(2);
+      
+      ///:for o in [['+','PLUS'], ['-', 'MINUS'], ['*','MULT'], ['/', 'DIVD']]
+      {
+      	NodePtr N3 = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
+      	NodePtr N4 = oa::ops::new_node(TYPE_${o[1]}$, N2, N1);        
+	ArrayPtr A3 = oa::funcs::to_rank0(oa::ops::eval(N3));
+	ArrayPtr A4 = oa::funcs::to_rank0(oa::ops::eval(N4));
+        
+	C3 = C1 ${o[0]}$ C2;
+        C4 = C2 ${o[0]}$ C1;
+        
+	if(rank == 0){
+          // std::cout<<"${o[1]}$"<<"    ${o[0]}$"<<std::endl;
+          // std::cout<<C3<<std::endl;
+          // A4->display("A4");
+          // MPI_Barrier(A4->get_partition()->get_comm());
+
+	  EXPECT_TRUE(oa::funcs::is_equal(A3, C3));
+	  EXPECT_TRUE(oa::funcs::is_equal(A4, C4));
+	}
+      }
+      ///:endfor
+    }
+    ///:endfor
+    ///:endfor
+  }
+
 
   TEST_P(MPITest, GhostUpdate){
     ///:for t in dtypes
@@ -151,108 +271,96 @@ namespace{
     }
     ///:endfor
   }
-  
-  TEST_P(MPITest, ArrayCreation){
+
+
+  TEST_P(MPITest, MinMax){
 
     ///:for t in dtypes
     {
-      ArrayPtr A1 = oa::funcs::to_rank0(oa::funcs::seqs(comm, {m, n, p}, 1,
-              oa::utils::dtype<${t}$>::type));
-      arma::Cube<${t}$> B1 = make_seqs<${t}$>(m, n, p);
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+      ArrayPtr A = oa::funcs::rand(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+      //NA->display("NA");
 
-      ArrayPtr A2 =
-        oa::funcs::to_rank0(oa::funcs::consts<${t}$>(comm, {m, n, p},
-                 ${t}$(2),
-                 oa::utils::dtype<${t}$>::type));
-      arma::Cube<${t}$> B2(m, n, p);
-      B2.fill(${t}$(2));
+      NodePtr N1 = oa::ops::new_node(TYPE_MAX, NA);
+      NodePtr N2 = oa::ops::new_node(TYPE_MIN, NA);
+      NodePtr N3 = oa::ops::new_node(TYPE_ABS_MAX, NA);
+      NodePtr N4 = oa::ops::new_node(TYPE_ABS_MIN, NA);
+      
+      NodePtr N5 = oa::ops::new_node(TYPE_MAX_AT, NA);
+      NodePtr N6 = oa::ops::new_node(TYPE_MIN_AT, NA);
+      NodePtr N7 = oa::ops::new_node(TYPE_ABS_MAX_AT, NA);
+      NodePtr N8 = oa::ops::new_node(TYPE_ABS_MIN_AT, NA);
 
+      ArrayPtr V1 = oa::funcs::to_rank0(oa::ops::eval(N1));
+      ArrayPtr V2 = oa::funcs::to_rank0(oa::ops::eval(N2));
+      ArrayPtr V3 = oa::funcs::to_rank0(oa::ops::eval(N3));
+      ArrayPtr V4 = oa::funcs::to_rank0(oa::ops::eval(N4));
+      ArrayPtr V5 = oa::funcs::to_rank0(oa::ops::eval(N5));
+      ArrayPtr V6 = oa::funcs::to_rank0(oa::ops::eval(N6));
+      ArrayPtr V7 = oa::funcs::to_rank0(oa::ops::eval(N7));
+      ArrayPtr V8 = oa::funcs::to_rank0(oa::ops::eval(N8));
+      
+      // NodePtr NSA = oa::ops::new_node(TYPE_MIN, NA);
+
+      //A->display("A");
+      
+      ArrayPtr A1 = oa::funcs::to_rank0(A);
+      Shape s = A1->buffer_shape();
+      arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(s, A1->get_buffer())
+                       (arma::span(sw, s[0] - sw - 1),
+                        arma::span(sw, s[1] - sw - 1),
+                        arma::span(sw, s[2] - sw - 1));
+      
+
+      // ArrayPtr V2 = oa::ops::eval(NSA);
+      
       if(rank == 0){
-        EXPECT_TRUE(oa::funcs::is_equal(A1, B1));
-        EXPECT_TRUE(oa::funcs::is_equal(A2, B2));
-      }
-    }
-    ///:endfor
-  }
 
+        EXPECT_TRUE(oa::funcs::is_equal(V1, C.max()));
+        EXPECT_TRUE(oa::funcs::is_equal(V2, C.min()));
+        EXPECT_TRUE(oa::funcs::is_equal(V3, arma::abs(C).max()));
+        EXPECT_TRUE(oa::funcs::is_equal(V4, arma::abs(C).min()));
 
-  TEST_P(MPITest, BasicMath){
-
-    ///:for t1 in dtypes
-    ///:for t2 in dtypes
-    {
-      DataType dt1  = oa::utils::dtype<${t1}$>::type;
-      DataType dt2  = oa::utils::dtype<${t2}$>::type;
-      
-      NodePtr N1 = oa::ops::new_node(oa::funcs::seqs(comm, {m, n, p}, 1, dt1));
-      NodePtr N2 = oa::ops::new_node(oa::funcs::consts(comm, {m, n, p}, ${t2}$(2.0), 1));
-
-      arma::Cube<${t1}$> C1 = make_seqs<${t1}$>(m, n, p);
-      arma::Cube<${t2}$> C2(m,n,p);  C2.fill(${t2}$(2));
-      arma::Cube<otype<${t1}$, ${t2}$>::value> C3;
-      
-      ///:for o in [['+','PLUS'], ['-', 'MINUS'], ['%','MULT'], ['/', 'DIVD']]
-      {
-        NodePtr N3 = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
-        ArrayPtr A3 = oa::funcs::to_rank0(oa::ops::eval(N3));
-
-        C3 = C1 ${o[0]}$ C2;
-
-        if(rank == 0){
-          EXPECT_TRUE(oa::funcs::is_equal(A3, C3));
-        }
-      }
-      ///:endfor
-    
-      // // ((A+B)-(C*D))/E
-      // NodePtr A = oa::ops::new_node(ap1);
-      // NodePtr B = oa::ops::new_node(ap2);
-      // NodePtr C = oa::ops::new_node(ap3);
-
-      // NodePtr F = oa::ops::new_node(TYPE_PLUS, A, B);
-      // NodePtr G = oa::ops::new_node(TYPE_PLUS, F, C);
-      // ArrayPtr ans = oa::funcs::to_rank0(oa::ops::eval(G));
-    }
-    ///:endfor
-    ///:endfor
-
-    ///:for t1 in dtypes
-    ///:for t2 in dtypes
-    {
-      DataType dt1  = oa::utils::dtype<${t1}$>::type;
-      DataType dt2  = oa::utils::dtype<${t2}$>::type;
-      
-      NodePtr N1 = oa::ops::new_node(oa::funcs::seqs(comm, {m, n, p}, 1, dt1));
-      NodePtr N2 = oa::ops::new_node(oa::funcs::consts(MPI_COMM_SELF,
-                                                       {1, 1, 1}, ${t2}$(2.0), 0));
-
-      arma::Cube<${t1}$> C1 = make_seqs<${t1}$>(m, n, p);
-      arma::Cube<${t2}$> C2(m,n,p);  C2.fill(${t2}$(2));
-      arma::Cube<otype<${t1}$, ${t2}$>::value> C3;
-      
-      ///:for o in [['+','PLUS'], ['-', 'MINUS'], ['%','MULT'], ['/', 'DIVD']]
-      {
-      	NodePtr N3 = oa::ops::new_node(TYPE_${o[1]}$, N1, N2);
-      	NodePtr N4 = oa::ops::new_node(TYPE_${o[1]}$, N2, N1);        
-	ArrayPtr A3 = oa::funcs::to_rank0(oa::ops::eval(N3));
-	ArrayPtr A4 = oa::funcs::to_rank0(oa::ops::eval(N4));
         
-	C3 = C1 ${o[0]}$ C2;
+        // V1->display("V1");
+        // std::cout<<"C.max():"<<C.max()<<std::endl;
+        // V2->display("V2");
+        // std::cout<<"C.min():"<<C.min()<<std::endl;
+        // V1->display("V3");
+        // std::cout<<"abs(C).max():"<<arma::abs(C).max()<<std::endl;
+        // V2->display("V4");
+        // std::cout<<"abs(C).min():"<<arma::abs(C).min()<<std::endl;
 
-	if(rank == 0){
-	  EXPECT_TRUE(oa::funcs::is_equal(A3, C3));
-	  EXPECT_TRUE(oa::funcs::is_equal(A4, C3));          
-	}
+        arma::uvec VI;
+        VI = ind2sub(arma::size(C), C.index_max());
+
+        EXPECT_TRUE(oa::funcs::is_equal(V5, VI.memptr()));
+
+        VI = ind2sub(arma::size(C), C.index_min());
+        
+        // V6->display("V6");
+        // std::cout<<VI<<std::endl;
+
+        EXPECT_TRUE(oa::funcs::is_equal(V6, VI.memptr()));
+
+        VI = ind2sub(arma::size(C), abs(C).index_max());
+        EXPECT_TRUE(oa::funcs::is_equal(V7, VI.memptr()));
+
+        VI = ind2sub(arma::size(C), abs(C).index_min());
+        EXPECT_TRUE(oa::funcs::is_equal(V8, VI.memptr()));
+        
+        // V2->display("V2");
+        //EXPECT_TRUE(V1->is_seqs());
+        //EXPECT_TRUE(V1->shape() == SCALAR_SHAPE);
       }
-      ///:endfor
     }
-    ///:endfor
     ///:endfor
   }
 
   INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
-        gt::Combine(gt::Values(MPI_COMM_WORLD),
-              MRange, NRange, PRange));
-
+                          gt::Combine(gt::Values(MPI_COMM_WORLD),
+                                      MRange, NRange, PRange));
   
 }

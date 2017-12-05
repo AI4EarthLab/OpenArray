@@ -25,6 +25,8 @@
 #define DATA_DOUBLE 2
 #define DATA_BOOL 3
 
+#define NO_STENCIL 0
+
 // define basic data size
 #define DATA_SIZE(i) ((int[]{4, 4, 8})[i])
 

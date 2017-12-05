@@ -157,13 +157,32 @@ namespace oa {
 
     ///:endfor
 
-    // ap = {max/min}u 
+
+    // ap = {max/min}u
     ///:mute
     ///:include "NodeType.fypp"
     ///:endmute
     ///:for k in [i for i in L if i[3] == 'E']
     ///:set name = k[1]
-    ///:set sy = k[2]
+    ///:set kernel_name = k[2]
+
+    ///:set sy = ">"
+    ///:if k[2][-3:] == 'min'
+    ///:set sy = "<"
+    ///:endif
+
+    ///:mute
+    ///:set pos_mode = False
+    ///:if name[-2:]=='at'
+    ///:set pos_mode = True
+    ///:endif
+
+    ///:set op = ""
+    ///:if name[:3] =='abs'
+    ///:set op = abs
+    ///:endif
+    ///:endmute
+
     // A = ${sy}$ U
     template<typename T>
     ArrayPtr t_kernel_${name}$(vector<ArrayPtr> &ops_ap) {
@@ -172,60 +191,83 @@ namespace oa {
       int dt = u_dt;
       int sw = u->get_partition()->get_stencil_width();
 
-      // part_val, total_val;
-      struct {
-          T value;
-          int thread_id;
-          int x;
-          int y;
-          int z;
-      } local, global;
+      typedef struct {
+        T value;
+        int pos[3];
+      } m_info;
 
-      int3 pos = oa::internal::buffer_${name}$_const(
-        local.value, 
-        (T*) u->get_buffer(),
-        u->get_local_box(),
-        sw,
-        u->buffer_size()
-      );
+      m_info local, global;
+      if(u->has_local_data()){
+        oa::internal::buffer_${kernel_name}$_const(local.value,
+                                                   local.pos,
+                                                   (T*) u->get_buffer(),
+                                                   u->get_local_box(),
+                                                   sw);
+      }else{
+        local.pos[0]=local.pos[1]=local.pos[2]=-1;
+      }
 
       MPI_Comm comm = u->get_partition()->get_comm();
-      int rankID = oa::utils::get_rank(comm);
 
-      local.x = pos[0];
-      local.y = pos[1];
-      local.z = pos[2];
-      local.thread_id = rankID;
+      const int size = oa::utils::get_size(comm);
+      const int rank = oa::utils::get_rank(comm);
 
-      MPI_Reduce(&local, &global, 1, MPI_DOUBLE_INT, MPI_${sy}$LOC, 0, comm);
+      m_info* global_all = new m_info[size];
 
-      int answer_thread;
-      if (rankID == 0) {
-        std::cout<<"the root received:"<<global.value<<" @"<<global.thread_id<<std::endl;
-        answer_thread = global.thread_id;
+      MPI_Gather(&local,
+                 sizeof(m_info),
+                 MPI_BYTE,
+                 global_all,
+                 sizeof(m_info),
+                 MPI_BYTE,
+                 0,
+                 comm);
+
+      // std::cout<<"rank="<<rank
+      //          <<" "<<local.value <<" "
+      //          <<local.pos[0]<<" "
+      //          <<local.pos[1]<<" "
+      //          <<local.pos[2]<<" "
+      //          <<"sizeof="<<sizeof(m_info)<<std::endl;
+
+      //u->get_local_box().display("b");
+
+      if(rank == 0){
+        global = local;
+        for(int i = 0; i < size; ++i){
+
+          // std::cout<<"rank="<<rank
+          //          <<" global:"<<global_all[i].value <<" "
+          //          <<global_all[i].pos[0]<<" "
+          //          <<global_all[i].pos[1]<<" "
+          //          <<global_all[i].pos[2]<<std::endl;
+          if(global_all[i].pos[0] < 0) continue;
+
+          if(global_all[i].value ${sy}$ global.value){
+            global = global_all[i];
+          }
+        }
       }
 
-      MPI_Bcast(&answer_thread, 1, MPI_INT, 0, comm);
+      MPI_Bcast(&global, sizeof(m_info), MPI_BYTE, 0, comm);
 
-      if (rankID == answer_thread) {
-        std::cout<<"\nanswer is on rank"<<rankID<<",my value="<<local.value<<" and local postion=["<<local.x<<","<<local.y<<","<<local.z<<"]"<<std::endl;
-        global.value = local.value;
-        global.x = local.x;
-        global.y = local.y;
-        global.z = local.z;
-      }
+      delete(global_all);
 
-      MPI_Bcast(&global.value, 1, MPI_INT, answer_thread, comm);
-      MPI_Bcast(&global.x, 1, MPI_INT, answer_thread, comm);
-      MPI_Bcast(&global.y, 1, MPI_INT, answer_thread, comm);
-      MPI_Bcast(&global.z, 1, MPI_INT, answer_thread, comm);
+      ArrayPtr ap;
 
-      
-      std::cout<<"\nfinish by rank"<<rankID<<"my value="<<local.value<<" and local postion=["<<local.x<<","<<local.y<<","<<local.z<<"]"<<std::endl;
+      ///:if pos_mode == True
+      ap = oa::funcs::ones(MPI_COMM_SELF, {3,1,1}, 0, DATA_INT);
+      int* p = (int*)ap->get_buffer();
+      p[0] = global.pos[0];
+      p[1] = global.pos[1];
+      p[2] = global.pos[2];
+      ///:else
+      ap = oa::funcs::get_seq_scalar(global.value);
+      // if(rank == 0)
+      //   ap->display("ap = ");
+      ///:endif
 
-      ArrayPtr ap = oa::funcs::get_seq_scalar(global.value);
       return ap;
-
     }
 
     ///:endfor
@@ -455,6 +497,8 @@ namespace oa {
       delete []buffer;
       return ap;
     }
+
+
   }
 }
 #endif

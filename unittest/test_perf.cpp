@@ -17,6 +17,24 @@ void test_sample_math(){
   int m = 512, n = 512, p = 256;
 
   MPI_Comm comm = MPI_COMM_WORLD;
+  
+  ArrayPtr A =
+    oa::funcs::ones(comm,{m, n, p}, 1, oa::utils::dtype<double>::type);
+  ArrayPtr B =
+    oa::funcs::ones(comm,{m, n, p}, 1, oa::utils::dtype<double>::type);
+  ArrayPtr C =
+    oa::funcs::ones(comm,{m, n, p}, 1, oa::utils::dtype<double>::type);
+
+
+  for(int i = 0; i < 10; ++i){
+    tic("A");    
+    NodePtr X = oa::ops::new_node(A);
+    NodePtr Y = oa::ops::new_node(B);
+
+    NodePtr Z = oa::ops::new_node(TYPE_PLUS, X, Y);
+    ArrayPtr T = oa::ops::eval(Z);
+    toc("A");
+  }
 
   ///:for dt in ['float', 'double']
   {
@@ -42,6 +60,7 @@ void test_sample_math(){
     ///:endfor
   }
   ///:endfor
+
 }
 
 int main(int argc, char** argv){
@@ -55,4 +74,3 @@ int main(int argc, char** argv){
   MPI_Finalize();
   return 0;
 }
-
