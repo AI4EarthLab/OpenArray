@@ -63,8 +63,10 @@ do
            $src_filename > $dst_filename
       echo " >>>processing file $src_filename" 
     else
-      src_time=$(date +'%y%m%d%H%M' -r $src_filename)
-      dst_time=$(date +'%y%m%d%H%M' -r $dst_filename)
+      #src_time=$(date +'%y%m%d%H%M' -r $src_filename)
+      #dst_time=$(date +'%y%m%d%H%M' -r $dst_filename)
+      src_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $src_filename)
+      dst_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $dst_filename)
 
       if [[ "$src_time" > "$dst_time" ]]; then
         ./fypp -p -m re -m string -m io -m os --create-parents \

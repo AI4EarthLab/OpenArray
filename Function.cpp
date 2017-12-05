@@ -577,6 +577,104 @@ namespace oa {
       }
     }
 
+    inline int calc_id(int i, int j, int k, int3 S) {
+      int M = S[0];
+      int N = S[1];
+      int P = S[2];
+      return k * M * N + j * M + i;
+    }
+
+    // ap = Operator(A), only calc inside
+    // lbound = [-xs_sw, -ys_sw, -zs_sw]
+    // rbound = [xe_sw, ye_sw, ze_sw]
+    void calc_inside(ArrayPtr &ap, ArrayPtr &A, int3 lbound, int3 rbound) {
+      int sw = A->get_partition()->get_stencil_width();
+      Shape sp = A->local_shape();
+      Shape S = A->buffer_shape();
+
+      int* b1 = (int*) ap->get_buffer();
+      int* b2 = (int*) A->get_buffer();
+
+      for (int k = sw + lbound[2]; k < sw + sp[2] - rbound[2]; k++) {
+        for (int j = sw + lbound[1]; j < sw + sp[1] - rbound[1]; j++) {
+          for (int i = sw + lbound[0]; i < sw + sp[0] - rbound[0]; i++) {
+            b1[calc_id(i, j, k, S)] = b2[calc_id(i - 2, j - 1, k, S)] 
+                + b2[calc_id(i + 1, j + 2, k + 1, S)];
+          }
+        }
+      }
+
+    }
+
+    void calc_outside(ArrayPtr &ap, ArrayPtr &A, int3 lbound, int3 rbound) {
+      int sw = A->get_partition()->get_stencil_width();
+      Shape sp = A->local_shape();
+      Shape S = A->buffer_shape();
+
+      int* b1 = (int*) ap->get_buffer();
+      int* b2 = (int*) A->get_buffer(); 
+
+      int M = S[0];
+      int N = S[1];
+      int P = S[2];
+
+      // update outside six surface (contains boundary, doesn't care)
+
+      for (int k = sw; k < sw + lbound[2]; k++) {
+        for (int j = 0; j < N; j++) {
+          for (int i = 0; i < M; i++) {
+            b1[calc_id(i, j, k, S)] = b2[calc_id(i - 2, j - 1, k, S)] 
+                + b2[calc_id(i + 1, j + 2, k + 1, S)];
+          }
+        }
+      }
+
+      for (int k = sw + sp[2] - rbound[2]; k < sw + sp[2]; k++) {
+        for (int j = 0; j < N; j++) {
+          for (int i = 0; i < M; i++) {
+            b1[calc_id(i, j, k, S)] = b2[calc_id(i - 2, j - 1, k, S)] 
+                + b2[calc_id(i + 1, j + 2, k + 1, S)];
+          }
+        }
+      }
+
+      for (int k = 0; k < P; k++) {
+        for (int j = sw; j < sw + lbound[1]; j++) {
+          for (int i = 0; i < M; i++) {
+            b1[calc_id(i, j, k, S)] = b2[calc_id(i - 2, j - 1, k, S)] 
+                + b2[calc_id(i + 1, j + 2, k + 1, S)];
+          }
+        }
+      }
+
+      for (int k = 0; k < P; k++) {
+        for (int j = sw + sp[1] - rbound[1]; j < sw + sp[1]; j++) {
+          for (int i = 0; i < M; i++) {
+            b1[calc_id(i, j, k, S)] = b2[calc_id(i - 2, j - 1, k, S)] 
+                + b2[calc_id(i + 1, j + 2, k + 1, S)];
+          }
+        }
+      }
+
+      for (int k = 0; k < P; k++) {
+        for (int j = 0; j < N; j++) {
+          for (int i = sw; i < sw + lbound[0]; i++) {
+            b1[calc_id(i, j, k, S)] = b2[calc_id(i - 2, j - 1, k, S)] 
+                + b2[calc_id(i + 1, j + 2, k + 1, S)];
+          }
+        }
+      }
+
+      for (int k = 0; k < P; k++) {
+        for (int j = 0; j < N; j++) {
+          for (int i = sw + sp[0] - rbound[0]; i < sw + sp[0]; i++) {
+            b1[calc_id(i, j, k, S)] = b2[calc_id(i - 2, j - 1, k, S)] 
+                + b2[calc_id(i + 1, j + 2, k + 1, S)];
+          }
+        }
+      }
+    }
+
     
     ArrayPtr to_rank0(ArrayPtr A){
       assert(A->get_partition() != NULL);

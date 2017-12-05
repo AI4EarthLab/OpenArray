@@ -1,5 +1,5 @@
 name = main
-compile_thread = -j8
+compile_thread = -j4
 FC = mpif90
 CC = mpicc -I${PNETCDF_INC} -L${PNETCDF_LIB} -Werror=return-type \
 	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} -L${GTEST}

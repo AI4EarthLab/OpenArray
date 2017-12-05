@@ -46,7 +46,8 @@ int main(int argc, char** argv) {
   //test_sum();
   //test_sub();
   //test_set();
-  test_rep();
+  //test_rep();
+  test_fusion_operator();
 
   MPI_Finalize();
   return 0;
