@@ -662,39 +662,29 @@ void test_set_l2g() {
   global->display("======global======");
 }
 
-/*
 //local_A (MPI_COMM_SELF)= sub(global_B)
 void test_set_g2l() {
-  // A
   ArrayPtr local = oa::funcs::zeros(MPI_COMM_SELF, {3, 3, 3}, 0);
   ArrayPtr global = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 0);
-
-
-
 
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-
-
   if(rank == 2)
     local->display("======local======");
 
   global->display("======global======");
 
-  std::cout<<"now set ..................."<<std::endl;
+  if(rank == 0)
+    std::cout<<"now set ..................."<<std::endl;
 
-  Box box(2, 4, 3, 5, 4, 6);
-  oa::funcs::set_g2l(global, box, ap);
-  global->display("======global_set_l2g======");
+  Box sub_box(2, 4, 3, 5, 4, 6);
+  oa::funcs::set_g2l(local, sub_box, global);
   if(rank == 2)
     local->display("======local======");
-
-  global->display("======global======");
 
 
 }
 
-*/
 
 #endif

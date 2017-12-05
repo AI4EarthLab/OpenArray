@@ -969,14 +969,11 @@ namespace oa {
       set(A, A_box, gap);
     }
 
-/*
-
     // local_A (MPI_COMM_SELF)= sub(global_B)
-    void set_g2l(ArrayPtr& A, const Box& B_box, ArrayPtr& B) {
-      ArrayPtr gap = l2g(B);
-      set(A, A_box, gap);
+    void set_g2l(ArrayPtr& local, const Box& sub_box, ArrayPtr& global) {
+      ArrayPtr sub = subarray(global, sub_box);
+      local = g2l(sub);
     }
-*/
 
 
     ArrayPtr rep(ArrayPtr& A, int x, int y, int z)
