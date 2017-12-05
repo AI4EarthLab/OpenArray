@@ -623,9 +623,7 @@ void test_set_l2g() {
     ap->display("======A======");
   global->display("======global======");
 
-  std::cout<<"cal..........."<<std::endl;
   Box box(2, 4, 3, 5, 4, 6);
-  //oa::funcs::set_l2g(global, box, ap);
   oa::funcs::set_l2g(global, box, ap);
   global->display("======global_set_l2g======");
 }
@@ -649,4 +647,19 @@ void test_l2g(){
   ArrayPtr global = oa::funcs::l2g(lap);
   global->display("======global======");
 }
+
+void test_g2l(){
+  ArrayPtr global = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 1);
+  global->display("======global======");
+
+  ArrayPtr local = oa::funcs::g2l(global);
+  
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  //sleep(rank);
+  if(rank == 3)
+    local->display("======local======");
+    
+}
+
 #endif
