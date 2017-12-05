@@ -3,7 +3,7 @@
 #include "utils/utils.hpp"
 #include <fstream>
 #include <mpi.h>
-
+using namespace std;
 namespace oa {
   namespace funcs {
 
@@ -872,7 +872,7 @@ namespace oa {
       ///:endfor
 
     }
-    
+
     // sub(A) = A(A_box), sub(B) = B(B_box) && set sub(A) = sub(B)
     void set(ArrayPtr& A, const Box& A_box, 
         const ArrayPtr& B, const Box& B_box) {
@@ -885,30 +885,193 @@ namespace oa {
 
     }
 
-/*
+    ArrayPtr l2g(ArrayPtr& lap)
+    {
+      ArrayPtr gap;
+
+      PartitionPtr lpp = lap->get_partition();
+
+      Shape lsp = lpp->shape();
+      Shape gsp = lsp;
+      int sw = lpp->get_stencil_width(); 
+      int datatype = lap->get_data_type();
+      gap = zeros(MPI_COMM_WORLD, gsp, sw, datatype);
+      PartitionPtr gpp = gap->get_partition();
+      Box gbox = gpp->get_local_box();
+      int xs, ys, zs, xe, ye, ze;
+      gbox.get_corners(xs, xe, ys, ye, zs, ze);
+
+      int lxs, lys, lzs, lxe, lye, lze;
+      Box lbox =lpp->get_local_box();
+      lbox.get_corners(lxs, lxe, lys, lye, lzs, lze);
+
+      vector<int> clx = gpp->m_clx;
+      vector<int> cly = gpp->m_cly;
+      vector<int> clz = gpp->m_clz;
+
+      int mpisize = oa::utils::get_size(gpp->get_comm());
+      int myrank = oa::utils::get_rank(gpp->get_comm());
+
+      vector<int> location = gpp->get_procs_3d(myrank);
+
+      switch(datatype) {
+        case DATA_INT:
+          {
+            int *gbuff = (int *) gap->get_buffer();
+            int *lbuff = (int *) lap->get_buffer();
+            for (int k = zs; k < ze; k++) {
+              for (int j = ys; j < ye; j++) {
+                for (int i = xs; i < xe; i++) {
+                  int gindex = (xe-xs+2*sw)*(ye-ys+2*sw)*(k-zs+sw)+(xe-xs+2*sw)*(j-ys+sw)+(i-xs+sw);
+                  gbuff[gindex] = 1;
+                  int lk = k + clx[location[0]];
+                  int lj = j + cly[location[1]];
+                  int li = i + clz[location[2]];
+                  int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(k+sw)+(lxe-lxs+2*sw)*(j+sw)+(i+sw);
+                  gbuff[gindex] = lbuff[lindex];
+                }
+              }
+            }
+            break;
+          }
+        case DATA_FLOAT:
+          {
+            float *gbuff = (float *) gap->get_buffer();
+            float *lbuff = (float *) lap->get_buffer();
+            for (int k = zs; k < ze; k++) {
+              for (int j = ys; j < ye; j++) {
+                for (int i = xs; i < xe; i++) {
+                  int gindex = (xe-xs+2*sw)*(ye-ys+2*sw)*(k-zs+sw)+(xe-xs+2*sw)*(j-ys+sw)+(i-xs+sw);
+                  gbuff[gindex] = 1;
+                  int lk = k + clx[location[0]];
+                  int lj = j + cly[location[1]];
+                  int li = i + clz[location[2]];
+                  int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(k+sw)+(lxe-lxs+2*sw)*(j+sw)+(i+sw);
+                  gbuff[gindex] = lbuff[lindex];
+                }
+              }
+            }
+            break;
+          }
+        case DATA_DOUBLE:
+          {
+            double *gbuff = (double *) gap->get_buffer();
+            double *lbuff = (double *) lap->get_buffer();
+            for (int k = zs; k < ze; k++) {
+              for (int j = ys; j < ye; j++) {
+                for (int i = xs; i < xe; i++) {
+                  int gindex = (xe-xs+2*sw)*(ye-ys+2*sw)*(k-zs+sw)+(xe-xs+2*sw)*(j-ys+sw)+(i-xs+sw);
+                  gbuff[gindex] = 1;
+                  int lk = k + clx[location[0]];
+                  int lj = j + cly[location[1]];
+                  int li = i + clz[location[2]];
+                  int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(k+sw)+(lxe-lxs+2*sw)*(j+sw)+(i+sw);
+                  gbuff[gindex] = lbuff[lindex];
+                }
+              }
+            }
+            break;
+          }
+        default:
+          std::cout<<"err"<<std::endl;
+          break;
+      }
+
+      return gap;
+    }
+
+    ArrayPtr g2l(ArrayPtr& gap)
+    {
+      PartitionPtr m_par_ptr = gap->get_partition();
+      Shape ps = m_par_ptr->procs_shape();
+      int m_data_type = gap->get_data_type();
+      int npx = ps[0];
+      int npy = ps[1];
+      int npz = ps[2];
+
+      MPI_Comm comm = m_par_ptr->get_comm();
+      int my_rank = oa::utils::get_rank(comm);
+
+      int num_procs = npx * npy * npz;
+
+      Shape gs = gap->shape();
+
+      MPI_Request reqs[num_procs];
+      int reqs_cnt = 0;
+      ArrayPtr lap = zeros(MPI_COMM_SELF, gs, 0, m_data_type);
+      void * global_buf = lap->get_buffer();
+      // rank 0 recv & others send
+      if (my_rank == 0) {
+        for(int z = 0; z < npz; ++z) {
+          for(int y = 0; y < npy; ++y) {
+            for(int x = 0; x < npx; ++x) {
+
+              Box box = m_par_ptr -> get_local_box({x, y, z});
+              if (box.size() <= 0) continue;
+
+              int xs, ys, zs, xe, ye, ze;
+              box.get_corners(xs, xe, ys, ye, zs, ze);
+
+              MPI_Datatype target_sub_array;
+              int starts[3] = {xs, ys, zs};
+              int subsize[3] = {xe-xs, ye-ys, ze-zs};
+              int bigsize[3] = {gs[0], gs[1], gs[2]};
+
+              MPI_Type_create_subarray(3, bigsize, subsize,
+                  starts, MPI_ORDER_FORTRAN,
+                  oa::utils::mpi_datatype(m_data_type),
+                  &target_sub_array);
+
+              MPI_Type_commit(&target_sub_array);
+              int target_rank = m_par_ptr->get_procs_rank({x, y, z});
+              MPI_Irecv(global_buf, 1,
+                  target_sub_array,
+                  target_rank, 100,
+                  m_par_ptr->get_comm(),
+                  &reqs[reqs_cnt++]);
+
+              MPI_Type_free(&target_sub_array);
+            }
+          }
+        }
+
+      }
+
+      // all process send subarray (if size > 0) to global_buf
+      Box box = m_par_ptr -> get_local_box();
+      if (box.size() > 0) {
+        int xs, ys, zs, xe, ye, ze;
+        box.get_corners(xs, xe, ys, ye, zs, ze);
+        int sw = m_par_ptr -> get_stencil_width();  
+
+        MPI_Datatype mysubarray;
+        int starts[3]  = {sw, sw, sw};
+        int bigsize[3] = {xe-xs+2*sw, ye-ys+2*sw, ze-zs+2*sw};
+        int subsize[3] = {xe-xs, ye-ys, ze-zs};
+        MPI_Type_create_subarray(3, bigsize, subsize,
+            starts, MPI_ORDER_FORTRAN,
+            oa::utils::mpi_datatype(m_data_type),
+            &mysubarray);
+        MPI_Type_commit(&mysubarray);
+        MPI_Send(gap->get_buffer(), 1, mysubarray, 0, 100, m_par_ptr->get_comm());
+        MPI_Type_free(&mysubarray);
+      }
+      MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
+      MPI_Bcast(global_buf, gs[0]*gs[1]*gs[2], oa::utils::mpi_datatype(m_data_type), 0, comm);  
+      return lap;
+    }
+
     // sub(A) = B (MPI_COMM_SELF)
     void set_l2g(ArrayPtr& A, const Box& A_box, ArrayPtr& B) {
-      // sub(A)'shape must equal B's shape
-      assert(B->shape() == A_box.shape());
-
-      // sub(A)'s partition
-      vector<int> rsx, rsy, rsz;
-      PartitionPtr pp = A->get_partition();
-      Shape ps = pp->procs_shape();
-      pp->split_box_procs(A_box, rsx, rsy, rsz);
-      
-      vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
-      for (int i = 0; i < rsx.size(); i += 3)
-        x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
-      for (int i = 0; i < rsy.size(); i += 3)
-        y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
-      for (int i = 0; i < rsz.size(); i += 3)
-        z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
-
-      PartitionPtr subA_par_ptr = PartitionPool::global()->
-        get(pp->get_comm(), x, y, z, pp->get_stencil_width());
+      ArrayPtr gap = l2g(B);
+      set(A, A_box, gap);
     }
-*/
+
+    // local_A (MPI_COMM_SELF)= sub(global_B)
+    void set_g2l(ArrayPtr& local, const Box& sub_box, ArrayPtr& global) {
+      ArrayPtr sub = subarray(global, sub_box);
+      local = g2l(sub);
+    }
 
 
     ArrayPtr rep(ArrayPtr& A, int x, int y, int z)

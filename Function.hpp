@@ -188,7 +188,16 @@ namespace oa {
       ///:endfor
       
     }
-    
+
+    ArrayPtr l2g(ArrayPtr& lap);
+    ArrayPtr g2l(ArrayPtr& gap);
+
+    // sub(A) = B (MPI_COMM_SELF)
+    void set_l2g(ArrayPtr& A, const Box& A_box, ArrayPtr& B);
+
+    // local_A (MPI_COMM_SELF)= sub(global_B)
+    void set_g2l(ArrayPtr& local, const Box& sub_box, ArrayPtr& global); 
+
     // rep arry_B = rep_A(arryA, 1, 2, 3)
     ArrayPtr rep(ArrayPtr& A, int x, int y, int z);
   }
