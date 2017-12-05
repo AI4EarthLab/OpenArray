@@ -72,6 +72,12 @@ namespace oa {
     
     void update_ghost_end(vector<MPI_Request> &reqs);
 
+    inline int calc_id(int i, int j, int k, int3 S);
+
+    void calc_inside(ArrayPtr &ap, ArrayPtr &A, int3 lbound, int3 rbound);
+
+    void calc_outside(ArrayPtr &ap, ArrayPtr &B, int3 lbound, int3 rbound);
+
     // convert a mpi array to sequential array
     ArrayPtr to_rank0(ArrayPtr A);
 

@@ -686,5 +686,46 @@ void test_set_g2l() {
 
 }
 
+void test_fusion_operator() {
+/*
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ap->display("A");
+  ap->get_partition()->set_stencil_type(STENCIL_BOX);
+  oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 2);
+  Shape S = ap->buffer_shape();
+  
+  ArrayPtr ans = oa::funcs::zeros(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  vector<MPI_Request> reqs;
+  
+  oa::funcs::update_ghost_start(ap, reqs, -1);
+  oa::funcs::calc_inside(ans, ap, {2, 1, 0}, {1, 2, 1});
+  oa::funcs::update_ghost_end(reqs);
+  oa::funcs::calc_outside(ans, ap, {2, 1, 0}, {1, 2, 1});
+  
+  ans->display("ans = a[i-2,j-1,k]+a[i+1,j+2,k+1]");
+
+  if (rk == 0) {
+  ArrayPtr test = oa::funcs::seqs(MPI_COMM_SELF, {6, 6, 6}, 2);
+  ArrayPtr test_ans = oa::funcs::zeros(MPI_COMM_SELF, {6, 6, 6}, 2);
+  //test->display("test");
+  test->get_partition()->set_stencil_type(STENCIL_BOX);
+  oa::internal::set_ghost_consts((int*)test->get_buffer(), test->local_shape(), 0, 2);
+  oa::funcs::calc_inside(test_ans, test, {0, 0, 0}, {0, 0, 0});
+  test_ans->display("test_ans");
+  }
+
+*/
+  /*int rk = ap->rank();
+  
+  vector<MPI_Request> reqs;
+  oa::funcs::
+  oa::funcs::update_ghost_start(ap, reqs, -1);
+  oa::funcs::update_ghost_end(reqs);
+
+  oa::utils::mpi_order_start(MPI_COMM_WORLD);
+  printf("=====%d======\n", rk);
+  oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
+  oa::utils::mpi_order_end(MPI_COMM_WORLD);
+*/}
 
 #endif
