@@ -77,7 +77,7 @@ quick:
 	@rm -rf ${name}
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
-	@./test.sh
+	@./pre.sh
 	@cd build
 	@echo "Cleaning done."
 	@cd build && make ${name} -j8 -f ${MAKEFILE}

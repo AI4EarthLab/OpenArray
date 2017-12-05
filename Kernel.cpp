@@ -272,7 +272,8 @@ namespace oa {
       return ap;
     }
 
-    ///:for k in ['min', 'max']
+    ///:for k in ['min', 'max', 'min_at', 'max_at', &
+  'abs_max', 'abs_min', 'abs_max_at', 'abs_min_at']
     ///:set name = k
     // crate kernel_${name}$
     // A = ${name}$(A)
@@ -286,7 +287,6 @@ namespace oa {
           break;
         case DATA_FLOAT:
           ap = t_kernel_${name}$<float>(ops_ap);
-          
           break;
         case DATA_DOUBLE:
           ap = t_kernel_${name}$<double>(ops_ap);
@@ -294,7 +294,6 @@ namespace oa {
       }
       return ap;
     }
-
     ///:endfor
   }
 }

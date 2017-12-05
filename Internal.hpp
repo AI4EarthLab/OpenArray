@@ -122,13 +122,15 @@ namespace oa {
 
     template<typename T>
     void set_buffer_rand(T *buffer, int size) {
-      srand(SEED);
-      for (int i = 0; i < size; i++) {
-        float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        buffer[i] = r;
-      }
+      arma::Col<T> v = oa::utils::make_vec(size, buffer);
+      v.randu();
     }
 
+    //specialized for int type
+    template<>
+    void set_buffer_rand(int *buffer, int size);
+
+    
     template<typename T>
     void set_buffer_seqs(T *buffer, const Shape& s, Box box, int sw) {
       int cnt = 0;
@@ -263,11 +265,11 @@ namespace oa {
       }
     }
 
-    ///:for k in [['max', '>'], ['min', '<']]
+    ///:for k in [['max','>',''],['min','<',''],['abs_max','>'],['abs_min','<']]
     ///:set name = k[0]
     ///:set sy = k[1]
     template<typename T>
-    int3 buffer_${name}$_const(T &val, T *A, Box box, int sw, int size) {
+    void buffer_${name}$_const(T &val, int* pos, T *A, Box box, int sw) {
       int x = 0, y = 0, z = 0;
       int xs, xe, ys, ye, zs, ze;
       box.get_corners(xs, xe, ys, ye, zs, ze, sw);
@@ -275,31 +277,43 @@ namespace oa {
       int M = xe - xs;
       int N = ye - ys;
       int K = ze - zs;
-      val = A[sw * M * N + sw + M + sw];
 
-      int3 pos = {sw, sw, sw};
+      //std::cout<<"MNK:"<<M<<" "<<N<<" "<<" "<<K<<" sw="<<sw<<std::endl;
+      
+      ///:mute
+      ///:if k[0:3] == 'abs'
+      ///:set op = "abs"
+      ///:else
+      ///:set op = ""
+      ///:endif
+      ///:endmute
+      
+      val = ${op}$(A[sw * M * N + sw * M + sw]);
 
-      int cnt = 0;
-      for (int k = zs; k < ze; k++) {
-        for (int j = ys; j < ye; j++) {
-          for (int i = xs; i < xe; i++) {
-            if ((xs + sw <= i && i < xe - sw) &&
-                (ys + sw <= j && j < ye - sw) &&
-                (zs + sw <= k && k < ze - sw)) {
-              if (A[cnt] ${sy}$ val) {
-                val = A[cnt];
-                pos = {i, j, k};  
-              }
+      pos[0] = xs;
+      pos[1] = ys;
+      pos[2] = zs;
+
+      //oa::utils::mpi_order_start(MPI_COMM_WORLD);
+      for (int k = sw; k < K-sw; k++) {
+        for (int j = sw; j < N-sw; j++) {
+          for (int i = sw; i < M-sw; i++) {
+            //printf("(%d,%d,%d) = %d"
+            // std::cout<<"("<<i<<","<<j<<","<<k<<")="
+            //          <<A[i + j * M + k * M * N]<<std::endl;
+            
+            if (A[i + j * M + k * M * N] ${sy}$ ${op}$(val)) {
+              val = A[i + j * M + k * M * N];
+              pos[0] = i - sw + xs;
+              pos[1] = j - sw + ys;
+              pos[2] = k - sw + zs;
             }
-            cnt++;
           }
         }
       }
-      return pos;
+      //oa::utils::mpi_order_end(MPI_COMM_WORLD);
     }
-
     ///:endfor
-      
   }
 }
 

@@ -87,7 +87,6 @@ namespace oa {
       int A_size = A->size();
 
       // std::cout<<"A_size : "<<A_size;
-
       // std::cout<<"B_size : "<<arma::size(B)[0]
       //  * arma::size(B)[1] * arma::size(B)[2];
 
@@ -110,6 +109,48 @@ namespace oa {
       return true;
     }
 
+    template<class T>
+    bool is_equal(const ArrayPtr& A, T B){
+      
+      if (!A->is_seqs_scalar()) return false;
+      
+      T* A_buf = (T*)A->get_buffer();
+
+      return *A_buf == B;
+    }
+
+    template<class T>
+    bool is_equal(const ArrayPtr& A, T* B){
+
+      if (!A->is_seqs()) return false;
+
+      ///:for t in [['DATA_INT', 'int'],['DATA_FLOAT','float'],['DATA_DOUBLE','double']]
+      if(A->get_data_type() == ${t[0]}$){
+        ${t[1]}$* A_buf = (${t[1]}$*)A->get_buffer();
+        Shape s = A->buffer_shape();
+        const int sw = A->get_partition()->get_stencil_width();
+
+        int cnt = 0;
+        for(int k = sw; k < s[2] - sw; k++){
+          for(int j = sw; j < s[1] - sw; j++){
+            for(int i = sw; i < s[0] - sw; i++){
+              if(abs(int(A_buf[i + j * s[0] + k * s[0] * s[1]]) - int(B[cnt])) > 1E-6){
+                std::cout<<"compare: "
+                         <<int(A_buf[i + j * s[0] + k * s[0] * s[1]])
+                         <<"  "
+                         <<int(B[cnt])
+                         <<std::endl;
+                return false;
+              }
+              cnt ++;
+            }
+          }
+        }
+      }
+      ///:endfor
+      return true;
+    }
+    
     bool is_equal(const ArrayPtr& A, const ArrayPtr& B);
 
     template<class T>

@@ -61,7 +61,7 @@ arma::Cube<T> make_seqs(int m, int n, int p){
 }
 
 ///:set dtypes = ['int', 'float', 'double']
-// ///:set dtypes = ['int']
+///:set fdtypes = ['float', 'double']
 
 using namespace oa::funcs;
 
@@ -268,6 +268,93 @@ namespace{
       //   arma::Cube<${t}$> C1 = oa::utils::make_cube<${t}$>(A1->buffer_shape(),
       //                                                      A1->get_buffer());
       // }
+    }
+    ///:endfor
+  }
+
+
+  TEST_P(MPITest, MinMax){
+
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+      ArrayPtr A = oa::funcs::rand(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+      //NA->display("NA");
+
+      NodePtr N1 = oa::ops::new_node(TYPE_MAX, NA);
+      NodePtr N2 = oa::ops::new_node(TYPE_MIN, NA);
+      NodePtr N3 = oa::ops::new_node(TYPE_ABS_MAX, NA);
+      NodePtr N4 = oa::ops::new_node(TYPE_ABS_MIN, NA);
+      
+      NodePtr N5 = oa::ops::new_node(TYPE_MAX_AT, NA);
+      NodePtr N6 = oa::ops::new_node(TYPE_MIN_AT, NA);
+      NodePtr N7 = oa::ops::new_node(TYPE_ABS_MAX_AT, NA);
+      NodePtr N8 = oa::ops::new_node(TYPE_ABS_MIN_AT, NA);
+
+      ArrayPtr V1 = oa::funcs::to_rank0(oa::ops::eval(N1));
+      ArrayPtr V2 = oa::funcs::to_rank0(oa::ops::eval(N2));
+      ArrayPtr V3 = oa::funcs::to_rank0(oa::ops::eval(N3));
+      ArrayPtr V4 = oa::funcs::to_rank0(oa::ops::eval(N4));
+      ArrayPtr V5 = oa::funcs::to_rank0(oa::ops::eval(N5));
+      ArrayPtr V6 = oa::funcs::to_rank0(oa::ops::eval(N6));
+      ArrayPtr V7 = oa::funcs::to_rank0(oa::ops::eval(N7));
+      ArrayPtr V8 = oa::funcs::to_rank0(oa::ops::eval(N8));
+      
+      // NodePtr NSA = oa::ops::new_node(TYPE_MIN, NA);
+
+      //A->display("A");
+      
+      ArrayPtr A1 = oa::funcs::to_rank0(A);
+      Shape s = A1->buffer_shape();
+      arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(s, A1->get_buffer())
+                       (arma::span(sw, s[0] - sw - 1),
+                        arma::span(sw, s[1] - sw - 1),
+                        arma::span(sw, s[2] - sw - 1));
+      
+
+      // ArrayPtr V2 = oa::ops::eval(NSA);
+      
+      if(rank == 0){
+
+        EXPECT_TRUE(oa::funcs::is_equal(V1, C.max()));
+        EXPECT_TRUE(oa::funcs::is_equal(V2, C.min()));
+        EXPECT_TRUE(oa::funcs::is_equal(V3, arma::abs(C).max()));
+        EXPECT_TRUE(oa::funcs::is_equal(V4, arma::abs(C).min()));
+
+        
+        // V1->display("V1");
+        // std::cout<<"C.max():"<<C.max()<<std::endl;
+        // V2->display("V2");
+        // std::cout<<"C.min():"<<C.min()<<std::endl;
+        // V1->display("V3");
+        // std::cout<<"abs(C).max():"<<arma::abs(C).max()<<std::endl;
+        // V2->display("V4");
+        // std::cout<<"abs(C).min():"<<arma::abs(C).min()<<std::endl;
+
+        arma::uvec VI;
+        VI = ind2sub(arma::size(C), C.index_max());
+
+        EXPECT_TRUE(oa::funcs::is_equal(V5, VI.memptr()));
+
+        VI = ind2sub(arma::size(C), C.index_min());
+        
+        // V6->display("V6");
+        // std::cout<<VI<<std::endl;
+
+        EXPECT_TRUE(oa::funcs::is_equal(V6, VI.memptr()));
+
+        VI = ind2sub(arma::size(C), abs(C).index_max());
+        EXPECT_TRUE(oa::funcs::is_equal(V7, VI.memptr()));
+
+        VI = ind2sub(arma::size(C), abs(C).index_min());
+        EXPECT_TRUE(oa::funcs::is_equal(V8, VI.memptr()));
+        
+        // V2->display("V2");
+        //EXPECT_TRUE(V1->is_seqs());
+        //EXPECT_TRUE(V1->shape() == SCALAR_SHAPE);
+      }
     }
     ///:endfor
   }
