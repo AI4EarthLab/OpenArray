@@ -646,14 +646,15 @@ void test_fusion_operator() {
   
   ans->display("ans = a[i-2,j-1,k]+a[i+1,j+2,k+1]");
 
+  int rk = ap->rank();
   if (rk == 0) {
-  ArrayPtr test = oa::funcs::seqs(MPI_COMM_SELF, {6, 6, 6}, 2);
-  ArrayPtr test_ans = oa::funcs::zeros(MPI_COMM_SELF, {6, 6, 6}, 2);
-  //test->display("test");
-  test->get_partition()->set_stencil_type(STENCIL_BOX);
-  oa::internal::set_ghost_consts((int*)test->get_buffer(), test->local_shape(), 0, 2);
-  oa::funcs::calc_inside(test_ans, test, {0, 0, 0}, {0, 0, 0});
-  test_ans->display("test_ans");
+    ArrayPtr test = oa::funcs::seqs(MPI_COMM_SELF, {6, 6, 6}, 2);
+    ArrayPtr test_ans = oa::funcs::zeros(MPI_COMM_SELF, {6, 6, 6}, 2);
+    //test->display("test");
+    test->get_partition()->set_stencil_type(STENCIL_BOX);
+    oa::internal::set_ghost_consts((int*)test->get_buffer(), test->local_shape(), 0, 2);
+    oa::funcs::calc_inside(test_ans, test, {0, 0, 0}, {0, 0, 0});
+    test_ans->display("test_ans");
   }
 
 
