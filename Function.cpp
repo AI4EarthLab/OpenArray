@@ -3,7 +3,7 @@
 #include "utils/utils.hpp"
 #include <fstream>
 #include <mpi.h>
-
+using namespace std;
 namespace oa {
   namespace funcs {
 
@@ -774,7 +774,7 @@ namespace oa {
       ///:endfor
 
     }
-    
+
     // sub(A) = A(A_box), sub(B) = B(B_box) && set sub(A) = sub(B)
     void set(ArrayPtr& A, const Box& A_box, 
         const ArrayPtr& B, const Box& B_box) {
@@ -787,6 +787,134 @@ namespace oa {
 
     }
 
+    ArrayPtr l2g(ArrayPtr& lap)
+    {
+      ArrayPtr gap;
+
+      PartitionPtr lpp = lap->get_partition();
+
+      Shape lsp = lpp->shape();
+      Shape gsp = lsp;
+      int sw = lpp->get_stencil_width(); 
+      int datatype = lap->get_data_type();
+      gap = zeros(MPI_COMM_WORLD, gsp, sw, datatype);
+      PartitionPtr gpp = gap->get_partition();
+      Box gbox = gpp->get_local_box();
+      int xs, ys, zs, xe, ye, ze;
+      gbox.get_corners(xs, xe, ys, ye, zs, ze);
+
+      int lxs, lys, lzs, lxe, lye, lze;
+      Box lbox =lpp->get_local_box();
+      lbox.get_corners(lxs, lxe, lys, lye, lzs, lze);
+
+      vector<int> clx = gpp->m_clx;
+      vector<int> cly = gpp->m_cly;
+      vector<int> clz = gpp->m_clz;
+
+      int mpisize = oa::utils::get_size(gpp->get_comm());
+      int myrank = oa::utils::get_rank(gpp->get_comm());
+
+      vector<int> location = gpp->get_procs_3d(myrank);
+      //std::cout<<"this is rank "<<myrank<<std::endl;
+      //cout<<"location="<<location[0]<<","<<location[1]<<","<<location[2]<<endl;
+      //cout<<xs<<","<<xe<<","<<ys<<","<<ye<<","<<zs<<","<<ze<<". " <<gbox.size()<<endl;
+
+
+      switch(datatype) {
+        case DATA_INT:
+          {
+            int *gbuff = (int *) gap->get_buffer();
+            int *lbuff = (int *) lap->get_buffer();
+            for (int k = zs; k < ze; k++) {
+              for (int j = ys; j < ye; j++) {
+                for (int i = xs; i < xe; i++) {
+                  int gindex = (xe-xs+2*sw)*(ye-ys+2*sw)*(k-zs+sw)+(xe-xs+2*sw)*(j-ys+sw)+(i-xs+sw);
+                  gbuff[gindex] = 1;
+                  int lk = k + clx[location[0]];
+                  int lj = j + cly[location[1]];
+                  int li = i + clz[location[2]];
+                  int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(k+sw)+(lxe-lxs+2*sw)*(j+sw)+(i+sw);
+                  gbuff[gindex]=lbuff[lindex];
+                }
+              }
+            }
+            break;
+          }
+        case DATA_FLOAT:
+          {
+            float *gbuff = (float *) gap->get_buffer();
+            float *lbuff = (float *) lap->get_buffer();
+            for (int k = zs; k < ze; k++) {
+              for (int j = ys; j < ye; j++) {
+                for (int i = xs; i < xe; i++) {
+                  int gindex = (xe-xs+2*sw)*(ye-ys+2*sw)*(k-zs+sw)+(xe-xs+2*sw)*(j-ys+sw)+(i-xs+sw);
+                  gbuff[gindex] = 1;
+                  int lk = k + clx[location[0]];
+                  int lj = j + cly[location[1]];
+                  int li = i + clz[location[2]];
+                  int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(k+sw)+(lxe-lxs+2*sw)*(j+sw)+(i+sw);
+                  gbuff[gindex]=lbuff[lindex];
+                }
+              }
+            }
+            break;
+          }
+        case DATA_DOUBLE:
+          {
+            double *gbuff = (double *) gap->get_buffer();
+            double *lbuff = (double *) lap->get_buffer();
+            for (int k = zs; k < ze; k++) {
+              for (int j = ys; j < ye; j++) {
+                for (int i = xs; i < xe; i++) {
+                  int gindex = (xe-xs+2*sw)*(ye-ys+2*sw)*(k-zs+sw)+(xe-xs+2*sw)*(j-ys+sw)+(i-xs+sw);
+                  gbuff[gindex] = 1;
+                  int lk = k + clx[location[0]];
+                  int lj = j + cly[location[1]];
+                  int li = i + clz[location[2]];
+                  int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(k+sw)+(lxe-lxs+2*sw)*(j+sw)+(i+sw);
+                  gbuff[gindex]=lbuff[lindex];
+                }
+              }
+            }
+            break;
+          }
+      }
+
+
+
+/*
+      int *gbuff = (int *) gap->get_buffer();
+      int *lbuff = (int *) lap->get_buffer();
+      */
+/*
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            int gindex = (xe-xs+2*sw)*(ye-ys+2*sw)*(k-zs+sw)+(xe-xs+2*sw)*(j-ys+sw)+(i-xs+sw);
+            gbuff[gindex] = 1;
+            int lk = k + clx[location[0]];
+            int lj = j + cly[location[1]];
+            int li = i + clz[location[2]];
+            //cout<<"lindex="<<lindex<<endl;
+            //int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(lk-lzs+sw)+(lxe-lxs+2*sw)*(lj-lys+sw)+(li-lxs+sw);
+            //cout<<lk<<","<<lj<<","<<li<<":"<<lbuff[lindex]<<endl;
+            int lindex = (lxe-lxs+2*sw)*(lye-lys+2*sw)*(k+sw)+(lxe-lxs+2*sw)*(j+sw)+(i+sw);
+            //cout<<k<<","<<j<<","<<i<<":"<<lbuff[lindex]<<endl;
+            gbuff[gindex]=lbuff[lindex];
+
+          }
+        }
+      }
+*/
+      return gap;
+    }
+
+    ArrayPtr g2l(ArrayPtr& gap)
+    {
+      ArrayPtr lap;
+
+      return lap;
+    }
 
     // sub(A) = B (MPI_COMM_SELF)
     void set_l2g(ArrayPtr& A, const Box& A_box, ArrayPtr& B) {
@@ -809,6 +937,56 @@ namespace oa {
 
       PartitionPtr subA_par_ptr = PartitionPool::global()->
         get(pp->get_comm(), x, y, z, pp->get_stencil_width());
+      subA_par_ptr->display();
+      ////////////////////////////////
+      Shape subps = subA_par_ptr->procs_shape();
+
+      int myrank = oa::utils::get_rank(pp->get_comm());
+      int mpisize = oa::utils::get_size(pp->get_comm());
+      int npx = subps[0];
+      int npy = subps[1];
+      int npz = subps[2];
+
+      Box lbox = subA_par_ptr->get_local_box();
+      Box gbox = pp->get_local_box();
+
+      //if (lbox.size() > 0) 
+      {
+        int xs, ys, zs, xe, ye, ze;
+        lbox.get_corners(xs, xe, ys, ye, zs, ze);
+        int sw = subA_par_ptr -> get_stencil_width();  
+
+        MPI_Barrier(pp->get_comm());
+        for(int l = 0; l < mpisize ;l++){
+          MPI_Barrier(pp->get_comm());
+          if(myrank == 6)
+          {
+            std::cout<<"this is rank "<<myrank<<std::endl;
+            cout<<xs<<","<<xe<<","<<ys<<","<<ye<<","<<zs<<","<<ze<<". " <<lbox.size()<<endl;
+            int *M = (int *) A->get_buffer();
+            for(int i=0;i<gbox.size();i++)
+              M[i]=0;
+            /*
+            for (int k = zs; k < ze; k++) {
+              for (int j = ys; j < ye; j++) {
+                for (int i = xs; i < xe; i++) {
+                  if ((xs + sw <= i && i < xe - sw) &&
+                      (ys + sw <= j && j < ye - sw) &&
+                      (zs + sw <= k && k < ze - sw)) {
+                    int temp = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
+                    M[temp] = 0;
+                  }
+                }
+              }
+            }
+            */
+
+          }
+          MPI_Barrier(pp->get_comm());
+        }
+        MPI_Barrier(pp->get_comm());
+      }
+
     }
 
 
