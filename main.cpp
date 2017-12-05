@@ -48,8 +48,9 @@ int main(int argc, char** argv) {
   //test_set();
   //test_rep();
   //test_l2g();
-  test_g2l();
-  //test_set_l2g();
+
+  //test_g2l();
+  test_set_l2g();
   MPI_Finalize();
   return 0;
 }

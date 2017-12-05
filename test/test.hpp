@@ -612,23 +612,6 @@ void test_set() {
   ap->display("======after_set======");
 }
 
-void test_set_l2g() {
-  // A
-  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_SELF, {3, 3, 3}, 0);
-  ArrayPtr global = oa::funcs::ones(MPI_COMM_WORLD, {8, 8, 8}, 0);
-
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  if(rank == 0)
-    ap->display("======A======");
-  global->display("======global======");
-
-  Box box(2, 4, 3, 5, 4, 6);
-  oa::funcs::set_l2g(global, box, ap);
-  global->display("======global_set_l2g======");
-}
-
-
 void test_rep() {
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
   ap->display("======A======");
@@ -638,28 +621,80 @@ void test_rep() {
   ap->display("======A======");
 }
 
-void test_l2g(){
-  ArrayPtr lap = oa::funcs::seqs(MPI_COMM_SELF, {6, 6, 6}, 1);
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  if(rank == 0)
-    lap->display("======local======");
-  ArrayPtr global = oa::funcs::l2g(lap);
-  global->display("======global======");
-}
-
 void test_g2l(){
   ArrayPtr global = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 1);
   global->display("======global======");
-
   ArrayPtr local = oa::funcs::g2l(global);
-  
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   //sleep(rank);
   if(rank == 3)
     local->display("======local======");
-    
 }
+
+void test_l2g(){
+  ArrayPtr lap = oa::funcs::seqs(MPI_COMM_SELF, {6, 6, 6}, 1);
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  if(rank == 3)
+    lap->display("======local======");
+  ArrayPtr global = oa::funcs::l2g(lap);
+  global->display("======global======");
+}
+
+
+// sub(A) = B (MPI_COMM_SELF)
+void test_set_l2g() {
+  // A
+  ArrayPtr local = oa::funcs::seqs(MPI_COMM_SELF, {3, 3, 3}, 0);
+  ArrayPtr global = oa::funcs::ones(MPI_COMM_WORLD, {8, 8, 8}, 0);
+
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  if(rank == 0)
+    local->display("======local======");
+  global->display("======global======");
+
+  if(rank == 0)
+    std::cout<<"now set ..................."<<std::endl;
+  Box box(2, 4, 3, 5, 4, 6);
+  oa::funcs::set_l2g(global, box, local);
+  global->display("======global======");
+}
+
+/*
+//local_A (MPI_COMM_SELF)= sub(global_B)
+void test_set_g2l() {
+  // A
+  ArrayPtr local = oa::funcs::zeros(MPI_COMM_SELF, {3, 3, 3}, 0);
+  ArrayPtr global = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 0);
+
+
+
+
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+
+
+  if(rank == 2)
+    local->display("======local======");
+
+  global->display("======global======");
+
+  std::cout<<"now set ..................."<<std::endl;
+
+  Box box(2, 4, 3, 5, 4, 6);
+  oa::funcs::set_g2l(global, box, ap);
+  global->display("======global_set_l2g======");
+  if(rank == 2)
+    local->display("======local======");
+
+  global->display("======global======");
+
+
+}
+
+*/
 
 #endif
