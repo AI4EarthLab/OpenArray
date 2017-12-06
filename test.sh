@@ -10,8 +10,9 @@ if [ ! -d "$build_dir" ]; then
     mkdir ${build_dir}
 fi
 
-cp makefile  ${build_dir}/makefile
-cp makefile.intel  ${build_dir}/makefile.intel
+cp makefile*  ${build_dir}/ 2>/dev/null
+cp dependency.inc ${build_dir}/ 2>/dev/null
+
 if [ ! -d "${build_dir}/libjit.so" ]; then 
    cp libjit.so  ${build_dir}/libjit.so
 fi
@@ -74,7 +75,8 @@ do
       #fi
         src_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $src_filename)
         dst_time=$(stat -f "%Sm" -t "%y%m%d%H%M" $dst_filename)
-      if [[ "$src_time" > "$dst_time" ]]; then
+        if [[ "$src_time" > "$dst_time" ]]; then
+
         ./fypp -p -m re -m string -m io -m os --create-parents \
            $src_filename > $dst_filename
         
