@@ -24,8 +24,9 @@ private:
   int m_depth = 0;
   Shape m_global_shape = {{1, 1, 1}};
   int m_data_type;
-  int3 m_lbound = {0, 0, 0};
-  int3 m_rbound = {0, 0, 0};
+  int3 m_lbound = {{0, 0, 0}};
+  int3 m_rbound = {{0, 0, 0}};
+  bool m_update_boundary = false;
   //BoxPtr ref;
 
 public:
@@ -108,6 +109,13 @@ public:
 
   void set_rbound(int3 rb);
 
+  void set_lbound(int3 left_lb, int3 right_lb);
+
+  void set_rbound(int3 left_rb, int3 ribht_rb);
+
+  void set_update();
+
+  bool need_update();
 
 };
 

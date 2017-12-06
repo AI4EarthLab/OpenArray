@@ -175,3 +175,11 @@ void Node::set_lbound(int3 lb) {
 void Node::set_rbound(int3 rb) {
   m_rbound = rb;
 }
+
+void Node::set_update() {
+  m_update_boundary = true;
+}
+
+bool Node::need_update() {
+  return m_update_boundary;
+}

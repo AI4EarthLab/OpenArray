@@ -62,7 +62,7 @@ Operator.o: Operator.cpp Operator.hpp NodePool.hpp common.hpp otype.hpp \
  Node.hpp Array.hpp Partition.hpp Box.hpp Range.hpp ArrayPool.hpp \
  PartitionPool.hpp Function.hpp utils/utils.hpp \
  utils/../common.hpp Internal.hpp NodeDesc.hpp Kernel.hpp Jit_Driver.hpp \
- jit/Jit.hpp
+ Jit.hpp
 Node.o: Node.cpp Node.hpp Array.hpp Partition.hpp common.hpp otype.hpp \
  Box.hpp Range.hpp NodeDesc.hpp Operator.hpp NodePool.hpp ArrayPool.hpp \
  PartitionPool.hpp Function.hpp utils/utils.hpp \

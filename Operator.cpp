@@ -49,8 +49,13 @@ namespace oa {
           np->set_shape(u->shape());
         }
         np->set_data_type(dt);
-      } else {
+        
+        np->set_lbound({0, 0, 0});
+        np->set_rbound({0, 0, 0});
+        np->set_update();
 
+      } else {
+        
         // to do
         // set data_type && shape
         
@@ -119,7 +124,7 @@ namespace oa {
         ///:set ef = i[7]
         ///:set rt = i[8]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F' or i[3] == 'C' or name == 'pow' or name == 'csum' or name == 'sum' or name == 'not' or i[3] == 'E' or i[3] == 'D')
+        ///:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'csum' or name == 'sum' or name == 'not')
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$, ${rt}$};
         ///:else
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL, ${rt}$};
