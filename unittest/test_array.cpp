@@ -1,6 +1,6 @@
 
 
-#include <armadillo/armadillo>
+#include <armadillo>
 #include "../Array.hpp"
 #include "../Function.hpp"
 #include "../NodePool.hpp"

@@ -15,7 +15,7 @@ CXXFLAGS= -fPIC --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
 LIBS = -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem \
 	-lboost_system -ldl -llapack -lblas \
-	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} libjit.so
+	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} libjit.so -lpthread
 
 
 OBJS	= Range.o Box.o Partition.o Array.o \
