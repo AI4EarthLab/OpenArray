@@ -21,6 +21,9 @@ void Node::display(char const *prefix) {
     const NodeDesc& nd = oa::ops::get_node_desc(m_type);    
     printf("  type : %s\n", nd.name.c_str());
     printf("  hash : %d\n", m_hash);
+    printf("  lbound : [%d %d %d]\n", m_lbound[0], m_lbound[1], m_lbound[2]);
+    printf("  rbound : [%d %d %d]\n", m_rbound[0], m_rbound[1], m_rbound[2]);
+    printf("  need_update : %s\n", m_update_boundary ? "True" : "False");
 
     printf(" input : \n");
     for(int i = 0; i < m_input.size(); ++i)
@@ -175,6 +178,19 @@ void Node::set_lbound(int3 lb) {
 void Node::set_rbound(int3 rb) {
   m_rbound = rb;
 }
+
+void Node::set_lbound(int3 b1, int3 b2) {
+  m_lbound[0] = max(b1[0], b2[0]);
+  m_lbound[1] = max(b1[1], b2[1]);
+  m_lbound[2] = max(b1[2], b2[2]);
+}
+
+void Node::set_rbound(int3 b1, int3 b2) {
+  m_rbound[0] = max(b1[0], b2[0]);
+  m_rbound[1] = max(b1[1], b2[1]);
+  m_rbound[2] = max(b1[2], b2[2]);
+}
+
 
 void Node::set_update() {
   m_update_boundary = true;

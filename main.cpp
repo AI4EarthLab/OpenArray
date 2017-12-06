@@ -52,7 +52,8 @@ int main(int argc, char** argv) {
   //test_set_l2g();
   //test_set_g2l();
   //test_fusion_operator();
-  test_op();
+  //test_op();
+  test_fusion_op();
 
   MPI_Finalize();
   return 0;
