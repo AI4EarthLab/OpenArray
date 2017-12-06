@@ -159,3 +159,19 @@ void Node::set_data_type(int dt) {
 int Node::get_data_type() const {
   return m_data_type;
 }
+
+int3 Node::get_lbound() {
+  return m_lbound;
+}
+
+int3 Node::get_rbound() {
+  return m_rbound;
+}
+
+void Node::set_lbound(int3 lb) {
+  m_lbound = lb;
+}
+
+void Node::set_rbound(int3 rb) {
+  m_rbound = rb;
+}
