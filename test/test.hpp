@@ -10,6 +10,7 @@
 #include "../Operator.hpp"
 #include "../IO.hpp"
 #include "../c-interface/c_oa_type.hpp"
+#include "../op_define.hpp"
 
 #include <assert.h>
 
@@ -845,7 +846,7 @@ void test_fusion_op() {
   NodePtr a30 = oa::ops::new_node(TYPE_MULT, a29, dvm_3d);
   NodePtr a31 = oa::ops::new_node(TYPE_MINUS, a23, a30);
   NodePtr a32 = oa::ops::new_node(TYPE_DYF, a31);
-  NodePtr a33 = oa::ops::new_node(TYPE_PLUS, a18, a32);
+  NodePtr a33 = PLUS(a18, a32);
   
   oa::ops::write_graph(a33);  
   

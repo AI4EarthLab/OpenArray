@@ -1,11 +1,7 @@
 #include "Operator.hpp"
 #include "Grid.hpp"
+#include "op_define.hpp"
 #include <boost/throw_exception.hpp>
-
-#define AXB(x) oa::ops::new_node(TYPE_AXB, x)
-#define AYB(x) oa::ops::new_node(TYPE_AYB, x)
-#define AZB(x) oa::ops::new_node(TYPE_AZB, x)
-#define EVAL(x) oa::ops::eval(x)
 
 void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
 
