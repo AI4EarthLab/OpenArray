@@ -26,6 +26,8 @@ class Partition;
 typedef std::shared_ptr<Partition> PartitionPtr;
 
 class Partition {
+private:
+  static Shape m_default_procs_shape;
   public:
   MPI_Comm m_comm = MPI_COMM_SELF;
   Shape m_global_shape = { {1, 1, 1} };
@@ -94,6 +96,10 @@ class Partition {
   static size_t gen_hash(MPI_Comm comm, const Shape& gs, int stencil_width = 1);
   static size_t gen_hash(MPI_Comm comm, const vector<int> &x, 
     const vector<int> &y, const vector<int> &z, int stencil_width = 1);
+
+  static void set_default_procs_shape(const Shape& s);
+  static void set_auto_procs_shape();  
+  static Shape get_default_procs_shape();
 };
 
 

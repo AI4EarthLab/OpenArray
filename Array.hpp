@@ -13,6 +13,8 @@
  */
 class Array;
 typedef shared_ptr<Array> ArrayPtr;
+class Grid;
+typedef shared_ptr<Grid> GridPtr;
 
 class Array {
   private:
@@ -26,7 +28,8 @@ class Array {
   bool m_is_scalar = false;
   bool m_is_seqs = false;
   size_t m_hash;
-
+  int pos;
+  GridPtr grid;
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
   ~Array();

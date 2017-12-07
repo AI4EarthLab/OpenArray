@@ -10,6 +10,7 @@
 #include "../Operator.hpp"
 #include "../IO.hpp"
 #include "../c-interface/c_oa_type.hpp"
+#include "../op_define.hpp"
 
 #include <assert.h>
 
@@ -786,6 +787,77 @@ void test_op() {
   ans = oa::ops::force_eval(B);
   ans->display("DZB");
   
+}
+
+void test_fusion_op() {
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap3 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap6 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap7 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap8 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap10 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  
+
+  NodePtr w = oa::ops::new_node(ap1);
+  NodePtr q2 = oa::ops::new_node(ap2);
+  NodePtr dt_3d = oa::ops::new_node(ap3);
+  NodePtr u = oa::ops::new_node(ap4);
+  NodePtr aam = oa::ops::new_node(ap5);
+  NodePtr h_3d = oa::ops::new_node(ap6);
+  NodePtr q2b = oa::ops::new_node(ap7);
+  NodePtr dum_3d = oa::ops::new_node(ap8);
+  NodePtr v = oa::ops::new_node(ap9);
+  NodePtr dvm_3d = oa::ops::new_node(ap10);
+  
+  
+  NodePtr a1 = oa::ops::new_node(TYPE_MULT, w, q2);
+  NodePtr a2 = oa::ops::new_node(TYPE_AZF, a1);
+  NodePtr a3 = oa::ops::new_node(TYPE_DZF, a2);
+  NodePtr a4 = oa::ops::new_node(TYPE_AXB, q2);
+  NodePtr a5 = oa::ops::new_node(TYPE_AXB, dt_3d);
+  NodePtr a6 = oa::ops::new_node(TYPE_MULT, a4, a5);
+  NodePtr a7 = oa::ops::new_node(TYPE_AZB, u);
+  NodePtr a8 = oa::ops::new_node(TYPE_MULT, a6, a7);
+  NodePtr a9 = oa::ops::new_node(TYPE_AXB, aam);
+  NodePtr a10 = oa::ops::new_node(TYPE_AZB, a9);
+  NodePtr a11 = oa::ops::new_node(TYPE_AXB, h_3d);
+  NodePtr a12 = oa::ops::new_node(TYPE_MULT, a10, a11);
+  NodePtr a13 = oa::ops::new_node(TYPE_DXB, q2b);
+  NodePtr a14 = oa::ops::new_node(TYPE_MULT, a12, a13);
+  NodePtr a15 = oa::ops::new_node(TYPE_MULT, a14, dum_3d);
+  NodePtr a16 = oa::ops::new_node(TYPE_MINUS, a8, a15);
+  NodePtr a17 = oa::ops::new_node(TYPE_DXF, a16);
+  NodePtr a18 = oa::ops::new_node(TYPE_PLUS, a3, a17);
+  NodePtr a19 = oa::ops::new_node(TYPE_AYB, q2);
+  NodePtr a20 = oa::ops::new_node(TYPE_AYB, dt_3d);
+  NodePtr a21 = oa::ops::new_node(TYPE_MULT, a19, a20);
+  NodePtr a22 = oa::ops::new_node(TYPE_AZB, v);
+  NodePtr a23 = oa::ops::new_node(TYPE_MULT, a21, a22);
+  NodePtr a24 = oa::ops::new_node(TYPE_AYB, aam);
+  NodePtr a25 = oa::ops::new_node(TYPE_AZB, a24);
+  NodePtr a26 = oa::ops::new_node(TYPE_AYB, h_3d);
+  NodePtr a27 = oa::ops::new_node(TYPE_MULT, a25, a26);
+  NodePtr a28 = oa::ops::new_node(TYPE_DYB, q2b);
+  NodePtr a29 = oa::ops::new_node(TYPE_MULT, a27, a28);
+  NodePtr a30 = oa::ops::new_node(TYPE_MULT, a29, dvm_3d);
+  NodePtr a31 = oa::ops::new_node(TYPE_MINUS, a23, a30);
+  NodePtr a32 = oa::ops::new_node(TYPE_DYF, a31);
+  NodePtr a33 = PLUS(a18, a32);
+  
+  oa::ops::write_graph(a33);  
+  
+  oa::ops::gen_kernels(a33);
+  
+  
+
+  // q2f= DZB(AZF(w*q2)) + DXF(AXB(q2)* AXB(dt_3d)* AZB(u)  & 
+  //    -AZB( AXB(aam))*AXB(h_3d)*DXB( q2b )* dum_3d)+DYF(AYB(q2)* AYB(dt_3d)* AZB(v) & 
+  //    -AZB( AYB(aam))*AYB(h_3d)*DYB( q2b )* dvm_3d))
+
 }
 
 #endif

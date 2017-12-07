@@ -49,16 +49,15 @@ namespace oa {
           np->set_shape(u->shape());
         }
         np->set_data_type(dt);
-        
+        np->set_lbound(u->get_lbound(), v->get_lbound());
+        np->set_rbound(u->get_rbound(), v->get_rbound());
+      } else {
+
+        // to do
+        // set data_type && shape
         np->set_lbound({0, 0, 0});
         np->set_rbound({0, 0, 0});
         np->set_update();
-
-      } else {
-        
-        // to do
-        // set data_type && shape
-        
         np->set_data_type(dt);
       }
       return np;
@@ -80,8 +79,72 @@ namespace oa {
         np->set_shape(u->shape());
 
         np->set_data_type(dt);
+        np->set_lbound(u->get_lbound());
+        np->set_rbound(u->get_rbound());
+        
+
+        if (TYPE_AXB <= type && type <= TYPE_DZF) {
+          int3 lb, rb;
+          switch (type) {
+            case TYPE_AXB:
+            case TYPE_DXB:
+              lb = {1, 0, 0};
+              rb = {0, 0, 0}; 
+              break;
+            case TYPE_AXF:
+            case TYPE_DXF:
+              lb = {0, 0, 0};
+              rb = {1, 0, 0}; 
+              break;
+            case TYPE_AYB:
+            case TYPE_DYB:
+              lb = {0, 1, 0};
+              rb = {0, 0, 0}; 
+              break;
+            case TYPE_AYF:
+            case TYPE_DYF:
+              lb = {0, 0, 0};
+              rb = {0, 1, 0}; 
+              break;
+            case TYPE_AZB:
+            case TYPE_DZB:
+              lb = {0, 0, 1};
+              rb = {0, 0, 0}; 
+              break;
+            case TYPE_AZF:
+            case TYPE_DZF:
+              lb = {0, 0, 0};
+              rb = {0, 0, 1}; 
+              break;
+          }
+
+          int3 new_lb = u->get_lbound();
+          int3 new_rb = u->get_rbound();
+          
+          int mx = 0;
+          for (int i = 0; i < 3; i++) {
+            new_lb[i] += lb[i];
+            mx = max(new_lb[i], mx);
+            new_rb[i] += rb[i];
+            mx = max(new_rb[i], mx);
+          }
+
+          // set default max stencil as two
+          if (mx > 1) {
+            np->set_lbound(lb);
+            np->set_rbound(rb);
+            u->set_update();
+          } else {
+            np->set_lbound(new_lb);
+            np->set_rbound(new_rb);
+          }
+        }
+
       } else {
         // to do set data_type && shape
+        np->set_lbound({0, 0, 0});
+        np->set_rbound({0, 0, 0});
+        np->set_update();
         np->set_data_type(dt);
       }
       return np;
@@ -192,7 +255,7 @@ namespace oa {
 
       // not element wise, need eval
       const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew) {
+      if (!nd.ew || A->need_update()) {
         ArrayPtr ap = eval(A);
         list.push_back(ap->get_buffer());
         if (ptr == NULL && !(ap->is_seqs_scalar())) {
@@ -302,9 +365,10 @@ namespace oa {
     void gen_kernels(NodePtr A, bool is_root, MPI_Comm comm) {
       if (oa::utils::get_rank(comm)) return ;
       if (A->has_data()) return ;
-
+      //A->display();
+      
       const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew) {
+      if (!nd.ew || A->need_update()) {
         for (int i = 0; i < A->input_size(); i++) {
           gen_kernels(A->input(i), true);
         }
@@ -343,7 +407,7 @@ namespace oa {
       if (A->has_data()) return ;
       
       const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew) {
+      if (!nd.ew || A->need_update()) {
         for (int i = 0; i < A->input_size(); i++) {
           gen_kernels_JIT(A->input(i), true);
         }
@@ -395,7 +459,7 @@ namespace oa {
       const NodeDesc &nd = get_node_desc(A->type());
       
       // only data or non-element-wise
-      if (A->has_data() || !nd.ew) {
+      if (A->has_data() || !nd.ew || A->need_update()) {
         if (A->is_seqs_scalar()) ss<<"S";
         else ss<<"A";
         ss<<A->get_data_type();
@@ -423,7 +487,7 @@ namespace oa {
     void tree_to_code(NodePtr A, stringstream &ss, int &id) {
       const NodeDesc &nd = get_node_desc(A->type());
 
-      if (A->has_data() || !nd.ew) {
+      if (A->has_data() || !nd.ew || A->need_update()) {
         ss<<"(";
         switch(A->get_data_type()) {
           case DATA_INT:
@@ -465,7 +529,7 @@ namespace oa {
     void tree_to_string_stack(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());
 
-      if (A->has_data() || !nd.ew) {
+      if (A->has_data() || !nd.ew || A->need_update()) {
         if (A->is_seqs_scalar()) ss<<"S";
         else ss<<"A";
         ss<<A->get_data_type();

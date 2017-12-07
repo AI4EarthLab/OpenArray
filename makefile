@@ -20,7 +20,7 @@ LIBS = -lstdc++ -lpnetcdf \
 
 OBJS	= Range.o Box.o Partition.o Array.o \
 	  Internal.o Function.o Kernel.o Operator.o \
-	  Node.o IO.o 
+	  Node.o IO.o Grid.o
 
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
 			      utils.o)

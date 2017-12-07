@@ -10,8 +10,9 @@ if [ ! -d "$build_dir" ]; then
     mkdir ${build_dir}
 fi
 
-cp makefile  ${build_dir}/makefile
-cp makefile.intel  ${build_dir}/makefile.intel
+cp makefile*  ${build_dir}/ 2>/dev/null
+cp dependency.inc ${build_dir}/ 2>/dev/null
+
 if [ ! -d "${build_dir}/libjit.so" ]; then 
    cp libjit.so  ${build_dir}/libjit.so
 fi
