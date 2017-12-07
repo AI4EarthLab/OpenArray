@@ -3,7 +3,7 @@ module test
   use oa_type
   use oa_utils
   use mpi
-
+  use oa_test
 contains
   subroutine test_create_array()
     implicit none
@@ -79,8 +79,9 @@ program main
   call oa_mpi_init()
   
   !call test_create_array()
-  call test_create_node()
+  !call test_create_node()
 
-  call oa_mpi_finalize()
+  !call oa_mpi_finalize()
 
+  call test_parition()
 end program main

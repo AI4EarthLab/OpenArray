@@ -24,8 +24,8 @@ private:
   int m_depth = 0;
   Shape m_global_shape = {{1, 1, 1}};
   int m_data_type;
-  int3 m_lbound = {0, 0, 0};
-  int3 m_rbound = {0, 0, 0};
+  int3 m_lbound = int3({0, 0, 0});
+  int3 m_rbound = int3({0, 0, 0});
   //BoxPtr ref;
 
 public:

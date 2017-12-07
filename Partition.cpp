@@ -23,26 +23,29 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
   double fy = gs[1] / tot;
   double fz = gs[2] / tot;
 
-  m_procs_shape = {-1, -1, -1};
-  double factor = INT_MAX;
-  double tsz = pow(size * 1.0, 1.0 / 3);
+  //m_procs_shape = {-1, -1, -1};
+  m_procs_shape = Partition::get_default_procs_shape();
+  if(m_procs_shape[0] < 1){
+    double factor = INT_MAX;
+    double tsz = pow(size * 1.0, 1.0 / 3);
 
-  for (int i = 1; i <= size; i++) if (size % i == 0) {
-    int ed = size / i;
-    for (int j = 1; j <= ed; j++) if (ed % j == 0) {
-      int k = ed / j;
-      double dfx = fx - i * 1.0 / tsz;
-      double dfy = fy - j * 1.0 / tsz;
-      double dfz = fz - k * 1.0 / tsz;
-      double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
-      //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
-      if (factor >= new_factor) {
-        m_procs_shape = {i, j, k};
-        factor = new_factor;
+    for (int i = 1; i <= size; i++) if (size % i == 0) {
+        int ed = size / i;
+        for (int j = 1; j <= ed; j++) if (ed % j == 0) {
+            int k = ed / j;
+            double dfx = fx - i * 1.0 / tsz;
+            double dfy = fy - j * 1.0 / tsz;
+            double dfz = fz - k * 1.0 / tsz;
+            double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
+            //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
+            if (factor >= new_factor) {
+              m_procs_shape = {i, j, k};
+              factor = new_factor;
+            }
+          }
       }
-    }
+    assert(m_procs_shape[0] > 0);
   }
-  assert(m_procs_shape[0] > 0);
   
   m_lx = vector<int> (m_procs_shape[0], gs[0] / m_procs_shape[0]);
   m_ly = vector<int> (m_procs_shape[1], gs[1] / m_procs_shape[1]);
@@ -384,6 +387,21 @@ size_t Partition::gen_hash(MPI_Comm comm, const vector<int> &x, const vector<int
   sstream<<":"<<stencil_width;
 
   return str_hash(sstream.str());
+}
+
+//initialize the default process shape to invilid shape
+Shape Partition::m_default_procs_shape = {0,0,0};
+
+Shape Partition::get_default_procs_shape(){
+  return m_default_procs_shape;
+}
+
+void Partition::set_default_procs_shape(const Shape& s){
+  m_default_procs_shape = s;
+}
+
+void Partition::set_auto_procs_shape(){
+  m_default_procs_shape = {0,0,0};
 }
 
 
