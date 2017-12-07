@@ -27,6 +27,7 @@ private:
   int3 m_lbound = {{0, 0, 0}};
   int3 m_rbound = {{0, 0, 0}};
   bool m_update_boundary = false;
+  int pos;
   //BoxPtr ref;
 
 public:
@@ -117,6 +118,9 @@ public:
 
   bool need_update();
 
+  void set_pos(int p);
+
+  int get_pos();
 };
 
 
