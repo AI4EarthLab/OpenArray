@@ -2,6 +2,7 @@
 #include "utils/utils.hpp"
 #include "Kernel.hpp"
 #include "Jit_Driver.hpp"
+#include "Grid.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
@@ -60,7 +61,7 @@ namespace oa {
       }
       
       // u & v must in the same grid pos
-      assert(u->get_pos(), v->get_pos());
+      assert(u->get_pos() == v->get_pos());
       np->set_pos(u->get_pos());
       
       return np;
@@ -78,7 +79,7 @@ namespace oa {
       if (type == TYPE_NOT) dt = nd.rt;
 
       // only OP will change grid pos
-      np->set_pos(u->get_pos);
+      np->set_pos(u->get_pos());
 
       if (nd.ew) {
         np->set_depth(u->get_depth());
