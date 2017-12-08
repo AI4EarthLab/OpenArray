@@ -24,6 +24,7 @@ void Node::display(char const *prefix) {
     printf("  lbound : [%d %d %d]\n", m_lbound[0], m_lbound[1], m_lbound[2]);
     printf("  rbound : [%d %d %d]\n", m_rbound[0], m_rbound[1], m_rbound[2]);
     printf("  need_update : %s\n", m_update_boundary ? "True" : "False");
+    printf("  grid pos : %d\n", pos);
 
     printf(" input : \n");
     for(int i = 0; i < m_input.size(); ++i)
@@ -198,4 +199,12 @@ void Node::set_update() {
 
 bool Node::need_update() {
   return m_update_boundary;
+}
+
+void Node::set_pos(int p) {
+  pos = p;
+}
+
+int Node::get_pos() {
+  return pos;
 }

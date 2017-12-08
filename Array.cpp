@@ -226,3 +226,11 @@ void Array::set_hash(const size_t &hash) {
 size_t Array::get_hash() const{
   return m_hash;
 }
+
+void Array::set_pos(int p) {
+  pos = p;
+}
+
+int Arrayget_pos() {
+  return pos;
+}

@@ -21,7 +21,11 @@ class Grid {
   ArrayPtr get_grid_dx(int pos);
   ArrayPtr get_grid_dy(int pos);
   ArrayPtr get_grid_dz(int pos);
+  int get_pos_x(int pos);
+  int get_pos_y(int pos);
+  int get_pos_z(int pos);
 
+  static Grid* global();
 };
 
 typedef std::shared_ptr<Grid> GridPtr;

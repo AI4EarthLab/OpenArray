@@ -21,6 +21,7 @@ namespace oa {
       np->set_shape(ap->shape());
       np->set_scalar(ap->is_scalar());
       np->set_seqs(ap->is_seqs());
+      np->set_pos(ap->get_pos());
       return np;
     }
 
@@ -52,14 +53,16 @@ namespace oa {
         np->set_lbound(u->get_lbound(), v->get_lbound());
         np->set_rbound(u->get_rbound(), v->get_rbound());
       } else {
-
-        // to do
-        // set data_type && shape
         np->set_lbound({0, 0, 0});
         np->set_rbound({0, 0, 0});
         np->set_update();
         np->set_data_type(dt);
       }
+      
+      // u & v must in the same grid pos
+      assert(u->get_pos(), v->get_pos());
+      np->set_pos(u->get_pos());
+      
       return np;
     }
 
@@ -73,6 +76,9 @@ namespace oa {
       if (TYPE_EXP <= type && type <= TYPE_DZF) dt = nd.rt;
       if (type == TYPE_UPLUS or type == TYPE_UMINUS) dt = u->get_data_type();
       if (type == TYPE_NOT) dt = nd.rt;
+
+      // only OP will change grid pos
+      np->set_pos(u->get_pos);
 
       if (nd.ew) {
         np->set_depth(u->get_depth());
@@ -89,7 +95,7 @@ namespace oa {
             case TYPE_AXB:
             case TYPE_DXB:
               lb = {1, 0, 0};
-              rb = {0, 0, 0}; 
+              rb = {0, 0, 0};
               break;
             case TYPE_AXF:
             case TYPE_DXF:
@@ -139,6 +145,27 @@ namespace oa {
             np->set_rbound(new_rb);
           }
         }
+
+        switch (type) {
+            case TYPE_AXB:
+            case TYPE_DXB:
+            case TYPE_AXF:
+            case TYPE_DXF:
+              np->set_pos( Grid::global()->get_pos_x(u->get_pos()) );
+              break;
+            case TYPE_AYB:
+            case TYPE_DYB:
+            case TYPE_AYF:
+            case TYPE_DYF:
+              np->set_pos( Grid::global()->get_pos_y(u->get_pos()) );
+              break;
+            case TYPE_AZB:
+            case TYPE_DZB:
+            case TYPE_AZF:
+            case TYPE_DZF:
+              np->set_pos( Grid::global()->get_pos_z(u->get_pos()) );
+              break;
+          }
 
       } else {
         // to do set data_type && shape

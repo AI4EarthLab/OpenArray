@@ -28,7 +28,7 @@ class Array {
   bool m_is_scalar = false;
   bool m_is_seqs = false;
   size_t m_hash;
-  int pos;
+  int pos = 0;
   GridPtr grid;
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
@@ -55,6 +55,8 @@ class Array {
   bool has_local_data() const;
   void set_hash(const size_t &hash);
   size_t get_hash() const;
+  void set_pos(int p);
+  int get_pos();
 };
 
 
