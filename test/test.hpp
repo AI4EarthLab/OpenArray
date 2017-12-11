@@ -860,4 +860,10 @@ void test_fusion_op() {
 
 }
 
+void test_rand() {
+  ArrayPtr ap = oa::funcs::rand(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+  ap->display("rand");
+}
+
+
 #endif

@@ -597,7 +597,6 @@ namespace{
       int y = 3;
       int z = 4;
 
-
       ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
       ArrayPtr repA = oa::funcs::rep(A, x, y, z);
 
@@ -637,6 +636,31 @@ namespace{
     }
     ///:endfor
   }
+
+  TEST_P(MPITest, RAND){
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      int x = 2;
+      int y = 3;
+      int z = 4;
+
+      ArrayPtr A = oa::funcs::rand(comm, {m,n,p}, sw, dt);
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      //if(rank == 0)result->display("result");
+      if(rank == 0){
+       rank0A->display("rand");
+       ;
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
 
     INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
       gt::Combine(gt::Values(MPI_COMM_WORLD),

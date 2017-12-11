@@ -31,7 +31,7 @@ namespace oa {
       }
 
       static auto abs_compare = [](T a, T b) {
-        return abs(a) < abs(b);
+        return std::abs(a) < std::abs(b);
       };
 
       T val = 1;
@@ -40,7 +40,7 @@ namespace oa {
         std::is_same<T, double>::value) {
         T max = *std::max_element(buf, buf+buf_size, abs_compare);
 
-        int factor = (int)log10(abs(max));
+        int factor = (int)log10(std::abs(max));
 
         if (factor > 2) {
           std::cout<< " * 1E"<<factor<<std::endl;
