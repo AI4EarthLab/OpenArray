@@ -1080,7 +1080,7 @@ namespace oa {
       Shape s = A->shape();
       int sw = A->get_partition()->get_stencil_width();
       //std::cout<<"s0:2:"<<s[0]<<","<<s[1]<<","<<s[2]<<","<<std::endl;
-      ap = oa::funcs::zeros(MPI_COMM_WORLD, {s[0]*x, s[1]*y, s[2]*z}, sw);
+      ap = oa::funcs::zeros(MPI_COMM_WORLD, {s[0]*x, s[1]*y, s[2]*z}, sw, A->get_data_type());
       int xs, xe, ys, ye, zs, ze;
       //std::cout<<"sw="<<sw<<std::endl;
       xs = ys = zs = 0;
