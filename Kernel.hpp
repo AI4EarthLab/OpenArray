@@ -483,7 +483,6 @@ namespace oa {
                   buffer,
                   type
                   );
-
               if(k != 0)
                 MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
             }

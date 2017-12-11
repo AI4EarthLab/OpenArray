@@ -1,5 +1,3 @@
-
-
 #include <armadillo>
 #include "../Array.hpp"
 #include "../Function.hpp"
@@ -8,6 +6,7 @@
 #include "../IO.hpp"
 #include "gtest/gtest.h"
 #include <boost/filesystem.hpp>
+#include <unistd.h>
 
 namespace gt=::testing;
 
@@ -66,7 +65,6 @@ arma::Cube<T> make_seqs(int m, int n, int p){
 using namespace oa::funcs;
 
 namespace{
-
   TEST(Array, Basic){
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -359,8 +357,239 @@ namespace{
     ///:endfor
   }
 
+  TEST_P(MPITest, SUM_scalar_CSUM_scalar){
+
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      double x = 0;
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+
+      NodePtr type0 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 0);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+      NodePtr N0 = oa::ops::new_node(TYPE_CSUM, NA, type0);
+      ArrayPtr RA0 = oa::ops::eval(N0);
+      ${t}$* res = (${t}$*) RA0->get_buffer();
+
+      NodePtr N1 = oa::ops::new_node(TYPE_SUM, NA, type0);
+      ArrayPtr RA1 = oa::ops::eval(N1);
+      ${t}$* res1 = (${t}$*) RA1->get_buffer();
+
+
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      if(rank == 0){
+        arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        x = accu(C);
+        EXPECT_TRUE(res[0] == x);
+        EXPECT_TRUE(res1[0] == x);
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
+  TEST_P(MPITest, CSUM_x){
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      double x = 0;
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+
+      NodePtr type0 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+      NodePtr N0 = oa::ops::new_node(TYPE_CSUM, NA, type0);
+      ArrayPtr RA0 = oa::ops::eval(N0);
+
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      ArrayPtr result = oa::funcs::to_rank0(RA0);
+      if(rank == 0){
+        arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        for(int i = m; i >= 0; i--){
+          if(i-1 >= 0 && i <= m-1){
+            C.subcube( i-1, 0, 0, i-1, n-1, p-1 ) += C.subcube( i, 0, 0, i, n-1, p-1 );
+          }
+        }
+        EXPECT_TRUE(oa::funcs::is_equal(result, C));
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
+  TEST_P(MPITest, CSUM_y){
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      double x = 0;
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+
+      NodePtr type0 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+      NodePtr N0 = oa::ops::new_node(TYPE_CSUM, NA, type0);
+      ArrayPtr RA0 = oa::ops::eval(N0);
+
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      ArrayPtr result = oa::funcs::to_rank0(RA0);
+      if(rank == 0){
+        arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        for(int i = n; i >= 0; i--){
+          if(i-1 >= 0 && i <= n-1){
+            C.subcube( 0, i-1, 0, m-1, i-1, p-1 ) += C.subcube( 0, i, 0, m-1, i, p-1 );
+          }
+        }
+        EXPECT_TRUE(oa::funcs::is_equal(result, C));
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
+  TEST_P(MPITest, CSUM_z){
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      double x = 0;
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+
+      NodePtr type0 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+      NodePtr N0 = oa::ops::new_node(TYPE_CSUM, NA, type0);
+      ArrayPtr RA0 = oa::ops::eval(N0);
+
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      ArrayPtr result = oa::funcs::to_rank0(RA0);
+      if(rank == 0){
+        arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        for(int i = p; i >= 0; i--){
+          if(i-1 >= 0 && i <= p-1){
+            C.subcube( 0, 0, i-1, m-1, n-1, i-1 ) += C.subcube( 0, 0, i, m-1, n-1, i );
+          }
+        }
+        EXPECT_TRUE(oa::funcs::is_equal(result, C));
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
+  TEST_P(MPITest, SUM_x){
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      double x = 0;
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+
+      NodePtr type0 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+      NodePtr N0 = oa::ops::new_node(TYPE_SUM, NA, type0);
+      ArrayPtr RA0 = oa::ops::eval(N0);
+
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      ArrayPtr result = oa::funcs::to_rank0(RA0);
+      if(rank == 0){
+        arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        for(int i = m; i >= 0; i--){
+          if(i-1 >= 0 && i <= m-1){
+            C.subcube( 0, 0, 0, 0, n-1, p-1 ) += C.subcube( i, 0, 0, i, n-1, p-1 );
+          }
+        }
+        arma::Cube<${t}$> Cr = C.subcube( 0, 0, 0, 0, n-1, p-1 );
+        EXPECT_TRUE(oa::funcs::is_equal(result, Cr));
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
+  TEST_P(MPITest, SUM_y){
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      double x = 0;
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+
+      NodePtr type0 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+      NodePtr N0 = oa::ops::new_node(TYPE_SUM, NA, type0);
+      ArrayPtr RA0 = oa::ops::eval(N0);
+
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      ArrayPtr result = oa::funcs::to_rank0(RA0);
+      if(rank == 0){
+        arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        for(int i = n; i >= 0; i--){
+          if(i-1 >= 0 && i <= n-1){
+            C.subcube( 0, 0, 0, m-1, 0, p-1 ) += C.subcube( 0, i, 0, m-1, i, p-1 );
+          }
+        }
+        arma::Cube<${t}$> Cr = C.subcube( 0, 0, 0, m-1, 0, p-1 );
+        EXPECT_TRUE(oa::funcs::is_equal(result, Cr));
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
+  TEST_P(MPITest, SUM_z){
+    ///:for t in dtypes
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
+
+      double x = 0;
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NA = oa::ops::new_node(A);
+
+      NodePtr type0 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+      NodePtr N0 = oa::ops::new_node(TYPE_SUM, NA, type0);
+      ArrayPtr RA0 = oa::ops::eval(N0);
+
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      ArrayPtr result = oa::funcs::to_rank0(RA0);
+      if(rank == 0){
+        arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        for(int i = p; i >= 0; i--){
+          if(i-1 >= 0 && i <= p-1){
+            C.subcube( 0, 0, 0, m-1, n-1, 0 ) += C.subcube( 0, 0, i, m-1, n-1, i );
+          }
+        }
+        arma::Cube<${t}$> Cr = C.subcube( 0, 0, 0, m-1, n-1, 0 );
+        EXPECT_TRUE(oa::funcs::is_equal(result, Cr));
+      }
+
+      MPI_Barrier(comm);
+    }
+    ///:endfor
+  }
+
+
   INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
-                          gt::Combine(gt::Values(MPI_COMM_WORLD),
-                                      MRange, NRange, PRange));
-  
+      gt::Combine(gt::Values(MPI_COMM_WORLD),
+        MRange, NRange, PRange));
+
 }

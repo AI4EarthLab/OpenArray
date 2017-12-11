@@ -468,7 +468,7 @@ namespace oa {
       int cnt = 0;
       int dcnt = 0;
       if(type == 2) 
-        for(int i = 0; i < (ye-ys-2*sw)*(ze-zs-2*sw); i++)
+        for(int i = 0; i < (ye-ys-2*sw)*(xe-xs-2*sw); i++)
           buffer[i] = 0;
 
       int index = 0;
