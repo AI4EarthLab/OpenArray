@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   //test_fusion_operator();
   //test_op();
   //test_fusion_op();
-  test_rand();
+  //test_rand();
 
   MPI_Finalize();
   return 0;

@@ -652,7 +652,7 @@ namespace{
       ArrayPtr rank0A = oa::funcs::to_rank0(A);
       //if(rank == 0)result->display("result");
       if(rank == 0){
-       rank0A->display("rand");
+       //rank0A->display("rand");
        ;
       }
 
