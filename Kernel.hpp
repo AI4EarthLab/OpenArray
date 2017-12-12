@@ -355,12 +355,12 @@ namespace oa {
       int buffersize = (ye-ys-2*sw)*(ze-zs-2*sw);
       T * buffer = new T[buffersize];
 
-      for(int i = sp[0]-1; i >= 0; i--)
+      for(int i = 0; i < sp[0]; i++)
       {
         int type;  //type:   top 2  mid 1  bottom 0
-        if(i == sp[0]-1) 
+        if(i == 0) 
           type = 2;
-        else if(i == 0) 
+        else if(i == sp[0] - 1) 
           type = 0;
         else
           type = 1;
@@ -369,8 +369,8 @@ namespace oa {
           for(int k = 0; k < sp[2]; k++){
             int sendid = upar->get_procs_rank(i, j, k);
             int receid = -1;
-            if(i != 0)
-              receid = upar->get_procs_rank(i-1, j, k);
+            if(i+1 < sp[0])
+              receid = upar->get_procs_rank(i+1, j, k);
             if(rankID == sendid){
               oa::internal::buffer_csum_x_const(
                   (T*) ap->get_buffer(),
@@ -382,7 +382,7 @@ namespace oa {
                   type
                   );
 
-              if(i != 0)
+              if(i+1 < sp[0])
                 MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
             }
             if(rankID == receid)
@@ -420,12 +420,12 @@ namespace oa {
       int buffersize = (xe-xs-2*sw)*(ze-zs-2*sw);
       T * buffer = new T[buffersize];
 
-      for(int j = sp[1]-1; j >= 0; j--)
+      for(int j = 0; j < sp[1]; j++)
       {
         int type;  //type:   top 2  mid 1  bottom 0
-        if(j == sp[1]-1) 
+        if(j == 0) 
           type = 2;
-        else if(j == 0) 
+        else if(j == sp[1]-1) 
           type = 0;
         else
           type = 1;
@@ -434,8 +434,8 @@ namespace oa {
           for(int k = 0; k < sp[2]; k++){
             int sendid = upar->get_procs_rank(i, j, k);
             int receid = -1;
-            if(j != 0)
-              receid = upar->get_procs_rank(i, j-1, k);
+            if(j + 1 < sp[1])
+              receid = upar->get_procs_rank(i, j+1, k);
             if(rankID == sendid){
               oa::internal::buffer_csum_y_const(
                   (T*) ap->get_buffer(),
@@ -447,7 +447,7 @@ namespace oa {
                   type
                   );
 
-              if(j != 0)
+              if(j + 1 < sp[1])
                 MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
             }
             if(rankID == receid)
@@ -486,12 +486,12 @@ namespace oa {
       int buffersize = (xe-xs-2*sw)*(ye-ys-2*sw);
       T * buffer = new T[buffersize];
 
-      for(int k = sp[2]-1; k >= 0; k--)
+      for(int k = 0; k < sp[2]; k++)
       {
         int type;  //type:   top 2  mid 1  bottom 0
-        if(k == sp[2]-1) 
+        if(k == 0) 
           type = 2;
-        else if(k == 0) 
+        else if(k == sp[2]-1) 
           type = 0;
         else
           type = 1;
@@ -500,8 +500,8 @@ namespace oa {
           for(int j = 0; j < sp[1]; j++){
             int sendid = upar->get_procs_rank(i, j, k);
             int receid = -1;
-            if(k != 0)
-              receid = upar->get_procs_rank(i, j, k-1);
+            if(k + 1 < sp[2])
+              receid = upar->get_procs_rank(i, j, k + 1);
             if(rankID == sendid){
               oa::internal::buffer_csum_z_const(
                   (T*) ap->get_buffer(),
@@ -512,8 +512,7 @@ namespace oa {
                   buffer,
                   type
                   );
-
-              if(k != 0)
+              if(k + 1 < sp[2])
                 MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
             }
             if(rankID == receid)

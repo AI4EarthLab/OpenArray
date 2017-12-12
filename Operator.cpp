@@ -64,7 +64,7 @@ namespace oa {
       }
       
       // u & v must in the same grid pos
-      assert(u->get_pos() == v->get_pos());
+      //assert(u->get_pos() == v->get_pos());
       np->set_pos(u->get_pos());
       
       return np;

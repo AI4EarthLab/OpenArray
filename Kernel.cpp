@@ -389,9 +389,9 @@ namespace oa {
       u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze);
       Shape s = u->shape();
       
-      Box box_x(0, 0, 0, s[1]-1, 0, s[2]-1);
-      Box box_y(0, s[0]-1, 0, 0, 0, s[2]-1);
-      Box box_z(0, s[0]-1, 0, s[1]-1, 0, 0);
+      Box box_x(s[0]-1  , s[0]-1  , 0     , s[1]-1  , 0     , s[2]-1  );
+      Box box_y(0       , s[0]-1  , s[1]-1, s[1]-1  , 0     , s[2]-1  );
+      Box box_z(0       , s[0]-1  , 0     , s[1]-1  , s[2]-1, s[2]-1  );
       switch(type){
         case 0:
           return ap;

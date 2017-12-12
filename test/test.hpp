@@ -543,7 +543,7 @@ void test_csum() {
   ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
   NodePtr EA2 = oa::ops::new_node(eap2);
   EA2->display("EA2");
-  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
   NodePtr EC2 = oa::ops::new_node(TYPE_CSUM, EA2, C);
 
   ArrayPtr esans2 = oa::ops::eval(EC2);
@@ -882,5 +882,11 @@ void test_pseudo_3d() {
 
 
 }
+
+void test_rand() {
+  ArrayPtr ap = oa::funcs::rand(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+  ap->display("rand");
+}
+
 
 #endif

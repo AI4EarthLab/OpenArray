@@ -15,7 +15,7 @@ CXXFLAGS= -fPIC --std=c++0x -Werror=return-type -I${PNETCDF_INC} \
 LIBS = -lstdc++ -lpnetcdf \
 	-lboost_program_options -lboost_filesystem \
 	-lboost_system -ldl -llapack -lblas \
-	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} libjit.so
+	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST} libjit.so -lpthread
 
 
 OBJS	= Range.o Box.o Partition.o Array.o \
@@ -109,7 +109,7 @@ all:
 	@rm -rf main
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
-	@./pre.sh
+	@./test.sh
 	@cd build && make clean
 	@echo "Cleaning done."
 	@cd build && make main ${compile_thread} 2>/dev/null
@@ -134,10 +134,10 @@ testall:
 	@rm -rf main
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
-	@./pre.sh
-	@cd build && make clean 
+	@./test.sh
+	@cd build 
 	@echo "Cleaning done."
-	@cd build && make testall_main
+	@cd build && make testall_main ${compile_thread}
 	@cp build/testall_main ./
 	@mpirun -np 2 ./testall_main 
 
@@ -148,7 +148,7 @@ testfortran:
 	@rm -rf fortran_main
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
-	@./pre.sh
+	@./test.sh
 	@cd build && make clean 
 	@echo "Cleaning done."
 	@cd build && make fortran_main

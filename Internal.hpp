@@ -432,7 +432,7 @@ namespace oa {
                 (ys + sw <= j && j < ye - sw) &&
                 (zs + sw <= k && k < ze - sw)) {
               int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
-              if((i == xe - sw -1) && (type == 1 || type == 0))
+              if((i == xs + sw) && (type == 1 || type == 0))
                 ap[temp1] = buffer[index++];
               else 
                 ap[temp1] = 0;
@@ -440,21 +440,21 @@ namespace oa {
           }
         }
       }
+
       index = 0;
       for (int k = zs; k < ze; k++) {
         for (int j = ys; j < ye; j++) {
-          int find = 0;
-          for (int i = xe-1; i >= xs; i--) {
+          for (int i = xs; i < xe; i++) {
             if ((xs + sw <= i && i < xe - sw) &&
                 (ys + sw <= j && j < ye - sw) &&
                 (zs + sw <= k && k < ze - sw)) {
               int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
-              int temp2 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs-1);
+              int temp2 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs+1);
               ap[temp1]+=A[temp1];
-              if(i > xs + sw){
+              if(i < xe - sw - 1){
                 ap[temp2] += ap[temp1];
               }
-              if((i == xs + sw) && (type == 1 || type == 2))
+              if((i == xe - sw - 1) && (type == 1 || type == 2))
                 buffer[index++] = ap[temp1];
             }
           }
@@ -488,7 +488,7 @@ namespace oa {
                 (ys + sw <= j && j < ye - sw) &&
                 (zs + sw <= k && k < ze - sw)) {
               int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
-              if((j == ye - sw -1) && (type == 1 || type == 0))
+              if((j == ys + sw) && (type == 1 || type == 0))
                 ap[temp1] = buffer[index++];
               else 
                 ap[temp1] = 0;
@@ -499,18 +499,17 @@ namespace oa {
       index = 0;
       for (int k = zs; k < ze; k++) {
         for (int i = xs; i < xe; i++) {
-          int find = 0;
-          for (int j = ye-1; j >= ys; j--) {
+          for (int j = ys; j < ye; j++) {
             if ((xs + sw <= i && i < xe - sw) &&
                 (ys + sw <= j && j < ye - sw) &&
                 (zs + sw <= k && k < ze - sw)) {
               int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
-              int temp2 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-1-ys)+(i-xs);
+              int temp2 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j+1-ys)+(i-xs);
               ap[temp1]+=A[temp1];
-              if(j > ys + sw){
+              if(j < ye - sw -1){
                 ap[temp2] += ap[temp1];
               }
-              if((j == ys + sw) && (type == 1 || type == 2))
+              if((j == ye - sw -1) && (type == 1 || type == 2))
                 buffer[index++] = ap[temp1];
             }
           }
@@ -532,7 +531,7 @@ namespace oa {
       int cnt = 0;
       int dcnt = 0;
       if(type == 2) 
-        for(int i = 0; i < (ye-ys-2*sw)*(ze-zs-2*sw); i++)
+        for(int i = 0; i < (ye-ys-2*sw)*(xe-xs-2*sw); i++)
           buffer[i] = 0;
 
       int index = 0;
@@ -543,7 +542,7 @@ namespace oa {
                 (ys + sw <= j && j < ye - sw) &&
                 (zs + sw <= k && k < ze - sw)) {
               int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
-              if((k == ze - sw -1) && (type == 1 || type == 0))
+              if((k == zs + sw) && (type == 1 || type == 0))
                 ap[temp1] = buffer[index++];
               else 
                 ap[temp1] = 0;
@@ -554,18 +553,17 @@ namespace oa {
       index = 0;
       for (int j = ys; j < ye; j++) {
         for (int i = xs; i < xe; i++) {
-          int find = 0;
-          for (int k = ze-1; k >= zs; k--) {
+          for (int k = zs; k < ze; k++) {
             if ((xs + sw <= i && i < xe - sw) &&
                 (ys + sw <= j && j < ye - sw) &&
                 (zs + sw <= k && k < ze - sw)) {
               int temp1 = (xe-xs)*(ye-ys)*(k-zs)+(xe-xs)*(j-ys)+(i-xs);
-              int temp2 = (xe-xs)*(ye-ys)*(k-1-zs)+(xe-xs)*(j-ys)+(i-xs);
+              int temp2 = (xe-xs)*(ye-ys)*(k+1-zs)+(xe-xs)*(j-ys)+(i-xs);
               ap[temp1]+=A[temp1];
-              if(k > zs + sw){
+              if(k < ze - sw - 1){
                 ap[temp2] += ap[temp1];
               }
-              if((k == zs + sw) && (type == 1 || type == 2))
+              if((k == ze - sw - 1) && (type == 1 || type == 2))
                 buffer[index++] = ap[temp1];
             }
           }
