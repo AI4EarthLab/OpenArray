@@ -173,7 +173,7 @@ namespace oa {
     }
 
     // set sub(A) = B
-    void set(ArrayPtr& A, const Box& A_box, ArrayPtr& B);
+    void set(ArrayPtr& A, const Box& A_box, const ArrayPtr& B);
 
     // set sub(A) = sub(B)
     void set(ArrayPtr& A, const Box& box_a, 
@@ -181,7 +181,7 @@ namespace oa {
 
     // set sub(A) = const
     template<typename T>
-    void set(ArrayPtr& A, const Box& A_box, T val) {
+    void set_with_const(ArrayPtr& A, const Box& A_box, T val) {
       // sub(A)'s partition
       vector<int> rsx, rsy, rsz;
       PartitionPtr pp = A->get_partition();

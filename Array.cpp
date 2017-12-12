@@ -135,7 +135,7 @@ void Array::display(const char *prefix) {
   }
 
   if (my_rank == 0){
-    printf("%s\n", prefix);
+    printf("\n%s\n", prefix);
     std::cout<<"\tdata type = "
              << oa::utils::get_type_string(m_data_type)
              << std::endl;
@@ -145,8 +145,8 @@ void Array::display(const char *prefix) {
     MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
     oa::utils::print_data((void*)global_buf, gs, m_data_type);
     delete(global_buf);
+    printf("\n");
   }
-
 }
 
 // set local box in each process

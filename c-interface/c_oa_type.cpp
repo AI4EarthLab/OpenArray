@@ -4,8 +4,14 @@
 
 extern "C" {
 
-  void array_assign_array(void* &A, void* &B, int & pa, int & pb) {
-    destroy_array(A);
+  void c_array_assign_array(void*& A, void*& B, int & pa, int & pb) {
+    c_destroy_array(A);
+
+    // printf("A=%p\n", A);
+    // printf("B=%p\n", B);
+    
+    if(B == NULL) return;
+    
     if (pb == R) {
       A = B;
       B = NULL;
@@ -14,6 +20,7 @@ extern "C" {
       ArrayPtr ap = ArrayPool::global()->get(
         (*(ArrayPtr*) B)->get_partition(), dt
       );
+
       switch(dt) {
         case DATA_INT:
           oa::internal::copy_buffer(
@@ -44,29 +51,50 @@ extern "C" {
     pa = L;
   }
 
-  void node_assign_node(void* &A, void* &B) {
-    destroy_node(A);
+  void c_node_assign_node(void* &A, void* &B) {
+    c_destroy_node(A);
     A = B;
   }
 
-  void destroy_array(void* A) {
+  void c_node_assign_array(void* &A, void* &B){
+    // ArrayPtr* p = (ArrayPtr*)A;
+    // *p = oa::ops::eval(*(NodePtr*)B);
+    // ArrayPtr p = oa::ops::eval(*(NodePtr*)B);
+    // p->display("P = ");
+    // printf("A = %p\n", A);
+    
+    c_destroy_array(A);
+    ArrayPtr* p = new ArrayPtr();
+    //printf("node_type = %d", (*(NodePtr*)B)->type());
+    *p = oa::ops::eval(*(NodePtr*)B);
+    A = p;
+  }
+  
+  void c_destroy_array(void*& A) {
     //cout<<"destroy_array called"<<endl;
-    if (A != NULL) delete((ArrayPtr*) A);
+    if (A != NULL) {
+      delete((ArrayPtr*) A);
+      A = NULL;
+    }
   }
 
-  void destroy_node(void* A) {
-    if (A != NULL) delete((NodePtr*) A);
+  void c_destroy_node(void*& A) {
+    if (A != NULL) {
+      delete((NodePtr*) A);
+      A = NULL;
+    }
   }
 
-  void display_array(void* A) {
-    (*(ArrayPtr*) A)->display();
+  void c_display_array(void* A, void* prefix) {
+    //printf("prefix = %s\n", (char*)prefix);
+    (*(ArrayPtr*) A)->display((char*)prefix);
   }
 
-  void display_node(void* A) {
-    (*(NodePtr*) A)->display();
+  void c_display_node(void* A, void* prefix) {
+    (*(NodePtr*) A)->display((char*) prefix);
   }
 
-  void ones(void* & ptr, int m, int n, int k, int stencil_width, 
+  void c_ones(void* & ptr, int m, int n, int k, int stencil_width, 
     int data_type, MPI_Fint fcomm) {
     MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
@@ -75,11 +103,11 @@ extern "C" {
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
 
-    if (ptr != NULL) destroy_array(ptr);
+    if (ptr != NULL) c_destroy_array(ptr);
     ptr = (void*) A;
   }
 
-  void zeros(void* & ptr, int m, int n, int k, int stencil_width, 
+  void c_zeros(void* & ptr, int m, int n, int k, int stencil_width, 
     int data_type, MPI_Fint fcomm) {
     MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
@@ -88,11 +116,11 @@ extern "C" {
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
 
-    if (ptr != NULL) destroy_array(ptr);
+    if (ptr != NULL) c_destroy_array(ptr);
     ptr = (void*) A;
   }
 
-  void rands(void* & ptr, int m, int n, int k, int stencil_width, 
+  void c_rands(void* & ptr, int m, int n, int k, int stencil_width, 
     int data_type, MPI_Fint fcomm) {
     MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
@@ -101,11 +129,11 @@ extern "C" {
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
 
-    if (ptr != NULL) destroy_array(ptr);
+    if (ptr != NULL) c_destroy_array(ptr);
     ptr = (void*) A;
   }
 
-  void seqs(void* & ptr, int m, int n, int k, int stencil_width, 
+  void c_seqs(void* & ptr, int m, int n, int k, int stencil_width, 
     int data_type, MPI_Fint fcomm) {
     MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
@@ -114,7 +142,7 @@ extern "C" {
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
 
-    if (ptr != NULL) destroy_array(ptr);
+    if (ptr != NULL) c_destroy_array(ptr);
     ptr = (void*) A;
   }
 
@@ -125,7 +153,7 @@ extern "C" {
   ///:endmute
 
   ///:for t in TYPE
-  void consts_${t[0]}$(void* &ptr, int m, int n, int k, ${t[0]}$ val, 
+  void c_consts_${t[0]}$(void* &ptr, int m, int n, int k, ${t[0]}$ val, 
     int stencil_width, MPI_Fint fcomm) {
     MPI_Comm comm = MPI_Comm_f2c(fcomm);
     Shape s = {m, n, k};
@@ -133,51 +161,58 @@ extern "C" {
     ArrayPtr* A = new ArrayPtr();
     *A = ap;
 
-    if (ptr != NULL) destroy_array(ptr);
+    if (ptr != NULL) c_destroy_array(ptr);
     ptr = (void*) A;
   }
 
   ///:endfor
 
   ///:for t in TYPE
-  void new_seqs_scalar_node_${t[0]}$(void* &ptr, ${t[0]}$ val, 
+  void c_new_seqs_scalar_node_${t[0]}$(void* &ptr, ${t[0]}$ val, 
     MPI_Fint fcomm) {
     MPI_Comm comm = MPI_Comm_f2c(fcomm);
     NodePtr np = oa::ops::new_seqs_scalar_node(comm, val);
     NodePtr* A = new NodePtr();
     *A = np;
 
-    if (ptr != NULL) destroy_array(ptr);
+    if (ptr != NULL) c_destroy_array(ptr);
     ptr = (void*) A;
   }
     
   ///:endfor
 
-  void new_node_array(void* &ptr, void* &ap) {
+  void c_new_node_array(void* &ptr, void* &ap) {
     NodePtr np = oa::ops::new_node(*(ArrayPtr*)ap);
     NodePtr* A = new NodePtr();
     *A = np;
 
-    if (ptr != NULL) destroy_node(ptr);
+    if (ptr != NULL) c_destroy_node(ptr);
     ptr = (void*) A;
   }
 
-  void new_node_op2(void* &ptr, int nodetype, void* &u, void* &v) {
+  void c_new_node_op2(void* &ptr, int nodetype, void* &u, void* &v) {
     NodePtr np = oa::ops::new_node((NodeType)nodetype, *(NodePtr*)u, *(NodePtr*)v);
     NodePtr* A = new NodePtr();
     *A = np;
 
-    if (ptr != NULL) destroy_node(ptr);
+    if (ptr != NULL) c_destroy_node(ptr);
     ptr = (void*) A;
   }
 
-  void new_node_op1(void* &ptr, int nodetype, void* &u) {
+  void c_new_node_op1(void* &ptr, int nodetype, void* &u) {
     NodePtr np = oa::ops::new_node((NodeType)nodetype, *(NodePtr*)u);
     NodePtr* A = new NodePtr();
     *A = np;
 
-    if (ptr != NULL) destroy_node(ptr);
+    if (ptr != NULL) c_destroy_node(ptr);
     ptr = (void*) A;
   }
+
+  void c_new_local_int3(NodePtr* &B, int* val){
+    NodePtr *p = new NodePtr();
+    *p = NodePool::global()->get_local_1d<int, 3>(val);
+    B = p;
+  }
+
 }
 

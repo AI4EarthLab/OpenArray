@@ -14,6 +14,8 @@ extern "C"{
   void show_all();
 }
 
+using namespace std;
+
 namespace oa {
   namespace internal {
 
@@ -127,6 +129,7 @@ namespace oa {
     template<typename T>
     void set_buffer_rand(T *buffer, int size) {
       arma::Col<T> v = oa::utils::make_vec(size, buffer);
+      arma::arma_rng::set_seed_random();
       v.randu();
     }
 
@@ -190,22 +193,50 @@ namespace oa {
     ///:set sy = k[2]
     // A = B ${sy}$ val
     template<typename T1, typename T2, typename T3>
-    void buffer_${name}$_const(T1 *A, T2 *B, T3 val, int size) {
-      for (int i = 0; i < size; i++) {
-        A[i] = B[i] ${sy}$ val;
-      }
+    void buffer_${name}$_const(T1 *A, T2 *B, T3 val, const Shape& s,
+                               int sw) {
+
+      const int M = s[0];
+      const int N = s[1];
+      const int P = s[2];
+
+      for (int k = sw; k < P-sw; k++) 
+        for (int j = sw; j < N-sw; j++)      
+          for (int i = sw; i < M-sw; i++) {
+            const int index = i + j * M + k * M * N;
+            A[index] = (T1)B[index] ${sy}$ (T1)val;
+          }
+
+      // for (int i = 0; i < size; i++) {
+      //   A[i] = B[i] ${sy}$ val;
+      // }
     }
 
     template<typename T1, typename T2, typename T3>
-    void const_${name}$_buffer(T1 *A, T2 val, T3 *B, int size) {
-      for (int i = 0; i < size; i++) {
-        A[i] = val ${sy}$ B[i];
-      }
+    void const_${name}$_buffer(T1 *A, T2 val, T3 *B, const Shape& s,
+                               int sw) {
+
+      const int M = s[0];
+      const int N = s[1];
+      const int P = s[2];
+
+      for (int k = sw; k < P-sw; k++) 
+        for (int j = sw; j < N-sw; j++)      
+          for (int i = sw; i < M-sw; i++) {
+            const int index = i + j * M + k * M * N;
+            A[index] = (T1)val ${sy}$ (T1)B[index];
+          }
+
+      // for (int i = 0; i < size; i++) {
+      //   A[i] = val ${sy}$ B[i];
+      // }
     }
 
     // A = U ${sy}$ V
     template<typename T1, typename T2, typename T3>
-    void buffer_${name}$_buffer(T1 *A, T2 *U, T3 *V, int size) {
+    void buffer_${name}$_buffer(T1 *A, T2 *U, T3 *V,
+                                const Shape& s,
+                                int sw) {
 
       // arma::Col<T1> CA = oa::utils::make_vec<T1>(size, A);
       // arma::Col<T2> CU = oa::utils::make_vec<T2>(size, U);
@@ -220,11 +251,21 @@ namespace oa {
       //std::cout<<CA(arma::span(1, 10))<<std::endl;
       
       //tic("kernel");
-      
-#pragma omp parallel for
-      for (int i = 0; i < size; i++) {
-        A[i] = U[i] ${sy}$ V[i];
+      const int M = s[0];
+      const int N = s[1];
+      const int P = s[2];
+
+      for (int k = sw; k < P-sw; k++) 
+        for (int j = sw; j < N-sw; j++)      
+          for (int i = sw; i < M-sw; i++) {
+            const int index = i + j * M + k * M * N;
+            A[index] = (T1)U[index] ${sy}$ (T1)V[index];
       }
+
+      // #pragma omp parallel for
+      //       for (int i = 0; i < size; i++) {
+      //         A[i] = (T1)U[i] ${sy}$ (T1)V[i];
+      //       }
       //toc("kernel");
     }
 

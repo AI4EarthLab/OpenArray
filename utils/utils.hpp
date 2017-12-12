@@ -40,16 +40,19 @@ namespace oa {
         std::is_same<T, double>::value) {
         T max = *std::max_element(buf, buf+buf_size, abs_compare);
 
-        int factor = (int)log10(std::abs(max));
+        if(std::abs(max) > 0.1){
 
-        if (factor > 2) {
-          std::cout<< " * 1E"<<factor<<std::endl;
-          val  = val / pow(10, factor);
-        }
+          int factor = (int)log10(std::abs(max));
 
-        if (factor <= -3) {
-          std::cout<< " * 1E"<<factor-1<<std::endl;
-          val  = val / pow(10, factor-1);
+          if (factor > 2) {
+            std::cout<< " * 1E"<<factor<<std::endl;
+            val  = val / pow(10, factor);
+          }
+
+          if (factor <= -3) {
+            std::cout<< " * 1E"<<factor-1<<std::endl;
+            val  = val / pow(10, factor-1);
+          }
         }
 
         //std::cout<<"min = "<< max << std::endl;

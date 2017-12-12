@@ -144,7 +144,9 @@ namespace oa {
           (T1 *) ap->get_buffer(),
           scalar,
           (T3 *) v->get_buffer(),
-          ap->buffer_size()
+          //ap->buffer_size()
+          ap->buffer_shape(),
+          ap->get_partition()->get_stencil_width()
         );
       } else if (v->is_seqs_scalar()) {
         ap = ArrayPool::global()->get(u->get_partition(), dt);
@@ -153,7 +155,9 @@ namespace oa {
           (T1 *) ap->get_buffer(),
           (T2 *) u->get_buffer(),
           scalar,
-          ap->buffer_size()
+          //ap->buffer_size()
+          ap->buffer_shape(),
+          ap->get_partition()->get_stencil_width()
         );
       } else {
         PartitionPtr upar = u->get_partition();
@@ -169,7 +173,9 @@ namespace oa {
             (T1 *) ap->get_buffer(),
             (T2 *) u->get_buffer(),
             (T3 *) v->get_buffer(),
-            ap->buffer_size()
+            //ap->buffer_size()
+            ap->buffer_shape(),
+            ap->get_partition()->get_stencil_width()
           );
         } else {
           ArrayPtr tmp = oa::funcs::transfer(v, upar);
@@ -177,7 +183,9 @@ namespace oa {
             (T1 *) ap->get_buffer(),
             (T2 *) u->get_buffer(),
             (T3 *) tmp->get_buffer(),
-            ap->buffer_size()
+            //ap->buffer_size()
+            ap->buffer_shape(),
+            ap->get_partition()->get_stencil_width()
           );
         }
       }

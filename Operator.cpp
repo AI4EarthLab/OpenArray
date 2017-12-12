@@ -218,7 +218,7 @@ namespace oa {
         ///:set ef = i[7]
         ///:set rt = i[8]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'csum' or name == 'sum' or name == 'not')
+        ///:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'csum' or name == 'sum' or name == 'not' or name == 'rep')
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$, ${rt}$};
         ///:else
         s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL, ${rt}$};
