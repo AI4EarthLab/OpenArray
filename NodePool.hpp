@@ -43,6 +43,20 @@ public:
     p->set_shape(ap->shape());
     return p;
   }
+
+  template<class T, int size>
+  NodePtr get_local_1d(T* val) {
+    NodePtr p = NodePool::global()->get();
+    ArrayPtr ap = oa::funcs::consts(MPI_COMM_SELF, {size,1,1}, 0, DATA_INT);
+    oa::internal::copy_buffer((T*)ap->get_buffer(), val, size);
+    p->clear_input();
+    p->set_type(TYPE_DATA);
+    p->set_data(ap);
+    p->set_seqs();
+    p->set_data_type(ap->get_data_type());
+    p->set_shape(ap->shape());
+    return p;
+  }
   
   // throw the object into object pool 
   void dispose(Node* n) {

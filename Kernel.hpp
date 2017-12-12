@@ -74,7 +74,9 @@ namespace oa {
             (T1 *) ap->get_buffer(),
             scalar,
             (T3 *) v->get_buffer(),
-            ap->buffer_size()
+            //ap->buffer_size()
+            ap->buffer_shape(),
+            ap->get_partition()->get_stencil_width()
           );
         } else if (v->is_seqs_scalar()) {
           // (2) v is a scalar
@@ -84,23 +86,27 @@ namespace oa {
             (T1 *) ap->get_buffer(),
             (T2 *) u->get_buffer(),
             scalar,
-            ap->buffer_size()
+            //ap->buffer_size()
+            ap->buffer_shape(),
+            ap->get_partition()->get_stencil_width()
           );
         } else {
           PartitionPtr upar = u->get_partition();
           PartitionPtr vpar = v->get_partition();
           assert(upar->get_comm() == vpar->get_comm());
 
-  /*        // U and V must have same shape
+/*          // U and V must have same shape
           assert(oa::utils::is_equal_shape(upar->shape(), vpar->shape()));
-  */
+*/
           ap = ArrayPool::global()->get(upar, dt);
           if (upar->equal(vpar)) {
             oa::internal::buffer_${name}$_buffer(
               (T1 *) ap->get_buffer(),
               (T2 *) u->get_buffer(),
               (T3 *) v->get_buffer(),
-              ap->buffer_size()
+              //ap->buffer_size()
+              ap->buffer_shape(),
+              ap->get_partition()->get_stencil_width()
             );
           } else {
             ArrayPtr tmp = oa::funcs::transfer(v, upar);
@@ -108,7 +114,9 @@ namespace oa {
               (T1 *) ap->get_buffer(),
               (T2 *) u->get_buffer(),
               (T3 *) tmp->get_buffer(),
-              ap->buffer_size()
+              //ap->buffer_size()
+              ap->buffer_shape(),
+              ap->get_partition()->get_stencil_width()
             );
           }
         }
