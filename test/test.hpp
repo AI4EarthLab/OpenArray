@@ -366,11 +366,6 @@ void test_c_interface() {
 
   ArrayPtr ans = oa::ops::eval(*(NodePtr*)I);
   ans->display();*/
-  void* A = NULL;
-  ones(A, 4, 4, 1, 1);
-  (*(ArrayPtr*)A)->display();
-  destroy_array(A);
-  cout<<"after "<<A<<endl;
 }
 
 void test_logic_operator() {
