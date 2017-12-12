@@ -93,5 +93,21 @@ namespace oa {
       }
       return "unknow";
     }
+
+    int get_shape_dimension(Shape S) {
+      int d = 0;
+      for (int i = 0; i < 3; i++) {
+        if (S[i] > 1) d++;
+      }
+      return d;
+    }
+
+    bool check_legal_shape_calc(Shape u, Shape v) {
+      for (int i = 0; i < 3; i++) {
+        if (u[i] != v[i] && u[i] != 1 && v[i] != 1) return false;
+      }
+      return true;
+    }
+
   }
 }

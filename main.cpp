@@ -53,7 +53,8 @@ int main(int argc, char** argv) {
   //test_set_g2l();
   //test_fusion_operator();
   //test_op();
-  test_fusion_op();
+  //test_fusion_op();
+  test_pseudo_3d();
 
   MPI_Finalize();
   return 0;

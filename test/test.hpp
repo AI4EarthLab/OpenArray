@@ -11,6 +11,7 @@
 #include "../IO.hpp"
 #include "../c-interface/c_oa_type.hpp"
 #include "../op_define.hpp"
+#include "../Grid.hpp"
 
 #include <assert.h>
 
@@ -790,6 +791,8 @@ void test_op() {
 }
 
 void test_fusion_op() {
+  Grid::global()->init_grid('C', NULL, NULL, NULL);
+
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   ArrayPtr ap3 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
@@ -801,7 +804,6 @@ void test_fusion_op() {
   ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   ArrayPtr ap10 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   
-
   NodePtr w = oa::ops::new_node(ap1);
   NodePtr q2 = oa::ops::new_node(ap2);
   NodePtr dt_3d = oa::ops::new_node(ap3);
@@ -848,6 +850,7 @@ void test_fusion_op() {
   NodePtr a32 = oa::ops::new_node(TYPE_DYF, a31);
   NodePtr a33 = PLUS(a18, a32);
   
+  
   oa::ops::write_graph(a33);  
   
   oa::ops::gen_kernels(a33);
@@ -857,6 +860,26 @@ void test_fusion_op() {
   // q2f= DZB(AZF(w*q2)) + DXF(AXB(q2)* AXB(dt_3d)* AZB(u)  & 
   //    -AZB( AXB(aam))*AXB(h_3d)*DXB( q2b )* dum_3d)+DYF(AYB(q2)* AYB(dt_3d)* AZB(v) & 
   //    -AZB( AYB(aam))*AYB(h_3d)*DYB( q2b )* dvm_3d))
+
+}
+
+void test_pseudo_3d() {
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap2 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  
+  ap2->set_pseudo(true);
+  
+  ap1->display("3d");
+  ap2->display("pseudo_3d");
+
+  NodePtr a1 = NODE(ap1);
+  NodePtr a2 = NODE(ap2);
+  NodePtr a3 = PLUS(a1, a2);
+
+  ArrayPtr ans = EVAL(a3);
+
+  ans->display("ans");
+
 
 }
 

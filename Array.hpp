@@ -30,6 +30,9 @@ class Array {
   size_t m_hash;
   int pos = 0;
   GridPtr grid;
+  bool m_is_pseudo = false;
+
+
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
   ~Array();
@@ -57,6 +60,8 @@ class Array {
   size_t get_hash() const;
   void set_pos(int p);
   int get_pos();
+  void set_pseudo(bool ps);
+  bool is_pseudo();
 };
 
 

@@ -157,6 +157,10 @@ namespace oa {
 
     //convert a given datatype to a string
     std::string get_type_string(DataType t);
+
+    int get_shape_dimension(Shape S);
+
+    bool check_legal_shape_calc(Shape u, Shape v);
   }  
 }
 

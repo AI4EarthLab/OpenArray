@@ -231,6 +231,14 @@ void Array::set_pos(int p) {
   pos = p;
 }
 
-int Arrayget_pos() {
+int Array::get_pos() {
   return pos;
+}
+
+void Array::set_pseudo(bool ps) {
+  m_is_pseudo = ps;
+}
+
+bool Array::is_pseudo() {
+  return m_is_pseudo;
 }

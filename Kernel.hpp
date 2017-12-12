@@ -41,50 +41,79 @@ namespace oa {
       int v_dt = v->get_data_type();
       int dt = oa::utils::cast_data_type(u_dt, v_dt);
 
-      if (u->is_seqs_scalar()) {
-        ap = ArrayPool::global()->get(v->get_partition(), dt);
-        T2 scalar = *(T2*) u->get_buffer();
-        oa::internal::const_${name}$_buffer(
-          (T1 *) ap->get_buffer(),
-          scalar,
-          (T3 *) v->get_buffer(),
-          ap->buffer_size()
-        );
-      } else if (v->is_seqs_scalar()) {
-        ap = ArrayPool::global()->get(u->get_partition(), dt);
-        T3 scalar = *(T3*) v->get_buffer();
-        oa::internal::buffer_${name}$_const(
-          (T1 *) ap->get_buffer(),
-          (T2 *) u->get_buffer(),
-          scalar,
-          ap->buffer_size()
-        );
-      } else {
-        PartitionPtr upar = u->get_partition();
-        PartitionPtr vpar = v->get_partition();
-        assert(upar->get_comm() == vpar->get_comm());
+      // support pseudo array calculation
+      if (u->is_pseudo() || v->is_pseudo()) {
+        int su = oa::utils::get_shape_dimension(u->local_shape());
+        int sv = oa::utils::get_shape_dimension(v->local_shape());
 
-/*        // U and V must have same shape
-        assert(oa::utils::is_equal_shape(upar->shape(), vpar->shape()));
-*/
-        ap = ArrayPool::global()->get(upar, dt);
-        if (upar->equal(vpar)) {
-          oa::internal::buffer_${name}$_buffer(
+        PartitionPtr pp;
+        if (su > sv) pp = u->get_partition();
+        else pp = v->get_partition(); 
+        
+        ap = ArrayPool::global()->get(pp, dt);
+
+        oa::internal::pseudo_buffer_${name}$_buffer(
+          (T1*) ap->get_buffer(),
+          (T2*) u->get_buffer(),
+          (T3*) v->get_buffer(),
+          ap->get_local_box(),
+          u->get_local_box(),
+          v->get_local_box(),
+          ap->buffer_shape(),
+          u->buffer_shape(),
+          v->buffer_shape(),
+          pp->get_stencil_width()
+        );
+
+      } else {
+        if (u->is_seqs_scalar()) {
+          // (1) u is a scalar
+          ap = ArrayPool::global()->get(v->get_partition(), dt);
+          T2 scalar = *(T2*) u->get_buffer();
+          oa::internal::const_${name}$_buffer(
             (T1 *) ap->get_buffer(),
-            (T2 *) u->get_buffer(),
+            scalar,
             (T3 *) v->get_buffer(),
             ap->buffer_size()
           );
-        } else {
-          ArrayPtr tmp = oa::funcs::transfer(v, upar);
-          oa::internal::buffer_${name}$_buffer(
+        } else if (v->is_seqs_scalar()) {
+          // (2) v is a scalar
+          ap = ArrayPool::global()->get(u->get_partition(), dt);
+          T3 scalar = *(T3*) v->get_buffer();
+          oa::internal::buffer_${name}$_const(
             (T1 *) ap->get_buffer(),
             (T2 *) u->get_buffer(),
-            (T3 *) tmp->get_buffer(),
+            scalar,
             ap->buffer_size()
           );
+        } else {
+          PartitionPtr upar = u->get_partition();
+          PartitionPtr vpar = v->get_partition();
+          assert(upar->get_comm() == vpar->get_comm());
+
+  /*        // U and V must have same shape
+          assert(oa::utils::is_equal_shape(upar->shape(), vpar->shape()));
+  */
+          ap = ArrayPool::global()->get(upar, dt);
+          if (upar->equal(vpar)) {
+            oa::internal::buffer_${name}$_buffer(
+              (T1 *) ap->get_buffer(),
+              (T2 *) u->get_buffer(),
+              (T3 *) v->get_buffer(),
+              ap->buffer_size()
+            );
+          } else {
+            ArrayPtr tmp = oa::funcs::transfer(v, upar);
+            oa::internal::buffer_${name}$_buffer(
+              (T1 *) ap->get_buffer(),
+              (T2 *) u->get_buffer(),
+              (T3 *) tmp->get_buffer(),
+              ap->buffer_size()
+            );
+          }
         }
       }
+
       return ap;
     }
 

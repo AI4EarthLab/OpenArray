@@ -5,9 +5,9 @@
 
 void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
 
-  NodePtr ndx = oa::ops::new_node(dx);
-  NodePtr ndy = oa::ops::new_node(dy);
-  NodePtr ndz = oa::ops::new_node(dz);
+  // NodePtr ndx = oa::ops::new_node(dx);
+  // NodePtr ndy = oa::ops::new_node(dy);
+  // NodePtr ndz = oa::ops::new_node(dz);
 
   switch(type){
   case 'C':
@@ -43,9 +43,9 @@ void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
     // y_d[7] = dy;
     // z_d[7] = EVAL(AZB(ndz));
 
-    // x_map.resize(8);
-    // y_map.resize(8);
-    // z_map.resize(8);
+    x_map.resize(8);
+    y_map.resize(8);
+    z_map.resize(8);
 
     x_map[0] = 1;  y_map[0] = 2;  z_map[0] = 4;
     x_map[1] = 0;  y_map[1] = 3;  z_map[1] = 5;
