@@ -411,9 +411,9 @@ namespace{
       ArrayPtr result = oa::funcs::to_rank0(RA0);
       if(rank == 0){
         arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
-        for(int i = m; i >= 0; i--){
+        for(int i = 0; i <= m; i++){
           if(i-1 >= 0 && i <= m-1){
-            C.subcube( i-1, 0, 0, i-1, n-1, p-1 ) += C.subcube( i, 0, 0, i, n-1, p-1 );
+            C.subcube( i, 0, 0, i, n-1, p-1 ) += C.subcube( i-1, 0, 0, i-1, n-1, p-1 );
           }
         }
         EXPECT_TRUE(oa::funcs::is_equal(result, C));
@@ -443,9 +443,9 @@ namespace{
       ArrayPtr result = oa::funcs::to_rank0(RA0);
       if(rank == 0){
         arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
-        for(int i = n; i >= 0; i--){
+        for(int i = 0; i <= n ; i++){
           if(i-1 >= 0 && i <= n-1){
-            C.subcube( 0, i-1, 0, m-1, i-1, p-1 ) += C.subcube( 0, i, 0, m-1, i, p-1 );
+            C.subcube( 0, i, 0, m-1, i, p-1 ) += C.subcube( 0, i-1, 0, m-1, i-1, p-1 );
           }
         }
         EXPECT_TRUE(oa::funcs::is_equal(result, C));
@@ -475,9 +475,9 @@ namespace{
       ArrayPtr result = oa::funcs::to_rank0(RA0);
       if(rank == 0){
         arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
-        for(int i = p; i >= 0; i--){
+        for(int i = 0; i <=p; i++){
           if(i-1 >= 0 && i <= p-1){
-            C.subcube( 0, 0, i-1, m-1, n-1, i-1 ) += C.subcube( 0, 0, i, m-1, n-1, i );
+            C.subcube( 0, 0, i, m-1, n-1, i ) += C.subcube( 0, 0, i-1, m-1, n-1, i-1 );
           }
         }
         EXPECT_TRUE(oa::funcs::is_equal(result, C));
