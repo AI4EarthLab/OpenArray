@@ -65,8 +65,11 @@ namespace oa {
       
       // u & v must in the same grid pos
       //assert(u->get_pos() == v->get_pos());
-      np->set_pos(u->get_pos());
-      
+      if(u->get_pos() != -1)
+        np->set_pos(u->get_pos());
+      else if(v->get_pos() != -1)
+        np->set_pos(v->get_pos());
+     
       return np;
     }
 
@@ -150,26 +153,9 @@ namespace oa {
           }
         }
 
-        switch (type) {
-            case TYPE_AXB:
-            case TYPE_DXB:
-            case TYPE_AXF:
-            case TYPE_DXF:
-              np->set_pos( Grid::global()->get_pos_x(u->get_pos()) );
-              break;
-            case TYPE_AYB:
-            case TYPE_DYB:
-            case TYPE_AYF:
-            case TYPE_DYF:
-              np->set_pos( Grid::global()->get_pos_y(u->get_pos()) );
-              break;
-            case TYPE_AZB:
-            case TYPE_DZB:
-            case TYPE_AZF:
-            case TYPE_DZF:
-              np->set_pos( Grid::global()->get_pos_z(u->get_pos()) );
-              break;
-          }
+        if(u->get_pos() != -1){
+          np->set_pos(Grid::global()->get_pos(u->get_pos(), type));
+        }
 
       } else {
         // to do set data_type && shape

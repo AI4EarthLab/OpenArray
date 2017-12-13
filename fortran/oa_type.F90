@@ -268,15 +268,12 @@
       type(node)  :: B
       type(node) :: NA
 
-      NA%ptr = C_NULL_PTR
-      
       ///:if t == 'array'
       call c_new_node_array(NA%ptr, A%ptr)
-      call c_new_node_op1(B%ptr, ${i[0]}$, NA%ptr)
+      call c_new_node_op1(B%ptr, ${n[0]}$, NA%ptr)
       ///:else
-      call c_new_node_op1(B%ptr, ${i[0]}$, A%ptr)
+      call c_new_node_op1(B%ptr, ${n[0]}$, A%ptr)
       ///:endif
-      print*, "HHHHHHHHHHHHHHHHHHHHHHHHHHHH"
       !!B%ptr = C_NULL_PTR
     end function
     ///:endfor

@@ -727,61 +727,61 @@ void test_fusion_operator() {
 */}
 
 void test_op() {
-  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  ap->display("A");
-  ap->get_partition()->set_stencil_type(STENCIL_BOX);
-  oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 2);
+  // ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ap->display("A");
+  // ap->get_partition()->set_stencil_type(STENCIL_BOX);
+  // oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 2);
   
-  NodePtr A = oa::ops::new_node(ap);
-  NodePtr B;
-  ArrayPtr ans;
-  B = oa::ops::new_node(TYPE_AXF, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("AXF");
+  // NodePtr A = oa::ops::new_node(ap);
+  // NodePtr B;
+  // ArrayPtr ans;
+  // B = oa::ops::new_node(TYPE_AXF, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("AXF");
 
-  B = oa::ops::new_node(TYPE_AXB, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("AXB");
+  // B = oa::ops::new_node(TYPE_AXB, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("AXB");
   
-  B = oa::ops::new_node(TYPE_AYF, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("AYF");
+  // B = oa::ops::new_node(TYPE_AYF, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("AYF");
 
-  B = oa::ops::new_node(TYPE_AYB, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("AYB");
+  // B = oa::ops::new_node(TYPE_AYB, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("AYB");
   
-  B = oa::ops::new_node(TYPE_AZF, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("AZF");
+  // B = oa::ops::new_node(TYPE_AZF, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("AZF");
   
-  B = oa::ops::new_node(TYPE_AZB, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("AZB");
+  // B = oa::ops::new_node(TYPE_AZB, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("AZB");
   
-  B = oa::ops::new_node(TYPE_DXF, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("DXF");
+  // B = oa::ops::new_node(TYPE_DXF, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("DXF");
   
-  B = oa::ops::new_node(TYPE_DXB, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("DXB");
+  // B = oa::ops::new_node(TYPE_DXB, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("DXB");
   
-  B = oa::ops::new_node(TYPE_DYF, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("DYF");
+  // B = oa::ops::new_node(TYPE_DYF, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("DYF");
   
-  B = oa::ops::new_node(TYPE_DYB, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("DYB");
+  // B = oa::ops::new_node(TYPE_DYB, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("DYB");
   
-  B = oa::ops::new_node(TYPE_DZF, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("DZF");
+  // B = oa::ops::new_node(TYPE_DZF, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("DZF");
   
-  B = oa::ops::new_node(TYPE_DZB, A);
-  ans = oa::ops::force_eval(B);
-  ans->display("DZB");
+  // B = oa::ops::new_node(TYPE_DZB, A);
+  // ans = oa::ops::force_eval(B);
+  // ans->display("DZB");
   
 }
 

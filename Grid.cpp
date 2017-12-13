@@ -2,12 +2,14 @@
 #include "Grid.hpp"
 #include "op_define.hpp"
 #include <boost/throw_exception.hpp>
+#include "common.hpp"
 
 void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
 
-  // NodePtr ndx = oa::ops::new_node(dx);
-  // NodePtr ndy = oa::ops::new_node(dy);
-  // NodePtr ndz = oa::ops::new_node(dz);
+  
+  NodePtr ndx = oa::ops::new_node(dx);
+  NodePtr ndy = oa::ops::new_node(dy);
+  NodePtr ndz = oa::ops::new_node(dz);
 
   switch(type){
   case 'C':
@@ -64,27 +66,52 @@ void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
 }
 
 ArrayPtr Grid::get_grid_dx(int pos){
-  return x_d[pos];
+  return x_d.at(pos);
 }
 
 ArrayPtr Grid::get_grid_dy(int pos){
-  return y_d[pos];
+  return y_d.at(pos);
 }
 
 ArrayPtr Grid::get_grid_dz(int pos){
-  return z_d[pos];
+  return z_d.at(pos);
+}
+
+int Grid::get_pos(int pos, NodeType t){
+  switch (t) {
+  case TYPE_AXB:
+  case TYPE_DXB:
+  case TYPE_AXF:
+  case TYPE_DXF:
+    return Grid::global()->get_pos_x(pos);
+    break;
+  case TYPE_AYB:
+  case TYPE_DYB:
+  case TYPE_AYF:
+  case TYPE_DYF:
+    return Grid::global()->get_pos_y(pos);
+    break;
+  case TYPE_AZB:
+  case TYPE_DZB:
+  case TYPE_AZF:
+  case TYPE_DZF:
+    return Grid::global()->get_pos_z(pos);
+    break;
+  default:
+    return pos;
+  }
 }
 
 int Grid::get_pos_x(int pos) {
-  return x_map[pos];
+  return x_map.at(pos);
 }
 
 int Grid::get_pos_y(int pos) {
-  return y_map[pos];
+  return y_map.at(pos);
 }
 
 int Grid::get_pos_z(int pos) {
-  return z_map[pos];
+  return z_map.at(pos);
 }
 
 Grid* Grid::global() {

@@ -272,7 +272,7 @@ contains
     implicit none
     type(array) :: A, B, C
 
-    A = seqs(8, 7, 6) + 1
+    A = seqs(6, 6, 66) + 1
     call display(A, "A = ")
 
     ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'AZB', 'AZF', &
@@ -281,6 +281,8 @@ contains
     B = ${o}$(A)
     call display(B, "${o}$(A)")
     ///:endfor
+
+    !call grid_init('C', dx, dy, dz)
   end subroutine
   
   subroutine test_set()
