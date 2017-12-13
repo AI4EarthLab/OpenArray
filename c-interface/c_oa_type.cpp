@@ -57,37 +57,53 @@ extern "C" {
   }
 
   void c_node_assign_array(void* &A, void* &B){
-    // ArrayPtr* p = (ArrayPtr*)A;
-    // *p = oa::ops::eval(*(NodePtr*)B);
-    // ArrayPtr p = oa::ops::eval(*(NodePtr*)B);
-    // p->display("P = ");
-    // printf("A = %p\n", A);
+    c_destroy_array(A);    
+
+    if(B == NULL) return;
     
-    c_destroy_array(A);
     ArrayPtr* p = new ArrayPtr();
-    //printf("node_type = %d", (*(NodePtr*)B)->type());
-    *p = oa::ops::eval(*(NodePtr*)B);
+
+    try{
+      *p = oa::ops::eval(*(NodePtr*)B);      
+    }catch(const std::exception& e){
+      std::cout<<"Execetion caught while executing eval function. "
+        "Message: "<<e.what()<<std::endl;
+      exit(0);
+    }
+
     A = p;
   }
   
   void c_destroy_array(void*& A) {
     //cout<<"destroy_array called"<<endl;
-    if (A != NULL) {
-      delete((ArrayPtr*) A);
-      A = NULL;
+    try{
+      if (A != NULL) {
+        delete((ArrayPtr*) A);
+        A = NULL;
+      }      
+    }catch(const std::exception& e){
+      std::cout<<"Exception occured whilg destroying array. Message: "
+               <<e.what()<<std::endl;
     }
   }
 
   void c_destroy_node(void*& A) {
-    if (A != NULL) {
-      delete((NodePtr*) A);
-      A = NULL;
+    try{
+      if (A != NULL) {
+        delete((NodePtr*)A);
+        A = NULL;
+      }      
+    }catch(const std::exception& e){
+      std::cout<<"Exception occured whilg destroying node. Message: "
+               <<e.what()<<std::endl;
     }
   }
 
   void c_display_array(void* A, void* prefix) {
     //printf("prefix = %s\n", (char*)prefix);
-    (*(ArrayPtr*) A)->display((char*)prefix);
+    if(A != NULL){
+      (*(ArrayPtr*) A)->display((char*)prefix);      
+    }
   }
 
   void c_display_node(void* A, void* prefix) {
@@ -208,11 +224,11 @@ extern "C" {
     ptr = (void*) A;
   }
 
-  void c_new_local_int3(NodePtr* &B, int* val){
-    NodePtr *p = new NodePtr();
-    *p = NodePool::global()->get_local_1d<int, 3>(val);
-    B = p;
-  }
+void c_new_local_int3(NodePtr* &B, int* val){
+  NodePtr *p = new NodePtr();
+  *p = NodePool::global()->get_local_1d<int, 3>(val);
+  B = p;
+}
 
 }
 

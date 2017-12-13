@@ -17,31 +17,36 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-Wl,-rpath=${JIT_LIB}
 
 
-FC = mpif90
+FC = mpif90 -O1
 CC = mpicc  
 CXX = mpicxx
 
-FCFLAGS  =
-CXXFLAGS = -fPIC --std=c++0x -Werror=return-type
-CFLAGS   = -Werror=return-type
+FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans
+
+CXXFLAGS = -fPIC --std=c++0x -Werror=return-type \
+		-fno-trapping-math -fno-signaling-nans
+
+CFLAGS   = -Werror=return-type -fno-trapping-math \
+		-fno-signaling-nans
 
 LIBS =  -lstdc++ ${EXT_LIB} ${EXT_LIB_LINK} 
 
 OBJS = Range.o Box.o Partition.o Array.o \
        Internal.o Function.o Kernel.o Operator.o \
-       Node.o IO.o Grid.o
+       Node.o IO.o Grid.o Init.o
 
 OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
 			utils.o)
 
 OBJS_C_INTERFACE = $(addprefix ./c-interface/, \
 			c_oa_partition.o \
-			c_oa_type.o c_oa_utils.o)
+			c_oa_type.o c_oa_utils.o c_oa_sub.o)
 
 OBJ_FORTRAN = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} \
 		$(addprefix ./fortran/, \
-		oa_partition.o \
-		oa_type.o oa_utils.o oa_test.o fortran_main.o)
+		oa_partition.o oa_type.o oa_ops.o \
+		oa_utils.o oa_sub.o oa_sum.o oa_rep.o oa_mod.o \
+		oa_test.o oa_main.o)
 
 OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} main.o
 
@@ -67,7 +72,27 @@ debug:
 	$(CXX) ${EXT_INCLUDE} -c $(CFLAGS) $< -o $@
 
 %.o: %.F90
-	$(FC) -c $< -o $@
+	$(FC) ${FCFLAGS} -c $< -o $@
+
+%.d: %.cpp
+	@set -e; rm -f $@; $(CXX) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+%.d: %.c
+	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+
+%.d: %.F90 
+	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>err; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+##===##-include $(OBJS:.o=.d) 
+##===##-include $(OBJ_FORTRAN:.o=.d) 
+##===##-include $(OBJS_UTILS:.o=.d) 
 
 all:
 	@rm -rf main
@@ -114,12 +139,13 @@ testfortran:
 	@./pre.sh
 	@cd build && make clean 
 	@echo "Cleaning done."
-	@cd build && make fortran_main -j8 -f ${MAKEFILE}
+	@cd build &&sed -i "s/##===##//g" makefile.linux && make fortran_main  -f ${MAKEFILE} -j8
 	@cp build/fortran_main ./
 	@mpirun -n 4 ./fortran_main
 
 fortran_main : ${OBJ_FORTRAN}
-	-${CXX} -o fortran_main ${OBJ_FORTRAN} ${EXT_LIB_LINK}
+	-${CXX} -o fortran_main ${OBJ_FORTRAN} \
+	${EXT_LIB_LINK} ${LIBS} -lgfortran
 
 small:
 	@make all -j8 -f ${MAKEFILE}
@@ -127,5 +153,3 @@ small:
 
 clean:
 	@rm -rf *.o 2>/dev/null
-
-include ./dependency.inc

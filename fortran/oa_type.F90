@@ -74,6 +74,14 @@
        end subroutine
     end interface
 
+    ///:for n in [i for i in L if i[3] == 'D']
+    interface ${n[2]}$    
+    ///:for t in ['node', 'array']
+       module procedure ${n[2]}$_${t}$
+    ///:endfor
+    end interface ${n[2]}$    
+    ///:endfor
+    
     integer, parameter :: OA_INT = 0
     integer, parameter :: OA_FLOAT = 1
     integer, parameter :: OA_DOUBLE = 2
@@ -250,5 +258,27 @@
 
       call c_new_local_int3(A%ptr, v)
     end function
-    
+
+
+    ///:for t in ['node', 'array']
+    ///:for n in [i for i in L if i[3] == 'D']
+    function ${n[2]}$_${t}$(A) result(B)
+      implicit none
+      type(${t}$) :: A
+      type(node)  :: B
+      type(node) :: NA
+
+      NA%ptr = C_NULL_PTR
+      
+      ///:if t == 'array'
+      call c_new_node_array(NA%ptr, A%ptr)
+      call c_new_node_op1(B%ptr, ${i[0]}$, NA%ptr)
+      ///:else
+      call c_new_node_op1(B%ptr, ${i[0]}$, A%ptr)
+      ///:endif
+      print*, "HHHHHHHHHHHHHHHHHHHHHHHHHHHH"
+      !!B%ptr = C_NULL_PTR
+    end function
+    ///:endfor
+    ///:endfor
   end module

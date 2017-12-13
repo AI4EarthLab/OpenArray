@@ -267,6 +267,21 @@ contains
     ///:endfor
     
   end subroutine test_sum
+
+  subroutine test_operator()
+    implicit none
+    type(array) :: A, B, C
+
+    A = seqs(8, 7, 6) + 1
+    call display(A, "A = ")
+
+    ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'AZB', 'AZF', &
+         'DXB', 'DXF', 'DYB', 'DYF', 'DZB', 'DZF']
+
+    B = ${o}$(A)
+    call display(B, "${o}$(A)")
+    ///:endfor
+  end subroutine
   
   subroutine test_set()
     

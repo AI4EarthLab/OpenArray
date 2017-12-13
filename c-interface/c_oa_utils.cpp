@@ -1,5 +1,5 @@
 #include "c_oa_utils.hpp"
-//#include "../Init.hpp"
+#include "../Init.hpp"
 #include <mpi.h>
 
 extern "C" {
@@ -9,10 +9,10 @@ extern "C" {
   }
 
   void c_init(){
-    //oa::init();
+    oa::init();
   }
 
   void c_finalize(){
-    //oa::finalize();
+    oa::finalize();
   }
 }
