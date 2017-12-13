@@ -259,6 +259,26 @@
       call c_new_local_int3(A%ptr, v)
     end function
 
+    subroutine grid_init(ch, A, B, C)
+      use iso_c_binding
+      character(len=1) :: ch
+      type(Array), intent(in) :: A, B, C
+
+      interface
+         subroutine c_grid_init(ch, A, B, C) &
+              bind(C, name = 'c_grid_init')
+           use iso_c_binding
+           character(len=1) :: ch
+           type(c_ptr), intent(in) :: A, B, C
+         end subroutine
+      end interface
+
+      call c_grid_init(ch, A%ptr, B%ptr, C%ptr)
+
+    end subroutine
+
+
+
 
     ///:for t in ['node', 'array']
     ///:for n in [i for i in L if i[3] == 'D']

@@ -271,6 +271,10 @@ contains
   subroutine test_operator()
     implicit none
     type(array) :: A, B, C
+    
+    character(len=1) :: ch
+    ch = 'C'
+    call grid_init(ch, A, B, C)
 
     A = seqs(8, 7, 6) + 1
     call display(A, "A = ")

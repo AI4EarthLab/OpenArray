@@ -230,5 +230,9 @@ void c_new_local_int3(NodePtr* &B, int* val){
   B = p;
 }
 
+  void c_grid_init (char *ch, void*& A, void*& B, void*& C){
+    //Grid::global()->init_grid(*ch, (ArrayPtr*)A, (ArrayPtr*)B, (ArrayPtr*)C);
+    Grid::global()->init_grid(*ch, NULL,NULL,NULL);
+  }
 }
 
