@@ -17,9 +17,9 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-Wl,-rpath=${JIT_LIB}
 
 
-FC = mpif90 -O0
-CC = mpicc  
-CXX = mpicxx
+FC = mpif90 -O0 -g
+CC = mpicc  -O0 -g
+CXX = mpicxx -O0 -g
 
 FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans
 
