@@ -13,9 +13,9 @@ fi
 cp makefile*  ${build_dir}/ 2>/dev/null
 cp dependency.inc ${build_dir}/ 2>/dev/null
 
-if [ ! -d "${build_dir}/libjit.so" ]; then 
-   cp libjit.so  ${build_dir}/libjit.so
-fi
+#if [ ! -d "${build_dir}/libjit.so" ]; then 
+#   cp libjit.so  ${build_dir}/libjit.so
+#fi
 
 for d in `find . -maxdepth 2 -type d`
 do

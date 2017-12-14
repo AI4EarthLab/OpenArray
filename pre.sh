@@ -4,13 +4,15 @@
 build_dir=`pwd`/build
 current_dir=`pwd`
 
+rm build -rf
+
 if [ ! -d "$build_dir" ]; then
     mkdir ${build_dir}
 fi
 
 cp makefile  ${build_dir}/makefile
 cp makefile.intel  ${build_dir}/makefile.intel
-cp libjit.so  ${build_dir}/libjit.so
+#cp libjit.so  ${build_dir}/libjit.so
 cp -rf makefile* ${build_dir}/
 
 for d in `find . -maxdepth 2 -type d`
@@ -57,9 +59,10 @@ do
         #echo $f | cut -d '\.\/' -f 2
     
     ./fypp  -p -m re -m string -m io -m os --create-parents \
-           $src_filename > $dst_filename
-    
+           $src_filename > $dst_filename & 
     echo " >>>processing file $src_filename" 
          
     done
 done
+wait
+echo "finished"

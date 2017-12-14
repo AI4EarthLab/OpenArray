@@ -613,9 +613,16 @@ void test_rep() {
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
   ap->display("======A======");
 
-  ArrayPtr repA = oa::funcs::rep(ap, 2, 2, 2);
+  NodePtr NN = oa::ops::new_node(ap);
+  ArrayPtr lap = oa::funcs::consts(MPI_COMM_SELF, {3, 1, 1}, 2, 0);
+  NodePtr NN2 = oa::ops::new_node(lap);
+
+
+  NodePtr NP = oa::ops::new_node(TYPE_REP, NN, NN2);
+  ArrayPtr repA = oa::ops::eval(NP);
   repA->display("======after_rep======");
-  ap->display("======A======");
+
+
 }
 
 void test_g2l(){

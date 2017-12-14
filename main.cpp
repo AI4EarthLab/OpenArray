@@ -42,11 +42,11 @@ int main(int argc, char** argv) {
   //test_gen_kernel_JIT();
   //test_min_max();
   //test_eval();
-  test_csum();
+  //test_csum();
   //test_sum();
   //test_sub();
   //test_set();
-  //test_rep();
+  test_rep();
   //test_l2g();
   //test_g2l();
   //test_set_l2g();
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   //test_fusion_operator();
   //test_op();
   //test_fusion_op();
-  test_pseudo_3d();
+  //test_pseudo_3d();
   //test_rand();
 
   MPI_Finalize();

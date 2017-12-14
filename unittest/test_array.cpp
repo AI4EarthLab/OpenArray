@@ -586,7 +586,7 @@ namespace{
     }
     ///:endfor
   }
-
+/*
   TEST_P(MPITest, REP){
     ///:for t in dtypes
     {
@@ -636,7 +636,7 @@ namespace{
     }
     ///:endfor
   }
-
+*/
   TEST_P(MPITest, RAND){
     ///:for t in dtypes
     {
