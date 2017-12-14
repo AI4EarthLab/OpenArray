@@ -21,7 +21,9 @@ namespace oa{
     ArrayPtr kernel_${name}$(vector<ArrayPtr> &ops_ap);
     ///:endfor
 
-
+    ArrayPtr kernel_pow(vector<ArrayPtr> &ops_ap);
+    ArrayPtr kernel_not(vector<ArrayPtr> &ops_ap);
+      
     // ap = u {+ - * /} v
     ///:for k in [i for i in L if i[3] == 'A']
     ///:set name = k[1]

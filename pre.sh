@@ -57,9 +57,10 @@ do
         #echo $f | cut -d '\.\/' -f 2
     
     ./fypp  -p -m re -m string -m io -m os --create-parents \
-           $src_filename > $dst_filename
-    
+           $src_filename > $dst_filename &
+
     echo " >>>processing file $src_filename" 
          
     done
 done
+wait

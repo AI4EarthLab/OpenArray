@@ -13,45 +13,6 @@
     use iso_c_binding
     use oa_type
 
-    ///:for t in types
-    ///:if t[2] == 'scalar'
-    ! interface
-    !   subroutine c_new_seqs_scalar_node_${t[0]}$(ptr, val, comm) &
-    !        bind(C, name = 'new_seqs_scalar_node_${t[0]}$')
-    !     use iso_c_binding
-    !     type(c_ptr), intent(inout) :: ptr
-    !     ${t[1]}$, intent(in), VALUE :: val
-    !     integer(c_int), intent(in), VALUE :: comm
-    !   end subroutine
-    ! end interface
-    ///:endif
-    ///:endfor
-
-    ! interface
-    !   subroutine c_new_node_array(A, B) bind(C, name='new_node_array')
-    !     type(c_ptr) :: A
-    !     type(c_ptr) :: B
-    !   end subroutine
-    ! end interface
-
-    ! interface
-    !   subroutine c_new_node_op2(A, nodetype, U, V) &
-    !       bind(C, name='new_node_op2')
-    !     type(c_ptr), intent(inout) :: A
-    !     type(c_ptr), intent(in) :: U, V 
-    !     integer(c_int), intent(in), VALUE :: nodetype
-    !   end subroutine
-    ! end interface
-
-    ! interface
-    !   subroutine c_new_node_op1(A, nodetype, U) &
-    !       bind(C, name='new_node_op1')
-    !     type(c_ptr), intent(inout) :: A
-    !     type(c_ptr), intent(in) :: U 
-    !     integer(c_int), intent(in), VALUE :: nodetype
-    !   end subroutine
-    ! end interface
-
     interface assignment(=)
        module procedure array_assign_array
        module procedure node_assign_node
@@ -110,7 +71,7 @@
        ///:endfor
     end interface ${b}$ 
     ///:endfor
-    
+
   contains
 
     ///:for e in [x for x in L if x[3] == 'A' or x[3] == 'B']
@@ -119,7 +80,19 @@
     ///:for type2 in types
     ///:if not (type1[2] == 'scalar' and type2[2] == 'scalar')
     function ops_${type1[0]}$_${op}$_${type2[0]}$(A, B) result(res)
-      implicit none       
+      implicit none
+
+      interface
+         subroutine c_new_node_${op}$(p1, nodetype, p2, p3) &
+              bind(C, name='c_new_node_${op}$')
+           use iso_c_binding
+           implicit none
+           type(c_ptr), intent(inout) :: p1
+           type(c_ptr), intent(in) :: p2, p3
+           integer(c_int), intent(in), VALUE :: nodetype
+         end subroutine
+      end interface
+
       ${type1[1]}$, intent(in) :: A
       ${type2[1]}$, intent(in) :: B
       ///:if type1[0] != 'node'
@@ -152,7 +125,7 @@
       ///:set BD = 'D'
       ///:endif
 
-      call c_new_node_op2(res%ptr, ${e[0]}$, ${AC}$%ptr, ${BD}$%ptr)
+      call c_new_node_${op}$(res%ptr, ${e[0]}$, ${AC}$%ptr, ${BD}$%ptr)
 
     end function
 
@@ -167,7 +140,18 @@
     ///:for type1 in types
     ///:if not (type1[2] == 'scalar')
     function ops_${op}$_${type1[2]}$(A) result(res)
-      implicit none       
+      implicit none
+
+      interface
+         subroutine c_new_node_${op}$(A, nodetype, U) &
+              bind(C, name='c_new_node_${op}$')
+           use iso_c_binding
+           type(c_ptr), intent(inout) :: A
+           type(c_ptr), intent(in) :: U 
+           integer(c_int), intent(in), VALUE :: nodetype
+         end subroutine
+      end interface
+
       ${type1[1]}$, intent(in) :: A
       type(node) :: res
       ///:if type1[0] != 'node'

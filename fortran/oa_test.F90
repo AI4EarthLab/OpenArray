@@ -272,13 +272,14 @@ contains
     implicit none
     type(array) :: A, B, C
 
-    A = seqs(6, 6, 66) + 1
+    A = rands(4,4,4) !seqs(4, 4, 4) + 1
     call display(A, "A = ")
 
     ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'AZB', 'AZF', &
          'DXB', 'DXF', 'DYB', 'DYF', 'DZB', 'DZF']
 
     B = ${o}$(A)
+    call display(A, "A = ")
     call display(B, "${o}$(A)")
     ///:endfor
 

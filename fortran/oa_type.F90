@@ -262,17 +262,30 @@
 
     ///:for t in ['node', 'array']
     ///:for n in [i for i in L if i[3] == 'D']
+    ///:set name = n[1]
     function ${n[2]}$_${t}$(A) result(B)
       implicit none
+
+      interface
+         subroutine c_new_node_${name}$(A, U) &
+              bind(C, name='c_new_node_${name}$')
+           use iso_c_binding
+           type(c_ptr), intent(inout) :: A
+           type(c_ptr), intent(in) :: U 
+         end subroutine
+      end interface
+
       type(${t}$) :: A
       type(node)  :: B
       type(node) :: NA
 
       ///:if t == 'array'
       call c_new_node_array(NA%ptr, A%ptr)
-      call c_new_node_op1(B%ptr, ${n[0]}$, NA%ptr)
+      !call c_new_node_op1(B%ptr, ${n[0]}$,NA%ptr)
+      
+      call c_new_node_${name}$(B%ptr, NA%ptr)
       ///:else
-      call c_new_node_op1(B%ptr, ${n[0]}$, A%ptr)
+      call c_new_node_${name}$(B%ptr, A%ptr)
       ///:endif
       !!B%ptr = C_NULL_PTR
     end function
