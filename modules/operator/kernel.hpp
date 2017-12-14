@@ -48,6 +48,15 @@ namespace oa {
       lbound = {0, 0, 1};
       ///:elif name[1:] == "zf"
       rbound = {0, 0, 1};
+      ///:elif name[1:] == 'xc'
+      lbound = {1, 0, 0};
+      rbound = {1, 0, 0};
+      ///:elif name[1:] == 'yc'
+      lbound = {0, 1, 0};
+      rbound = {0, 1, 0};
+      ///:elif name[1:] == 'zc'      
+      lbound = {0, 0, 1};
+      rbound = {0, 0, 1};
       ///:endif
 
       double* ans = (double*) ap->get_buffer();

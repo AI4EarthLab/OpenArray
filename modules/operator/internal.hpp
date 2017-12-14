@@ -37,6 +37,12 @@ namespace oa{
     ///:set func = '1.0 * (b[calc_id(i, j, k, S)] - b[calc_id(i, j, k - 1, S)]) / 1.0'
     ///:elif name == "dzf"
     ///:set func = '1.0 * (-b[calc_id(i, j, k, S)] + b[calc_id(i, j, k + 1, S)]) / 1.0'
+    ///:elif name == "dxc"
+    ///:set func = '1.0 * (-b[calc_id(i+1, j, k, S)] + b[calc_id(i-1, j, k, S)]) / 2.0'
+    ///:elif name == "dyc"
+    ///:set func = '1.0 * (-b[calc_id(i, j+1, k, S)] + b[calc_id(i, j-1, k, S)]) / 2.0'
+    ///:elif name == "dzc"
+    ///:set func = '1.0 * (-b[calc_id(i, j, k+1, S)] + b[calc_id(i, j, k-1, S)]) / 2.0'
     ///:endif
 
     // crate kernel_${name}$

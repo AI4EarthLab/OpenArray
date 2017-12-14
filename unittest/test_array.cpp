@@ -134,13 +134,13 @@ namespace{
     ///:for t in dtypes
     {
       ArrayPtr A1 = oa::funcs::to_rank0(oa::funcs::seqs(comm, {m, n, p}, 1,
-                                                        oa::utils::dtype<${t}$>::type));
+                      oa::utils::dtype<${t}$>::type));
       arma::Cube<${t}$> B1 = make_seqs<${t}$>(m, n, p);
 
       ArrayPtr A2 =
         oa::funcs::to_rank0(oa::funcs::consts<${t}$>(comm, {m, n, p},
-                                                     ${t}$(2),
-                                                     oa::utils::dtype<${t}$>::type));
+                        ${t}$(2),
+                        oa::utils::dtype<${t}$>::type));
       arma::Cube<${t}$> B2(m, n, p);
       B2.fill(${t}$(2));
 
@@ -162,8 +162,8 @@ namespace{
       
       NodePtr N1 = oa::ops::new_node(oa::funcs::seqs(comm, {m, n, p}, 0, dt1));
       NodePtr N2 = oa::ops::new_node(oa::funcs::consts(comm,
-                                                       {m, n, p},
-                                                       ${t2}$(2.0), 0));
+                      {m, n, p},
+                      ${t2}$(2.0), 0));
 
       
       typedef otype<${t1}$, ${t2}$>::value result_type;
@@ -204,9 +204,9 @@ namespace{
       DataType dt2  = oa::utils::dtype<${t2}$>::type;
       
       NodePtr N1 = oa::ops::new_node(oa::funcs::consts(comm, {m, n, p},
-                                                       ${t1}$(3.0), 0));
+                      ${t1}$(3.0), 0));
       NodePtr N2 = oa::ops::new_node(oa::funcs::consts(MPI_COMM_SELF,
-                                                       {1, 1, 1}, ${t2}$(2), 0));
+                      {1, 1, 1}, ${t2}$(2), 0));
 
       typedef otype<${t1}$, ${t2}$>::value result_type;
       arma::Cube<result_type> C3, C4;
@@ -307,9 +307,9 @@ namespace{
       ArrayPtr A1 = oa::funcs::to_rank0(A);
       Shape s = A1->buffer_shape();
       arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(s, A1->get_buffer())
-                       (arma::span(sw, s[0] - sw - 1),
-                        arma::span(sw, s[1] - sw - 1),
-                        arma::span(sw, s[2] - sw - 1));
+                                                       (arma::span(sw, s[0] - sw - 1),
+                                                               arma::span(sw, s[1] - sw - 1),
+                                                               arma::span(sw, s[2] - sw - 1));
       
 
       // ArrayPtr V2 = oa::ops::eval(NSA);
@@ -589,51 +589,57 @@ namespace{
 
   TEST_P(MPITest, REP){
     ///:for t in dtypes
-    // {
-    //   int sw = NO_STENCIL;
-    //   DataType dt = oa::utils::dtype<${t}$>::type;
+    {
+      int sw = NO_STENCIL;
+      DataType dt = oa::utils::dtype<${t}$>::type;
 
-    //   int x = 2;
-    //   int y = 3;
-    //   int z = 4;
+      int x = 2;
+      int y = 2;
+      int z = 2;
 
-    //   ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
-    //   ArrayPtr repA = oa::funcs::rep(A, x, y, z);
-
-    //   ArrayPtr rank0A = oa::funcs::to_rank0(A);
-    //   ArrayPtr result = oa::funcs::to_rank0(repA);
-    //   //if(rank == 0)result->display("result");
-    //   if(rank == 0){
-    //     arma::Cube<${t}$> C0 = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
-    //     arma::Cube<${t}$> Cr(m*x, n*y, p*z); 
-    //     Cr.zeros();
-    //     int ii,jj,kk;
-    //     //result->display("result");
-    //     //Cr.print("Cr");
-    //     ii = 0;
-    //     for(int i = 0; i < x; i++){
-    //       jj = 0;
-    //       for(int j = 0; j < y; j++){
-    //         kk = 0;
-    //         for(int k = 0; k < z; k++){
-    //           //cout<<ii<<","<<jj<<","<<kk<<endl;
-    //           Cr.subcube(0+ii,0+jj,0+kk,m-1+ii,n-1+jj,p-1+kk) = C0;
-    //           kk += p;
-    //         }
-    //         jj += n;
-    //       }
-    //       ii += m;
-    //     }
-    //     //Cr.print("Cr");
-    //     //result->display("result");
-    //     //        EXPECT_TRUE(oa::funcs::is_equal(rank0A, C));
-    //     EXPECT_TRUE(oa::funcs::is_equal(result, Cr));
-
-    //   }
+      ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
+      NodePtr NN = oa::ops::new_node(A);
+      ArrayPtr lap = oa::funcs::consts(MPI_COMM_SELF, {3, 1, 1}, 2, 0);
+      NodePtr NN2 = oa::ops::new_node(lap);
 
 
-    //   MPI_Barrier(comm);
-    // }
+      NodePtr NP = oa::ops::new_node(TYPE_REP, NN, NN2);
+      ArrayPtr repA = oa::ops::eval(NP);
+
+      ArrayPtr rank0A = oa::funcs::to_rank0(A);
+      ArrayPtr result = oa::funcs::to_rank0(repA);
+      //if(rank == 0)result->display("result");
+      if(rank == 0){
+        arma::Cube<${t}$> C0 = oa::utils::make_cube<${t}$>(rank0A->buffer_shape(), rank0A->get_buffer());
+        arma::Cube<${t}$> Cr(m*x, n*y, p*z); 
+        Cr.zeros();
+        int ii,jj,kk;
+        //result->display("result");
+        //Cr.print("Cr");
+        ii = 0;
+        for(int i = 0; i < x; i++){
+          jj = 0;
+          for(int j = 0; j < y; j++){
+            kk = 0;
+            for(int k = 0; k < z; k++){
+              //cout<<ii<<","<<jj<<","<<kk<<endl;
+              Cr.subcube(0+ii,0+jj,0+kk,m-1+ii,n-1+jj,p-1+kk) = C0;
+              kk += p;
+            }
+            jj += n;
+          }
+          ii += m;
+        }
+        //Cr.print("Cr");
+        //result->display("result");
+        //        EXPECT_TRUE(oa::funcs::is_equal(rank0A, C));
+        EXPECT_TRUE(oa::funcs::is_equal(result, Cr));
+
+      }
+
+
+      MPI_Barrier(comm);
+    }
     ///:endfor
   }
 
@@ -652,8 +658,8 @@ namespace{
       ArrayPtr rank0A = oa::funcs::to_rank0(A);
       //if(rank == 0)result->display("result");
       if(rank == 0){
-       //rank0A->display("rand");
-       ;
+        //rank0A->display("rand");
+        ;
       }
 
       MPI_Barrier(comm);
@@ -662,8 +668,8 @@ namespace{
   }
 
 
-    INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
-      gt::Combine(gt::Values(MPI_COMM_WORLD),
-        MRange, NRange, PRange));
+  INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
+          gt::Combine(gt::Values(MPI_COMM_WORLD),
+                  MRange, NRange, PRange));
 
 }

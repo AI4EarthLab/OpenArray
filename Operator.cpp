@@ -214,11 +214,16 @@ namespace oa {
         s[${type}$].expr = "${ef}$";
         
         
-        ///:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'not')
-        s[${type}$].func = ${kernel_name}$;
-        ///:else
+        ///!:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'not')
+        ///:if i[2] == ''
         s[${type}$].func = NULL;
+        ///:else
+        s[${type}$].func = ${kernel_name}$;
         ///:endif
+        
+        ///!:else
+        ///s[${type}$].func = NULL;
+        ///!:endif
         
         s[${type}$].rt = ${rt}$;
 
