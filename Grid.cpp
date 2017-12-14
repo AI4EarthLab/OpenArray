@@ -6,44 +6,49 @@
 
 void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
 
-  
   NodePtr ndx = oa::ops::new_node(dx);
   NodePtr ndy = oa::ops::new_node(dy);
   NodePtr ndz = oa::ops::new_node(dz);
 
   switch(type){
   case 'C':
-    // x_d[0] = EVAL(AYB(AXB(ndx)));
-    // y_d[0] = EVAL(AYB(AXB(ndy)));
-    // z_d[0] = dz;
+    x_d[0] = EVAL(AYB(AXB(ndx)));
+    y_d[0] = EVAL(AYB(AXB(ndy)));
+    z_d[0] = dz;
 
-    // x_d[1] = EVAL(AYB(ndx));
-    // y_d[1] = EVAL(AYB(ndy));
-    // z_d[1] = dz;
+    x_d[1] = EVAL(AYB(ndx));
+    y_d[1] = EVAL(AYB(ndy));
+    z_d[1] = dz;
 
-    // x_d[2] = EVAL(AXB(ndx));
-    // y_d[2] = EVAL(AXB(ndy));
-    // z_d[2] = dz;
+    x_d[2] = EVAL(AXB(ndx));
+    y_d[2] = EVAL(AXB(ndy));
+    z_d[2] = dz;
 
-    // x_d[3] = dx;
-    // y_d[3] = dy;
-    // z_d[3] = dz;
+    x_d[3] = dx;
+    y_d[3] = dy;
+    z_d[3] = dz;
 
-    // x_d[4] = EVAL(AYB(AXB(ndx)));
-    // y_d[4] = EVAL(AYB(AXB(ndy)));
-    // z_d[4] = EVAL(AZB(ndz));
+    x_d[4] = EVAL(AYB(AXB(ndx)));
+    y_d[4] = EVAL(AYB(AXB(ndy)));
+    z_d[4] = EVAL(AZB(ndz));
 
-    // x_d[5] = EVAL(AYB(ndx));
-    // y_d[5] = EVAL(AYB(ndy));
-    // z_d[5] = EVAL(AZB(ndz));
+    x_d[5] = EVAL(AYB(ndx));
+    y_d[5] = EVAL(AYB(ndy));
+    z_d[5] = EVAL(AZB(ndz));
 
-    // x_d[6] = EVAL(AXB(ndx));
-    // x_d[6] = EVAL(AXB(ndy));
-    // x_d[6] = EVAL(AZB(ndz));
+    x_d[6] = EVAL(AXB(ndx));
+    y_d[6] = EVAL(AXB(ndy));
+    z_d[6] = EVAL(AZB(ndz));
 
-    // x_d[7] = dx;
-    // y_d[7] = dy;
-    // z_d[7] = EVAL(AZB(ndz));
+    x_d[7] = dx;
+    y_d[7] = dy;
+    z_d[7] = EVAL(AZB(ndz));
+
+    // for (int i = 0; i < 8; i++) {
+    //   x_d[i]->display("x_d");
+    //   y_d[i]->display("y_d");
+    //   z_d[i]->display("z_d");
+    // }
 
     x_map.resize(8);
     y_map.resize(8);

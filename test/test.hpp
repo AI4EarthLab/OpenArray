@@ -31,7 +31,7 @@ void test_Range() {
   assert(B.size() == 2);
   assert(!A.equal(B));
     
-    // A [1, 1)
+  // A [1, 1)
   A.shift(1);
   cout<<"After shift by 1: "<<endl;
   A.display("A");
@@ -197,12 +197,12 @@ void test_operator() {
   NodePtr np2 = oa::ops::new_node(ap);
   np2->display("===B===");
   /*std::cout<<"int size: "<<dtype<int>::size<<std::endl;
-  std::cout<<"bool size: "<<dtype<bool>::size<<std::endl;
-  std::cout<<"double size: "<<dtype<double>::size<<std::endl;
+    std::cout<<"bool size: "<<dtype<bool>::size<<std::endl;
+    std::cout<<"double size: "<<dtype<double>::size<<std::endl;
 
-  std::cout<<"int type: "<<dtype<int>::type<<std::endl;
-  std::cout<<"bool type: "<<dtype<bool>::type<<std::endl;
-  std::cout<<"double type: "<<dtype<double>::type<<std::endl;
+    std::cout<<"int type: "<<dtype<int>::type<<std::endl;
+    std::cout<<"bool type: "<<dtype<bool>::type<<std::endl;
+    std::cout<<"double type: "<<dtype<double>::type<<std::endl;
   */
   //ap->get_data()->display("======A======");
 }
@@ -291,28 +291,28 @@ void test_force_eval() {
 
 void test_fusion_kernel() {
   /*ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
-  ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
-  ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
-  // ((A+B)-(C*D))/E
-  NodePtr A = oa::ops::new_node(ap1);
-  NodePtr B = oa::ops::new_node(ap2);
-  NodePtr C = oa::ops::new_node(ap3);
-  NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
-  NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
-  NodePtr F = oa::ops::new_node(TYPE_PLUS, A, B);
-  NodePtr G = oa::ops::new_node(TYPE_MULT, C, D);
-  NodePtr H = oa::ops::new_node(TYPE_MINUS, F, G);
-  NodePtr I = oa::ops::new_node(TYPE_DIVD, H, E);
+    ArrayPtr ap2 = oa::funcs::ones(MPI_COMM_WORLD, {4, 4, 1}, 1);
+    ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {4, 4, 1}, 3, 1);
+    // ((A+B)-(C*D))/E
+    NodePtr A = oa::ops::new_node(ap1);
+    NodePtr B = oa::ops::new_node(ap2);
+    NodePtr C = oa::ops::new_node(ap3);
+    NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
+    NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
+    NodePtr F = oa::ops::new_node(TYPE_PLUS, A, B);
+    NodePtr G = oa::ops::new_node(TYPE_MULT, C, D);
+    NodePtr H = oa::ops::new_node(TYPE_MINUS, F, G);
+    NodePtr I = oa::ops::new_node(TYPE_DIVD, H, E);
 
-  oa::ops::gen_kernels(I);
+    oa::ops::gen_kernels(I);
 
-  ArrayPtr ans = oa::ops::eval(I);
-  A->display("A");
-  B->display("B");
-  C->display("C");
-  D->display("D");
-  E->display("E");
-  ans->display("((A+B)-(C*D)) / E");*/
+    ArrayPtr ans = oa::ops::eval(I);
+    A->display("A");
+    B->display("B");
+    C->display("C");
+    D->display("D");
+    E->display("E");
+    ans->display("((A+B)-(C*D)) / E");*/
 
 
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
@@ -340,32 +340,32 @@ void test_fusion_kernel() {
 
   ArrayPtr ans = oa::ops::force_eval(K);
   ans->display("force_eval");
-/*  ArrayPtr ans = oa::ops::eval(I);
-  A->display("A");
-  B->display("B");
-  C->display("C");
-  D->display("D");
-  E->display("E");
-  ans->display("((A+B)-(C*D)) / E");*/
+  /*  ArrayPtr ans = oa::ops::eval(I);
+      A->display("A");
+      B->display("B");
+      C->display("C");
+      D->display("D");
+      E->display("E");
+      ans->display("((A+B)-(C*D)) / E");*/
 }
 
 void test_c_interface() {
-/*  void* ap1 = seqs(4,4,1,1);
-  void* ap2 = ones(4,4,1,1);
-  void* ap3 = consts_int(4,4,1,3,1);
+  /*  void* ap1 = seqs(4,4,1,1);
+      void* ap2 = ones(4,4,1,1);
+      void* ap3 = consts_int(4,4,1,3,1);
   
-  void* A = new_node_array(ap1);
-  void* B = new_node_array(ap2);
-  void* C = new_node_array(ap3);
-  void* D = new_seqs_scalar_node_int(1, MPI_COMM_SELF);
-  void* E = new_seqs_scalar_node_double(2.0, MPI_COMM_SELF);
-  void* F = new_node_op2(TYPE_PLUS, A, B);
-  void* G = new_node_op2(TYPE_MULT, C, D);
-  void* H = new_node_op2(TYPE_MINUS, F, G);
-  void* I = new_node_op2(TYPE_DIVD, H, E);
+      void* A = new_node_array(ap1);
+      void* B = new_node_array(ap2);
+      void* C = new_node_array(ap3);
+      void* D = new_seqs_scalar_node_int(1, MPI_COMM_SELF);
+      void* E = new_seqs_scalar_node_double(2.0, MPI_COMM_SELF);
+      void* F = new_node_op2(TYPE_PLUS, A, B);
+      void* G = new_node_op2(TYPE_MULT, C, D);
+      void* H = new_node_op2(TYPE_MINUS, F, G);
+      void* I = new_node_op2(TYPE_DIVD, H, E);
 
-  ArrayPtr ans = oa::ops::eval(*(NodePtr*)I);
-  ans->display();*/
+      ArrayPtr ans = oa::ops::eval(*(NodePtr*)I);
+      ans->display();*/
 }
 
 void test_logic_operator() {
@@ -610,12 +610,12 @@ void test_set() {
 }
 
 void test_rep() {
-  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
-  ap->display("======A======");
+  //ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
+  //ap->display("======A======");
 
-  ArrayPtr repA = oa::funcs::rep(ap, 2, 2, 2);
-  repA->display("======after_rep======");
-  ap->display("======A======");
+  //ArrayPtr repA = oa::funcs::rep(ap, 2, 2, 2);
+  //repA->display("======after_rep======");
+  //ap->display("======A======");
 }
 
 void test_g2l(){
@@ -684,25 +684,25 @@ void test_set_g2l() {
 }
 
 void test_fusion_operator() {
-/*
-  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  ap->display("A");
-  ap->get_partition()->set_stencil_type(STENCIL_BOX);
-  oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 2);
-  Shape S = ap->buffer_shape();
+  /*
+    ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+    ap->display("A");
+    ap->get_partition()->set_stencil_type(STENCIL_BOX);
+    oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 2);
+    Shape S = ap->buffer_shape();
   
-  ArrayPtr ans = oa::funcs::zeros(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  vector<MPI_Request> reqs;
+    ArrayPtr ans = oa::funcs::zeros(MPI_COMM_WORLD, {6, 6, 6}, 2);
+    vector<MPI_Request> reqs;
   
-  oa::funcs::update_ghost_start(ap, reqs, -1);
-  oa::funcs::calc_inside(ans, ap, {2, 1, 0}, {1, 2, 1});
-  oa::funcs::update_ghost_end(reqs);
-  oa::funcs::calc_outside(ans, ap, {2, 1, 0}, {1, 2, 1});
+    oa::funcs::update_ghost_start(ap, reqs, -1);
+    oa::funcs::calc_inside(ans, ap, {2, 1, 0}, {1, 2, 1});
+    oa::funcs::update_ghost_end(reqs);
+    oa::funcs::calc_outside(ans, ap, {2, 1, 0}, {1, 2, 1});
   
-  ans->display("ans = a[i-2,j-1,k]+a[i+1,j+2,k+1]");
+    ans->display("ans = a[i-2,j-1,k]+a[i+1,j+2,k+1]");
 
-  int rk = ap->rank();
-  if (rk == 0) {
+    int rk = ap->rank();
+    if (rk == 0) {
     ArrayPtr test = oa::funcs::seqs(MPI_COMM_SELF, {6, 6, 6}, 2);
     ArrayPtr test_ans = oa::funcs::zeros(MPI_COMM_SELF, {6, 6, 6}, 2);
     //test->display("test");
@@ -710,21 +710,21 @@ void test_fusion_operator() {
     oa::internal::set_ghost_consts((int*)test->get_buffer(), test->local_shape(), 0, 2);
     oa::funcs::calc_inside(test_ans, test, {0, 0, 0}, {0, 0, 0});
     test_ans->display("test_ans");
-  }
+    }
 
-*/
+  */
   /*int rk = ap->rank();
   
-  vector<MPI_Request> reqs;
-  oa::funcs::
-  oa::funcs::update_ghost_start(ap, reqs, -1);
-  oa::funcs::update_ghost_end(reqs);
+    vector<MPI_Request> reqs;
+    oa::funcs::
+    oa::funcs::update_ghost_start(ap, reqs, -1);
+    oa::funcs::update_ghost_end(reqs);
 
-  oa::utils::mpi_order_start(MPI_COMM_WORLD);
-  printf("=====%d======\n", rk);
-  oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
-  oa::utils::mpi_order_end(MPI_COMM_WORLD);
-*/}
+    oa::utils::mpi_order_start(MPI_COMM_WORLD);
+    printf("=====%d======\n", rk);
+    oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
+    oa::utils::mpi_order_end(MPI_COMM_WORLD);
+  */}
 
 void test_op() {
   // ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
@@ -786,18 +786,71 @@ void test_op() {
 }
 
 void test_fusion_op() {
-  Grid::global()->init_grid('C', NULL, NULL, NULL);
+  ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
+  ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  
+  dx->set_pseudo(true);
+  dy->set_pseudo(true);
+  dz->set_pseudo(true);
 
+  NodePtr n1 = NODE(dx);
+  NodePtr n2 = NODE(dy);
+  NodePtr n3 = NODE(dz);
+  NodePtr n4 = NODE(A);
+
+  NodePtr n5 = PLUS(n4, n1);
+  NodePtr n6 = PLUS(n4, n3);
+  NodePtr n7 = PLUS(n2, n3);
+
+  ArrayPtr ans1 = EVAL(n5);
+  ArrayPtr ans2 = EVAL(n6);
+  ArrayPtr ans3 = EVAL(n7);
+
+  //ans1->display("ans1");
+  //ans2->display("ans2");
+  //ans3->display("ans3");
+  
+  // Grid::global()->init_grid('C', NULL, NULL, NULL);
+  Grid::global()->init_grid('C', dx, dy, dz);
+
+  // for (int i = 0; i < 8; i++) {
+  //   ArrayPtr ans = Grid::global()->get_grid_dx(i);
+  //   ans->display(to_string(i).c_str());
+  // }
+  // for (int i = 0; i < 8; i++) {
+  //   ArrayPtr ans = Grid::global()->get_grid_dy(i);
+  //   ans->display(to_string(i).c_str());
+  // }
+  // for (int i = 0; i < 8; i++) {
+  //   ArrayPtr ans = Grid::global()->get_grid_dz(i);
+  //   ans->display(to_string(i).c_str());
+  // }
+  
+  // // 3d 
+  // ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap3 = oa::funcs::ones(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap6 = oa::funcs::ones(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap7 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap8 = oa::funcs::ones(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr ap10 = oa::funcs::ones(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  
+  // pseudo 3d
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  ArrayPtr ap3 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
   ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  ArrayPtr ap6 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap6 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
   ArrayPtr ap7 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  ArrayPtr ap8 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap8 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
   ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  ArrayPtr ap10 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  ArrayPtr ap10 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
   
   NodePtr w = oa::ops::new_node(ap1);
   NodePtr q2 = oa::ops::new_node(ap2);
@@ -846,11 +899,13 @@ void test_fusion_op() {
   NodePtr a33 = PLUS(a18, a32);
   
   
-  oa::ops::write_graph(a33);  
+  //oa::ops::write_graph(a33);  
   
-  oa::ops::gen_kernels(a33);
-  
-  
+  //oa::ops::gen_kernels(a33);
+
+  ArrayPtr gao = EVAL(a33);
+  gao->display("gao");
+
 
   // q2f= DZB(AZF(w*q2)) + DXF(AXB(q2)* AXB(dt_3d)* AZB(u)  & 
   //    -AZB( AXB(aam))*AXB(h_3d)*DXB( q2b )* dum_3d)+DYF(AYB(q2)* AYB(dt_3d)* AZB(v) & 

@@ -204,11 +204,25 @@ namespace oa {
         ///:set ef = i[7]
         ///:set rt = i[8]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'csum' or name == 'sum' or name == 'not' or name == 'rep')
-        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$, ${rt}$};
+        
+
+        s[${type}$].type = ${type}$;
+        s[${type}$].name = "${name}$";
+        s[${type}$].sy = "${sy}$";
+        s[${type}$].ew = ${ew}$;
+        s[${type}$].cl = ${cl}$;
+        s[${type}$].expr = "${ef}$";
+        
+        
+        ///:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'not')
+        s[${type}$].func = ${kernel_name}$;
         ///:else
-        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL, ${rt}$};
+        s[${type}$].func = NULL;
         ///:endif
+        
+        s[${type}$].rt = ${rt}$;
+
+
         ///:set id = id + 1
         ///:endfor
         has_init = true;

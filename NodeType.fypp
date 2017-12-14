@@ -78,6 +78,8 @@
 #!:set FUNCS = [name for name in os.listdir('./modules') &
 #!  if os.path.isdir(os.path.join('./modules/', name))]
 
+///:set MODULES = [name for name in os.listdir('./modules') &
+     if os.path.isdir(os.path.join('./modules/', name))]
 
 
 

@@ -14,13 +14,13 @@
 ///:set line = i.split(' ')
 ///:set key = line[0]
 ///:set expr = line[1]
-ArrayPtr kernel_${key}$(vector<ArrayPtr> &ops, const Shape& s, int dt) {
-  ArrayPtr ap = ArrayPool::global()->get(COMM, s, STENCIL_WIDTH, dt);
-  int size = ap->buffer_size();
-  for (int i = 0; i < size; i++) {
-    ap[i] = 0;
-  }
-  return ap;
-}
+// ArrayPtr kernel_${key}$(vector<ArrayPtr> &ops, const Shape& s, int dt) {
+//   ArrayPtr ap = ArrayPool::global()->get(COMM, s, STENCIL_WIDTH, dt);
+//   int size = ap->buffer_size();
+//   for (int i = 0; i < size; i++) {
+//     ap[i] = 0;
+//   }
+//   return ap;
+// }
 ///:endfor
 ///:endif

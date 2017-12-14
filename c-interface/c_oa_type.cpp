@@ -26,8 +26,7 @@ extern "C" {
           oa::internal::copy_buffer(
             (int*) (ap->get_buffer()),
             (int*) ((*(ArrayPtr*) B)->get_buffer()),
-            ap->buffer_size()
-          );
+            ap->buffer_size());
           break;
         case DATA_FLOAT:
           oa::internal::copy_buffer(

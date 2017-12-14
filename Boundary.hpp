@@ -4,7 +4,7 @@
 #include <memory>
 
 class Boundary;
-typedef shared_ptr<Boundary> BoundaryPtr;
+typedef std::shared_ptr<Boundary> BoundaryPtr;
 
 class Boundary {
 private:
@@ -12,6 +12,8 @@ private:
   int m_size;
 
 public:
+  Boundary(int size);
+  ~Boundary();
   void* get_buffer();
   void set_size(int sz);
   int size();
