@@ -9,7 +9,7 @@ namespace oa{
     ///:for o in [i for i in L if i[3] == 'D']
     ///:set type = o[0]
     ///:set name = o[1]
-    NodePtr new_node_${name}$(const NodePtr& u){
+    NodePtr new_node_${name}$(NodeType type, const NodePtr& u){
       NodePtr np = NodePool::global()->get();
       np->set_type(${type}$);
       np->add_input(0, u);
@@ -43,9 +43,18 @@ namespace oa{
       ///:elif name in ['azb', 'dzb']
       lb = {0, 0, 1};
       rb = {0, 0, 0};
-      ///elif name in ['azf', 'dzf']
+      ///:elif name in ['azf', 'dzf']
       lb = {0, 0, 0};
-      rb = {0, 0, 1}; 
+      rb = {0, 0, 1};
+      ///:elif name in ['dxc']
+      lb = {1, 0, 0};
+      rb = {1, 0, 0};
+      ///:elif name in ['dyc']
+      lb = {0, 1, 0};
+      rb = {0, 1, 1};
+      ///:elif name in ['dzc']
+      lb = {0, 0, 1};
+      rb = {0, 0, 1};  
       ///:endif
 
       int3 new_lb = u->get_lbound();
@@ -72,6 +81,8 @@ namespace oa{
       if(u->get_pos() != -1){
         np->set_pos(Grid::global()->get_pos(u->get_pos(), ${type}$));
       }
+
+      np->set_pseudo(u->is_pseudo());
   
       return np;
     }

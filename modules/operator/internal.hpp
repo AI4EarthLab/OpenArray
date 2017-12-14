@@ -71,7 +71,7 @@ namespace oa{
 
       // update outside one surface (contains boundary, doesn't care)
 
-      ///:if name[1:] == 'zb'
+      ///:if name[1:] in ['zb', 'zc']
       for (int k = sw; k < sw + lbound[2]; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = 0; i < M; i++) {
@@ -80,7 +80,7 @@ namespace oa{
         }
       }
 
-      ///:elif name[1:] == 'zf'
+      ///:elif name[1:] in ['zf', 'zc']
       for (int k = sw + sp[2] - rbound[2]; k < sw + sp[2]; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = 0; i < M; i++) {
@@ -89,7 +89,7 @@ namespace oa{
         }
       }
 
-      ///:elif name[1:] == 'yb'
+      ///:elif name[1:] in ['yb', 'yc']
       for (int k = 0; k < P; k++) {
         for (int j = sw; j < sw + lbound[1]; j++) {
           for (int i = 0; i < M; i++) {
@@ -98,7 +98,7 @@ namespace oa{
         }
       }
 
-      ///:elif name[1:] == 'yf'
+      ///:elif name[1:] in ['yf', 'yc']
       for (int k = 0; k < P; k++) {
         for (int j = sw + sp[1] - rbound[1]; j < sw + sp[1]; j++) {
           for (int i = 0; i < M; i++) {
@@ -107,7 +107,7 @@ namespace oa{
         }
       }
 
-      ///:elif name[1:] == 'xb'
+      ///:elif name[1:] in ['xb', 'xc']
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = sw; i < sw + lbound[0]; i++) {
@@ -116,7 +116,7 @@ namespace oa{
         }
       }
 
-      ///:elif name[1:] == 'xf'
+      ///:elif name[1:] in ['xf', 'xc']
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = sw + sp[0] - rbound[0]; i < sw + sp[0]; i++) {

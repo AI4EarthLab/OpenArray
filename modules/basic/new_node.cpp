@@ -24,10 +24,14 @@ namespace oa{
       else if (v->is_seqs_scalar()) np->set_shape(u->shape());
       else {
         /*
-          pseudo 3d, so don't have to assert
-          assert(oa::utils::is_equal_shape(u->shape(), v->shape()));
+          pseudo 3d, ans's should be the bigger one among u'shape & v'shape
         */
-        np->set_shape(u->shape());
+        bool flag = false;
+        for (int i = 0; i < 3; i++) {
+          if (u->shape()[i] > v->shape()[i]) flag = true;
+        }
+        if (flag) np->set_shape(u->shape());
+        else np->set_shape(v->shape());
       }
       np->set_data_type(dt);
       np->set_lbound(u->get_lbound(), v->get_lbound());
@@ -40,6 +44,8 @@ namespace oa{
       else if(v->get_pos() != -1)
         np->set_pos(v->get_pos());
      
+      np->set_pseudo(u->is_pseudo() && v->is_pseudo());
+
       return np;
     }
     ///:endfor
@@ -77,7 +83,9 @@ namespace oa{
         np->set_pos(u->get_pos());
       else if(v->get_pos() != -1)
         np->set_pos(v->get_pos());
-     
+      
+      np->set_pseudo(u->is_pseudo() && v->is_pseudo());
+
       return np;
     }
     ///:endfor
@@ -102,6 +110,7 @@ namespace oa{
       np->set_lbound(u->get_lbound());
       np->set_rbound(u->get_rbound());
 
+      np->set_pseudo(u->is_pseudo());
       return np;
     }
     ///:endfor

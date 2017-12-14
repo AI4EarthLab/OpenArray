@@ -209,3 +209,11 @@ void Node::set_pos(int p) {
 int Node::get_pos() {
   return pos;
 }
+
+void Node::set_pseudo(bool ps) {
+  m_is_pseudo = ps;
+}
+
+bool Node::is_pseudo() {
+  return m_is_pseudo;
+}
