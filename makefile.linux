@@ -101,7 +101,7 @@ all:
 	@./pre.sh
 	@cd build && make clean -j  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build && make main -j8 -f ${MAKEFILE} 2>/dev/null
+	@cd build && make main -j8 -f ${MAKEFILE} 
 	cp build/main ./
 
 quick:

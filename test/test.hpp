@@ -589,7 +589,7 @@ void test_eval() {
 // need 6 mpi_process
 void test_set() {
   // A
-  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6}, {6, 6, 6}, {1}, 1);
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {18, 18, 18}, {1}, 1);
   ap->display("======A======");
   // sub1
   Box box1(4, 6, 5, 12, 0, 0);
@@ -605,7 +605,7 @@ void test_set() {
   oa::funcs::set(ap, box1, ap, box2);
   ap->display("======after_set======");
 
-  oa::funcs::set(ap, box1, 0);
+  oa::funcs::set_with_const(ap, box1, 0);
   ap->display("======after_set======");
 }
 

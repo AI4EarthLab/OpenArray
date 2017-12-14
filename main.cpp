@@ -45,8 +45,8 @@ int main(int argc, char** argv) {
   //test_csum();
   //test_sum();
   //test_sub();
-  //test_set();
-  test_rep();
+  test_set();
+  //test_rep();
   //test_l2g();
   //test_g2l();
   //test_set_l2g();
