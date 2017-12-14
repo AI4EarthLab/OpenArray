@@ -586,7 +586,7 @@ namespace{
     }
     ///:endfor
   }
-/*
+
   TEST_P(MPITest, REP){
     ///:for t in dtypes
     {
@@ -594,11 +594,17 @@ namespace{
       DataType dt = oa::utils::dtype<${t}$>::type;
 
       int x = 2;
-      int y = 3;
-      int z = 4;
+      int y = 2;
+      int z = 2;
 
       ArrayPtr A = oa::funcs::seqs(comm, {m,n,p}, sw, dt);
-      ArrayPtr repA = oa::funcs::rep(A, x, y, z);
+      NodePtr NN = oa::ops::new_node(A);
+      ArrayPtr lap = oa::funcs::consts(MPI_COMM_SELF, {3, 1, 1}, 2, 0);
+      NodePtr NN2 = oa::ops::new_node(lap);
+
+
+      NodePtr NP = oa::ops::new_node(TYPE_REP, NN, NN2);
+      ArrayPtr repA = oa::ops::eval(NP);
 
       ArrayPtr rank0A = oa::funcs::to_rank0(A);
       ArrayPtr result = oa::funcs::to_rank0(repA);
@@ -636,7 +642,7 @@ namespace{
     }
     ///:endfor
   }
-*/
+
   TEST_P(MPITest, RAND){
     ///:for t in dtypes
     {
