@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <string>
 #include <mpi.h>
-#include "./test/test.hpp"
+#include "test.hpp"
 
 using namespace std;
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   //test_gen_kernel_JIT();
   //test_min_max();
   //test_eval();
-  test_csum();
+  //test_csum();
   //test_sum();
   //test_sub();
   //test_set();

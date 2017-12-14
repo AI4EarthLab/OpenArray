@@ -67,7 +67,7 @@ OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
 OBJ_FORTRAN = ${OBJS} \
 	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
 
-OBJ_MAIN  = ${OBJS}  main.o
+OBJ_MAIN  = ${OBJS}  test/main.o
 
 OBJ_TEST = ${OBJS} $(addprefix ./unittest/, test_array.o gtest_main.o)
 
@@ -114,11 +114,11 @@ debug:
 all:
 	@rm -rf main
 	@echo "Cleaning..."
-	@mkdir -p build 2>/dev/null
+	@mkdir -p build 
 	@./pre.sh
 	@cd build && make clean -j  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build && make main -j8 -f ${MAKEFILE} 2>/dev/null
+	@cd build && make main -j8 -f ${MAKEFILE} 
 	cp build/main ./
 
 quick:
@@ -130,9 +130,9 @@ quick:
 	@echo "Cleaning done."
 	@cd build && make ${name} -j8 -f ${MAKEFILE}
 	@cp build/${name} ./
-	@mpirun -n 4 ./${name} 4 4 4
+	@mpirun -oversubscribe -n 8 ./${name} 4 4 4
 
-main: ${OBJ_MAIN}
+main: ${OBJ_MAIN} 
 	-${CXX} -rdynamic -o main ${OBJ_MAIN} ${LIBS}
 
 testall:
