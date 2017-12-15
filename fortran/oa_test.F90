@@ -286,7 +286,27 @@ contains
     
     ///:endfor
 
+    A = rands(m, n, 1)
+    ///:for o in ['AXB', 'AXF', 'DXB', 'DXF', 'DXC']
+    B = ${o}$(A)
+    call display(B, "${o}$(A)")
+    ///:endfor
 
+    A = rands(1, n, k)
+    ///:for o in ['AZB', 'AZF', 'DZB', 'DZF', 'DZC']
+
+    B = ${o}$(A)
+    call display(A, "A = ")
+    call display(B, "${o}$(A)")
+    ///:endfor
+
+    A = rands(1, 1, k)
+    ///:for o in ['AZB', 'AZF', 'DZB', 'DZF', 'DZC']
+    B = ${o}$(A)
+    call display(A, "A = ")
+    call display(B, "${o}$(A)")
+    ///:endfor
+    
     B = DXB(AXF(A))
     call display(B, "DXB(AXF(A))")
     
@@ -314,4 +334,27 @@ contains
 
   end subroutine test_parition
 
+  subroutine test_grid()
+    implicit none
+    type(array) :: A, B, C, dx, dy, dz
+    
+    dx = ones(m, n)  * 0.1
+    dy = ones(m, n)  * 0.2
+    dz = ones(1,1,k) * 0.15
+
+    call grid_init('C', dx, dy, dz)
+    
+    A = seqs(m, n, k) + 1
+    
+    call grid_bind(A, 3)
+
+    call display(A, "A = ")
+    
+    ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'DXB', 'DXF', 'DYB', 'DYF']
+    ! B = ${o}$(A)
+    ! call display(B, "${o}$(A) = ")
+    ///:endfor
+
+    
+  end subroutine
 end module

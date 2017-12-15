@@ -17,7 +17,8 @@ class Grid {
   
   public:
   //dx, dy, dz are two dimensional arrays
-  void init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz);
+  void init_grid(char type, const ArrayPtr& dx,
+          const ArrayPtr& dy, const ArrayPtr& dz);
   ArrayPtr get_grid_dx(int pos);
   ArrayPtr get_grid_dy(int pos);
   ArrayPtr get_grid_dz(int pos);

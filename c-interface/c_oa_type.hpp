@@ -63,7 +63,10 @@ extern "C" {
 
   void c_new_local_int3(NodePtr* &B, int* val);
 
-  void c_grid_init (char *ch, void*& A, void*& B, void*& C);
+  void c_grid_init (char* ch, const ArrayPtr*& A,
+          const ArrayPtr*& B, const ArrayPtr*& C);
+  
+  void c_grid_bind(ArrayPtr*& A, int pos);
 }
 
 #endif

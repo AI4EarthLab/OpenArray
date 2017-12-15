@@ -29,7 +29,7 @@ class Array {
   bool m_is_seqs = false;
   size_t m_hash;
   int pos = -1;
-  GridPtr grid;
+  //GridPtr grid;
   bool m_is_pseudo = false;
 
 

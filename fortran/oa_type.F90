@@ -165,8 +165,8 @@
     ///:endmute
     ///:for t in NAME
     function ${t[0]}$(m, n, k, sw, dt, comm) result(A)
-      integer(c_int) :: m, n, k, op_sw, op_dt, op_comm
-      integer(c_int), optional :: sw, dt, comm
+      integer(c_int) :: m, op_n, op_k, op_sw, op_dt, op_comm
+      integer(c_int), optional :: n, k, sw, dt, comm
       type(Array) :: A
 
       interface
@@ -198,7 +198,19 @@
          op_comm = MPI_COMM_WORLD
       endif
 
-      call c_${t[0]}$(A%ptr, m, n, k, op_sw, op_dt, op_comm)
+      if(present(n)) then
+         op_n = n
+      else
+         op_n = 1
+      end if
+
+      if(present(k)) then
+         op_k = k
+      else
+         op_k = 1
+      end if
+      
+      call c_${t[0]}$(A%ptr, m, op_n, op_k, op_sw, op_dt, op_comm)
       A%lr = R
 
     end function
@@ -278,6 +290,22 @@
 
     end subroutine
 
+    subroutine grid_bind(A, pos)
+      use iso_c_binding
+      type(Array), intent(in) :: A
+      integer :: pos
+      interface
+         subroutine c_grid_bind(A, pos) &
+              bind(C, name = 'c_grid_bind')
+           use iso_c_binding
+           type(c_ptr), intent(in) :: A
+           integer , value :: pos
+         end subroutine
+      end interface
+
+      call c_grid_bind(A%ptr, pos)
+
+    end subroutine
 
 
     ///:for t in ['node', 'array']

@@ -31,6 +31,8 @@ program main
   call test_rep()
 
   call test_operator()
+
+  call test_grid()
   
   ! call test_create_node()
 

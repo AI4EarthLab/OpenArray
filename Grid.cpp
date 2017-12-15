@@ -4,7 +4,8 @@
 #include <boost/throw_exception.hpp>
 #include "common.hpp"
 
-void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
+void Grid::init_grid(char type,
+        const ArrayPtr& dx, const ArrayPtr& dy, const ArrayPtr& dz){
 
   NodePtr ndx = oa::ops::new_node(dx);
   NodePtr ndy = oa::ops::new_node(dy);

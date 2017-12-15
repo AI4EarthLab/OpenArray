@@ -139,6 +139,10 @@ void Array::display(const char *prefix) {
     std::cout<<"\tdata type = "
              << oa::utils::get_type_string(m_data_type)
              << std::endl;
+
+    std::cout<<"\tpos = "
+             << pos
+             << std::endl;
     
     m_par_ptr->display(NULL, true);
     
