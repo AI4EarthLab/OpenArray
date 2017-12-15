@@ -83,13 +83,12 @@
       implicit none
 
       interface
-         subroutine c_new_node_${op}$(p1, nodetype, p2, p3) &
+         subroutine c_new_node_${op}$(p1, p2, p3) &
               bind(C, name='c_new_node_${op}$')
            use iso_c_binding
            implicit none
            type(c_ptr), intent(inout) :: p1
            type(c_ptr), intent(in) :: p2, p3
-           integer(c_int), intent(in), VALUE :: nodetype
          end subroutine
       end interface
 
@@ -125,7 +124,7 @@
       ///:set BD = 'D'
       ///:endif
 
-      call c_new_node_${op}$(res%ptr, ${e[0]}$, ${AC}$%ptr, ${BD}$%ptr)
+      call c_new_node_${op}$(res%ptr, ${AC}$%ptr, ${BD}$%ptr)
 
     end function
 
@@ -143,12 +142,11 @@
       implicit none
 
       interface
-         subroutine c_new_node_${op}$(A, nodetype, U) &
+         subroutine c_new_node_${op}$(A, U) &
               bind(C, name='c_new_node_${op}$')
            use iso_c_binding
            type(c_ptr), intent(inout) :: A
            type(c_ptr), intent(in) :: U 
-           integer(c_int), intent(in), VALUE :: nodetype
          end subroutine
       end interface
 
@@ -163,7 +161,7 @@
       call c_new_node_array(C%ptr, A%ptr)
       ///:set AC = 'C'
       ///:endif
-      call c_new_node_op1(res%ptr, ${e[0]}$, ${AC}$%ptr)
+      call c_new_node_${op}$(res%ptr, ${AC}$%ptr)
 
     end function
 

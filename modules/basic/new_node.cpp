@@ -4,15 +4,15 @@
 namespace oa{
   namespace ops{
     ///:for op in [i for i in L if i[3] == 'A']
-    NodePtr new_node_${op[1]}$(NodeType type,
-                               const NodePtr& u,
+    ///:set type = op[0]
+    NodePtr new_node_${op[1]}$(const NodePtr& u,
                                const NodePtr& v){
       NodePtr np = NodePool::global()->get();
-      np->set_type(type);
+      np->set_type(${type}$);
       np->add_input(0, u);
       np->add_input(1, v);
       
-      const NodeDesc &nd = get_node_desc(type);
+      // const NodeDesc &nd = get_node_desc(${type}$);
 
       DataType dt = oa::utils::cast_data_type(u->get_data_type(),
                                               v->get_data_type());
@@ -51,11 +51,11 @@ namespace oa{
     ///:endfor
 
     ///:for op in [i for i in L if i[3] == 'B']
-    NodePtr new_node_${op[1]}$(NodeType type,
-                               const NodePtr& u,
+    ///:set type = op[0]
+    NodePtr new_node_${op[1]}$(const NodePtr& u,
                                const NodePtr& v){
       NodePtr np = NodePool::global()->get();
-      np->set_type(type);
+      np->set_type(${type}$);
       np->add_input(0, u);
       np->add_input(1, v);
       
@@ -92,10 +92,10 @@ namespace oa{
 
 
     ///:for op in [i for i in L if i[3] == 'C']
-    NodePtr new_node_${op[1]}$(NodeType type,
-                               const NodePtr& u){
+    ///:set type = op[0]
+    NodePtr new_node_${op[1]}$(const NodePtr& u) {
       NodePtr np = NodePool::global()->get();
-      np->set_type(type);
+      np->set_type(${type}$);
       np->add_input(0, u);
       
       // only OP will change grid pos

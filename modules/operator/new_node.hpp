@@ -11,7 +11,7 @@ namespace oa{
 
     ///:for o in [i for i in L if i[3] == 'D']
     ///:set name = o[1]
-    NodePtr new_node_${name}$(NodeType type, const NodePtr& u);
+    NodePtr new_node_${name}$(const NodePtr& u);
     ///:endfor
   }
 }

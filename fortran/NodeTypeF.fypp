@@ -51,9 +51,9 @@
        ["TYPE_TANH",    "tanh",    "tanh",       "C",   "B", "T", "F",  "tanh(A)",    "2"],& 
        ["TYPE_SINH",    "sinh",    "sinh",       "C",   "B", "T", "F",  "sinh(A)",    "2"],& 
        ["TYPE_COSH",    "cosh",    "cosh",       "C",   "B", "T", "F",  "cosh(A)",    "2"],&
-       ["TYPE_DXC",     "dxc",     "dxc",        " ",   "B", "F", "F",  "DXC(A)",     "2"],&
-       ["TYPE_DYC",     "dyc",     "dyc",        " ",   "B", "F", "F",  "DYC(A)",     "2"],&
-       ["TYPE_DZC",     "dzc",     "dzc",        " ",   "B", "F", "F",  "DZC(A)",     "2"],&
+       ["TYPE_DXC",     "dxc",     "dxc",        "D",   "B", "F", "F",  "DXC(A)",     "2"],&
+       ["TYPE_DYC",     "dyc",     "dyc",        "D",   "B", "F", "F",  "DYC(A)",     "2"],&
+       ["TYPE_DZC",     "dzc",     "dzc",        "D",   "B", "F", "F",  "DZC(A)",     "2"],&
        ["TYPE_AXB",     "axb",     "axb",        "D",   "B", "F", "F",  "AXB(A)",     "2"],&
        ["TYPE_AXF",     "axf",     "axf",        "D",   "B", "F", "F",  "AXF(A)",     "2"],&
        ["TYPE_AYB",     "ayb",     "ayb",        "D",   "B", "F", "F",  "AYB(A)",     "2"],&

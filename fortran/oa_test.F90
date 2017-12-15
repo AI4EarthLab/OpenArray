@@ -276,7 +276,7 @@ contains
     call display(A, "A = ")
 
     ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'AZB', 'AZF', &
-         'DXB', 'DXF', 'DYB', 'DYF', 'DZB', 'DZF']
+         'DXB', 'DXF', 'DYB', 'DYF', 'DZB', 'DZF', 'DXC', 'DYC', 'DZC']
 
     B = ${o}$(A)
     call display(A, "A = ")
