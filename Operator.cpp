@@ -23,6 +23,9 @@ namespace oa {
       np->set_scalar(ap->is_scalar());
       np->set_seqs(ap->is_seqs());
       np->set_pos(ap->get_pos());
+      np->set_bitset(ap->get_bitset());
+      np->set_pseudo(ap->is_pseudo());
+
       return np;
     }
 
@@ -272,6 +275,9 @@ namespace oa {
       //printf("kernel : %p\n", kernel_addr.target< kernel_rawptr* >());
       ArrayPtr ap = kernel_addr(ops_ap);
       A->set_data(ap);
+      ap->set_pseudo(A->is_pseudo());
+      ap->set_bitset(A->get_bitset());
+      ap->set_pos(A->get_pos());
 
       return ap;
     }
@@ -322,6 +328,10 @@ namespace oa {
           cout<<"fusion-kernel called"<<endl;
           
           A->set_data(ap);
+          ap->set_pseudo(A->is_pseudo());
+          ap->set_bitset(A->get_bitset());
+          ap->set_pos(A->get_pos());
+
           return ap;
         }
       }
@@ -340,6 +350,65 @@ namespace oa {
       KernelPtr kernel_addr = nd.func;
       ArrayPtr ap = kernel_addr(ops_ap);
       A->set_data(ap);
+      ap->set_pseudo(A->is_pseudo());
+      ap->set_bitset(A->get_bitset());
+      ap->set_pos(A->get_pos());
+
+
+      return ap;
+    }
+
+    ArrayPtr eval_JIT(NodePtr A) {
+      // data
+      if (A->has_data()) return A->get_data();
+
+      // generate hash
+      if (!A->hash()) {
+        stringstream ss;
+        tree_to_string_stack(A, ss);
+        std::hash<string> str_hash;
+        size_t hash = str_hash(ss.str());
+        A->set_hash(hash);
+      }
+
+      // fusion kernel
+      if (A->hash()) {
+        FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
+        if (fkptr != NULL) {
+          vector<void*> list;
+          PartitionPtr par_ptr;
+          get_kernel_parameter(A, list, par_ptr);
+          ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
+
+          list.push_back(ap->get_buffer());
+          void** list_pointer = list.data();
+          fkptr(list_pointer, ap->buffer_size());
+          cout<<"fusion-kernel called"<<endl;
+          
+          A->set_data(ap);
+          ap->set_pseudo(A->is_pseudo());
+          ap->set_bitset(A->get_bitset());
+          ap->set_pos(A->get_pos());
+
+          return ap;
+        }
+      }
+
+      // tree
+      vector<ArrayPtr> ops_ap;
+
+      for (int i = 0; i < A->input_size(); i++) {
+        ops_ap.push_back(eval(A->input(i)));
+      }
+
+      const NodeDesc& nd = get_node_desc(A->type());
+      KernelPtr kernel_addr = nd.func;
+      ArrayPtr ap = kernel_addr(ops_ap);
+      A->set_data(ap);
+      ap->set_pseudo(A->is_pseudo());
+      ap->set_bitset(A->get_bitset());
+      ap->set_pos(A->get_pos());
+
 
       return ap;
     }
@@ -439,7 +508,7 @@ namespace oa {
     }
 
     void gen_kernels_JIT(NodePtr A, bool is_root, MPI_Comm comm) {
-      if (oa::utils::get_rank(comm)) return ;
+      //if (oa::utils::get_rank(comm)) return ;
       if (A->has_data()) return ;
       
       const NodeDesc &nd = get_node_desc(A->type());

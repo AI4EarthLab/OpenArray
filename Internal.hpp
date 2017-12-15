@@ -7,12 +7,12 @@
 #include "utils/utils.hpp"
 #include <vector>
 
-extern "C"{
-  void tic(const char* s);
-  void toc(const char* s);
-  void show_time(const char* s);
-  void show_all();
-}
+// extern "C"{
+//   void tic(const char* s);
+//   void toc(const char* s);
+//   void show_time(const char* s);
+//   void show_all();
+// }
 
 using namespace std;
 

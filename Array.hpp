@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <memory>
+#include <bitset>
+#include <string>
 #include "Partition.hpp"
 
 /*
@@ -31,6 +33,7 @@ class Array {
   int pos = -1;
   //GridPtr grid;
   bool m_is_pseudo = false;
+  std::bitset<3> m_bs = std::bitset<3>(std::string("111"));
 
 
   public:
@@ -62,6 +65,10 @@ class Array {
   int get_pos();
   void set_pseudo(bool ps);
   bool is_pseudo();
+  void set_bitset(std::string);
+  bitset<3> get_bitset();
+  void set_bitset(bitset<3> bs);
+
 };
 
 
