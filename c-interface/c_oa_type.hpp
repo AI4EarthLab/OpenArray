@@ -3,7 +3,6 @@
 
 #include "../ArrayPool.hpp"
 #include "../NodePool.hpp"
-#include "../Grid.hpp"
 
 #define L 0
 #define R 1
@@ -60,10 +59,6 @@ extern "C" {
   void c_new_node_op2(void* &ptr, int nodetype, void* &u, void* &v);
 
   void c_new_node_op1(void* &ptr, int nodetype, void* &u);
-
-  void c_new_local_int3(NodePtr* &B, int* val);
-
-  void c_grid_init (char *ch, void*& A, void*& B, void*& C);
 }
 
 #endif
