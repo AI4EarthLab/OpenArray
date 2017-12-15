@@ -357,4 +357,18 @@ contains
 
     
   end subroutine
+
+  subroutine test_shift()
+    type(array) :: A
+    type(array) :: B
+    
+    A = seqs(6, 8, 3) + 1
+    ! call display(A, "A")
+
+    B = shift(A, 2,2,0)
+
+    ! print*, "after shifted"
+    ! call display(A, "A")
+  end subroutine
+  
 end module

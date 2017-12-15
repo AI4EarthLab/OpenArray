@@ -81,7 +81,12 @@
     ///:endfor
     end interface ${n[2]}$    
     ///:endfor
-    
+
+    interface shift
+       module procedure shift_node
+       module procedure shift_array
+    end interface shift
+         
     integer, parameter :: OA_INT = 0
     integer, parameter :: OA_FLOAT = 1
     integer, parameter :: OA_DOUBLE = 2
@@ -339,4 +344,63 @@
     end function
     ///:endfor
     ///:endfor
+
+
+    ///:for t in ['node', 'array']
+    function shift_${t}$(A, x, y, z) result(B) 
+         implicit none
+      type(${t}$) :: A
+      type(node)  :: B
+      type(node) :: D, NA
+      integer :: x, op_y, op_z
+      integer, optional :: y, z
+
+      
+      interface
+         subroutine c_oa_shift(C, A, B) &
+              bind(C, name = "c_oa_shift")
+           use iso_c_binding
+           implicit none
+           type(c_ptr) :: C, A, B
+         end subroutine
+      end interface
+
+      interface
+         subroutine c_new_local_int3(A, v) &
+              bind(C, name='c_new_local_int3')
+           use iso_c_binding
+           implicit none
+           type(c_ptr) :: A
+           integer :: v(3)
+         end subroutine
+      end interface
+
+
+      if(present(y)) then
+         op_y = y
+      else
+         op_y = 1
+      end if
+
+      if(present(z)) then
+         op_z = z
+      else
+         op_z = 1
+      end if
+
+      call c_new_local_int3(D%ptr, [x, op_y, op_z])
+      
+      ///:set A = 'A'
+      
+      ///:if t == 'array'
+      call c_new_node_array(NA%ptr, A%ptr)
+      ///:set A = 'NA'
+      ///:endif
+
+      call c_oa_shift(B%ptr, ${A}$%ptr, D%ptr);
+
+    end function
+    ///:endfor
+    
+
   end module
