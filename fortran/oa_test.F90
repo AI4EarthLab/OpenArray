@@ -281,8 +281,12 @@ contains
     B = ${o}$(A)
     call display(A, "A = ")
     call display(B, "${o}$(A)")
+    
     ///:endfor
 
+    B = DXB(AXF(A))
+    call display(B, "DXB(AXF(A))")
+    
     !call grid_init('C', dx, dy, dz)
   end subroutine
   
