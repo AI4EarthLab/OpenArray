@@ -3,7 +3,7 @@
 
 namespace oa{
   namespace ops{
-    ///:for op in [i for i in L if i[3] == 'A']
+    ///:for op in [i for i in L if i[3] in ['A', 'H']]
     ///:set type = op[0]
     NodePtr new_node_${op[1]}$(const NodePtr& u,
                                const NodePtr& v){
@@ -50,7 +50,7 @@ namespace oa{
     }
     ///:endfor
 
-    ///:for op in [i for i in L if i[3] == 'B']
+    ///:for op in [i for i in L if i[3] in ['B', 'F']]
     ///:set type = op[0]
     NodePtr new_node_${op[1]}$(const NodePtr& u,
                                const NodePtr& v){
@@ -91,7 +91,7 @@ namespace oa{
     ///:endfor
 
 
-    ///:for op in [i for i in L if i[3] == 'C']
+    ///:for op in [i for i in L if i[3] in ['C', 'G']]
     ///:set type = op[0]
     NodePtr new_node_${op[1]}$(const NodePtr& u) {
       NodePtr np = NodePool::global()->get();
@@ -105,7 +105,11 @@ namespace oa{
 
       np->set_shape(u->shape());
 
+      ///:if i[3] == 'C'
       np->set_data_type(u->get_data_type());
+      ///:else
+      np->set_data_type(DATA_INT);
+      ///:endif
       
       np->set_lbound(u->get_lbound());
       np->set_rbound(u->get_rbound());

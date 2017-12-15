@@ -11,12 +11,17 @@ namespace oa{
     NodePtr new_node_${op[1]}$(const NodePtr& u, const NodePtr& v);
     ///:endfor
 
-    ///:for op in [i for i in L if i[3] == 'B']
+    ///:for op in [i for i in L if i[3] in ['B', 'F']]
     NodePtr new_node_${op[1]}$(const NodePtr& u, const NodePtr& v);
     ///:endfor
 
     ///:for op in [i for i in L if i[3] == 'C']
     NodePtr new_node_${op[1]}$(const NodePtr& u);
     ///:endfor
+
+    NodePtr new_node_not(const NodePtr& u);
+
+    NodePtr new_node_pow(const NodePtr& u, const NodePtr& v);
+
   }
 }
