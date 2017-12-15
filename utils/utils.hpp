@@ -10,6 +10,13 @@
 #include "../common.hpp"
 #include <armadillo>
 
+extern "C" {
+  void tic(const char* s);
+  void toc(const char* s);
+  void show_time(const char* s);
+  void show_all();
+}
+
 namespace oa {
   namespace utils {
     template<class T>
@@ -164,6 +171,8 @@ namespace oa {
     int get_shape_dimension(Shape S);
 
     bool check_legal_shape_calc(Shape u, Shape v);
+
+
   }  
 }
 

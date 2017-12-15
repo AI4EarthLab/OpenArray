@@ -62,6 +62,11 @@ namespace oa {
       double* ans = (double*) ap->get_buffer();
       T* buffer = (T*) u->get_buffer();
 
+      /*
+        to chose the right bind grid
+      */
+        
+
       vector<MPI_Request> reqs;
       oa::funcs::update_ghost_start(u, reqs, -1);
       oa::internal::${name}$_calc_inside<T>(ans,

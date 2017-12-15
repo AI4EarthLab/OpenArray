@@ -46,6 +46,8 @@ namespace oa{
      
       np->set_pseudo(u->is_pseudo() && v->is_pseudo());
 
+      np->set_bitset(u->get_bitset() | v->get_bitset());
+
       return np;
     }
     ///:endfor
@@ -86,6 +88,8 @@ namespace oa{
       
       np->set_pseudo(u->is_pseudo() && v->is_pseudo());
 
+      np->set_bitset(u->get_bitset() | v->get_bitset());
+
       return np;
     }
     ///:endfor
@@ -115,6 +119,8 @@ namespace oa{
       np->set_rbound(u->get_rbound());
 
       np->set_pseudo(u->is_pseudo());
+
+      np->set_bitset(u->get_bitset());
       return np;
     }
     ///:endfor

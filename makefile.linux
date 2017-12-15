@@ -19,9 +19,9 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 oplevel0 = -O0 -g 
 oplevel3 = -O3
 
-FC = mpif90 ${oplevel0}
-CC = mpicc  ${oplevel0}
-CXX = mpicxx ${oplevel0}
+FC = mpif90 ${oplevel3}
+CC = mpicc  ${oplevel3}
+CXX = mpicxx ${oplevel3}
 
 FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans
 
@@ -110,9 +110,11 @@ debug:
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
-##===##-include $(OBJS:.o=.d) 
+###===##-include $(OBJS:.o=.d) 
 ##===##-include $(OBJ_FORTRAN:.o=.d) 
 ##===##-include $(OBJS_UTILS:.o=.d) 
+##===##-include $(OBJ_MAIN:.o=.d) 
+###===##-include test/main.o=test/main.d
 
 all:
 	@rm -rf main
@@ -129,7 +131,7 @@ quick:
 	@rm -rf ${name}
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
-	@./pre.sh
+	@./test.sh
 	@cd build
 	@echo "Cleaning done."
 	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make ${name} ${compile_thread} -f ${MAKEFILE}

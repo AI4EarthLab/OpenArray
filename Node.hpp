@@ -5,6 +5,8 @@
 #include "common.hpp"
 #include <vector>
 #include <memory>
+#include <bitset>
+#include <string>
 
 class Node;
 
@@ -29,6 +31,8 @@ private:
   bool m_update_boundary = false;
   int pos = -1;
   bool m_is_pseudo = false;
+  std::bitset<3> m_bs = std::bitset<3>(std::string("111"));
+
   //BoxPtr ref;
 
 public:
@@ -126,6 +130,13 @@ public:
   void set_pseudo(bool ps);
 
   bool is_pseudo();
+
+  void set_bitset(string s);
+
+  void set_bitset(bitset<3> bs);
+
+  bitset<3> get_bitset();
+  
 };
 
 

@@ -25,6 +25,13 @@ void Node::display(char const *prefix) {
     printf("  rbound : [%d %d %d]\n", m_rbound[0], m_rbound[1], m_rbound[2]);
     printf("  need_update : %s\n", m_update_boundary ? "True" : "False");
     printf("  grid pos : %d\n", pos);
+    std::cout<<"\tis_pseudo = "
+             << m_is_pseudo
+             << std::endl;
+    
+    std::cout<<"\tbitset = "
+             << m_bs
+             << std::endl;
 
     printf(" input : \n");
     for(int i = 0; i < m_input.size(); ++i)
@@ -216,4 +223,16 @@ void Node::set_pseudo(bool ps) {
 
 bool Node::is_pseudo() {
   return m_is_pseudo;
+}
+
+void Node::set_bitset(string s) {
+  m_bs = bitset<3>(s);
+}
+
+void Node::set_bitset(bitset<3> bs) {
+  m_bs = bs;
+}
+
+bitset<3> Node::get_bitset() {
+  return m_bs;
 }

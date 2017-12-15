@@ -143,7 +143,15 @@ void Array::display(const char *prefix) {
     std::cout<<"\tpos = "
              << pos
              << std::endl;
+
+    std::cout<<"\tis_pseudo = "
+             << m_is_pseudo
+             << std::endl;
     
+    std::cout<<"\tbitset = "
+             << m_bs
+             << std::endl;
+
     m_par_ptr->display(NULL, true);
     
     MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
@@ -245,4 +253,16 @@ void Array::set_pseudo(bool ps) {
 
 bool Array::is_pseudo() {
   return m_is_pseudo;
+}
+
+void Array::set_bitset(string s) {
+  m_bs = std::bitset<3> (s);
+}
+
+void Array::set_bitset(bitset<3> bs) {
+  m_bs = bs;
+}
+
+bitset<3> Array::get_bitset() {
+  return m_bs;
 }
