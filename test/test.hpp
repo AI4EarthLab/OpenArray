@@ -591,7 +591,8 @@ void test_eval() {
 // need 6 mpi_process
 void test_set() {
   // A
-  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6}, {6, 6, 6}, {1}, 1);
+  //ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6}, {6, 6, 6}, {1}, 1);
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD,  {18, 18, 18}, {1}, 1);
   ap->display("======A======");
   // sub1
   Box box1(4, 6, 5, 12, 0, 0);
@@ -607,17 +608,22 @@ void test_set() {
   oa::funcs::set(ap, box1, ap, box2);
   ap->display("======after_set======");
 
-  oa::funcs::set(ap, box1, 0);
+  oa::funcs::set_with_const(ap, box1, 0);
   ap->display("======after_set======");
 }
 
 void test_rep() {
-  //ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
-  //ap->display("======A======");
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
+  ap->display("======A======");
 
-  //ArrayPtr repA = oa::funcs::rep(ap, 2, 2, 2);
-  //repA->display("======after_rep======");
-  //ap->display("======A======");
+  NodePtr NN = oa::ops::new_node(ap);
+  ArrayPtr lap = oa::funcs::consts(MPI_COMM_SELF, {3, 1, 1}, 2, 0);
+  NodePtr NN2 = oa::ops::new_node(lap);
+
+
+  NodePtr NP = oa::ops::new_node(TYPE_REP, NN, NN2);
+  ArrayPtr repA = oa::ops::eval(NP);
+  repA->display("======after_rep======");
 }
 
 void test_g2l(){
@@ -788,6 +794,7 @@ void test_op() {
 }
 
 void test_fusion_op() {
+/*
   ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
   ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
   ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
@@ -912,7 +919,7 @@ void test_fusion_op() {
   // q2f= DZB(AZF(w*q2)) + DXF(AXB(q2)* AXB(dt_3d)* AZB(u)  & 
   //    -AZB( AXB(aam))*AXB(h_3d)*DXB( q2b )* dum_3d)+DYF(AYB(q2)* AYB(dt_3d)* AZB(v) & 
   //    -AZB( AYB(aam))*AYB(h_3d)*DYB( q2b )* dvm_3d))
-
+*/
 }
 
 void test_pseudo_3d() {
