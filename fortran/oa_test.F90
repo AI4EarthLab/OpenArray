@@ -276,15 +276,18 @@ contains
     ch = 'C'
     call grid_init(ch, A, B, C)
 
-    A = seqs(8, 7, 6) + 1
+    A = rands(4,4,4) !seqs(4, 4, 4) + 1
     call display(A, "A = ")
 
     ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'AZB', 'AZF', &
          'DXB', 'DXF', 'DYB', 'DYF', 'DZB', 'DZF']
 
     B = ${o}$(A)
+    call display(A, "A = ")
     call display(B, "${o}$(A)")
     ///:endfor
+
+    !call grid_init('C', dx, dy, dz)
   end subroutine
   
   subroutine test_set()

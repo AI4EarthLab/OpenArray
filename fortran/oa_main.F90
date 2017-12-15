@@ -14,7 +14,7 @@ program main
   call oa_init()
 
   !initialize the test module  
-  call test_init(4, 3, 2, MPI_COMM_WORLD) 
+  call test_init(6, 6, 6, MPI_COMM_WORLD) 
   
   !call test_create_array()
 

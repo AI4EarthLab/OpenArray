@@ -17,9 +17,9 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-Wl,-rpath=${JIT_LIB}
 
 
-FC = mpif90 -O0 -g
-CC = mpicc  -O0 -g
-CXX = mpicxx -O0 -g
+FC = mpif90 -O1
+CC = mpicc  
+CXX = mpicxx
 
 FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans
 
@@ -31,39 +31,56 @@ CFLAGS   = -Werror=return-type -fno-trapping-math \
 
 LIBS =  -lstdc++ ${EXT_LIB} ${EXT_LIB_LINK} 
 
-OBJS = Range.o Box.o Partition.o Array.o \
-       Internal.o Function.o Kernel.o Operator.o \
-       Node.o IO.o Grid.o Init.o
+# OBJS = Range.o Box.o Partition.o Array.o \
+#        Internal.o Function.o Kernel.o Operator.o \
+#        Node.o IO.o Grid.o Init.o
 
-OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
-			utils.o)
+OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
+	$(addsuffix .o, $(basename $(wildcard utils/*.cpp))) \
+	$(addsuffix .o, $(basename $(wildcard c-interface/*.cpp))) \
+	$(addsuffix .o, $(basename $(wildcard modules/*/*.cpp)))
 
-OBJS_C_INTERFACE = $(addprefix ./c-interface/, \
-			c_oa_partition.o \
-			c_oa_type.o c_oa_utils.o c_oa_sub.o)
+# $(addsuffix .o, \
+# $(basename \
+# $(wildcard \
+# $(addsuffix /*.cpp, \
+# $(wildcard modules/*)))))
 
-OBJ_FORTRAN = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} \
-		$(addprefix ./fortran/, \
-		oa_partition.o oa_type.o oa_ops.o \
-		oa_utils.o oa_sub.o oa_sum.o oa_rep.o oa_mod.o \
-		oa_test.o oa_main.o)
 
-OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} main.o
+#OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
+#			utils.o)
 
-OBJ_TEST = ${OBJS} ${OBJS_UTILS} \
-	   $(addprefix ./unittest/, test_array.o gtest_main.o)
+#OBJS_UTILS = $(addsuffix .o, $(basename $(wildcard utils/*.cpp)))
 
-OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
-	   $(addprefix ./unittest/, test_perf.o)
+# OBJS_C_INTERFACE = $(addprefix ./c-interface/, \
+# 			c_oa_partition.o \
+# 			c_oa_type.o c_oa_utils.o c_oa_sub.o)
+
+
+
+# OBJ_FORTRAN = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} \
+# 		$(addprefix ./fortran/, \
+# 		oa_partition.o oa_type.o oa_ops.o \
+# 		oa_utils.o oa_sub.o oa_sum.o oa_rep.o oa_mod.o \
+# 		oa_test.o oa_main.o)
+
+OBJ_FORTRAN = ${OBJS} \
+	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
+
+OBJ_MAIN  = ${OBJS}  main.o
+
+OBJ_TEST = ${OBJS} $(addprefix ./unittest/, test_array.o gtest_main.o)
+
+OBJ_TEST_PERF = ${OBJS} $(addprefix ./unittest/, test_perf.o)
 
 .DEFAULT_GOAL := all
 
 MAKEFILE = makefile.linux
 
-
+AA = $(wildcard *.cpp) $(wildcard modules/*/*.cpp)
 
 debug:
-	@echo ${LIBS}   
+	@echo ${OBJS}   
 
 %.o: %.cpp
 	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $@
@@ -101,7 +118,7 @@ all:
 	@./pre.sh
 	@cd build && make clean -j  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build && make main -j8 -f ${MAKEFILE} 
+	@cd build && make main -j8 -f ${MAKEFILE} 2>/dev/null
 	cp build/main ./
 
 quick:

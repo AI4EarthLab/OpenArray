@@ -2,46 +2,53 @@
 #include "Grid.hpp"
 #include "op_define.hpp"
 #include <boost/throw_exception.hpp>
+#include "common.hpp"
 
 void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
 
-  // NodePtr ndx = oa::ops::new_node(dx);
-  // NodePtr ndy = oa::ops::new_node(dy);
-  // NodePtr ndz = oa::ops::new_node(dz);
+  NodePtr ndx = oa::ops::new_node(dx);
+  NodePtr ndy = oa::ops::new_node(dy);
+  NodePtr ndz = oa::ops::new_node(dz);
 
   switch(type){
   case 'C':
-    // x_d[0] = EVAL(AYB(AXB(ndx)));
-    // y_d[0] = EVAL(AYB(AXB(ndy)));
-    // z_d[0] = dz;
+    x_d[0] = EVAL(AYB(AXB(ndx)));
+    y_d[0] = EVAL(AYB(AXB(ndy)));
+    z_d[0] = dz;
 
-    // x_d[1] = EVAL(AYB(ndx));
-    // y_d[1] = EVAL(AYB(ndy));
-    // z_d[1] = dz;
+    x_d[1] = EVAL(AYB(ndx));
+    y_d[1] = EVAL(AYB(ndy));
+    z_d[1] = dz;
 
-    // x_d[2] = EVAL(AXB(ndx));
-    // y_d[2] = EVAL(AXB(ndy));
-    // z_d[2] = dz;
+    x_d[2] = EVAL(AXB(ndx));
+    y_d[2] = EVAL(AXB(ndy));
+    z_d[2] = dz;
 
-    // x_d[3] = dx;
-    // y_d[3] = dy;
-    // z_d[3] = dz;
+    x_d[3] = dx;
+    y_d[3] = dy;
+    z_d[3] = dz;
 
-    // x_d[4] = EVAL(AYB(AXB(ndx)));
-    // y_d[4] = EVAL(AYB(AXB(ndy)));
-    // z_d[4] = EVAL(AZB(ndz));
+    x_d[4] = EVAL(AYB(AXB(ndx)));
+    y_d[4] = EVAL(AYB(AXB(ndy)));
+    z_d[4] = EVAL(AZB(ndz));
 
-    // x_d[5] = EVAL(AYB(ndx));
-    // y_d[5] = EVAL(AYB(ndy));
-    // z_d[5] = EVAL(AZB(ndz));
+    x_d[5] = EVAL(AYB(ndx));
+    y_d[5] = EVAL(AYB(ndy));
+    z_d[5] = EVAL(AZB(ndz));
 
-    // x_d[6] = EVAL(AXB(ndx));
-    // x_d[6] = EVAL(AXB(ndy));
-    // x_d[6] = EVAL(AZB(ndz));
+    x_d[6] = EVAL(AXB(ndx));
+    y_d[6] = EVAL(AXB(ndy));
+    z_d[6] = EVAL(AZB(ndz));
 
-    // x_d[7] = dx;
-    // y_d[7] = dy;
-    // z_d[7] = EVAL(AZB(ndz));
+    x_d[7] = dx;
+    y_d[7] = dy;
+    z_d[7] = EVAL(AZB(ndz));
+
+    // for (int i = 0; i < 8; i++) {
+    //   x_d[i]->display("x_d");
+    //   y_d[i]->display("y_d");
+    //   z_d[i]->display("z_d");
+    // }
 
     x_map.resize(8);
     y_map.resize(8);
@@ -64,27 +71,52 @@ void Grid::init_grid(char type, ArrayPtr dx, ArrayPtr dy, ArrayPtr dz){
 }
 
 ArrayPtr Grid::get_grid_dx(int pos){
-  return x_d[pos];
+  return x_d.at(pos);
 }
 
 ArrayPtr Grid::get_grid_dy(int pos){
-  return y_d[pos];
+  return y_d.at(pos);
 }
 
 ArrayPtr Grid::get_grid_dz(int pos){
-  return z_d[pos];
+  return z_d.at(pos);
+}
+
+int Grid::get_pos(int pos, NodeType t){
+  switch (t) {
+  case TYPE_AXB:
+  case TYPE_DXB:
+  case TYPE_AXF:
+  case TYPE_DXF:
+    return Grid::global()->get_pos_x(pos);
+    break;
+  case TYPE_AYB:
+  case TYPE_DYB:
+  case TYPE_AYF:
+  case TYPE_DYF:
+    return Grid::global()->get_pos_y(pos);
+    break;
+  case TYPE_AZB:
+  case TYPE_DZB:
+  case TYPE_AZF:
+  case TYPE_DZF:
+    return Grid::global()->get_pos_z(pos);
+    break;
+  default:
+    return pos;
+  }
 }
 
 int Grid::get_pos_x(int pos) {
-  return x_map[pos];
+  return x_map.at(pos);
 }
 
 int Grid::get_pos_y(int pos) {
-  return y_map[pos];
+  return y_map.at(pos);
 }
 
 int Grid::get_pos_z(int pos) {
-  return z_map[pos];
+  return z_map.at(pos);
 }
 
 Grid* Grid::global() {

@@ -29,7 +29,7 @@ void Node::display(char const *prefix) {
     printf(" input : \n");
     for(int i = 0; i < m_input.size(); ++i)
       printf("     %p : %s\n", m_input[i].get(),
-	     oa::ops::get_node_desc(m_input[i]->type()).name.c_str());
+              oa::ops::get_node_desc(m_input[i]->type()).name.c_str());
   }
 
   if (m_type == TYPE_DATA) {
@@ -112,6 +112,7 @@ void Node::reset() {
   m_type = TYPE_UNKNOWN;
   m_hash = 0;
   id = -1;
+  m_depth = 0;
 }
 
 bool Node::is_scalar() const {

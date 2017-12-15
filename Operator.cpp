@@ -65,8 +65,11 @@ namespace oa {
       
       // u & v must in the same grid pos
       //assert(u->get_pos() == v->get_pos());
-      np->set_pos(u->get_pos());
-      
+      if(u->get_pos() != -1)
+        np->set_pos(u->get_pos());
+      else if(v->get_pos() != -1)
+        np->set_pos(v->get_pos());
+     
       return np;
     }
 
@@ -150,26 +153,9 @@ namespace oa {
           }
         }
 
-        switch (type) {
-            case TYPE_AXB:
-            case TYPE_DXB:
-            case TYPE_AXF:
-            case TYPE_DXF:
-              np->set_pos( Grid::global()->get_pos_x(u->get_pos()) );
-              break;
-            case TYPE_AYB:
-            case TYPE_DYB:
-            case TYPE_AYF:
-            case TYPE_DYF:
-              np->set_pos( Grid::global()->get_pos_y(u->get_pos()) );
-              break;
-            case TYPE_AZB:
-            case TYPE_DZB:
-            case TYPE_AZF:
-            case TYPE_DZF:
-              np->set_pos( Grid::global()->get_pos_z(u->get_pos()) );
-              break;
-          }
+        if(u->get_pos() != -1){
+          np->set_pos(Grid::global()->get_pos(u->get_pos(), type));
+        }
 
       } else {
         // to do set data_type && shape
@@ -218,11 +204,30 @@ namespace oa {
         ///:set ef = i[7]
         ///:set rt = i[8]
         ///:set kernel_name = 'kernel_' + i[1]
-        ///:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'csum' or name == 'sum' or name == 'not' or name == 'rep')
-        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", ${kernel_name}$, ${rt}$};
+        
+
+        s[${type}$].type = ${type}$;
+        s[${type}$].name = "${name}$";
+        s[${type}$].sy = "${sy}$";
+        s[${type}$].ew = ${ew}$;
+        s[${type}$].cl = ${cl}$;
+        s[${type}$].expr = "${ef}$";
+        
+        
+        ///!:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'not')
+        ///:if i[2] == ''
+        s[${type}$].func = NULL;
         ///:else
-        s[${type}$] = {${type}$, "${name}$", "${sy}$", ${ew}$, ${cl}$, "${ef}$", NULL, ${rt}$};
+        s[${type}$].func = ${kernel_name}$;
         ///:endif
+        
+        ///!:else
+        ///s[${type}$].func = NULL;
+        ///!:endif
+        
+        s[${type}$].rt = ${rt}$;
+
+
         ///:set id = id + 1
         ///:endfor
         has_init = true;

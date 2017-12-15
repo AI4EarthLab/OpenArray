@@ -26,8 +26,7 @@ extern "C" {
           oa::internal::copy_buffer(
             (int*) (ap->get_buffer()),
             (int*) ((*(ArrayPtr*) B)->get_buffer()),
-            ap->buffer_size()
-          );
+            ap->buffer_size());
           break;
         case DATA_FLOAT:
           oa::internal::copy_buffer(
@@ -72,6 +71,7 @@ extern "C" {
     }
 
     A = p;
+    
   }
   
   void c_destroy_array(void*& A) {
@@ -216,11 +216,14 @@ extern "C" {
   }
 
   void c_new_node_op1(void* &ptr, int nodetype, void* &u) {
-    NodePtr np = oa::ops::new_node((NodeType)nodetype, *(NodePtr*)u);
+
+    if (ptr != NULL) c_destroy_node(ptr);
+    NodePtr np = oa::ops::new_node(TYPE_AXB, *(NodePtr*)u);
+    
+    //NodePtr np = oa::ops::new_node((NodeType)nodetype, *(NodePtr*)u);
     NodePtr* A = new NodePtr();
     *A = np;
 
-    if (ptr != NULL) c_destroy_node(ptr);
     ptr = (void*) A;
   }
 

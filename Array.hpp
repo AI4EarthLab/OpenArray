@@ -19,8 +19,8 @@ typedef shared_ptr<Grid> GridPtr;
 class Array {
   private:
   void *m_buffer;
-  bool m_is_field = false;
-  int m_grid_pos = -1;
+  // bool m_is_field = false;
+  // int m_grid_pos = -1;
   int m_data_type = 2;
   PartitionPtr m_par_ptr;
   BoxPtr m_ref_box_ptr;
@@ -28,7 +28,7 @@ class Array {
   bool m_is_scalar = false;
   bool m_is_seqs = false;
   size_t m_hash;
-  int pos = 0;
+  int pos = -1;
   GridPtr grid;
   bool m_is_pseudo = false;
 

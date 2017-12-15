@@ -27,7 +27,8 @@ private:
   int3 m_lbound = {{0, 0, 0}};
   int3 m_rbound = {{0, 0, 0}};
   bool m_update_boundary = false;
-  int pos;
+  int pos = -1;
+  bool m_is_pseudo = false;
   //BoxPtr ref;
 
 public:
@@ -121,6 +122,10 @@ public:
   void set_pos(int p);
 
   int get_pos();
+
+  void set_pseudo(bool ps);
+
+  bool is_pseudo();
 };
 
 

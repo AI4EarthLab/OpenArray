@@ -259,44 +259,34 @@
       call c_new_local_int3(A%ptr, v)
     end function
 
-    subroutine grid_init(ch, A, B, C)
-      use iso_c_binding
-      character(len=1) :: ch
-      type(Array), intent(in) :: A, B, C
-
-      interface
-         subroutine c_grid_init(ch, A, B, C) &
-              bind(C, name = 'c_grid_init')
-           use iso_c_binding
-           character(len=1) :: ch
-           type(c_ptr), intent(in) :: A, B, C
-         end subroutine
-      end interface
-
-      call c_grid_init(ch, A%ptr, B%ptr, C%ptr)
-
-    end subroutine
-
-
-
 
     ///:for t in ['node', 'array']
     ///:for n in [i for i in L if i[3] == 'D']
+    ///:set name = n[1]
     function ${n[2]}$_${t}$(A) result(B)
       implicit none
+
+      interface
+         subroutine c_new_node_${name}$(A, U) &
+              bind(C, name='c_new_node_${name}$')
+           use iso_c_binding
+           type(c_ptr), intent(inout) :: A
+           type(c_ptr), intent(in) :: U 
+         end subroutine
+      end interface
+
       type(${t}$) :: A
       type(node)  :: B
       type(node) :: NA
 
-      NA%ptr = C_NULL_PTR
-      
       ///:if t == 'array'
       call c_new_node_array(NA%ptr, A%ptr)
-      call c_new_node_op1(B%ptr, ${n[0]}$, NA%ptr)
+      !call c_new_node_op1(B%ptr, ${n[0]}$,NA%ptr)
+      
+      call c_new_node_${name}$(B%ptr, NA%ptr)
       ///:else
-      call c_new_node_op1(B%ptr, ${n[0]}$, A%ptr)
+      call c_new_node_${name}$(B%ptr, A%ptr)
       ///:endif
-      print*, "HHHHHHHHHHHHHHHHHHHHHHHHHHHH"
       !!B%ptr = C_NULL_PTR
     end function
     ///:endfor

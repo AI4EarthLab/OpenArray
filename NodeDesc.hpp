@@ -14,7 +14,7 @@ typedef std::function<kernel_rawptr> KernelPtr;
 //typedef std::function<ArrayPtr(std::vector<ArrayPtr>&)> KernelPtr;
 
 struct NodeDesc{
-  int type;         // operator type
+  NodeType type;         // operator type
   std::string name; // operator name
   std::string sy;   // operator symbol
   bool ew;          // if element-wise operation
@@ -22,7 +22,22 @@ struct NodeDesc{
   std::string expr; // expression form
   KernelPtr func;   // operator function address
   int rt;           // result type
+
+  NodeDesc(){}
+  
+  // NodeDesc(NodeType _type,
+  //          const char* _name,
+  //          const char* _sy,
+  //          bool _ew, bool _cl,
+  //          const char* _expr,
+  //          kernel_rawptr* _func,
+  //          int _rt) : type(_type), name(_name),
+  //                     sy(_sy), ew(_ew), cl(_cl), func(_func), rt(_rt){
+    
+  // }
 };
+
+
 
 typedef std::vector<NodeDesc> OpDescList;
 

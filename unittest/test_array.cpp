@@ -134,13 +134,13 @@ namespace{
     ///:for t in dtypes
     {
       ArrayPtr A1 = oa::funcs::to_rank0(oa::funcs::seqs(comm, {m, n, p}, 1,
-                                                        oa::utils::dtype<${t}$>::type));
+                      oa::utils::dtype<${t}$>::type));
       arma::Cube<${t}$> B1 = make_seqs<${t}$>(m, n, p);
 
       ArrayPtr A2 =
         oa::funcs::to_rank0(oa::funcs::consts<${t}$>(comm, {m, n, p},
-                                                     ${t}$(2),
-                                                     oa::utils::dtype<${t}$>::type));
+                        ${t}$(2),
+                        oa::utils::dtype<${t}$>::type));
       arma::Cube<${t}$> B2(m, n, p);
       B2.fill(${t}$(2));
 
@@ -162,8 +162,8 @@ namespace{
       
       NodePtr N1 = oa::ops::new_node(oa::funcs::seqs(comm, {m, n, p}, 0, dt1));
       NodePtr N2 = oa::ops::new_node(oa::funcs::consts(comm,
-                                                       {m, n, p},
-                                                       ${t2}$(2.0), 0));
+                      {m, n, p},
+                      ${t2}$(2.0), 0));
 
       
       typedef otype<${t1}$, ${t2}$>::value result_type;
@@ -204,9 +204,9 @@ namespace{
       DataType dt2  = oa::utils::dtype<${t2}$>::type;
       
       NodePtr N1 = oa::ops::new_node(oa::funcs::consts(comm, {m, n, p},
-                                                       ${t1}$(3.0), 0));
+                      ${t1}$(3.0), 0));
       NodePtr N2 = oa::ops::new_node(oa::funcs::consts(MPI_COMM_SELF,
-                                                       {1, 1, 1}, ${t2}$(2), 0));
+                      {1, 1, 1}, ${t2}$(2), 0));
 
       typedef otype<${t1}$, ${t2}$>::value result_type;
       arma::Cube<result_type> C3, C4;
@@ -307,9 +307,9 @@ namespace{
       ArrayPtr A1 = oa::funcs::to_rank0(A);
       Shape s = A1->buffer_shape();
       arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(s, A1->get_buffer())
-                       (arma::span(sw, s[0] - sw - 1),
-                        arma::span(sw, s[1] - sw - 1),
-                        arma::span(sw, s[2] - sw - 1));
+                                                       (arma::span(sw, s[0] - sw - 1),
+                                                               arma::span(sw, s[1] - sw - 1),
+                                                               arma::span(sw, s[2] - sw - 1));
       
 
       // ArrayPtr V2 = oa::ops::eval(NSA);
@@ -658,8 +658,8 @@ namespace{
       ArrayPtr rank0A = oa::funcs::to_rank0(A);
       //if(rank == 0)result->display("result");
       if(rank == 0){
-       //rank0A->display("rand");
-       ;
+        //rank0A->display("rand");
+        ;
       }
 
       MPI_Barrier(comm);
@@ -668,8 +668,8 @@ namespace{
   }
 
 
-    INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
-      gt::Combine(gt::Values(MPI_COMM_WORLD),
-        MRange, NRange, PRange));
+  INSTANTIATE_TEST_CASE_P(OpenArray, MPITest,
+          gt::Combine(gt::Values(MPI_COMM_WORLD),
+                  MRange, NRange, PRange));
 
 }

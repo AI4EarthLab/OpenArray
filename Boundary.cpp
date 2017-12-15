@@ -11,14 +11,14 @@ Boundary::~Boundary() {
   delete((double*) m_buffer);
 }
 
-Boundary::get_buffer() {
+void* Boundary::get_buffer() {
   return m_buffer;
 }
 
-Boundary::set_size(int sz) {
+void Boundary::set_size(int sz) {
   m_size = sz;
 }
 
-Boundary::size() {
+int Boundary::size() {
   return m_size;
 }
