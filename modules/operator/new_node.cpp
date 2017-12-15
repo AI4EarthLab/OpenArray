@@ -22,6 +22,8 @@ namespace oa{
       np->set_depth(u->get_depth());
       np->set_shape(u->shape());
 
+      if(dt == DATA_INT) dt = DATA_FLOAT;
+      
       np->set_data_type(dt);
       np->set_lbound(u->get_lbound());
       np->set_rbound(u->get_rbound());
