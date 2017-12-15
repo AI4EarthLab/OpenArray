@@ -271,6 +271,8 @@ contains
   subroutine test_operator()
     implicit none
     type(array) :: A, B, C
+    
+    !call grid_init('C', dx, dy, dz)
 
     A = rands(4,4,4) !seqs(4, 4, 4) + 1
     call display(A, "A = ")
@@ -283,6 +285,7 @@ contains
     call display(B, "${o}$(A)")
     
     ///:endfor
+
 
     B = DXB(AXF(A))
     call display(B, "DXB(AXF(A))")

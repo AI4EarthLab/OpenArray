@@ -1,5 +1,5 @@
-
 name = main
+compile_thread = -j8
 
 #if you put the exteranl libaray in one directory
 EXT_INCLUDE = $(addprefix -I, $(shell find ${EXT_PATH}/include -maxdepth 1 -type d))
@@ -16,10 +16,12 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_system -ldl -llapack -lblas -lgtest -ljit \
 		-Wl,-rpath=${JIT_LIB}
 
+oplevel0 = -O0 -g 
+oplevel3 = -O3
 
-FC = mpif90 -O1
-CC = mpicc  
-CXX = mpicxx
+FC = mpif90 ${oplevel0}
+CC = mpicc  ${oplevel0}
+CXX = mpicxx ${oplevel0}
 
 FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans
 
@@ -66,6 +68,7 @@ OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
 
 OBJ_FORTRAN = ${OBJS} \
 	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
+
 
 OBJ_MAIN  = ${OBJS}  test/main.o
 
@@ -116,9 +119,13 @@ all:
 	@echo "Cleaning..."
 	@mkdir -p build 
 	@./pre.sh
-	@cd build && make clean -j  -f ${MAKEFILE}
+	@cd build && make clean  -f ${MAKEFILE}
 	@echo "Cleaning done."
+<<<<<<< HEAD
 	@cd build && make main -j8 -f ${MAKEFILE} 
+=======
+	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make main ${compile_thread} -f ${MAKEFILE} 
+>>>>>>> wangdong
 	cp build/main ./
 
 quick:
@@ -128,7 +135,7 @@ quick:
 	@./pre.sh
 	@cd build
 	@echo "Cleaning done."
-	@cd build && make ${name} -j8 -f ${MAKEFILE}
+	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make ${name} ${compile_thread} -f ${MAKEFILE}
 	@cp build/${name} ./
 	@mpirun -oversubscribe -n 8 ./${name} 4 4 4
 
@@ -140,9 +147,9 @@ testall:
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
 	@./pre.sh
-	@cd build && make clean 
+	@cd build && make clean  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build && make testall_main -j8 -f ${MAKEFILE}
+	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make testall_main ${compile_thread} -f ${MAKEFILE}
 	@cp build/testall_main ./
 	@mpirun -np 2 ./testall_main 
 
@@ -154,9 +161,9 @@ testfortran:
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
 	@./pre.sh
-	@cd build && make clean 
+	@cd build && make clean  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build &&sed -i "s/##===##//g" makefile.linux && make fortran_main  -f ${MAKEFILE} -j8
+	@cd build &&sed -i "s/##===##//g" ${MAKEFILE} && make fortran_main ${compile_thread} -f ${MAKEFILE} 
 	@cp build/fortran_main ./
 	@mpirun -n 4 ./fortran_main
 
@@ -165,8 +172,14 @@ fortran_main : ${OBJ_FORTRAN}
 	${EXT_LIB_LINK} ${LIBS} -lgfortran
 
 small:
-	@make all -j8 -f ${MAKEFILE}
+	@make all -f ${MAKEFILE}
 	@mpirun -n 4 ./main 4 3 2
 
 clean:
-	@rm -rf *.o 2>/dev/null
+	@find . -name "*.o" \
+	-or -name "*.d*" \
+	-or -name "*.mod" \
+	-or -name "main" \
+	-or -name "fortran_main" \
+	-or -name "testall_main" | \
+	xargs rm -f  &>/dev/null
