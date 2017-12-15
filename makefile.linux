@@ -121,11 +121,7 @@ all:
 	@./pre.sh
 	@cd build && make clean  -f ${MAKEFILE}
 	@echo "Cleaning done."
-<<<<<<< HEAD
-	@cd build && make main -j8 -f ${MAKEFILE} 
-=======
 	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make main ${compile_thread} -f ${MAKEFILE} 
->>>>>>> wangdong
 	cp build/main ./
 
 quick:
