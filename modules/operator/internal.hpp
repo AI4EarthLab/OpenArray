@@ -38,11 +38,11 @@ namespace oa{
     ///:elif name == "dzf"
     ///:set func = '1.0 * (-b[calc_id(i, j, k, S)] + b[calc_id(i, j, k + 1, S)]) / 1.0'
     ///:elif name == "dxc"
-    ///:set func = '1.0 * (-b[calc_id(i+1, j, k, S)] + b[calc_id(i-1, j, k, S)]) / 2.0'
+    ///:set func = '0.5 * (b[calc_id(i+1, j, k, S)] - b[calc_id(i-1, j, k, S)])'
     ///:elif name == "dyc"
-    ///:set func = '1.0 * (-b[calc_id(i, j+1, k, S)] + b[calc_id(i, j-1, k, S)]) / 2.0'
+    ///:set func = '0.5 * (b[calc_id(i, j+1, k, S)] - b[calc_id(i, j-1, k, S)])'
     ///:elif name == "dzc"
-    ///:set func = '1.0 * (-b[calc_id(i, j, k+1, S)] + b[calc_id(i, j, k-1, S)]) / 2.0'
+    ///:set func = '0.5 * (b[calc_id(i, j, k+1, S)] - b[calc_id(i, j, k-1, S)])'
     ///:endif
 
     // crate kernel_${name}$
@@ -79,8 +79,8 @@ namespace oa{
           }
         }
       }
-
-      ///:elif name[1:] in ['zf', 'zc']
+      ///:endif
+      ///:if name[1:] in ['zf', 'zc']
       for (int k = sw + sp[2] - rbound[2]; k < sw + sp[2]; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = 0; i < M; i++) {
@@ -88,8 +88,8 @@ namespace oa{
           }
         }
       }
-
-      ///:elif name[1:] in ['yb', 'yc']
+      ///:endif
+      ///:if name[1:] in ['yb', 'yc']
       for (int k = 0; k < P; k++) {
         for (int j = sw; j < sw + lbound[1]; j++) {
           for (int i = 0; i < M; i++) {
@@ -97,8 +97,8 @@ namespace oa{
           }
         }
       }
-
-      ///:elif name[1:] in ['yf', 'yc']
+      ///:endif
+      ///:if name[1:] in ['yf', 'yc']
       for (int k = 0; k < P; k++) {
         for (int j = sw + sp[1] - rbound[1]; j < sw + sp[1]; j++) {
           for (int i = 0; i < M; i++) {
@@ -106,8 +106,8 @@ namespace oa{
           }
         }
       }
-
-      ///:elif name[1:] in ['xb', 'xc']
+      ///:endif
+      ///:if name[1:] in ['xb', 'xc']
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = sw; i < sw + lbound[0]; i++) {
@@ -115,8 +115,8 @@ namespace oa{
           }
         }
       }
-
-      ///:elif name[1:] in ['xf', 'xc']
+      ///:endif
+      ///:if name[1:] in ['xf', 'xc']
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
           for (int i = sw + sp[0] - rbound[0]; i < sw + sp[0]; i++) {
@@ -124,8 +124,8 @@ namespace oa{
           }
         }
       }
-
       ///:endif
+
 
     }
 
