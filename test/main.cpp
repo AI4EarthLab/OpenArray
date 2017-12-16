@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
   //test_op();
   tic("3d");
   for (int i = 0; i < 1; i++)
-    test_fusion_op_3d(i);
+    test_fusion_op_3d(m, n, p, i);
   toc("3d");
   // tic("2d");
   // test_fusion_op_3d();

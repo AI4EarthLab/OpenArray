@@ -47,8 +47,14 @@ namespace oa{
 
     // crate kernel_${name}$
     // A = ${name}$(U)
-    template<typename T>
-    void ${name}$_calc_inside(double* ans, T* b, int3 lbound, int3 rbound, 
+
+    ///:mute
+    ///:include "kernel_type.fypp"
+    ///:endmute
+    ///:for i in T_INT
+    ///:set grid = i[4]
+    template<typename T1, typename T2>
+    void ${name}$_${grid}$_calc_inside(T1* ans, T2* b, int3 lbound, int3 rbound, 
             int sw, Shape sp, Shape S) {
 
       for (int k = sw + lbound[2]; k < sw + sp[2] - rbound[2]; k++) {
@@ -62,8 +68,8 @@ namespace oa{
       }
     }
 
-    template<typename T>
-    void ${name}$_calc_outside(double* ans, T* b, int3 lbound, int3 rbound, 
+    template<typename T1, typename T2>
+    void ${name}$_${grid}$_calc_outside(T1* ans, T2* b, int3 lbound, int3 rbound, 
             int sw, Shape sp, Shape S) {
       int M = S[0];
       int N = S[1];
@@ -129,6 +135,7 @@ namespace oa{
 
     }
 
+    ///:endfor
     ///:endfor
 
   }

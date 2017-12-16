@@ -83,24 +83,55 @@ ArrayPtr Grid::get_grid_dz(int pos){
   return z_d.at(pos);
 }
 
+ArrayPtr Grid::get_grid(int pos, NodeType t) {
+  switch (t) {
+  case TYPE_AXB:
+  case TYPE_DXB:
+  case TYPE_AXF:
+  case TYPE_DXF:
+  case TYPE_DXC:
+    return Grid::global()->get_grid_dx(pos);
+    break;
+  case TYPE_AYB:
+  case TYPE_DYB:
+  case TYPE_AYF:
+  case TYPE_DYF:
+  case TYPE_DYC:
+    return Grid::global()->get_grid_dy(pos);
+    break;
+  case TYPE_AZB:
+  case TYPE_DZB:
+  case TYPE_AZF:
+  case TYPE_DZF:
+  case TYPE_DZC:
+    return Grid::global()->get_grid_dz(pos);
+    break;
+  default:
+    return NULL;
+  }
+}
+
 int Grid::get_pos(int pos, NodeType t){
   switch (t) {
   case TYPE_AXB:
   case TYPE_DXB:
   case TYPE_AXF:
   case TYPE_DXF:
+  case TYPE_DXC:
     return Grid::global()->get_pos_x(pos);
     break;
   case TYPE_AYB:
   case TYPE_DYB:
   case TYPE_AYF:
   case TYPE_DYF:
+  case TYPE_DYC:
     return Grid::global()->get_pos_y(pos);
     break;
   case TYPE_AZB:
   case TYPE_DZB:
   case TYPE_AZF:
   case TYPE_DZF:
+  case TYPE_DZC:
     return Grid::global()->get_pos_z(pos);
     break;
   default:

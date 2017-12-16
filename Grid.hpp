@@ -23,6 +23,8 @@ class Grid {
   ArrayPtr get_grid_dy(int pos);
   ArrayPtr get_grid_dz(int pos);
 
+  ArrayPtr get_grid(int pos, NodeType t);
+
   int get_pos(int pos, NodeType t);
     
   int get_pos_x(int pos);

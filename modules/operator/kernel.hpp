@@ -28,8 +28,22 @@ namespace oa {
     ///:set name = k[1]
     // crate kernel_${name}$
     // A = ${name}$(U)
-    template<typename T>
-    void t_kernel_${name}$(ArrayPtr& ap, ArrayPtr& u) {
+
+    ///:mute
+    ///:include "kernel_type.fypp"
+    ///:endmute
+    
+    ///:for i in T_INT
+    ///:set grid = i[4]
+    template<typename T1, typename T2>
+    ArrayPtr t_kernel_${name}$_${grid}$(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr ap;
+
+      int dt = oa::utils::to_type<T1>();
+
+      ap = ArrayPool::global()->get(u->get_partition(), dt);
+
       int sw = u->get_partition()->get_stencil_width();
       Shape sp = u->local_shape();
       Shape S = u->buffer_shape();
@@ -59,8 +73,8 @@ namespace oa {
       rbound = {0, 0, 1};
       ///:endif
 
-      double* ans = (double*) ap->get_buffer();
-      T* buffer = (T*) u->get_buffer();
+      T1* ans = (T1*) ap->get_buffer();
+      T2* buffer = (T2*) u->get_buffer();
 
       /*
         to chose the right bind grid
@@ -69,14 +83,16 @@ namespace oa {
 
       vector<MPI_Request> reqs;
       oa::funcs::update_ghost_start(u, reqs, -1);
-      oa::internal::${name}$_calc_inside<T>(ans,
+      oa::internal::${name}$_${grid}$_calc_inside<T1, T2>(ans,
               buffer, lbound, rbound, sw, sp, S);
       oa::funcs::update_ghost_end(reqs);
-      oa::internal::${name}$_calc_outside<T>(ans,
+      oa::internal::${name}$_${grid}$_calc_outside<T1, T2>(ans,
               buffer, lbound, rbound, sw, sp, S);
 
+      return ap;
     }
 
+    ///:endfor
     ///:endfor
 
   }
