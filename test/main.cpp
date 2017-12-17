@@ -54,11 +54,11 @@ int main(int argc, char** argv) {
   //test_fusion_operator();
   //test_op();
   // tic("3d");
-  for (int i = 0; i < 1; i++)
-    test_fusion_op_3d(m, n, p, i);
+  // for (int i = 0; i < 1; i++)
+  //   test_fusion_op_3d(m, n, p, i);
   // toc("3d");
   // tic("2d");
-  test_fusion_op_2d(m, n, p);
+  // test_fusion_op_2d(m, n, p);
   // toc("2d");
   // oa::utils::mpi_order_start(MPI_COMM_WORLD);
   // show_all();
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
   //test_pseudo_3d();
   //test_rand();
   //test_bitset();
-  // test_operator_with_grid();
+  test_operator_with_grid();
 
 
   MPI_Finalize();

@@ -45,10 +45,20 @@ void Grid::init_grid(char type,
     y_d[7] = dy;
     z_d[7] = EVAL(AZB(ndz));
 
+    // // need update ghost of dx, dy, dz
     // for (int i = 0; i < 8; i++) {
-    //   x_d[i]->display("x_d");
-    //   y_d[i]->display("y_d");
-    //   z_d[i]->display("z_d");
+    //   vector<MPI_Request> reqs;
+    //   oa::funcs::update_ghost_start(x_d[i], reqs, -1);
+    //   oa::funcs::update_ghost_end(reqs);
+    //   reqs.clear();
+
+    //   oa::funcs::update_ghost_start(y_d[i], reqs, -1);
+    //   oa::funcs::update_ghost_end(reqs);
+    //   reqs.clear();
+
+    //   oa::funcs::update_ghost_start(z_d[i], reqs, -1);
+    //   oa::funcs::update_ghost_end(reqs);
+    //   reqs.clear();
     // }
 
     x_map.resize(8);
@@ -84,6 +94,7 @@ ArrayPtr Grid::get_grid_dz(int pos){
 }
 
 ArrayPtr Grid::get_grid(int pos, NodeType t) {
+  if (pos == -1) return NULL;
   switch (t) {
   case TYPE_AXB:
   case TYPE_DXB:
@@ -106,9 +117,8 @@ ArrayPtr Grid::get_grid(int pos, NodeType t) {
   case TYPE_DZC:
     return Grid::global()->get_grid_dz(pos);
     break;
-  default:
-    return NULL;
   }
+  return NULL;
 }
 
 int Grid::get_pos(int pos, NodeType t){

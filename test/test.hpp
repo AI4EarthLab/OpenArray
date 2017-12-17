@@ -1049,12 +1049,28 @@ void test_bitset() {
 }
 
 void test_operator_with_grid() {
-  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  NodePtr n1 = NODE(ap1);
-  NodePtr n2 = DXF(n1);
+  ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
+  
+  dx->set_pseudo(true);
+  dy->set_pseudo(true);
+  dz->set_pseudo(true);
 
+  dx->set_bitset("110");
+  dy->set_bitset("110");
+  dz->set_bitset("001");
+  
+  Grid::global()->init_grid('C', dx, dy, dz);
+
+  // Grid::global()->get_grid_dx(3)->display("dx[3]");
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 1);
   ap1->display("ap1");
+  ap1->set_pos(3);
+  
+  NodePtr n1 = NODE(ap1);
   n1->display("n1");
+  NodePtr n2 = DXF(n1);
   n2->display("n2");
 
   ArrayPtr ans = EVAL(n2);

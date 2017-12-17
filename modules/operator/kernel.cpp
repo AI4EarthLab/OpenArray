@@ -66,10 +66,6 @@ namespace oa {
       
       ap = kernel_table[u_dt][id](ops_ap);
 
-      // oa::utils::mpi_order_start(MPI_COMM_WORLD);
-      // if (oa::utils::get_rank() == 0) printf("%d %d %s\n", u_dt, id, "t_kernel_${name}$_${grid}$");
-      // oa::utils::mpi_order_end(MPI_COMM_WORLD);
-
       return ap;
     }
 
