@@ -794,10 +794,13 @@ void test_fusion_op_3d(int m, int n, int k, int i) {
   ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
   // ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   
-  // dx->set_pseudo(true);
-  // dy->set_pseudo(true);
-  // dz->set_pseudo(true);
+  dx->set_pseudo(true);
+  dy->set_pseudo(true);
+  dz->set_pseudo(true);
 
+  dx->set_bitset("110");
+  dy->set_bitset("110");
+  dz->set_bitset("001");
   
   // // Grid::global()->init_grid('C', NULL, NULL, NULL);
   Grid::global()->init_grid('C', dx, dy, dz);
@@ -813,26 +816,6 @@ void test_fusion_op_3d(int m, int n, int k, int i) {
   ArrayPtr ap8 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
   ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
   ArrayPtr ap10 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
-  
-  // pseudo 3d
-  // ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  // ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  // ArrayPtr ap3 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  // ap3->set_pseudo(true);
-  // ap3->set_bitset("110");
-  // ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  // ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  // ArrayPtr ap6 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  // ap6->set_pseudo(true);
-  // ap6->set_bitset("110");
-  // ArrayPtr ap7 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  // ArrayPtr ap8 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  // ap8->set_pseudo(true);
-  // ap8->set_bitset("110");
-  // ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-  // ArrayPtr ap10 = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  // ap10->set_pseudo(true);
-  // ap10->set_bitset("110");
   
   NodePtr w = NODE(ap1);
   NodePtr q2 = NODE(ap2);
@@ -884,7 +867,7 @@ void test_fusion_op_3d(int m, int n, int k, int i) {
   //if (i == 0)
   //  oa::ops::gen_kernels_JIT(a33);
   ArrayPtr gao = EVAL(a33);
-  //gao->display("gao");
+  gao->display("gao");
   
   //oa::ops::write_graph(a33);  
   
@@ -955,6 +938,7 @@ void test_fusion_op_2d(int m, int n, int k) {
   ArrayPtr ap10 = oa::funcs::consts(MPI_COMM_WORLD, {m/2, m/2}, {n/2, n/2}, {1, 1}, 1, 2);
   ap10->set_pseudo(true);
   ap10->set_bitset("110");
+
   
   NodePtr w = NODE(ap1);
   NodePtr q2 = NODE(ap2);
@@ -1004,7 +988,7 @@ void test_fusion_op_2d(int m, int n, int k) {
   NodePtr a33 = PLUS(a18, a32);
   
   ArrayPtr gao = EVAL(a33);
-  //gao->display("gao");
+  gao->display("gao");
   
   //oa::ops::write_graph(a33);  
   
@@ -1065,7 +1049,16 @@ void test_bitset() {
 }
 
 void test_operator_with_grid() {
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  NodePtr n1 = NODE(ap1);
+  NodePtr n2 = DXF(n1);
 
+  ap1->display("ap1");
+  n1->display("n1");
+  n2->display("n2");
+
+  ArrayPtr ans = EVAL(n2);
+  ans->display("ans");
 }
 
 #endif

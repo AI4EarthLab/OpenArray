@@ -136,7 +136,7 @@ quick:
 	@echo "Cleaning done."
 	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make ${name} ${compile_thread} -f ${MAKEFILE}
 	@cp build/${name} ./
-	@mpirun -oversubscribe -n 8 ./${name} 4 4 4
+	@mpirun -oversubscribe -n 8 ./${name} 6 6 6
 
 main: ${OBJ_MAIN} 
 	-${CXX} -rdynamic -o main ${OBJ_MAIN} ${LIBS}

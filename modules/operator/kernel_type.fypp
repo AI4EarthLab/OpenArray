@@ -1,0 +1,37 @@
+
+#! binary operator
+#!              A   =     Operator(U)
+
+#!      ID        A_TYPE    U_TYPE      NAME
+///:set T_INT = &
+       [[0, 000, 'float',  'int', 'with_grid_ooo'], & 
+        [1, 001, 'float',  'int', 'with_grid_ooz'], & 
+        [2, 010, 'float',  'int', 'with_grid_oyo'], & 
+        [3, 011, 'float',  'int', 'with_grid_oyz'], & 
+        [4, 100, 'float',  'int', 'with_grid_xoo'], & 
+        [5, 101, 'float',  'int', 'with_grid_xoz'], & 
+        [6, 110, 'float',  'int', 'with_grid_xyo'], & 
+        [7, 111, 'float',  'int', 'with_grid_xyz']]
+
+
+///:set T_FLOAT = &
+       [[0, 000, 'float',  'float', 'with_grid_ooo'], & 
+        [1, 001, 'float',  'float', 'with_grid_ooz'], & 
+        [2, 010, 'float',  'float', 'with_grid_oyo'], & 
+        [3, 011, 'float',  'float', 'with_grid_oyz'], & 
+        [4, 100, 'float',  'float', 'with_grid_xoo'], & 
+        [5, 101, 'float',  'float', 'with_grid_xoz'], & 
+        [6, 110, 'float',  'float', 'with_grid_xyo'], & 
+        [7, 111, 'float',  'float', 'with_grid_xyz']]
+
+
+///:set T_DOUBLE = &
+       [[0, 000, 'double',  'double', 'with_grid_ooo'], & 
+        [1, 001, 'double',  'double', 'with_grid_ooz'], & 
+        [2, 010, 'double',  'double', 'with_grid_oyo'], & 
+        [3, 011, 'double',  'double', 'with_grid_oyz'], & 
+        [4, 100, 'double',  'double', 'with_grid_xoo'], & 
+        [5, 101, 'double',  'double', 'with_grid_xoz'], & 
+        [6, 110, 'double',  'double', 'with_grid_xyo'], & 
+        [7, 111, 'double',  'double', 'with_grid_xyz']]
+        
