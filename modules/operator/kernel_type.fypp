@@ -54,10 +54,10 @@
 
 ///:set GRID = &
        [[0, 000, 'with_grid_ooo', '1.0'], & 
-        [1, 001, 'with_grid_ooz', 'g[calc_id(o, o, k, S)]'], & 
-        [2, 010, 'with_grid_oyo', 'g[calc_id(o, j, o, S)]'], & 
-        [3, 011, 'with_grid_oyz', 'g[calc_id(o, j, k, S)]'], & 
-        [4, 100, 'with_grid_xoo', 'g[calc_id(i, o, o, S)]'], & 
-        [5, 101, 'with_grid_xoz', 'g[calc_id(i, o, k, S)]'], & 
-        [6, 110, 'with_grid_xyo', 'g[calc_id(i, j, o, S)]'], & 
-        [7, 111, 'with_grid_xyz', 'g[calc_id(i, j, k, S)]']]
+        [1, 001, 'with_grid_ooz', 'g[calc_id(o, o, k, SG)]'], & 
+        [2, 010, 'with_grid_oyo', 'g[calc_id(o, j, o, SG)]'], & 
+        [3, 011, 'with_grid_oyz', 'g[calc_id(o, j, k, SG)]'], & 
+        [4, 100, 'with_grid_xoo', 'g[calc_id(i, o, o, SG)]'], & 
+        [5, 101, 'with_grid_xoz', 'g[calc_id(i, o, k, SG)]'], & 
+        [6, 110, 'with_grid_xyo', 'g[calc_id(i, j, o, SG)]'], & 
+        [7, 111, 'with_grid_xyz', 'g[calc_id(i, j, k, SG)]']]

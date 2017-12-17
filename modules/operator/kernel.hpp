@@ -87,14 +87,16 @@ namespace oa {
       // default grid data type
       int grid_dt = DATA_FLOAT;
       void* grid_buffer = NULL;
+      Shape SG = {0, 0, 0};
       
       // cout<<"${grid}$"<<endl; 
 
       if (gridptr != NULL) {
-        // cout<<"not null"<<endl;
-        // cout<<"${grid}$"<<endl;
+        cout<<"not null"<<endl;
+        cout<<"${grid}$"<<endl;
         grid_dt = gridptr->get_data_type();
         grid_buffer = gridptr->get_buffer();
+        SG = gridptr->buffer_shape();
       } 
 
       vector<MPI_Request> reqs;
@@ -104,29 +106,29 @@ namespace oa {
         case DATA_INT:
           oa::funcs::update_ghost_start(u, reqs, -1);
           oa::internal::${name}$_${grid}$_calc_inside<T1, T2, int>(ans,
-              buffer, (int*)grid_buffer, lbound, rbound, sw, sp, S);
+              buffer, (int*)grid_buffer, lbound, rbound, sw, sp, S, SG);
           oa::funcs::update_ghost_end(reqs);
           oa::internal::${name}$_${grid}$_calc_outside<T1, T2, int>(ans,
-              buffer, (int*)grid_buffer, lbound, rbound, sw, sp, S);
+              buffer, (int*)grid_buffer, lbound, rbound, sw, sp, S, SG);
           break;
 
         case DATA_FLOAT:
           oa::funcs::update_ghost_start(u, reqs, -1);
           oa::internal::${name}$_${grid}$_calc_inside<T1, T2, float>(ans,
-              buffer, (float*)grid_buffer, lbound, rbound, sw, sp, S);
+              buffer, (float*)grid_buffer, lbound, rbound, sw, sp, S, SG);
           oa::funcs::update_ghost_end(reqs);
           oa::utils::mpi_order_start(MPI_COMM_WORLD);
           oa::utils::mpi_order_end(MPI_COMM_WORLD);
           oa::internal::${name}$_${grid}$_calc_outside<T1, T2, float>(ans,
-              buffer, (float*)grid_buffer, lbound, rbound, sw, sp, S);
+              buffer, (float*)grid_buffer, lbound, rbound, sw, sp, S, SG);
           break;
 
         case DATA_DOUBLE:
           oa::internal::${name}$_${grid}$_calc_inside<T1, T2, double>(ans,
-              buffer, (double*)grid_buffer, lbound, rbound, sw, sp, S);
+              buffer, (double*)grid_buffer, lbound, rbound, sw, sp, S, SG);
           oa::funcs::update_ghost_end(reqs);
           oa::internal::${name}$_${grid}$_calc_outside<T1, T2, double>(ans,
-              buffer, (double*)grid_buffer, lbound, rbound, sw, sp, S);
+              buffer, (double*)grid_buffer, lbound, rbound, sw, sp, S, SG);
           break;
       }
 

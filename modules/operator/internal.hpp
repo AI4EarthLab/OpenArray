@@ -21,7 +21,7 @@ namespace oa{
     ///:set g = i[3]
     template<typename T1, typename T2, typename T3>
     void ${name}$_${grid}$_calc_inside(T1* ans, T2* b, T3* g, int3 lbound, int3 rbound, 
-            int sw, Shape sp, Shape S) {
+            int sw, Shape sp, Shape S, Shape SG) {
       int o = sw;
 
       for (int k = sw + lbound[2]; k < sw + sp[2] - rbound[2]; k++) {
@@ -37,7 +37,7 @@ namespace oa{
 
     template<typename T1, typename T2, typename T3>
     void ${name}$_${grid}$_calc_outside(T1* ans, T2* b, T3* g, int3 lbound, int3 rbound, 
-            int sw, Shape sp, Shape S) {
+            int sw, Shape sp, Shape S, Shape SG) {
       int M = S[0];
       int N = S[1];
       int P = S[2];
