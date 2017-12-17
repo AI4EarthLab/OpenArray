@@ -33,44 +33,16 @@ CFLAGS   = -Werror=return-type -fno-trapping-math \
 
 LIBS =  -lstdc++ ${EXT_LIB} ${EXT_LIB_LINK} 
 
-# OBJS = Range.o Box.o Partition.o Array.o \
-#        Internal.o Function.o Kernel.o Operator.o \
-#        Node.o IO.o Grid.o Init.o
 
 OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard utils/*.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard c-interface/*.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard modules/*/*.cpp)))
 
-# $(addsuffix .o, \
-# $(basename \
-# $(wildcard \
-# $(addsuffix /*.cpp, \
-# $(wildcard modules/*)))))
-
-
-#OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
-#			utils.o)
-
-#OBJS_UTILS = $(addsuffix .o, $(basename $(wildcard utils/*.cpp)))
-
-# OBJS_C_INTERFACE = $(addprefix ./c-interface/, \
-# 			c_oa_partition.o \
-# 			c_oa_type.o c_oa_utils.o c_oa_sub.o)
-
-
-
-# OBJ_FORTRAN = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} \
-# 		$(addprefix ./fortran/, \
-# 		oa_partition.o oa_type.o oa_ops.o \
-# 		oa_utils.o oa_sub.o oa_sum.o oa_rep.o oa_mod.o \
-# 		oa_test.o oa_main.o)
-
 OBJ_FORTRAN = ${OBJS} \
 	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
 
-
-OBJ_MAIN  = ${OBJS}  test/main.o
+OBJ_MAIN  = ${OBJS} $(addprefix ./test/, main.o)
 
 OBJ_TEST = ${OBJS} $(addprefix ./unittest/, test_array.o gtest_main.o)
 
@@ -110,9 +82,10 @@ debug:
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
-##===##-include $(OBJS:.o=.d) 
 ##===##-include $(OBJ_FORTRAN:.o=.d) 
-##===##-include $(OBJS_UTILS:.o=.d) 
+##===##-include $(OBJ_MAIN:.o=.d) 
+##===##-include $(OBJ_TEST:.o=.d) 
+##===##-include $(OBJ_TEST_PERF:.o=.d) 
 
 all:
 	@rm -rf main
@@ -128,7 +101,7 @@ quick:
 	@rm -rf ${name}
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
-	@./pre.sh
+	@./test.sh
 	@cd build
 	@echo "Cleaning done."
 	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make ${name} ${compile_thread} -f ${MAKEFILE}

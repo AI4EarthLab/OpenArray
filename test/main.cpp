@@ -45,8 +45,8 @@ int main(int argc, char** argv) {
   //test_csum();
   //test_sum();
   //test_sub();
-  test_set();
-  test_rep();
+  //test_set();
+  //test_rep();
   //test_l2g();
   //test_g2l();
   //test_set_l2g();
@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
   //test_pseudo_3d();
   //test_rand();
 
+  if (world_rank == 0) std::cout<<"Finished."<<std::endl;
   MPI_Finalize();
   return 0;
 }
