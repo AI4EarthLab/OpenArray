@@ -1,5 +1,6 @@
   ///:include "NodeTypeF.fypp"
-  
+
+#include "config.h"
 module oa_test
   use oa_mod
   integer :: m, n, k
@@ -334,6 +335,31 @@ contains
 
   end subroutine test_parition
 
+  subroutine test_cache()
+    implicit none
+    
+    type(array) :: A, B, C, D, E
+    type(node) :: ND
+    integer :: i
+    
+    A = ones(m, n, k)
+    B = seqs(m, n, k)
+    C = ones(m, n, k) * 0.1;
+
+    do i = 0, 10
+       FSET(D, A + B + C)
+       FSET(E, A + B - C)       
+    end do
+    
+    call display(A, "A = ")
+    call display(B, "B = ")
+    call display(C, "C = ")
+
+    call display(D, "D = ")
+    call display(E, "E = ")
+    
+  end subroutine 
+  
   subroutine test_grid()
     implicit none
     type(array) :: A, B, C, dx, dy, dz
@@ -359,6 +385,7 @@ contains
   end subroutine
 
   subroutine test_shift()
+    implicit none
     type(array) :: A
     type(array) :: B
     

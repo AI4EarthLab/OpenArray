@@ -14,4 +14,16 @@
 #define  ${L[i][0]}$  ${i}$
 ///:endfor
 
+
+#define FSET(A, B)                              \
+  call gen_node_key__(__FILE__,__LINE__);       \
+  call find_node__();                           \
+  if(is_valid__()) then;                        \
+  A = tmp_node__;                               \
+  else;                                         \
+  tmp_node__ = B;                               \
+  call cache_node__();                          \
+  A = tmp_node__;                               \
+  end if;
+
 #endif

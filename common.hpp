@@ -72,5 +72,6 @@ typedef arma::Cube<double> cube_double;
 
 #define SCALAR_SHAPE Shape({1,1,1})
 
+
 #endif
 

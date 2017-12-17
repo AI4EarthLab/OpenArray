@@ -23,7 +23,7 @@ FC = mpif90 ${oplevel3}
 CC = mpicc  ${oplevel3}
 CXX = mpicxx ${oplevel3}
 
-FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans
+FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans -ffree-line-length-0
 
 CXXFLAGS = -fPIC --std=c++0x -Werror=return-type \
 		-fno-trapping-math -fno-signaling-nans

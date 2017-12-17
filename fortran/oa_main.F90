@@ -34,7 +34,9 @@ program main
 
   ! call test_grid()
 
-  call test_shift()
+  !call test_shift()
+
+  call test_cache()
   
   ! call test_create_node()
 
