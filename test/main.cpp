@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
   //test_set_g2l();
   //test_fusion_operator();
   //test_op();
+
   // tic("3d");
   // for (int i = 0; i < 1; i++)
   //   test_fusion_op_3d(m, n, p, i);
@@ -63,12 +64,14 @@ int main(int argc, char** argv) {
   // oa::utils::mpi_order_start(MPI_COMM_WORLD);
   // show_all();
   // oa::utils::mpi_order_end(MPI_COMM_WORLD);
+
   //test_pseudo_3d();
   //test_rand();
   //test_bitset();
   test_operator_with_grid();
 
 
+  if (world_rank == 0) std::cout<<"Finished."<<std::endl;
   MPI_Finalize();
   return 0;
 }

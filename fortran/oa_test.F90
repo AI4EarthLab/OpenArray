@@ -318,7 +318,53 @@ contains
   end subroutine
   
   subroutine test_set()
-    
+    implicit none
+    type(array) :: A, B, C
+    integer :: val1
+    real  :: val2
+    real(kind=8)  :: val3
+    val1 = 9
+    val2 = 9.900
+    val3 = 9.9900
+
+
+    ///:for t in [['OA_INT','val1'], &
+        ['OA_FLOAT','val2'], &
+        ['OA_DOUBLE','val3']]
+
+    A = seqs(8, 8, 4, dt = ${t[0]}$);
+    call set(A, [3,5], [2,5],[1,3], ${t[1]}$)
+    !call set_with_const(A, [3,5], [2,5],[1,3], ${t[1]}$)
+    call display(A, "A = ")
+
+    ///:endfor
+
+    if(rank .eq. 0) print * ,   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
+
+    ///:for t in [['OA_INT','val1'], &
+        ['OA_FLOAT','val2'], &
+        ['OA_DOUBLE','val3']]
+
+    A = seqs(8, 8, 4, dt = ${t[0]}$);
+    B = seqs(3, 4, 3, dt = ${t[0]}$);
+    call set(A, [3,5], [2,5],[1,3], B)
+    call display(A, "A = ")
+
+    ///:endfor
+
+    if(rank .eq. 0) print * ,   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
+
+    ///:for t in [['OA_INT','val1'], &
+        ['OA_FLOAT','val2'], &
+        ['OA_DOUBLE','val3']]
+
+    A = seqs(8, 8, 4, dt = ${t[0]}$);
+    B = ones(8, 8, 4, dt = ${t[0]}$);
+    call set(A, [3,5], [2,5],[1,3], B, [1,3], [1,4], [1,3])
+    call display(A, "A = ")
+
+    ///:endfor
+ 
   end subroutine
   
   subroutine test_parition()

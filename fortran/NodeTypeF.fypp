@@ -82,7 +82,7 @@
 
 ///:set scalar_dtype = &
      [['int',   'integer'], &
-     [ 'float'  'real'], &
+     [ 'float',  'real'], &
      [ 'double','real(8)']]
 
 ///:set all_dtype = &

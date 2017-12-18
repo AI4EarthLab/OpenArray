@@ -11,11 +11,6 @@ if [ ! -d "$build_dir" ]; then
 fi
 
 cp makefile*  ${build_dir}/ 2>/dev/null
-cp dependency.inc ${build_dir}/ 2>/dev/null
-
-if [ ! -d "${build_dir}/libjit.so" ]; then 
-   cp libjit.so  ${build_dir}/libjit.so
-fi
 
 for d in `find . -maxdepth 2 -type d`
 do
@@ -63,7 +58,7 @@ do
     
     if [ ! -f "$dst_filename" ]; then
       ./fypp -p -m re -m string -m io -m os --create-parents \
-           $src_filename > $dst_filename
+           $src_filename > $dst_filename &
       echo " >>>processing file $src_filename" 
     else
       if [ "$osname" = "Linux" ];then 
@@ -85,4 +80,4 @@ do
 
     done
 done
-
+wait
