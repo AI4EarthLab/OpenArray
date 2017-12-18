@@ -6,6 +6,7 @@
 #include "../../NodeDesc.hpp"
 #include "../../Function.hpp"
 #include "internal.hpp"
+#include "../../Grid.hpp"
 #include <vector>
 using namespace std;
 
@@ -25,11 +26,26 @@ namespace oa {
     ///:endfor
 
     ///:for k in [i for i in L if i[3] == 'D']
+    ///:set type = k[0]
     ///:set name = k[1]
     // crate kernel_${name}$
     // A = ${name}$(U)
-    template<typename T>
-    void t_kernel_${name}$(ArrayPtr& ap, ArrayPtr& u) {
+
+    ///:mute
+    ///:include "kernel_type.fypp"
+    ///:endmute
+    
+    ///:for i in T_INT
+    ///:set grid = i[4]
+    template<typename T1, typename T2>
+    ArrayPtr t_kernel_${name}$_${grid}$(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr ap;
+
+      int dt = oa::utils::to_type<T1>();
+
+      ap = ArrayPool::global()->get(u->get_partition(), dt);
+
       int sw = u->get_partition()->get_stencil_width();
       Shape sp = u->local_shape();
       Shape S = u->buffer_shape();
@@ -59,24 +75,67 @@ namespace oa {
       rbound = {0, 0, 1};
       ///:endif
 
-      double* ans = (double*) ap->get_buffer();
-      T* buffer = (T*) u->get_buffer();
+      T1* ans = (T1*) ap->get_buffer();
+      T2* buffer = (T2*) u->get_buffer();
 
       /*
         to chose the right bind grid
       */
-        
+      
+      // get_gridptr
+      ArrayPtr gridptr = Grid::global()->get_grid(u->get_pos(), ${type}$);
+      // default grid data type
+      int grid_dt = DATA_FLOAT;
+      void* grid_buffer = NULL;
+      Shape SG = {0, 0, 0};
+      
+      // cout<<"${grid}$"<<endl; 
+
+      if (gridptr != NULL) {
+        cout<<"not null"<<endl;
+        cout<<"${grid}$"<<endl;
+        grid_dt = gridptr->get_data_type();
+        grid_buffer = gridptr->get_buffer();
+        SG = gridptr->buffer_shape();
+      } 
 
       vector<MPI_Request> reqs;
-      oa::funcs::update_ghost_start(u, reqs, -1);
-      oa::internal::${name}$_calc_inside<T>(ans,
-              buffer, lbound, rbound, sw, sp, S);
-      oa::funcs::update_ghost_end(reqs);
-      oa::internal::${name}$_calc_outside<T>(ans,
-              buffer, lbound, rbound, sw, sp, S);
 
+      int cnt = 0;
+      switch(grid_dt) {
+        case DATA_INT:
+          oa::funcs::update_ghost_start(u, reqs, -1);
+          oa::internal::${name}$_${grid}$_calc_inside<T1, T2, int>(ans,
+              buffer, (int*)grid_buffer, lbound, rbound, sw, sp, S, SG);
+          oa::funcs::update_ghost_end(reqs);
+          oa::internal::${name}$_${grid}$_calc_outside<T1, T2, int>(ans,
+              buffer, (int*)grid_buffer, lbound, rbound, sw, sp, S, SG);
+          break;
+
+        case DATA_FLOAT:
+          oa::funcs::update_ghost_start(u, reqs, -1);
+          oa::internal::${name}$_${grid}$_calc_inside<T1, T2, float>(ans,
+              buffer, (float*)grid_buffer, lbound, rbound, sw, sp, S, SG);
+          oa::funcs::update_ghost_end(reqs);
+          oa::utils::mpi_order_start(MPI_COMM_WORLD);
+          oa::utils::mpi_order_end(MPI_COMM_WORLD);
+          oa::internal::${name}$_${grid}$_calc_outside<T1, T2, float>(ans,
+              buffer, (float*)grid_buffer, lbound, rbound, sw, sp, S, SG);
+          break;
+
+        case DATA_DOUBLE:
+          oa::internal::${name}$_${grid}$_calc_inside<T1, T2, double>(ans,
+              buffer, (double*)grid_buffer, lbound, rbound, sw, sp, S, SG);
+          oa::funcs::update_ghost_end(reqs);
+          oa::internal::${name}$_${grid}$_calc_outside<T1, T2, double>(ans,
+              buffer, (double*)grid_buffer, lbound, rbound, sw, sp, S, SG);
+          break;
+      }
+
+      return ap;
     }
 
+    ///:endfor
     ///:endfor
 
   }
