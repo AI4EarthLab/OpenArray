@@ -22,6 +22,11 @@
        final :: destroy_node
     end type Node
 
+    interface shape
+       module procedure shape_node
+       module procedure shape_array
+    end interface shape
+    
     interface display
        module procedure display_node
        module procedure display_array
@@ -403,4 +408,40 @@
     ///:endfor
     
 
+    function shape_array(A) result(res)
+      implicit none
+      interface
+         subroutine c_shape_array(a, s) &
+              bind(C, name = "c_shape_array")
+           use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           integer, intent(out) :: s(3)
+         end subroutine
+      end interface
+
+      type(array) :: A
+      integer :: res(3)
+      
+      call c_shape_array(A%ptr, res)   
+    end function
+
+    function shape_node(A) result(res)
+      implicit none
+      interface
+         subroutine c_shape_node(a, s) &
+              bind(C, name = "c_shape_node")
+           use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           integer, intent(out) :: s(3)
+         end subroutine
+      end interface
+
+      type(node) :: A
+      integer :: res(3)
+      
+      call c_shape_node(A%ptr, res)   
+    end function
+    
   end module

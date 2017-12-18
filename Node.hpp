@@ -33,7 +33,7 @@ private:
   bool m_is_pseudo = false;
   std::bitset<3> m_bs = std::bitset<3>(std::string("111"));
 
-  //BoxPtr ref;
+  Box m_ref;
 
 public:
   Node();
@@ -136,7 +136,10 @@ public:
   void set_bitset(bitset<3> bs);
 
   bitset<3> get_bitset();
-  
+
+  void set_ref(const Box& b);
+
+  Box get_ref();
 };
 
 

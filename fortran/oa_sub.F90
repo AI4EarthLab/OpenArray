@@ -2,9 +2,10 @@
 module oa_sub
   use iso_c_binding
   use oa_type
+  
   interface
-     subroutine c_sub_array(A, B, rx, ry, rz) &
-          bind(C, name="c_sub_array")
+     subroutine c_new_node_sub_array(A, B, rx, ry, rz) &
+          bind(C, name="c_new_node_sub_array")
        use iso_c_binding       
        implicit none
        type(c_ptr) :: A, B
@@ -13,8 +14,8 @@ module oa_sub
   end interface
   
   interface
-     subroutine c_sub_node(A, B, rx, ry, rz) &
-          bind(C, name="c_sub_node")
+     subroutine c_new_node_sub_node(A, B, rx, ry, rz) &
+          bind(C, name="c_new_node_sub_node")
        use iso_c_binding       
        implicit none
        type(c_ptr) :: A, B
@@ -73,22 +74,29 @@ contains
   function sub_${t}$_${rx[0]}$(A, rx) result(B)
     implicit none
     type(${t}$), intent(in) :: A
-    type(array) :: B
+    type(node) :: B, NA
     ${rx[1]}$ :: rx
-    integer :: rx1(2), ry1(2), rz1(2)
+    integer :: rx1(2), ry1(2), rz1(2), s(3)
 
+    s = shape(A)
+    print*, "s = ", s
     ///:if rx[0] == 'int'
     rx1 = [rx, rx] - 1
     ///:elif rx[0] == 'int2'
     rx1 = rx - 1
     ///:else
-    rx1 = RALL
+    rx1 = [0, s(1)-1]
     ///:endif
 
-    ry1 = RALL
-    rz1 = RALL
-
-    call c_sub_${t}$(B%ptr, A%ptr, rx1, ry1, rz1)
+    ry1 = [0, s(2)-1]
+    rz1 = [0, s(3)-1]
+    
+    ///:if t == 'array'
+    call c_new_node_array(NA%ptr, A%ptr)
+    call c_new_node_sub_node(B%ptr, NA%ptr, rx1, ry1, rz1)
+    ///:else
+    call c_new_node_sub_node(B%ptr, A%ptr, rx1, ry1, rz1)
+    ///:endif
     
   end function
   ///:endfor
@@ -102,17 +110,19 @@ contains
        (A, rx, ry) result(B)
     implicit none
     type(${t}$), intent(in) :: A
-    type(array) :: B
+    type(node) :: B, NA
     ${rx[1]}$ :: rx
     ${ry[1]}$ :: ry
-    integer :: rx1(2), ry1(2), rz1(2)
+    integer :: rx1(2), ry1(2), rz1(2), s(3)
 
+    s = shape(A)
+    print*, "s = ", s
     ///:if rx[0] == 'int'
     rx1 = [rx, rx] - 1
     ///:elif rx[0] == 'int2'
     rx1 = rx - 1
     ///:else
-    rx1 = RALL
+    rx1 = [0, s(1)-1]
     ///:endif
 
 
@@ -121,12 +131,17 @@ contains
     ///:elif ry[0] == 'int2'
     ry1 = ry - 1
     ///:else
-    ry1 = RALL
+    ry1 = [0, s(2)-1]
     ///:endif
 
-    rz1 = RALL
+    rz1 = [0, s(3)-1]
 
-    call c_sub_${t}$(B%ptr, A%ptr, rx1, ry1, rz1)
+    ///:if t == 'array'
+    call c_new_node_array(NA%ptr, A%ptr)
+    call c_new_node_sub_node(B%ptr, NA%ptr, rx1, ry1, rz1)
+    ///:else
+    call c_new_node_sub_node(B%ptr, A%ptr, rx1, ry1, rz1)
+    ///:endif
     
   end function
   ///:endfor
@@ -142,18 +157,20 @@ contains
        (A, rx, ry, rz) result(B)
     implicit none
     type(${t}$), intent(in) :: A
-    type(array) :: B
+    type(node) :: B, NA
     ${rx[1]}$ :: rx
     ${ry[1]}$ :: ry
     ${rz[1]}$ :: rz    
-    integer :: rx1(2), ry1(2), rz1(2)
+    integer :: rx1(2), ry1(2), rz1(2), s(3)
 
+    s = shape(A)
+    
     ///:if rx[0] == 'int'
     rx1 = [rx, rx] - 1
     ///:elif rx[0] == 'int2'
     rx1 = rx - 1
     ///:else
-    rx1 = RALL
+    rx1 = [0, s(1)-1]
     ///:endif
 
     ///:if ry[0] == 'int'
@@ -161,7 +178,7 @@ contains
     ///:elif ry[0] == 'int2'
     ry1 = ry - 1
     ///:else
-    ry1 = RALL
+    ry1 = [0, s(2)-1]
     ///:endif
 
     ///:if rz[0] == 'int'
@@ -169,10 +186,16 @@ contains
     ///:elif rz[0] == 'int2'
     rz1 = rz - 1
     ///:else
-    rz1 = RALL
+    rz1 = [0, s(3)-1]
     ///:endif
 
-    call c_sub_${t}$(B%ptr, A%ptr, rx1, ry1, rz1)
+    ///:if t == 'array'
+    call c_new_node_array(NA%ptr, A%ptr)
+    call c_new_node_sub_node(B%ptr, NA%ptr, rx1, ry1, rz1)
+    ///:else
+    call c_new_node_sub_node(B%ptr, A%ptr, rx1, ry1, rz1)
+    ///:endif
+
     
   end function
   ///:endfor

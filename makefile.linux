@@ -16,7 +16,7 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_system -ldl -llapack -lblas -lgtest -ljit \
 		-Wl,-rpath=${JIT_LIB}
 
-oplevel0 = -O0 -g 
+oplevel0 = -O1 -g 
 oplevel3 = -O3
 
 FC = mpif90 ${oplevel0}

@@ -236,3 +236,11 @@ void Node::set_bitset(bitset<3> bs) {
 bitset<3> Node::get_bitset() {
   return m_bs;
 }
+
+void Node::set_ref(const Box& b){
+  m_ref = b;
+}
+
+Box Node::get_ref(){
+  return m_ref;
+}

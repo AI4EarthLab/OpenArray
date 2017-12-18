@@ -204,6 +204,9 @@ contains
     ///:endfor
     ///:endfor
 
+    B = sub(A, [1,3],[1,8],[1,2])
+    call display(B, "sub(A, [1,3],[1,8],[1,2]) = ")
+    
     B = sub(A, [1,3])
     call display(B, "sub(A, [1,3]) = ")
 

@@ -11,6 +11,8 @@ extern "C" {
     // printf("B=%p\n", B);
     
     if(B == NULL) return;
+
+    //(*(ArrayPtr*&)B)->display("B = ");
     
     if (pb == R) {
       A = B;
@@ -240,6 +242,18 @@ void c_new_local_int3(NodePtr* &B, int* val){
 
 void c_grid_bind(ArrayPtr*& A, int pos){
   (*A)->set_pos(pos);
+}
+
+void c_shape_node(NodePtr*& A, int* s){
+  s[0] = (*A)->shape()[0];
+  s[1] = (*A)->shape()[1];
+  s[2] = (*A)->shape()[2];
+}
+
+void c_shape_array(ArrayPtr*& A, int* s){
+  s[0] = (*A)->shape()[0];
+  s[1] = (*A)->shape()[1];
+  s[2] = (*A)->shape()[2];
 }
 }
 
