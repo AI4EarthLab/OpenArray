@@ -15,6 +15,7 @@
 #include "../modules/basic/new_node.hpp"
 #include "../modules/operator/new_node.hpp"
 #include "../utils/utils.hpp"
+#include "../cache.hpp"
 
 #include <assert.h>
 
@@ -796,21 +797,21 @@ void test_op() {
 
 
 void test_fusion_op_3d(int m, int n, int k, int i) {
-  ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
-  // ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  // ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  // ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  // ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
+  // // ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   
-  dx->set_pseudo(true);
-  dy->set_pseudo(true);
-  dz->set_pseudo(true);
+  // dx->set_pseudo(true);
+  // dy->set_pseudo(true);
+  // dz->set_pseudo(true);
 
-  dx->set_bitset("110");
-  dy->set_bitset("110");
-  dz->set_bitset("001");
+  // dx->set_bitset("110");
+  // dy->set_bitset("110");
+  // dz->set_bitset("001");
   
-  // // Grid::global()->init_grid('C', NULL, NULL, NULL);
-  Grid::global()->init_grid('C', dx, dy, dz);
+  // // // Grid::global()->init_grid('C', NULL, NULL, NULL);
+  // Grid::global()->init_grid('C', dx, dy, dz);
 
   // // 3d 
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
@@ -871,10 +872,9 @@ void test_fusion_op_3d(int m, int n, int k, int i) {
   NodePtr a32 = DYF(a31);
   NodePtr a33 = PLUS(a18, a32);
   
-  //if (i == 0)
-  //  oa::ops::gen_kernels_JIT(a33);
+  oa::ops::gen_kernels_JIT(a33);
   ArrayPtr gao = EVAL(a33);
-  gao->display("gao");
+  //gao->display("gao");
   
   //oa::ops::write_graph(a33);  
   
@@ -1057,24 +1057,24 @@ void test_bitset() {
 }
 
 void test_operator_with_grid() {
-  // ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  // ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-  // ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
+  ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
   
-  // dx->set_pseudo(true);
-  // dy->set_pseudo(true);
-  // dz->set_pseudo(true);
+  dx->set_pseudo(true);
+  dy->set_pseudo(true);
+  dz->set_pseudo(true);
 
-  // dx->set_bitset("110");
-  // dy->set_bitset("110");
-  // dz->set_bitset("001");
+  dx->set_bitset("110");
+  dy->set_bitset("110");
+  dz->set_bitset("001");
   
-  // Grid::global()->init_grid('C', dx, dy, dz);
+  Grid::global()->init_grid('C', dx, dy, dz);
 
-  // Grid::global()->get_grid_dx(3)->display("dx[3]");
+  Grid::global()->get_grid_dx(3)->display("dx[3]");
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   // ap1->display("ap1");
-  // ap1->set_pos(3);
+  ap1->set_pos(3);
   
   NodePtr n1 = NODE(ap1);
   // n1->display("n1");
@@ -1083,6 +1083,43 @@ void test_operator_with_grid() {
 
   ArrayPtr ans = EVAL(n2);
   ans->display("ans");
+}
+
+void test_cache(int m, int n, int k) {
+  ArrayPtr ans;
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap3 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap6 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap7 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap8 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  
+  // ArrayPtr ap3 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  
+  std::string tmp_node_key;
+  NodePtr tmp_node;
+
+  NodePtr n1 = NODE(ap1);
+  NodePtr n2 = NODE(ap2);
+  NodePtr n3 = NODE(ap3);
+  NodePtr n4 = NODE(ap4);
+  NodePtr n5 = NODE(ap5);
+  NodePtr n6 = NODE(ap6);
+  NodePtr n7 = NODE(ap7);
+  NodePtr n8 = NODE(ap8);
+  
+  NodePtr np;
+
+  for (int i = 0; i < 100; i++) {
+    CSET(np, PLUS( PLUS(n1, n2), PLUS(n3, n4) ) );
+    // oa::ops::gen_kernels_JIT(np);
+    ans = EVAL(np);
+  }
+
+  //ans->display("ans");
+
 }
 
 #endif

@@ -327,7 +327,7 @@ namespace oa {
           fkptr(list_pointer, ap->buffer_size());
           cout<<"fusion-kernel called"<<endl;
           
-          A->set_data(ap);
+          // A->set_data(ap);
           ap->set_pseudo(A->is_pseudo());
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
@@ -365,61 +365,6 @@ namespace oa {
         ap->set_pos(A->get_pos());
       }
       // ap->display();
-
-      return ap;
-    }
-
-    ArrayPtr eval_JIT(NodePtr A) {
-      // data
-      if (A->has_data()) return A->get_data();
-
-      // generate hash
-      if (!A->hash()) {
-        stringstream ss;
-        tree_to_string_stack(A, ss);
-        std::hash<string> str_hash;
-        size_t hash = str_hash(ss.str());
-        A->set_hash(hash);
-      }
-
-      // fusion kernel
-      if (A->hash()) {
-        FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
-        if (fkptr != NULL) {
-          vector<void*> list;
-          PartitionPtr par_ptr;
-          get_kernel_parameter(A, list, par_ptr);
-          ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
-
-          list.push_back(ap->get_buffer());
-          void** list_pointer = list.data();
-          fkptr(list_pointer, ap->buffer_size());
-          cout<<"fusion-kernel called"<<endl;
-          
-          A->set_data(ap);
-          ap->set_pseudo(A->is_pseudo());
-          ap->set_bitset(A->get_bitset());
-          ap->set_pos(A->get_pos());
-
-          return ap;
-        }
-      }
-
-      // tree
-      vector<ArrayPtr> ops_ap;
-
-      for (int i = 0; i < A->input_size(); i++) {
-        ops_ap.push_back(eval(A->input(i)));
-      }
-
-      const NodeDesc& nd = get_node_desc(A->type());
-      KernelPtr kernel_addr = nd.func;
-      ArrayPtr ap = kernel_addr(ops_ap);
-      A->set_data(ap);
-      ap->set_pseudo(A->is_pseudo());
-      ap->set_bitset(A->get_bitset());
-      ap->set_pos(A->get_pos());
-
 
       return ap;
     }
@@ -557,7 +502,7 @@ namespace oa {
         }
         code<<__code.str()<<";\n  }\n  return ;\n}}";
 
-        cout<<code.str()<<endl;
+        // cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
 
