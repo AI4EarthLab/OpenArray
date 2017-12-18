@@ -79,7 +79,7 @@ contains
     integer :: rx1(2), ry1(2), rz1(2), s(3)
 
     s = shape(A)
-    print*, "s = ", s
+
     ///:if rx[0] == 'int'
     rx1 = [rx, rx] - 1
     ///:elif rx[0] == 'int2'
@@ -116,7 +116,7 @@ contains
     integer :: rx1(2), ry1(2), rz1(2), s(3)
 
     s = shape(A)
-    print*, "s = ", s
+
     ///:if rx[0] == 'int'
     rx1 = [rx, rx] - 1
     ///:elif rx[0] == 'int2'

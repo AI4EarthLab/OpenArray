@@ -181,7 +181,7 @@ namespace oa {
 
     // set sub(A) = const
     template<typename T>
-    void set_with_const(ArrayPtr& A, const Box& A_box, T val) {
+    void set_ref_const(ArrayPtr& A, const Box& A_box, T val) {
       // sub(A)'s partition
       vector<int> rsx, rsy, rsz;
       PartitionPtr pp = A->get_partition();

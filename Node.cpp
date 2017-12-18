@@ -49,7 +49,7 @@ int Node::input_size() const {
   return m_input.size();
 }
 
-NodePtr Node::input(int i) {
+NodePtr& Node::input(int i) {
   return m_input.at(i);
 }
 
@@ -101,7 +101,7 @@ NodeType Node::type() {
   return m_type;
 }
 
-ArrayPtr Node::get_data() {
+ArrayPtr& Node::get_data() {
   return m_data;
 }
 

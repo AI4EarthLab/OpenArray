@@ -274,7 +274,7 @@ namespace oa {
       KernelPtr kernel_addr = nd.func;
       //printf("kernel : %p\n", kernel_addr.target< kernel_rawptr* >());
       ArrayPtr ap = kernel_addr(ops_ap);
-      A->set_data(ap);
+      //A->set_data(ap);
       ap->set_pseudo(A->is_pseudo());
       ap->set_bitset(A->get_bitset());
       ap->set_pos(A->get_pos());
@@ -327,7 +327,7 @@ namespace oa {
           fkptr(list_pointer, ap->buffer_size());
           cout<<"fusion-kernel called"<<endl;
           
-          A->set_data(ap);
+          //A->set_data(ap);
           ap->set_pseudo(A->is_pseudo());
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
@@ -351,10 +351,6 @@ namespace oa {
       ArrayPtr ap;
       if(A->type() == TYPE_REF){
         ap = oa::funcs::subarray(ops_ap[0], A->get_ref());
-        //A->set_data(ap);
-        // ap1->display("ap1 = ");
-        // A->get_ref().display("ref = ");
-        // return ap1;
       }else{
         const NodeDesc& nd = get_node_desc(A->type());
         KernelPtr kernel_addr = nd.func;
@@ -396,7 +392,7 @@ namespace oa {
           fkptr(list_pointer, ap->buffer_size());
           cout<<"fusion-kernel called"<<endl;
           
-          A->set_data(ap);
+          //A->set_data(ap);
           ap->set_pseudo(A->is_pseudo());
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
@@ -415,7 +411,7 @@ namespace oa {
       const NodeDesc& nd = get_node_desc(A->type());
       KernelPtr kernel_addr = nd.func;
       ArrayPtr ap = kernel_addr(ops_ap);
-      A->set_data(ap);
+      //A->set_data(ap);
       ap->set_pseudo(A->is_pseudo());
       ap->set_bitset(A->get_bitset());
       ap->set_pos(A->get_pos());

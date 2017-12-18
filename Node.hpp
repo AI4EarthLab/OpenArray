@@ -46,7 +46,7 @@ public:
 
   int input_size() const;
   
-  NodePtr input(int i);
+  NodePtr& input(int i);
 
   NodePtr output(int i);
 
@@ -68,7 +68,7 @@ public:
 
   NodeType type();
 
-  ArrayPtr get_data();
+  ArrayPtr& get_data();
 
   bool has_data();
 

@@ -8,108 +8,104 @@
 module oa_set
   use iso_c_binding
   use oa_type
-  interface
-     ///:for type1 in types
-     subroutine c_set_with_const_${type1[0]}$(A, rx, ry, rz, val) &
-          bind(C, name="c_set_with_const_${type1[0]}$")
-       use iso_c_binding       
-       implicit none
-       type(c_ptr) :: A
-       integer :: rx(2), ry(2), rz(2)
-       ${type1[1]}$ :: val
-     end subroutine
-     ///:endfor
-  end interface
-
-  interface
-     subroutine c_set1(A, rx, ry, rz, B) &
-          bind(C, name="c_set1")
-       use iso_c_binding       
-       implicit none
-       type(c_ptr) :: A, B
-       integer :: rx(2), ry(2), rz(2)
-     end subroutine
-  end interface
-
-  interface
-     subroutine c_set2(A, rx, ry, rz, B, sx, sy, sz) &
-          bind(C, name="c_set2")
-       use iso_c_binding       
-       implicit none
-       type(c_ptr) :: A, B
-       integer :: rx(2), ry(2), rz(2)
-       integer :: sx(2), sy(2), sz(2)
-     end subroutine
-  end interface
-
- 
-!  interface set_with_const
-!     ///:for type1 in types
-!     module procedure set_with_const_${type1[0]}$
-!     ///:endfor
-!  end interface set_with_const
 
   interface set
      ///:for type1 in types
-     module procedure set_with_const_${type1[0]}$
+     module procedure set_ref_const_${type1[0]}$
+     module procedure set_array_const_${type1[0]}$
      ///:endfor
-     module procedure set1
-     module procedure set2
+     module procedure set_ref_array
+     module procedure set_ref_ref
+
   end interface set
 
-    
+  interface assignment(=)
+     ///:for type1 in types
+     module procedure set_array_const_${type1[0]}$
+     ///:endfor
+  end interface assignment(=)
+  
 contains
+
   ///:for type1 in types
-  subroutine set_with_const_${type1[0]}$(A, rx, ry, rz, val)
+  subroutine set_ref_const_${type1[0]}$(A, val)
     implicit none
-    type(array), intent(inout) :: A
-    integer, dimension(2) :: rx, ry, rz
-    integer :: rx1(2), ry1(2), rz1(2)
+
+    interface
+       subroutine c_set_ref_const_${type1[0]}$(A,  val) &
+            bind(C, name="c_set_ref_const_${type1[0]}$")
+         use iso_c_binding       
+         implicit none
+         type(c_ptr) :: A
+         ${type1[1]}$, value :: val
+       end subroutine
+    end interface
+
+    type(node), intent(in) :: A
     ${type1[1]}$ :: val
 
-    rx1 = rx - 1
-    ry1 = ry - 1
-    rz1 = rz - 1
-          
-    call c_set_with_const_${type1[0]}$(A%ptr, rx1, ry1, rz1, val)
-             
+    call c_set_ref_const_${type1[0]}$(A%ptr, val)
+
+  end subroutine
+
+
+  subroutine set_array_const_${type1[0]}$(A, val)
+    implicit none
+
+    interface
+       subroutine c_set_array_const_${type1[0]}$(A,  val) &
+            bind(C, name="c_set_array_const_${type1[0]}$")
+         use iso_c_binding       
+         implicit none
+         type(c_ptr) :: A
+         ${type1[1]}$, value :: val
+       end subroutine
+    end interface
+
+    type(array), intent(inout) :: A
+    ${type1[1]}$, intent(in) :: val
+
+    call c_set_array_const_${type1[0]}$(A%ptr, val)
+
   end subroutine
   ///:endfor
 
- subroutine set1(A, rx, ry, rz, B)
-    implicit none
-    type(array), intent(inout) :: A, B
-    integer, dimension(2) :: rx, ry, rz
-    integer :: rx1(2), ry1(2), rz1(2)
 
-    rx1 = rx - 1
-    ry1 = ry - 1
-    rz1 = rz - 1
-          
-    call c_set1(A%ptr, rx1, ry1, rz1, B%ptr)
+   subroutine set_ref_array(A, B)
+     implicit none
+     
+     interface
+        subroutine c_set_ref_array(a, b) &
+             bind(C, name="c_set_ref_array")
+          use iso_c_binding
+          implicit none
+          type(c_ptr) :: a, b
+        end subroutine
+     end interface
+     
+    type(node), intent(in) :: A
+    type(array) :: B
+    
+    call c_set_ref_array(A%ptr, B%ptr)
+    
+  end subroutine
+  
+  subroutine set_ref_ref(A, B)
+    implicit none
+    interface
+        subroutine c_set_ref_ref(a, b) &
+             bind(C, name="c_set_ref_ref")
+          use iso_c_binding
+          implicit none
+          type(c_ptr) :: a, b
+        end subroutine
+     end interface
+
+    type(node), intent(in) :: A, B
+
+    call c_set_ref_ref(A%ptr, B%ptr)
              
   end subroutine
-
-  subroutine set2(A, rx, ry, rz, B, sx, sy, sz)
-    implicit none
-    type(array), intent(inout) :: A, B
-    integer, dimension(2) :: rx, ry, rz
-    integer, dimension(2) :: sx, sy, sz
-    integer :: rx1(2), ry1(2), rz1(2)
-    integer :: sx1(2), sy1(2), sz1(2)
-
-    rx1 = rx - 1
-    ry1 = ry - 1
-    rz1 = rz - 1
-
-    sx1 = sx - 1
-    sy1 = sy - 1
-    sz1 = sz - 1
-          
-    call c_set2(A%ptr, rx1, ry1, rz1, B%ptr, sx1, sy1, sz1)
-             
-  end subroutine
-
 
 
 

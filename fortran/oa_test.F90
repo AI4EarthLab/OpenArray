@@ -5,6 +5,13 @@ module oa_test
   use oa_mod
   integer :: m, n, k
   integer(c_int) :: rank, fcomm
+
+///:set types = &
+     [['int',   'integer'], &
+     [ 'float',  'real'], &
+     [ 'double','real(8)']]
+
+
 contains
 
   subroutine test_init(mm, nn, kk, comm)
@@ -216,7 +223,7 @@ contains
     B = sub(A, 1, 2, 2);
     call display(B, "sub(A, 1, 2, 2) = ")
 
-    B = sub(A, [1,3], 2, ':');
+    B = sub(A*2.0, [1,3], 2, ':');
     call display(B, "sub(A, [1,3], 2, ':') = ")
     
   end subroutine
@@ -333,7 +340,8 @@ contains
         ['OA_DOUBLE','val3']]
 
     A = seqs(8, 8, 4, dt = ${t[0]}$);
-    call set(A, [3,5], [2,5],[1,3], ${t[1]}$)
+    !call set(A, [3,5], [2,5],[1,3], ${t[1]}$)
+    call set(sub(A,[3,5],[2,5],[1,3]), ${t[1]}$)
     !call set_with_const(A, [3,5], [2,5],[1,3], ${t[1]}$)
     call display(A, "A = ")
 
@@ -347,7 +355,9 @@ contains
 
     A = seqs(8, 8, 4, dt = ${t[0]}$);
     B = seqs(3, 4, 3, dt = ${t[0]}$);
-    call set(A, [3,5], [2,5],[1,3], B)
+    !call set(A, [3,5], [2,5],[1,3], B)
+    call set(sub(A, [3,5], [2,5],[1,3]), B)
+    
     call display(A, "A = ")
 
     ///:endfor
@@ -360,11 +370,15 @@ contains
 
     A = seqs(8, 8, 4, dt = ${t[0]}$);
     B = ones(8, 8, 4, dt = ${t[0]}$);
-    call set(A, [3,5], [2,5],[1,3], B, [1,3], [1,4], [1,3])
+    call set(sub(A, [3,5], [2,5],[1,3]), &
+         sub(B, [1,3], [1,4], [1,3]))
     call display(A, "A = ")
 
     ///:endfor
- 
+
+    A = 1.1;
+    call display(A, "A = ")
+    
   end subroutine
   
   subroutine test_parition()
