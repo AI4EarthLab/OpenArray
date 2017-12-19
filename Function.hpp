@@ -278,6 +278,7 @@ namespace oa {
     template<class T>
     void set(ArrayPtr& A, const Box& ref_box,
             T* buf, Shape& buf_shape){
+
       assert(ref_box.shape() == buf_shape);
       
       Box local_box = A->get_local_box();
@@ -315,7 +316,7 @@ namespace oa {
             int idx2 = (i + x2) +
               (j + y2) * buf_shape[0] +
               (k + z2) * buf_shape[0] * buf_shape[1];
-            dst_buf[idx1] = dst_buf[idx2];
+            dst_buf[idx1] = buf[idx2];
           }
         }        
       }

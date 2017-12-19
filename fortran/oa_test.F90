@@ -396,7 +396,32 @@ contains
     call display(A, "A = ")
     ///:endfor
     ///:endfor
+
+    A = seqs(10,10,10)
+    call set(sub(A, [1,10],[1,1],[1,1]),  farr_double1)
+    call display(A, "A = ")
     
+    A = seqs(10,10,10)
+    call set(sub(A, [1,5], [1,5],[1,1]),  farr_double2)
+    call display(A, "A = ")
+    
+    A = seqs(10,10,10)
+    call set(sub(A, [1,5], [1,4],[1,3]),  farr_double3)
+    call display(A, "A = ")
+
+    A = seqs(10,10,10)
+    deallocate(farr_double3)
+    allocate(farr_double3(1,5,5))
+    farr_double3 = 10
+    call set(sub(A,1,[1,5],[1,5]), farr_double3)
+    call display(A, "A = ")
+
+    A = seqs(10,10,10)
+    deallocate(farr_double3)
+    allocate(farr_double3(1,1,10))
+    farr_double3 = 10
+    call set(sub(A,1,1,[1,10]), farr_double3)
+    call display(A, "A = ")
     
   end subroutine
   

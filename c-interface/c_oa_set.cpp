@@ -83,6 +83,9 @@ extern "C"{
 
     Shape sh;
     sh[0] = s[0]; sh[1] = s[1]; sh[2] = s[2];
+
+    //oa::utils::print_data(arr, sh, oa::utils::to_type<${type}$>());
+
     oa::funcs::set<${type}$>(ap, ref_box, arr, sh);
   }
   ///:endfor

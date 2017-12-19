@@ -250,8 +250,8 @@ bool Node::is_ref() const{
 }
 
 bool Node::is_ref_data() const{
-  return (m_data_type == TYPE_REF) &&
-    (m_input.at(0)->get_data_type()== TYPE_DATA);
+  return (m_type == TYPE_REF) &&
+    (m_input.at(0)->type()== TYPE_DATA);
 }
 
 ArrayPtr& Node::get_ref_data(){

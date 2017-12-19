@@ -8,8 +8,8 @@
 
 namespace oa{
   namespace ops{
-    NodePtr new_node(NodePtr& u, const Box& b);
-    NodePtr new_node(ArrayPtr& u, const Box& b);
+    NodePtr new_node_sub(NodePtr& u, const Box& b);
+    NodePtr new_node_sub(ArrayPtr& u, const Box& b);
   }
 }
 

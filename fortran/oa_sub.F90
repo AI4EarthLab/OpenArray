@@ -3,15 +3,15 @@ module oa_sub
   use iso_c_binding
   use oa_type
   
-  interface
-     subroutine c_new_node_sub_array(A, B, rx, ry, rz) &
-          bind(C, name="c_new_node_sub_array")
-       use iso_c_binding       
-       implicit none
-       type(c_ptr) :: A, B
-       integer :: rx(2), ry(2), rz(2)
-     end subroutine
-  end interface
+  ! interface
+  !    subroutine c_new_node_sub_array(A, B, rx, ry, rz) &
+  !         bind(C, name="c_new_node_sub_array")
+  !      use iso_c_binding       
+  !      implicit none
+  !      type(c_ptr) :: A, B
+  !      integer :: rx(2), ry(2), rz(2)
+  !    end subroutine
+  ! end interface
   
   interface
      subroutine c_new_node_sub_node(A, B, rx, ry, rz) &
