@@ -74,14 +74,10 @@ namespace oa {
       //ref_box.display("ref_box");
 
       int cnt = 0;
-      for (int k = zs; k < ze; k++) {
-        for (int j = ys; j < ye; j++) {
-          for (int i = xs; i < xe; i++) {
-            if (zs + sw <= k && k < ze - sw &&
-                ys + sw <= j && j < ye - sw &&
-                xs + sw <= i && i < xe - sw) {
+      for (int k = zs+sw; k < ze-sw; k++) {
+        for (int j = ys+sw; j < ye-sw; j++) {
+          for (int i = xs+sw; i < xe-sw; i++) {
               buffer[k * M * N + j * M + i] = sub_buffer[cnt];
-            }
             cnt++;
             //cout<<buffer[cnt-1]<<" ";
           }
@@ -108,14 +104,10 @@ namespace oa {
       
       //ref_box.display("ref_box");
 
-      for (int k = zs; k < ze; k++) {
-        for (int j = ys; j < ye; j++) {
-          for (int i = xs; i < xe; i++) {
-            if (zs + sw <= k && k < ze - sw &&
-                ys + sw <= j && j < ye - sw &&
-                xs + sw <= i && i < xe - sw) {
-              buffer[k * M * N + j * M + i] = val;
-            }
+      for (int k = zs+sw; k < ze-sw; k++) {
+        for (int j = ys+sw; j < ye-sw; j++) {
+          for (int i = xs+sw; i < xe-sw; i++) {
+            buffer[k * M * N + j * M + i] = val;
             //cout<<buffer[cnt-1]<<" ";
           }
           //cout<<endl;

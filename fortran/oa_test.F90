@@ -330,6 +330,13 @@ contains
     integer :: val1
     real  :: val2
     real(kind=8)  :: val3
+
+    ///:for d in fdim
+    ///:for t in scalar_dtype
+    ${t[1]}$, allocatable :: farr_${t[0]}$${d[0]}$(${d[1]}$)
+    ///:endfor
+    ///:endfor
+    
     val1 = 9
     val2 = 9.900
     val3 = 9.9900
@@ -347,7 +354,6 @@ contains
 
     ///:endfor
 
-    if(rank .eq. 0) print * ,   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
 
     ///:for t in [['OA_INT','val1'], &
         ['OA_FLOAT','val2'], &
@@ -362,7 +368,6 @@ contains
 
     ///:endfor
 
-    if(rank .eq. 0) print * ,   "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
 
     ///:for t in [['OA_INT','val1'], &
         ['OA_FLOAT','val2'], &
@@ -378,6 +383,20 @@ contains
 
     A = 1.1;
     call display(A, "A = ")
+
+    call set(sub(A,[3,5],[2,5],[1,3]), 2.1_8);
+    call display(A, "A = ")
+
+    ///:set fdim1 = [[1,'10'],[2,'5,5'],[3,'5,4,3']]
+    ///:for d in fdim1
+    ///:for t in scalar_dtype
+    allocate(farr_${t[0]}$${d[0]}$(${d[1]}$))
+    farr_${t[0]}$${d[0]}$ = 10
+    A = farr_${t[0]}$${d[0]}$
+    call display(A, "A = ")
+    ///:endfor
+    ///:endfor
+    
     
   end subroutine
   

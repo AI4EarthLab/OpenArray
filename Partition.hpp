@@ -28,6 +28,7 @@ typedef std::shared_ptr<Partition> PartitionPtr;
 class Partition {
 private:
   static Shape m_default_procs_shape;
+  static int m_default_stencil_width;
   public:
   MPI_Comm m_comm = MPI_COMM_SELF;
   Shape m_global_shape = { {1, 1, 1} };
@@ -100,6 +101,9 @@ private:
   static void set_default_procs_shape(const Shape& s);
   static void set_auto_procs_shape();  
   static Shape get_default_procs_shape();
+
+  static int  get_default_stencil_width();
+  static void set_default_stencil_width(int);  
 };
 
 

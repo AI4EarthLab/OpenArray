@@ -3,6 +3,7 @@
 #include <string>
 #include "../Node.hpp"
 #include <unordered_map>
+#include "../Operator.hpp"
 
 typedef std::unordered_map<std::string, NodePtr*> CachedNodes;
 
@@ -28,6 +29,7 @@ extern "C"{
       std::cout<<"Error: found a same key already cached. Maybe hash conflicted?";
     }else{
       cached_nodes[std::string(key)] = p;
+      oa::ops::gen_kernels_JIT(*p);
     }
   }
 

@@ -404,5 +404,14 @@ void Partition::set_auto_procs_shape(){
   m_default_procs_shape = {0,0,0};
 }
 
+int Partition::m_default_stencil_width = 1;
+int Partition::get_default_stencil_width(){
+  return m_default_stencil_width;
+}
+
+void Partition::set_default_stencil_width(int sw){
+  m_default_stencil_width = sw;
+}
+
 
 

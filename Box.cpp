@@ -68,7 +68,7 @@ bool Box::intersection(const Box &u) {
 }
 
 // get the intersection box
-Box Box::get_intersection(const Box &u) {
+Box Box::get_intersection(const Box &u){
   if (!intersection(u)) return Box();
   return Box(m_rx.get_intersection(u.m_rx), 
   m_ry.get_intersection(u.m_ry), m_rz.get_intersection(u.m_rz));

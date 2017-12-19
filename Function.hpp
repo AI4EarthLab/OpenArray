@@ -242,6 +242,84 @@ namespace oa {
 
     // rep arry_B = rep_A(arryA, 1, 2, 3)
     ArrayPtr rep(ArrayPtr& A, int x, int y, int z);
+
+    //ArrayPtr create_local_array(const Shape& gs, DataType dt);
+
+    template<class T>
+    ArrayPtr create_local_array(const Shape& gs, T* buf){
+      int sw = Partition::get_default_stencil_width();
+      DataType dt = oa::utils::to_type<T>();        
+      ArrayPtr ap = zeros(MPI_COMM_SELF, gs, sw, dt);
+      T* dst_buf = (T*)ap->get_buffer();
+
+      const int xs = 0;
+      const int xe = gs[0] + 2 * sw;
+      const int ys = 0;
+      const int ye = gs[1] + 2 * sw;
+      const int zs = 0;
+      const int ze = gs[2] + 2 * sw;
+
+      const int M = xe;
+      const int N = ye;
+      const int P = ze;
+      
+      for(int k = zs + sw; k < ze - sw; k++){
+        for(int j = ys + sw; j < ye - sw; j++){
+          for(int i = xs + sw; i < xe - sw; i++){
+            dst_buf[i+j*M+k*M*N] =
+              buf[i-sw + (j-sw) * gs[0] + (k-sw)*gs[0]*gs[1]];
+          }
+        }
+      }
+      return ap;
+    }
+
+
+    template<class T>
+    void set(ArrayPtr& A, const Box& ref_box,
+            T* buf, Shape& buf_shape){
+      assert(ref_box.shape() == buf_shape);
+      
+      Box local_box = A->get_local_box();
+      Box local_ref_box = local_box.get_intersection(ref_box);
+
+      int3 offset_local =
+        local_ref_box.starts() - local_box.starts();
+      int x1 = offset_local[0];
+      int y1 = offset_local[1];
+      int z1 = offset_local[2];
+      
+      int3 offset_ref =
+        local_ref_box.starts() - ref_box.starts();
+      int x2 = offset_ref[0];
+      int y2 = offset_ref[1];
+      int z2 = offset_ref[2];
+      
+      Shape slr = local_ref_box.shape();
+      int M = slr[0];
+      int N = slr[1];
+      int P = slr[2];
+
+      Shape bs = A->buffer_shape();
+
+      T* dst_buf = (T*)A->get_buffer();
+
+      const int sw = A->get_partition()->get_stencil_width();
+      
+      for(int k = 0; k < P; ++k){
+        for(int j = 0; j < N; ++j){
+          for(int i = 0; i < M; ++i){
+            int idx1 = (i + sw + x1) +
+              (j + sw + y1) * bs[0] +
+              (k + sw + z1) * bs[0] * bs[1];
+            int idx2 = (i + x2) +
+              (j + y2) * buf_shape[0] +
+              (k + z2) * buf_shape[0] * buf_shape[1];
+            dst_buf[idx1] = dst_buf[idx2];
+          }
+        }        
+      }
+    }
   }
 }
 

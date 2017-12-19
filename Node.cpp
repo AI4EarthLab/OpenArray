@@ -241,6 +241,20 @@ void Node::set_ref(const Box& b){
   m_ref = b;
 }
 
-Box Node::get_ref(){
+Box& Node::get_ref(){
   return m_ref;
+}
+
+bool Node::is_ref() const{
+  return m_data_type == TYPE_REF;
+}
+
+bool Node::is_ref_data() const{
+  return (m_data_type == TYPE_REF) &&
+    (m_input.at(0)->get_data_type()== TYPE_DATA);
+}
+
+ArrayPtr& Node::get_ref_data(){
+  assert(is_ref_data());
+  return m_input.at(0)->get_data();
 }

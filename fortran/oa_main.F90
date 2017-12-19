@@ -28,7 +28,7 @@ program main
 
   ! call test_math()
 
-  ! call test_sub()
+  !call test_sub()
 
   ! call test_sum()
 
@@ -40,7 +40,7 @@ program main
 
   ! call test_shift()
 
-  !call test_cache()
+  ! call test_cache()
   
   call test_set()
   

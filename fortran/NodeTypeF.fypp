@@ -79,7 +79,8 @@
 #!  if os.path.isdir(os.path.join('./modules/', name))]
 
 
-
+  ///:set fdim = [[1,':'],[2,':,:'],[3,':,:,:']]
+  
 ///:set scalar_dtype = &
      [['int',   'integer'], &
      [ 'float',  'real'], &

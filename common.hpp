@@ -34,11 +34,9 @@
 typedef std::array<int, 3> Shape;
 typedef std::array<int, 3> int3;
 
-// void operator= (int* a, const int3& b){
-//   a[0] = b[0];
-//   a[1] = b[1];
-//   a[2] = b[2];
-// }
+///:for o in ['+','-','*']
+int3 operator${o}$(const int3& a, const int3& b);
+///:endfor
 
 typedef int DataType;
 typedef int DATA_TYPE;

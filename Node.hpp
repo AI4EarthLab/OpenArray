@@ -139,7 +139,13 @@ public:
 
   void set_ref(const Box& b);
 
-  Box get_ref();
+  Box& get_ref();
+
+  bool is_ref() const;
+
+  bool is_ref_data() const;
+
+  ArrayPtr& get_ref_data();
 };
 
 
