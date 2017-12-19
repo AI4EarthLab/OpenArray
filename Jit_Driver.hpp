@@ -36,7 +36,7 @@ public:
 
     int fack_argc = 4;
     char arg0[] = "-O3" ;
-    char arg1[] = "-O3";
+    char arg1[] = "-ffast-math";
     char arg2[] = "-O3";
     char arg3[]= ""; //"-I/home/wangdong/comp/llvm.debug/lib/clang/6.0.0/include";
     //char **fake_argv = new char *[fack_argc+1]{arg0, arg1, arg2, arg3};

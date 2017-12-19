@@ -325,7 +325,7 @@ namespace oa {
           list.push_back(ap->get_buffer());
           void** list_pointer = list.data();
           fkptr(list_pointer, ap->buffer_size());
-          cout<<"fusion-kernel called"<<endl;
+          //cout<<"fusion-kernel called"<<endl;
           
           //A->set_data(ap);
           ap->set_pseudo(A->is_pseudo());
@@ -499,7 +499,7 @@ namespace oa {
         //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
         int id = 0;
         tree_to_code(A, code, id);
-        cout<<code.str()<<endl;
+        //cout<<code.str()<<endl;
         tree_to_string(A, ss);
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
@@ -539,7 +539,7 @@ namespace oa {
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
         
-        code<<"extern \"C\" {\nvoid kernel_"<<hash;
+        code<<"#include <math.h>\n extern \"C\" {\nvoid kernel_"<<hash;
         code<<"(void** &list, int size) {\n";
         code<<"  for (int i = 0; i < size; i++) {\n";
         switch(A->get_data_type()) {
@@ -588,7 +588,10 @@ namespace oa {
 
       switch(A->input_size()) {
       case 1:
-        ss<<nd.sy<<"("<<child[0].str()<<")";
+        if(nd.sy == "abs")
+          ss<<"fabs"<<"("<<child[0].str()<<")";
+        else
+          ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
       case 2:
         ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
@@ -629,7 +632,10 @@ namespace oa {
 
       switch(A->input_size()) {
       case 1:
-        ss<<nd.sy<<"("<<child[0].str()<<")";
+        if(nd.sy == "abs")
+          ss<<"fabs"<<"("<<child[0].str()<<")";
+        else
+          ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
       case 2:
         ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";

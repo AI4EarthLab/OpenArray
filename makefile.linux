@@ -16,12 +16,12 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_system -ldl -llapack -lblas -lgtest -ljit \
 		-Wl,-rpath=${JIT_LIB}
 
-oplevel0 = -O1 -g 
-oplevel3 = -O3
+oplevel0 = -O0 -g 
+oplevel3 = -O3 -ffast-math
 
-FC = mpif90 ${oplevel0}
-CC = mpicc  ${oplevel0}
-CXX = mpicxx ${oplevel0}
+FC = mpif90 ${oplevel3}
+CC = mpicc  ${oplevel3}
+CXX = mpicxx ${oplevel3}
 
 FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans -ffree-line-length-0
 
