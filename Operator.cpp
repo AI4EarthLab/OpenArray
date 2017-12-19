@@ -365,6 +365,7 @@ namespace oa {
       return ap;
     }
 
+
     ArrayPtr eval_JIT(NodePtr A) {
       // data
       if (A->has_data()) return A->get_data();
@@ -419,6 +420,7 @@ namespace oa {
 
       return ap;
     }
+
 
     const KernelPtr get_kernel_dict(size_t hash, const char *filename) {
       static bool has_init = false;
@@ -553,7 +555,7 @@ namespace oa {
         }
         code<<__code.str()<<";\n  }\n  return ;\n}}";
 
-        cout<<code.str()<<endl;
+        // cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
 

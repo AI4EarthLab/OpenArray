@@ -72,6 +72,20 @@ typedef arma::Cube<double> cube_double;
 
 #define SCALAR_SHAPE Shape({1,1,1})
 
+#define WITHOUT_FUSION_KERNEL 0
+#define WITH_FUSION_KERNEL 1
+
+
+#define CSET(A, B)                                    \
+  tmp_node_key = gen_node_key(__FILE__, __LINE__);    \
+  find_node(tmp_node, tmp_node_key);                  \
+  if (is_valid(tmp_node)) {                           \
+    A = tmp_node;                                     \
+  } else {                                            \
+    tmp_node = B;                                     \
+    cache_node(tmp_node, tmp_node_key);               \
+    A = tmp_node;                                     \
+  }
 
 #endif
 

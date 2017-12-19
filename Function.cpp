@@ -523,7 +523,10 @@ namespace oa {
         MPI_Type_free(&target_sub_array);
       }
 
-      for (int i = 0; i < 27; ++i) {
+      // for (int i = 0; i < 27; ++i) {
+      // receive should be reversed
+      for (int i = 26; i >= 0; i--) {
+      
         if (!update_bound[i]) continue;
         
         int xs1, ys1, zs1, xe1, ye1, ze1;

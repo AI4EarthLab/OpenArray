@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
   //test_op();
 
   // tic("3d");
-  // for (int i = 0; i < 1; i++)
+  // for (int i = 0; i < 10; i++)
   //   test_fusion_op_3d(m, n, p, i);
   // toc("3d");
   // tic("2d");
@@ -68,8 +68,13 @@ int main(int argc, char** argv) {
   //test_pseudo_3d();
   //test_rand();
   //test_bitset();
-  test_operator_with_grid();
+  //test_operator_with_grid();
+  
+  tic("cache");
+  test_cache(m, n, p);
+  toc("cache");
 
+  show_all();
 
   if (world_rank == 0) std::cout<<"Finished."<<std::endl;
   MPI_Finalize();
