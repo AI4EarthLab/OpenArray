@@ -60,9 +60,9 @@ public:
   
   // throw the object into object pool 
   void dispose(Node* n) {
+    if (n == NULL) return ;
     n -> reset();
     m_list.push_back(n);
-    //printf("node dispose called.\n");
   }
 
   static NodePool* global() {

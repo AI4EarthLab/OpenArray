@@ -47,6 +47,9 @@ namespace oa {
 
     void tree_to_code(NodePtr A, stringstream &ss, int &id);
 
+    void tree_to_code(NodePtr A, stringstream &ss, int &id,
+      vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
+
     void tree_to_string_stack(NodePtr A, stringstream &ss);
   }
 }

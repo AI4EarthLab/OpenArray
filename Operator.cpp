@@ -325,7 +325,7 @@ namespace oa {
           list.push_back(ap->get_buffer());
           void** list_pointer = list.data();
           fkptr(list_pointer, ap->buffer_size());
-          cout<<"fusion-kernel called"<<endl;
+          // cout<<"fusion-kernel called"<<endl;
           
           //A->set_data(ap);
           ap->set_pseudo(A->is_pseudo());
@@ -534,13 +534,24 @@ namespace oa {
         stringstream __code;
         //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
         int id = 0;
-        tree_to_code(A, __code, id);
+        vector<int> int_id, float_id, double_id;
+        tree_to_code(A, __code, id, int_id, float_id, double_id);
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
         
         code<<"extern \"C\" {\nvoid kernel_"<<hash;
         code<<"(void** &list, int size) {\n";
+        for (int i = 0; i < int_id.size(); i++) {
+          code<<"const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
+        }
+        for (int i = 0; i < float_id.size(); i++) {
+          code<<"const float F_"<<i<<" = ((float*)list["<<int_id[i]<<"])[0]\n";
+        }
+        for (int i = 0; i < double_id.size(); i++) {
+          code<<"const double D_"<<i<<" = ((double*)list["<<int_id[i]<<"])[0]\n";
+        }
+
         code<<"  for (int i = 0; i < size; i++) {\n";
         switch(A->get_data_type()) {
           case DATA_INT:
@@ -555,7 +566,7 @@ namespace oa {
         }
         code<<__code.str()<<";\n  }\n  return ;\n}}";
 
-        // cout<<code.str()<<endl;
+        cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
 
@@ -629,7 +640,73 @@ namespace oa {
 
       switch(A->input_size()) {
       case 1:
-        ss<<nd.sy<<"("<<child[0].str()<<")";
+        if(nd.sy == "abs")
+          ss<<"fabs"<<"("<<child[0].str()<<")";
+        else
+          ss<<nd.sy<<"("<<child[0].str()<<")";
+        break;
+      case 2:
+        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        break;
+      }
+
+      return;
+    }
+
+    void tree_to_code(NodePtr A, stringstream &ss, int &id,
+      vector<int>& int_id, vector<int>& float_id, vector<int>& double_id) {
+      const NodeDesc &nd = get_node_desc(A->type());
+
+      if (A->has_data() || !nd.ew || A->need_update()) {
+        if (A->is_seqs_scalar()) {
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"I_";
+              ss<<int_id.size();
+              int_id.push_back(id);
+              break;
+            case DATA_FLOAT:
+              ss<<"F_";
+              ss<<float_id.size();
+              float_id.push_back(id);
+              break;
+            case DATA_DOUBLE:
+              ss<<"D_";
+              ss<<double_id.size();
+              double_id.push_back(id);
+              break;
+          }
+        } else {
+          ss<<"(";
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"(int*)";
+              break;
+            case DATA_FLOAT:
+              ss<<"(float*)";
+              break;
+            case DATA_DOUBLE:
+              ss<<"(double*)";
+              break;
+          }
+          ss<<"(list["<<id<<"]))[i]";
+        }
+        id++;
+        return ;
+      }
+
+      stringstream child[2];
+      for (int i = 0; i < A->input_size(); i++) {
+        tree_to_code(A->input(i), child[i], id, int_id, float_id, double_id);
+        //child[i] = tree_to_string(A->input(i));
+      }
+
+      switch(A->input_size()) {
+      case 1:
+        if(nd.sy == "abs")
+          ss<<"fabs"<<"("<<child[0].str()<<")";
+        else
+          ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
       case 2:
         ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";

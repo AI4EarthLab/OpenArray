@@ -77,6 +77,9 @@ int main(int argc, char** argv) {
   show_all();
 
   if (world_rank == 0) std::cout<<"Finished."<<std::endl;
+  // !clear_cache();
+  
   MPI_Finalize();
+  clear_cache();
   return 0;
 }

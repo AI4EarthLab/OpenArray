@@ -11,6 +11,7 @@ extern "C" {
   void cache_node(NodePtr& p, std::string key);
   std::string gen_node_key(const char* file, const int line);
   bool is_valid(NodePtr& p);
+  void clear_cache();
 }
 
 #endif

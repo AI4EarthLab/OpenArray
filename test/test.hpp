@@ -610,7 +610,7 @@ void test_set() {
   oa::funcs::set(ap, box1, ap, box2);
   ap->display("======after_set======");
 
-  oa::funcs::set_with_const(ap, box1, 0);
+  oa::funcs::set_ref_const(ap, box1, 0);
   ap->display("======after_set======");
 }
 
@@ -1098,10 +1098,10 @@ void test_cache(int m, int n, int k) {
   
   // ArrayPtr ap3 = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
   
-  std::string tmp_node_key;
-  NodePtr tmp_node;
+  std::string tmp_node_key = "";
+  NodePtr tmp_node = NULL;
 
-  NodePtr n1 = NODE(ap1);
+  NodePtr n1 = NodePool::global()->get_seqs_scalar(MPI_COMM_SELF, 1);
   NodePtr n2 = NODE(ap2);
   NodePtr n3 = NODE(ap3);
   NodePtr n4 = NODE(ap4);
@@ -1112,13 +1112,33 @@ void test_cache(int m, int n, int k) {
   
   NodePtr np;
 
-  for (int i = 0; i < 100; i++) {
-    CSET(np, PLUS( PLUS(n1, n2), PLUS(n3, n4) ) );
+  for (int i = 0; i < 10; i++) {
+    // CSET(np, PLUS( PLUS(n1, n2), PLUS(n3, n4) ) );
     // oa::ops::gen_kernels_JIT(np);
+    // np = PLUS(PLUS(n1, n2), PLUS(n3, n4));
+    tmp_node_key = gen_node_key(__FILE__, __LINE__);  
+    find_node(tmp_node, tmp_node_key);                  
+    if (is_valid(tmp_node)) {                           
+      np = tmp_node;                                     
+    } else {
+      tmp_node = PLUS( PLUS(n1, n2), PLUS(n3, n4));
+      cache_node(tmp_node, tmp_node_key);               
+      np = tmp_node;                                     
+    }
     ans = EVAL(np);
   }
 
-  //ans->display("ans");
+  // // tmp_node.reset();
+  // tmp_node = NULL;
+  // //ans->display("ans");
+
+  // NodePtr ND = PLUS(n1, n2);
+
+  // for (int i = 0; i < 10; i++) {
+  //   np = ND;
+  // }
+
+
 
 }
 
