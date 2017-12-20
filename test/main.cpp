@@ -70,16 +70,18 @@ int main(int argc, char** argv) {
   //test_bitset();
   //test_operator_with_grid();
   
-  tic("cache");
-  test_cache(m, n, p);
-  toc("cache");
+  // tic("cache");
+  // test_cache(m, n, p);
+  // toc("cache");
 
-  show_all();
+  // show_all();
+
+  test_gen_kernel_JIT_with_op(m, n, p);
 
   if (world_rank == 0) std::cout<<"Finished."<<std::endl;
   // !clear_cache();
   
   MPI_Finalize();
-  clear_cache();
+  // clear_cache();
   return 0;
 }

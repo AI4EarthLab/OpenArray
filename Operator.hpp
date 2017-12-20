@@ -43,12 +43,22 @@ namespace oa {
     void gen_kernels_JIT(NodePtr A, 
         bool is_root = true, MPI_Comm comm = MPI_COMM_WORLD);
 
+    void gen_kernels_JIT_with_op(NodePtr A, 
+        bool is_root = true, MPI_Comm comm = MPI_COMM_WORLD);
+
     void tree_to_string(NodePtr A, stringstream &ss);
 
     void tree_to_code(NodePtr A, stringstream &ss, int &id);
 
     void tree_to_code(NodePtr A, stringstream &ss, int &id,
       vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
+
+    void tree_to_code_with_op(NodePtr A, stringstream &ss, int &id, int &S_id,
+      vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
+
+    void change_string_with_op(stringstream& ss, string in, const NodeDesc &nd);
+
+    string replace_string(string& in, const string& old_str, const string& new_str);
 
     void tree_to_string_stack(NodePtr A, stringstream &ss);
   }

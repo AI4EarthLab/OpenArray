@@ -546,10 +546,10 @@ namespace oa {
           code<<"const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
         }
         for (int i = 0; i < float_id.size(); i++) {
-          code<<"const float F_"<<i<<" = ((float*)list["<<int_id[i]<<"])[0]\n";
+          code<<"const float F_"<<i<<" = ((float*)list["<<float_id[i]<<"])[0];\n";
         }
         for (int i = 0; i < double_id.size(); i++) {
-          code<<"const double D_"<<i<<" = ((double*)list["<<int_id[i]<<"])[0]\n";
+          code<<"const double D_"<<i<<" = ((double*)list["<<double_id[i]<<"])[0];\n";
         }
 
         code<<"  for (int i = 0; i < size; i++) {\n";
@@ -575,6 +575,69 @@ namespace oa {
 
       for (int i = 0; i < A->input_size(); i++) {
         gen_kernels_JIT(A->input(i), false);
+      }
+    }
+
+    void gen_kernels_JIT_with_op(NodePtr A, bool is_root, MPI_Comm comm) {
+      //if (oa::utils::get_rank(comm)) return ;
+      if (A->has_data()) return ;
+      
+      const NodeDesc &nd = get_node_desc(A->type());
+      if (!nd.ew || A->need_update()) {
+        for (int i = 0; i < A->input_size(); i++) {
+          gen_kernels_JIT_with_op(A->input(i), true);
+        }
+        return ;
+      }
+
+      if (is_root && A->get_depth() >= 2) {
+        stringstream ss1;
+        stringstream code;
+        stringstream __code;
+        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
+        int id = 0;
+        int S_id = 0;
+        vector<int> int_id, float_id, double_id;
+        tree_to_code_with_op(A, __code, id, S_id, int_id, float_id, double_id);
+        tree_to_string_stack(A, ss1);
+        std::hash<string> str_hash;
+        size_t hash = str_hash(ss1.str());
+        
+        code<<"extern \"C\" {\nvoid kernel_"<<hash;
+        code<<"(void** &list, int size) {\n";
+        for (int i = 0; i < int_id.size(); i++) {
+          code<<"const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
+        }
+        for (int i = 0; i < float_id.size(); i++) {
+          code<<"const float F_"<<i<<" = ((float*)list["<<float_id[i]<<"])[0];\n";
+        }
+        for (int i = 0; i < double_id.size(); i++) {
+          code<<"const double D_"<<i<<" = ((double*)list["<<double_id[i]<<"])[0];\n";
+        }
+
+        code<<"  for (int i = 0; i < size; i++) {\n";
+        switch(A->get_data_type()) {
+          case DATA_INT:
+            code<<"    ((int*)(list["<<id<<"]))[i] = ";
+            break;
+          case DATA_FLOAT:
+            code<<"    ((float*)(list["<<id<<"]))[i] = ";
+            break;
+          case DATA_DOUBLE:
+            code<<"    ((double*)(list["<<id<<"]))[i] = ";
+            break;    
+        }
+        code<<__code.str()<<";\n  }\n  return ;\n}}";
+
+        cout<<code.str()<<endl;
+        // Add fusion kernel into JIT map
+        Jit_Driver::global()->insert(hash, code);
+
+        A->set_hash(hash);
+      }
+
+      for (int i = 0; i < A->input_size(); i++) {
+        gen_kernels_JIT_with_op(A->input(i), false);
       }
     }
 
@@ -715,7 +778,216 @@ namespace oa {
 
       return;
     }
+
+    void tree_to_code_with_op(NodePtr A, stringstream &ss, int &id, int& S_id,
+      vector<int>& int_id, vector<int>& float_id, vector<int>& double_id) {
+      const NodeDesc &nd = get_node_desc(A->type());
+
+      // data node
+      if (A->has_data() || !nd.ew || A->need_update()) {
+        // scalar
+        if (A->is_seqs_scalar()) {
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"I_";
+              ss<<int_id.size();
+              int_id.push_back(id);
+              break;
+            case DATA_FLOAT:
+              ss<<"F_";
+              ss<<float_id.size();
+              float_id.push_back(id);
+              break;
+            case DATA_DOUBLE:
+              ss<<"D_";
+              ss<<double_id.size();
+              double_id.push_back(id);
+              break;
+          }
+        // [i][j][k] based on node bitset
+        } else {
+          ss<<"(";
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"(int*)";
+              break;
+            case DATA_FLOAT:
+              ss<<"(float*)";
+              break;
+            case DATA_DOUBLE:
+              ss<<"(double*)";
+              break;
+          }
+          ss<<"(list["<<id<<"]))";
+          
+          char pos_i[3] = "oi";
+          char pos_j[3] = "oj";
+          char pos_k[3] = "ok";
+          
+          bitset<3> bit = A->get_bitset();
+          ss<<"[calc_id("<<pos_i[bit[0]]<<",";
+          ss<<pos_j[bit[1]]<<",";
+          ss<<pos_k[bit[2]]<<",S"<<S_id<<")]";
+          S_id++;
+        }
+        id++;
+        return ;
+      }
+
+      stringstream child[2];
+      for (int i = 0; i < A->input_size(); i++) {
+        tree_to_code_with_op(A->input(i), child[i], id, S_id, 
+          int_id, float_id, double_id);
+        //child[i] = tree_to_string(A->input(i));
+      }
+
+      switch(A->input_size()) {
+      case 1:
+        change_string_with_op(ss, child[0].str(), nd);
+        // bind grid if A.pos != -1
+        if (A->get_pos() != -1) {
+          if (nd.type == TYPE_DXC ||
+            nd.type == TYPE_DYC ||
+            nd.type == TYPE_DZC ||
+            nd.type == TYPE_DXB ||
+            nd.type == TYPE_DXF ||
+            nd.type == TYPE_DYB ||
+            nd.type == TYPE_DYF ||
+            nd.type == TYPE_DZB ||
+            nd.type == TYPE_DZF) {
+
+            // get grid ptr
+            ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);
+
+            ss<<"(";
+            switch(grid_ptr->get_data_type()) {
+              case DATA_INT:
+                ss<<"(int*)";
+                break;
+              case DATA_FLOAT:
+                ss<<"(float*)";
+                break;
+              case DATA_DOUBLE:
+                ss<<"(double*)";
+                break;
+            }
+            ss<<"(list["<<id<<"]))";
+            id++;
+            
+            char pos_i[3] = "oi";
+            char pos_j[3] = "oj";
+            char pos_k[3] = "ok";
+            
+            bitset<3> bit = grid_ptr->get_bitset();
+            ss<<"[calc_id("<<pos_i[bit[0]]<<",";
+            ss<<pos_j[bit[1]]<<",";
+            ss<<pos_k[bit[2]]<<",S"<<S_id<<")]";
+            S_id++;
+          }
+        }
+        break;
+      case 2:
+        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        break;
+      }
+
+      return;
+    }
+
+    void change_string_with_op(stringstream& ss, string in, const NodeDesc &nd) {
+      string new_str1, new_str2, new_str;
+      switch(nd.type) {
+      // Central difference operator
+      case TYPE_DXC:
+        new_str1 = replace_string(in, "i,", "+1+i,");
+        new_str2 = replace_string(in, "i,", "-1+i,");
+        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        break;
+      case TYPE_DYC:
+        new_str1 = replace_string(in, "j,", "+1+j,");
+        new_str2 = replace_string(in, "j,", "-1+j,");
+        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        break;
+      case TYPE_DZC:
+        new_str1 = replace_string(in, "k,", "+1+k,");
+        new_str2 = replace_string(in, "k,", "-1+k,");
+        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        break;
+
+      // average operator
+      case TYPE_AXB:
+        new_str = replace_string(in, "i,", "-1+i,");
+        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        break;
+      case TYPE_AXF:
+        new_str = replace_string(in, "i,", "+1+i,");
+        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        break;
+      case TYPE_AYB:
+        new_str = replace_string(in, "j,", "-1+j,");
+        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        break;
+      case TYPE_AYF:
+        new_str = replace_string(in, "j,", "+1+j,");
+        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        break;
+      case TYPE_AZB:
+        new_str = replace_string(in, "k,", "-1+k,");
+        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        break;
+      case TYPE_AZF:
+        new_str = replace_string(in, "k,", "+1+k,");
+        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        break;
+
+      // difference operator
+      case TYPE_DXB:
+        new_str = replace_string(in, "i,", "-1+i,");
+        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        break;
+      case TYPE_DXF:
+        new_str = replace_string(in, "i,", "+1+i,");
+        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        break;
+      case TYPE_DYB:
+        new_str = replace_string(in, "j,", "-1+j,");
+        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        break;
+      case TYPE_DYF:
+        new_str = replace_string(in, "j,", "+1+j,");
+        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        break;
+      case TYPE_DZB:
+        new_str = replace_string(in, "k,", "-1+k,");
+        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        break;
+      case TYPE_DZF:
+        new_str = replace_string(in, "k,", "+1+k,");
+        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        break;
+
+      // abs operator
+      case TYPE_ABS:
+        ss<<"fabs"<<"("<<in<<")";
+        break;
+
+      // other default monocular operator
+      default:
+        ss<<nd.sy<<"("<<in<<")";
+        break;
+      }
+    }
     
+    // replace all old_str in string in by new_str
+    string replace_string(string& in, const string& old_str, const string& new_str) {
+      string out = in;
+      // use replace is not efficient, should be optimized later
+      for(string::size_type i = 0; (i = out.find(old_str, i)) != string::npos;) {
+        out.replace(i, old_str.length(), new_str);
+        i += new_str.length();
+      }
+      return out;
+    }
 
     void tree_to_string_stack(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());

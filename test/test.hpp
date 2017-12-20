@@ -1088,7 +1088,8 @@ void test_operator_with_grid() {
 void test_cache(int m, int n, int k) {
   ArrayPtr ans;
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
-  ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m/2, m/2}, {n/2, n/2}, {1, 1}, 2);
+  ap2->set_bitset("110");
   ArrayPtr ap3 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
   ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
   ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
@@ -1116,17 +1117,20 @@ void test_cache(int m, int n, int k) {
     // CSET(np, PLUS( PLUS(n1, n2), PLUS(n3, n4) ) );
     // oa::ops::gen_kernels_JIT(np);
     // np = PLUS(PLUS(n1, n2), PLUS(n3, n4));
-    tmp_node_key = gen_node_key(__FILE__, __LINE__);  
-    find_node(tmp_node, tmp_node_key);                  
-    if (is_valid(tmp_node)) {                           
-      np = tmp_node;                                     
-    } else {
-      tmp_node = PLUS( PLUS(n1, n2), PLUS(n3, n4));
-      cache_node(tmp_node, tmp_node_key);               
-      np = tmp_node;                                     
-    }
-    ans = EVAL(np);
+    // tmp_node_key = gen_node_key(__FILE__, __LINE__);  
+    // find_node(tmp_node, tmp_node_key);                  
+    // if (is_valid(tmp_node)) {                           
+    //   np = tmp_node;                                     
+    // } else {
+    //   tmp_node = PLUS( PLUS(n1, n2), PLUS(n3, n4));
+    //   cache_node(tmp_node, tmp_node_key);               
+    //   np = tmp_node;                                     
+    // }
+    // ans = EVAL(np);
   }
+
+  np = PLUS( PLUS(n1, n2), PLUS(n3, n4) );
+  oa::ops::gen_kernels_JIT_with_op(np);
 
   // // tmp_node.reset();
   // tmp_node = NULL;
@@ -1140,6 +1144,38 @@ void test_cache(int m, int n, int k) {
 
 
 
+}
+
+void test_gen_kernel_JIT_with_op(int m, int n, int k) {
+  m = n = k = 6;
+
+  ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {6, 6, 1}, 1, 2);
+  ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {6, 6, 1}, 1, 2);
+  ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1, 6}, 1, 2);
+  
+  dx->set_pseudo(true);
+  dy->set_pseudo(true);
+  dz->set_pseudo(true);
+
+  dx->set_bitset("110");
+  dy->set_bitset("110");
+  dz->set_bitset("001");
+  
+  Grid::global()->init_grid('C', dx, dy, dz);
+
+
+  ArrayPtr ans;
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ap1->set_bitset("111");
+  ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, 1}, 2);
+  ap2->set_bitset("110");
+  
+  NodePtr n1 = NODE(ap1);
+  NodePtr n2 = NODE(ap2);
+  NodePtr n3 = NodePool::global()->get_seqs_scalar(MPI_COMM_SELF, 1);
+  
+  NodePtr np = PLUS( MULT(DXF(n1), DYB(n2)), n3 );
+  oa::ops::gen_kernels_JIT_with_op(np);
 }
 
 #endif
