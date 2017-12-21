@@ -207,11 +207,9 @@ namespace oa {
       if (x[procs_coord[0]] * y[procs_coord[1]] * z[procs_coord[2]] == 0) return ;
       
       Box box = A->get_local_box();
-      Box sub_box(
-                  rsx[idx * 3], rsx[idx * 3 + 1] - 1,
-                  rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
-                  rsz[idz * 3], rsz[idz * 3 + 1] - 1
-                  );
+      Box sub_box(rsx[idx * 3], rsx[idx * 3 + 1],
+                  rsy[idy * 3], rsy[idy * 3 + 1], 
+                  rsz[idz * 3], rsz[idz * 3 + 1]);
 
       // different data_type
 

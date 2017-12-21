@@ -22,17 +22,17 @@ namespace oa{
       int xs, xe, ys, ye, zs, ze;
       //std::cout<<"sw="<<sw<<std::endl;
       xs = ys = zs = 0;
-      xe = s[0] - 1;
-      ye = s[1] - 1;
-      ze = s[2] - 1;
+      xe = s[0];
+      ye = s[1];
+      ze = s[2];
       for(int i = 0; i < x; i++){
         ys = 0;
         zs = 0;
-        ye = s[1] - 1;
-        ze = s[2] - 1;
+        ye = s[1];
+        ze = s[2];
         for(int j = 0; j < y; j++){
           zs = 0;
-          ze = s[2] - 1;
+          ze = s[2];
           for(int k = 0; k < z; k++){
             Box box(xs, xe, ys, ye, zs, ze);
             oa::funcs::set(ap, box, A);

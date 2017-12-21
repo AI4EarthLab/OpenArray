@@ -155,9 +155,9 @@ Box Partition::get_local_box() {
 // get the box info based on process's coord [px, py, pz]
 Box Partition::get_local_box(const vector<int> &coord) {
   for (int i = 0; i < 3; i++) assert(0 <= coord[i] && coord[i] < m_procs_shape[i]);
-  Box box(m_clx[coord[0]], m_clx[coord[0] + 1] - 1, 
-  m_cly[coord[1]], m_cly[coord[1] + 1] - 1,
-  m_clz[coord[2]], m_clz[coord[2] + 1] - 1);
+  Box box(m_clx[coord[0]], m_clx[coord[0] + 1], 
+  m_cly[coord[1]], m_cly[coord[1] + 1],
+  m_clz[coord[2]], m_clz[coord[2] + 1]);
   return box;
 }
 
@@ -268,6 +268,12 @@ void Partition::split_box_procs(const Box& b,
   
   int xs, ys, zs, xe, ye, ze;
   b.get_corners(xs, xe, ys, ye, zs, ze);
+
+  assert((xs >= 0 && ys >= 0 && zs >=0
+                  && xe <= m_global_shape[0]
+                  && ye <= m_global_shape[1]
+                  && ze <= m_global_shape[2]) &&
+          "split_box_procs : the box does not match the partition");
   
   int bxs = std::lower_bound(m_clx.begin(), m_clx.end(), xs) - m_clx.begin();
   int bxe = std::upper_bound(m_clx.begin(), m_clx.end(), xe - 1) - m_clx.begin();

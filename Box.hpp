@@ -28,7 +28,7 @@ class Box {
 
   bool equal(const Box &u);
   bool equal_shape(const Box &b);
-  void display(char const *prefix = "");
+  void display(char const *prefix = "") const;
 
   // check if Box is inside Box u
   bool is_inside(const Box &u);
@@ -38,6 +38,9 @@ class Box {
 
   // get the intersection box
   Box get_intersection(const Box &u);
+
+  // get the intersection box
+  Box get_intersection1(const Box &u);
   
   Box ref_box(const Box &u) const;
   
@@ -51,7 +54,9 @@ class Box {
 
   int3 starts() const;
   int3 counts() const;
-  
+
+  Box shift(int i);
+
 };
 
 typedef std::shared_ptr<Box> BoxPtr;

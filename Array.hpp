@@ -6,7 +6,7 @@
 #include <bitset>
 #include <string>
 #include "Partition.hpp"
-
+#include "Internal.hpp"
 /*
  * Array:
  *  buffer:   data
@@ -68,7 +68,9 @@ class Array {
   void set_bitset(std::string);
   bitset<3> get_bitset();
   void set_bitset(bitset<3> bs);
-
+  int get_stencil_width() const;
+  int get_stencil_type() const;
+  void set_zeros();
 };
 
 

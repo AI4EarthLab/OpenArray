@@ -81,16 +81,15 @@ contains
     s = shape(A)
 
     ///:if rx[0] == 'int'
-    rx1 = [rx, rx] - 1
+    rx1 = [rx-1, rx]
     ///:elif rx[0] == 'int2'
-    rx1 = rx - 1
+    rx1 = [rx(1) - 1, rx(2)]
     ///:else
-    rx1 = [0, s(1)-1]
+    rx1 = [0, s(1)]
     ///:endif
 
-    ry1 = [0, s(2)-1]
-    rz1 = [0, s(3)-1]
-    
+    ry1 = [0, s(2)]
+    rz1 = [0, s(3)]
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)
     call c_new_node_sub_node(B%ptr, NA%ptr, rx1, ry1, rz1)
@@ -118,23 +117,23 @@ contains
     s = shape(A)
 
     ///:if rx[0] == 'int'
-    rx1 = [rx, rx] - 1
+    rx1 = [rx-1, rx]
     ///:elif rx[0] == 'int2'
-    rx1 = rx - 1
+    rx1 = [rx(1) - 1, rx(2)]
     ///:else
-    rx1 = [0, s(1)-1]
+    rx1 = [0, s(1)]
     ///:endif
 
 
     ///:if ry[0] == 'int'
-    ry1 = [ry, ry] - 1
+    ry1 = [ry-1, ry]
     ///:elif ry[0] == 'int2'
-    ry1 = ry - 1
+    ry1 = [ry(1) - 1, ry(2)]
     ///:else
-    ry1 = [0, s(2)-1]
+    ry1 = [0, s(2)]
     ///:endif
 
-    rz1 = [0, s(3)-1]
+    rz1 = [0, s(3)]
 
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)
@@ -166,27 +165,27 @@ contains
     s = shape(A)
     
     ///:if rx[0] == 'int'
-    rx1 = [rx, rx] - 1
+    rx1 = [rx-1, rx]
     ///:elif rx[0] == 'int2'
-    rx1 = rx - 1
+    rx1 = [rx(1)-1,rx(2)]
     ///:else
-    rx1 = [0, s(1)-1]
+    rx1 = [0, s(1)]
     ///:endif
 
     ///:if ry[0] == 'int'
-    ry1 = [ry, ry] - 1
+    ry1 = [ry-1, ry]
     ///:elif ry[0] == 'int2'
-    ry1 = ry - 1
+    ry1 = [ry(1) - 1, ry(2)]
     ///:else
-    ry1 = [0, s(2)-1]
+    ry1 = [0, s(2)]
     ///:endif
 
     ///:if rz[0] == 'int'
-    rz1 = [rz, rz] - 1
+    rz1 = [rz-1, rz]
     ///:elif rz[0] == 'int2'
-    rz1 = rz - 1
+    rz1 = [rz(1) - 1, rz(2)]
     ///:else
-    rz1 = [0, s(3)-1]
+    rz1 = [0, s(3)]
     ///:endif
 
     ///:if t == 'array'

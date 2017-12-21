@@ -74,7 +74,7 @@ void Array::display(const char *prefix) {
   
   MPI_Request reqs[num_procs];
   int reqs_cnt = 0;
-
+  //printf("gs:%d, %d, %d\n", gs[0], gs[1], gs[2]);
   // rank 0 recv & others send
   if (my_rank == 0) {
     global_buf = new char[gs[0] * gs[1] * gs[2] * 
@@ -265,4 +265,28 @@ void Array::set_bitset(bitset<3> bs) {
 
 bitset<3> Array::get_bitset() {
   return m_bs;
+}
+
+int Array::get_stencil_width() const{
+  return m_par_ptr->get_stencil_width();
+}
+int Array::get_stencil_type() const{
+  return m_par_ptr->get_stencil_type();
+}
+
+void Array::set_zeros(){
+  switch(m_data_type){
+  case DATA_INT:
+    oa::internal::set_buffer_consts<int>
+      ((int*)m_buffer, buffer_size(), 0);
+    break;
+  case DATA_FLOAT:
+    oa::internal::set_buffer_consts<float>
+      ((float*)m_buffer, buffer_size(), 0);
+    break;
+  case DATA_DOUBLE:
+    oa::internal::set_buffer_consts<double>
+      ((double*)m_buffer, buffer_size(), 0);
+    break;
+  }
 }

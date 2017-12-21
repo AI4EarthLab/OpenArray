@@ -9,7 +9,7 @@ Range::Range() {
 }
 
 Range::Range(int st, int ed) : 
-  m_lower(st), m_upper(ed + 1) {}
+  m_lower(st), m_upper(ed) {}
 
 int Range::get_lower() const {
   return m_lower;
@@ -20,7 +20,7 @@ int Range::get_upper() const {
 }
 
 bool Range::equal(int st, int ed) const {
-  return m_lower == st && m_upper == ed + 1;
+  return m_lower == st && m_upper == ed;
 }
 
 bool Range::equal(const Range &rg) const {
@@ -31,7 +31,7 @@ int Range::size() const{
   return std::max(m_upper - m_lower, 0);
 }
 
-void Range::display(char const *prefix) {
+void Range::display(char const *prefix) const {
   printf("Range %s is [%d, %d)\n", prefix, m_lower, m_upper);
 }
 
@@ -55,5 +55,11 @@ bool Range::intersection(const Range &u) {
 // get intersection Range with Range u
 Range Range::get_intersection(const Range &u) {
   if (!intersection(u)) return Range();
-  return Range(max(m_lower, u.m_lower), min(m_upper, u.m_upper) - 1);
+  return Range(max(m_lower, u.m_lower), min(m_upper, u.m_upper));
+}
+
+Range Range::get_intersection1(const Range &u) {
+  if (!intersection(u)) return Range();
+  return Range(max(m_lower, u.m_lower),
+          min(m_upper, u.m_upper)-1);
 }

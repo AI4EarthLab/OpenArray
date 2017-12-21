@@ -2,8 +2,15 @@
 #define __OP_DEFINE_HPP__
 
 #include "Operator.hpp"
-#include "modules/basic/new_node.hpp"
-#include "modules/operator/new_node.hpp"
+// #include "modules/basic/new_node.hpp"
+// #include "modules/operator/new_node.hpp"
+
+///:mute
+///:include "NodeType.fypp"
+///:endmute
+///:for m in MODULES
+#include "modules/${m}$/new_node.hpp"
+///:endfor
 
 #define NODE(x)           oa::ops::new_node(x)
 
@@ -61,12 +68,12 @@
 
 ///:include "NodeType.fypp"
 
-///:for t in [i for i in L if i[3] in ['A', 'B', 'F', 'H']]
+///:for t in [i for i in L if i[4] == '2']
 ///:set name = str.upper(t[1])
 #define ${name}$(x, y)  oa::ops::new_node_${t[1]}$(x, y)
 ///:endfor
 
-///:for t in [i for i in L if i[3] in ['C', 'D', 'G']]
+///:for t in [i for i in L if i[4] == '1']
 ///:set name = str.upper(t[1])
 #define ${name}$(x)  oa::ops::new_node_${t[1]}$(x)
 ///:endfor

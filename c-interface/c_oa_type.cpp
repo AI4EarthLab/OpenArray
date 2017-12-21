@@ -200,6 +200,9 @@ extern "C" {
   ///:endfor
 
   void c_new_node_array(void* &ptr, void* &ap) {
+    assert(ap != NULL &&
+            "array pointer can not be null to create a node.");
+      
     NodePtr np = oa::ops::new_node(*(ArrayPtr*)ap);
     NodePtr* A = new NodePtr();
     *A = np;

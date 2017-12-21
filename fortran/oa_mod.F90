@@ -8,6 +8,8 @@ module oa_mod
   use oa_sub
   use oa_set
   use oa_sum
+  use oa_shift
   use oa_rep
   use oa_cache
+
 end module

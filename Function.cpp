@@ -120,6 +120,23 @@ namespace oa {
       
       ArrayPtr arr_ptr = ArrayPool::global()->
         get(pp->get_comm(), x, y, z, pp->get_stencil_width(), ap->get_data_type());
+      // printf("shape:%d %d %d\n", ps[0], ps[1], ps[2]);
+      // for(int i = 0; i < rsx.size(); i++){
+      //   printf("%d ", rsx[i]);
+      // }
+      // printf("\n");
+      // for(int i = 0; i < rsy.size(); i++){
+      //   printf("%d ", rsy[i]);
+      // }
+      // printf("\n");
+      // for(int i = 0; i < rsz.size(); i++){
+      //   printf("%d ", rsz[i]);
+      // }
+      // printf("\n");
+      
+      // printf("D:%d %d %d\n", arr_ptr->shape()[0],
+      //         arr_ptr->shape()[1],
+      //         arr_ptr->shape()[2]);
 
       if (!arr_ptr->has_local_data()) return arr_ptr; // don't have local data in process
       
@@ -132,9 +149,9 @@ namespace oa {
 
       Box box = ap->get_local_box();
       Box sub_box(
-                  rsx[idx * 3], rsx[idx * 3 + 1] - 1,
-                  rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
-                  rsz[idz * 3], rsz[idz * 3 + 1] - 1
+                  rsx[idx * 3], rsx[idx * 3 + 1],
+                  rsy[idy * 3], rsy[idy * 3 + 1], 
+                  rsz[idz * 3], rsz[idz * 3 + 1]
                   );
 
       // different data_type
@@ -812,68 +829,96 @@ namespace oa {
     }
 
     // sub(A) = A(A_box) and set sub(A) = B
-    void set(ArrayPtr& A, const Box& A_box, const ArrayPtr& B) {
+    void set(ArrayPtr& A, const Box& sub_box,
+            const ArrayPtr& B) {
       // sub(A)'shape must equal B's shape
-      assert(B->shape() == A_box.shape());
-
+      assert(B->shape() == sub_box.shape());
+      // A->display("AAAA=");
+      // B->display("BBBB=");
+      // sub_box.display("sub_box=");
+      
       // sub(A)'s partition
       vector<int> rsx, rsy, rsz;
       PartitionPtr pp = A->get_partition();
-      Shape ps = pp->procs_shape();
-      pp->split_box_procs(A_box, rsx, rsy, rsz);
+      // Shape ps = pp->procs_shape();
+      // pp->split_box_procs(A_box, rsx, rsy, rsz);
       
-      vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
-      for (int i = 0; i < rsx.size(); i += 3)
-        x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
-      for (int i = 0; i < rsy.size(); i += 3)
-        y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
-      for (int i = 0; i < rsz.size(); i += 3)
-        z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
+      // vector<int> x(ps[0], 0), y(ps[1], 0), z(ps[2], 0);
+      // for (int i = 0; i < rsx.size(); i += 3)
+      //   x[rsx[i + 2]] = rsx[i + 1] - rsx[i];
+      // for (int i = 0; i < rsy.size(); i += 3)
+      //   y[rsy[i + 2]] = rsy[i + 1] - rsy[i];
+      // for (int i = 0; i < rsz.size(); i += 3)
+      //   z[rsz[i + 2]] = rsz[i + 1] - rsz[i];
 
-      PartitionPtr subA_par_ptr = PartitionPool::global()->
-        get(pp->get_comm(), x, y, z, pp->get_stencil_width());
+      // PartitionPtr subA_par_ptr = PartitionPool::global()->
+      //   get(pp->get_comm(), x, y, z, pp->get_stencil_width());
 
-      ArrayPtr ap = B;
-      // if sub(A)'s partition doesn't equal to B's partition, needs transfer
+      PartitionPtr subA_par_ptr = pp->sub(sub_box);
+      
+      ArrayPtr ap;
+      // if sub(A)'s partition doesn't equal to B's partition,
+      // needs transfer
       if (!subA_par_ptr->equal(B->get_partition())) {
         ap = transfer(B, subA_par_ptr);
+      }else{
+        ap = B;
       }
+      // ap->display("CCC=");
 
       // don't have local data in process
       if (!ap->has_local_data()) return ;
 
-      int rk = pp->rank();
-      vector<int> procs_coord = pp->get_procs_3d(rk);
+      // int rk = pp->rank();
+      // vector<int> procs_coord = pp->get_procs_3d(rk);
 
-      int idx = procs_coord[0] - rsx[2];
-      int idy = procs_coord[1] - rsy[2];
-      int idz = procs_coord[2] - rsz[2];
+      // int idx = procs_coord[0] - rsx[2];
+      // int idy = procs_coord[1] - rsy[2];
+      // int idz = procs_coord[2] - rsz[2];
 
-      Box box = A->get_local_box();
-      Box sub_box(
-                  rsx[idx * 3], rsx[idx * 3 + 1] - 1,
-                  rsy[idy * 3], rsy[idy * 3 + 1] - 1, 
-                  rsz[idz * 3], rsz[idz * 3 + 1] - 1
-                  );
+      Box A_local_box = A->get_local_box();
+      Box A_sub_box = A_local_box.get_intersection(sub_box)
+        .ref_box(A_local_box);
+      Shape s = ap->local_shape();
+      Box B_sub_box(0, s[0], 0, s[1], 0, s[2]);
+      
+      // Box sub_box(
+      //             rsx[idx * 3], rsx[idx * 3 + 1],
+      //             rsy[idy * 3], rsy[idy * 3 + 1], 
+      //             rsz[idz * 3], rsz[idz * 3 + 1]
+      //             );
 
+      //sub_box.display("sub_box = ");
+
+      int sw = A->get_stencil_width();
+      
+      // A_sub_box.display("A_sub_box = ");
+      // B_sub_box.display("B_sub_box = ");
+
+      // A_sub_box.shift(sw).display("A_sub_box1 = ");
+      // B_sub_box.shift(sw).display("B_sub_box1 = ");
+      
       // different data_type
-
+      
       ///:set TYPE = [['DATA_INT', 'int'], ['DATA_FLOAT', 'float'], ['DATA_DOUBLE', 'double']]
       ///:for i in TYPE
       ///:for j in TYPE
-      if (A->get_data_type() == ${i[0]}$ && ap->get_data_type() == ${j[0]}$) {
-        oa::internal::set_buffer_subarray<${i[1]}$, ${j[1]}$>(
+      if (A->get_data_type() == ${i[0]}$
+              && ap->get_data_type() == ${j[0]}$) {
+        oa::internal::copy_buffer<${i[1]}$, ${j[1]}$>(
           (${i[1]}$*) A->get_buffer(),
+          A->buffer_shape(),
+          A_sub_box.shift(sw),
           (${j[1]}$*) ap->get_buffer(),
-          box,
-          sub_box,
-          pp->get_stencil_width()
+          ap->buffer_shape(),
+          B_sub_box.shift(sw)
         );
       }
 
       ///:endfor
       ///:endfor
-
+      
+      // A->display("AAAA1111=");
     }
 
     // sub(A) = A(A_box), sub(B) = B(B_box) && set sub(A) = sub(B)
@@ -884,6 +929,7 @@ namespace oa {
       assert(A_box.shape() == B_box.shape());
 
       ArrayPtr subB = subarray(B, B_box);
+
       set(A, A_box, subB);
 
     }

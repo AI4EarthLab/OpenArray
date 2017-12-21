@@ -58,27 +58,39 @@ namespace oa {
 
     // set sub(A) = B
     template<typename T1, typename T2>
-    void set_buffer_subarray(T1* buffer, T2* sub_buffer, const Box &box,
-      const Box &sub_box, int sw) {
+    void copy_buffer(
+        T1* A_buf,
+        const Shape& A_buf_shape,
+        const Box&  A_window,
+        T2* B_buf,
+        const Shape& B_buf_shape,
+        const Box& B_window) {
 
-      Shape sp = box.shape(sw);
-      int M = sp[0];
-      int N = sp[1];
-      int P = sp[2];
+      Shape sp = A_window.shape();
+      const int M = sp[0];
+      const int N = sp[1];
+      const int P = sp[2];
       
-      Box bd_box = box.boundary_box(sw);
-      Box ref_box = sub_box.ref_box(bd_box);
-      int xs, xe, ys, ye, zs, ze;
-      ref_box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+      const int M1 = A_buf_shape[0];
+      const int N1 = A_buf_shape[1];
+
+      const int M2 = B_buf_shape[0];
+      const int N2 = B_buf_shape[1];      
+
+      int xs1, xe1, ys1, ye1, zs1, ze1;
+      A_window.get_corners(xs1, xe1, ys1, ye1, zs1, ze1);
+
+      int xs2, xe2, ys2, ye2, zs2, ze2;
+      B_window.get_corners(xs2, xe2, ys2, ye2, zs2, ze2);
       
       //ref_box.display("ref_box");
 
       int cnt = 0;
-      for (int k = zs+sw; k < ze-sw; k++) {
-        for (int j = ys+sw; j < ye-sw; j++) {
-          for (int i = xs+sw; i < xe-sw; i++) {
-              buffer[k * M * N + j * M + i] = sub_buffer[cnt];
-            cnt++;
+      for (int k = 0; k < P; k++) {
+        for (int j = 0; j < N; j++) {
+          for (int i = 0; i < M; i++) {
+            A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] =
+              B_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2];
             //cout<<buffer[cnt-1]<<" ";
           }
           //cout<<endl;

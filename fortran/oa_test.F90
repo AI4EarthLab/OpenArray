@@ -499,8 +499,14 @@ contains
     A = seqs(6, 8, 3) + 1
     ! call display(A, "A")
 
-    B = shift(A, 2,2,0)
-
+    B = shift(A, 1)
+    call display(B, "B = ")
+    
+    B = shift(A, -1)
+    call display(B, "B = ")
+    
+    ! B = shift(A, 1, 2,0)
+    
     ! print*, "after shifted"
     ! call display(A, "A")
   end subroutine

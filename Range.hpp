@@ -21,7 +21,7 @@ class Range {
   bool equal(int st, int ed) const;
   bool equal(const Range &rg) const;
   int size() const;
-  void display(char const *prefix = "");
+  void display(char const *prefix = "") const;
 
   // check if Range is inside the Range u
   bool is_inside(const Range &u);
@@ -34,6 +34,8 @@ class Range {
 
   // get intersection Range with Range u
   Range get_intersection(const Range &u);
+
+  Range get_intersection1(const Range &u);  
 };
 
 #endif

@@ -11,9 +11,9 @@ Box::Box(Range x, Range y, Range z) :
   m_rx(x), m_ry(y), m_rz(z) {}
 
 Box::Box(int *starts, int *counts) :
-  m_rx(starts[0], starts[0] + counts[0] - 1),
-  m_ry(starts[1], starts[1] + counts[1] - 1),
-  m_rz(starts[2], starts[2] + counts[2] - 1) {}
+  m_rx(starts[0], starts[0] + counts[0]),
+  m_ry(starts[1], starts[1] + counts[1]),
+  m_rz(starts[2], starts[2] + counts[2]) {}
 
 Box::Box(int sx, int ex, int sy, int ey, int sz, int ez) :
   m_rx(sx, ex), m_ry(sy, ey), m_rz(sz, ez) {}
@@ -49,7 +49,7 @@ bool Box::equal_shape(const Box &b) {
   return s[0] == u[0] && s[1] == u[1] && s[2] == u[2]; 
 }
 
-void Box::display(char const *prefix) {
+void Box::display(char const *prefix) const {
   printf("Box %s: \n", prefix);
   m_rx.display("rx");
   m_ry.display("ry");
@@ -74,6 +74,14 @@ Box Box::get_intersection(const Box &u){
   m_ry.get_intersection(u.m_ry), m_rz.get_intersection(u.m_rz));
 }
 
+// get the intersection box
+Box Box::get_intersection1(const Box &u){
+  if (!intersection(u)) return Box();
+  return Box(m_rx.get_intersection1(u.m_rx), 
+          m_ry.get_intersection1(u.m_ry),
+          m_rz.get_intersection1(u.m_rz));
+}
+
 // get the ref new box
 Box Box::ref_box(const Box &ref) const {
   int _xs, _xe, _ys, _ye, _zs, _ze;
@@ -82,6 +90,14 @@ Box Box::ref_box(const Box &ref) const {
   rx.shift(-_xs);
   ry.shift(-_ys);
   rz.shift(-_zs);
+  return Box(rx, ry, rz);
+}
+
+Box Box::shift(int i){
+  Range rx = m_rx, ry = m_ry, rz = m_rz;
+  rx.shift(i);
+  ry.shift(i);
+  rz.shift(i);
   return Box(rx, ry, rz);
 }
 

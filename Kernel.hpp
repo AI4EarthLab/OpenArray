@@ -8,7 +8,9 @@
 #include <vector>
 using namespace std;
 
+///:mute
 ///:include "NodeType.fypp"
+///:endmute
 ///:for m in MODULES
 #include "modules/${m}$/kernel.hpp"
 ///:endfor
