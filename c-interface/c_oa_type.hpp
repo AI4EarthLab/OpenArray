@@ -10,56 +10,50 @@
 
 extern "C" {
 
-  void c_array_assign_array(void* &A, void* &B, int & pa, int & pb);
+  void c_array_assign_array(ArrayPtr*& A, ArrayPtr*& B,
+          int & pa, int & pb);  
 
-  void c_node_assign_node(void* &A, void* &B);
+  void c_node_assign_node(NodePtr* &A, NodePtr* &B);
 
-  void c_node_assign_array(void* &A, void* &B);
+  void c_node_assign_array(ArrayPtr* &A, NodePtr* &B);
 
   void c_destroy_array(void*& A);
 
   void c_destroy_node(void*& A);
 
-  void c_display_array(void* A, void* prefix);
+  void c_display_array(ArrayPtr* A, char* prefix);
 
-  void c_display_node(void* A, void* prefix);
+  void c_display_node(NodePtr* A, char* prefix);
 
-  void c_ones(void* & ptr, int m, int n, int k, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE, 
-    MPI_Fint fcomm = 0);
-
-  void c_zeros(void* & ptr, int m, int n, int k, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE, 
-    MPI_Fint fcomm = 0);
-
-  void c_rand(void* & ptr, int m, int n, int k, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE, 
-    MPI_Fint fcomm = 0);
-
-  void c_seqs(void* & ptr, int m, int n, int k, int stencil_width = 1, 
-    int data_type = DATA_DOUBLE, 
-    MPI_Fint fcomm = 0);
-    
+  ///:for f in ['ones', 'zeros', 'rands', 'seqs']
+  void c_${f}$(ArrayPtr* & ptr, int m, int n, int k,
+          int stencil_width = 1, 
+          int data_type = DATA_DOUBLE, 
+          MPI_Fint fcomm = 0);
+  ///:endfor
+  
   ///:mute
   ///:set TYPE = [['int'], ['float'], ['double']]
   ///:endmute
+  
   ///:for t in TYPE
-  void c_consts_${t[0]}$(void* &ptr, int m, int n, int k, ${t[0]}$ val, 
-    int stencil_width = 1, MPI_Fint fcomm = 0);
-
+  void c_consts_${t[0]}$(ArrayPtr* &ptr,
+          int m, int n, int k, ${t[0]}$ val, 
+          int stencil_width, MPI_Fint fcomm);
   ///:endfor
 
   ///:for t in TYPE
-  void c_new_seqs_scalar_node_${t[0]}$(void* &ptr, ${t[0]}$ val, 
-    MPI_Fint fcomm = 0);
-
+  void c_new_seqs_scalar_node_${t[0]}$(NodePtr* &ptr,
+          ${t[0]}$ val, 
+          MPI_Fint fcomm);  
   ///:endfor
 
-  void c_new_node_array(void* &ptr, void* &ap);
+  void c_new_node_array(NodePtr* &ptr, ArrayPtr* &ap);
 
-  void c_new_node_op2(void* &ptr, int nodetype, void* &u, void* &v);
+  void c_new_node_op2(NodePtr* &ptr, int nodetype,
+          NodePtr* &u, NodePtr* &v);
 
-  void c_new_node_op1(void* &ptr, int nodetype, void* &u);
+  void c_new_node_op1(NodePtr* &ptr, int nodetype, NodePtr* &u);
 
   void c_new_local_int3(NodePtr* &B, int* val);
 

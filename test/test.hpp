@@ -135,7 +135,7 @@ void test_Pool() {
   ap = oa::funcs::zeros(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
   ap->display("Array_zeros"); 
 
-  ap = oa::funcs::rand(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+  ap = oa::funcs::rands(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
   ap->display("rand");
 }
 
@@ -1030,7 +1030,7 @@ void test_pseudo_3d() {
 }
 
 void test_rand() {
-  ArrayPtr ap = oa::funcs::rand(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
+  ArrayPtr ap = oa::funcs::rands(MPI_COMM_WORLD, {4, 4, 4}, 1, 1);
   ap->display("rand");
 }
 

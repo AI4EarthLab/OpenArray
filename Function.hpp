@@ -45,7 +45,7 @@ namespace oa {
       int stencil_width = 1, int data_type = DATA_INT);
 
     // create a rand array
-    ArrayPtr rand(MPI_Comm comm, const Shape& s, 
+    ArrayPtr rands(MPI_Comm comm, const Shape& s, 
       int stencil_width = 1, int data_type = DATA_INT);
 
     // create a seqs array

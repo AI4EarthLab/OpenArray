@@ -44,7 +44,7 @@ namespace oa {
     }
 
     // create a rand array
-    ArrayPtr rand(MPI_Comm comm, const Shape& s, 
+    ArrayPtr rands(MPI_Comm comm, const Shape& s, 
                   int stencil_width, int data_type) {
       ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, data_type);
       Box box = ap->get_local_box();

@@ -277,7 +277,7 @@ namespace{
     {
       int sw = NO_STENCIL;
       DataType dt = oa::utils::dtype<${t}$>::type;
-      ArrayPtr A = oa::funcs::rand(comm, {m,n,p}, sw, dt);
+      ArrayPtr A = oa::funcs::rands(comm, {m,n,p}, sw, dt);
       NodePtr NA = oa::ops::new_node(A);
       //NA->display("NA");
 
@@ -653,7 +653,7 @@ namespace{
       int y = 3;
       int z = 4;
 
-      ArrayPtr A = oa::funcs::rand(comm, {m,n,p}, sw, dt);
+      ArrayPtr A = oa::funcs::rands(comm, {m,n,p}, sw, dt);
 
       ArrayPtr rank0A = oa::funcs::to_rank0(A);
       //if(rank == 0)result->display("result");
