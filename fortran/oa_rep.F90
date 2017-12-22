@@ -12,7 +12,6 @@
 module oa_rep
   use iso_c_binding
   use oa_type
-  use oa_ops
   interface rep
      ///:for t in ['node', 'array']
      module procedure rep_${t}$

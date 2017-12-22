@@ -80,7 +80,8 @@
 
 
   ///:set fdim = [[1,':'],[2,':,:'],[3,':,:,:']]
-  
+
+  ///:mute  
 ///:set scalar_dtype = &
      [['int',   'integer'], &
      [ 'float',  'real'], &
@@ -93,8 +94,12 @@
      [ 'array',  'type(array)',  'array'], &
      [ 'node',   'type(node)',   'node']]
 
-
-
+  ///:set types = [['double','real(8)', 'scalar'],&
+       ['float','real', 'scalar'], &
+       ['int','integer', 'scalar'], &
+       ['array', 'type(array)', 'array'], &
+       ['node', 'type(node)',  'node']]
+  ///:endmute
 
 
 

@@ -4,7 +4,6 @@
 module oa_shift
   use iso_c_binding
   use oa_type
-  use oa_ops
   
   interface shift
      ///:for t in ['node', 'array']
