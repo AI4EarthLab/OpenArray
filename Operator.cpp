@@ -540,31 +540,12 @@ namespace oa {
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
         
-        code<<"extern \"C\" {\nvoid kernel_"<<hash;
-        code<<"(void** &list, int size) {\n";
-        for (int i = 0; i < int_id.size(); i++) {
-          code<<"const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
-        }
-        for (int i = 0; i < float_id.size(); i++) {
-          code<<"const float F_"<<i<<" = ((float*)list["<<float_id[i]<<"])[0];\n";
-        }
-        for (int i = 0; i < double_id.size(); i++) {
-          code<<"const double D_"<<i<<" = ((double*)list["<<double_id[i]<<"])[0];\n";
-        }
-
-        code<<"  for (int i = 0; i < size; i++) {\n";
-        switch(A->get_data_type()) {
-          case DATA_INT:
-            code<<"    ((int*)(list["<<id<<"]))[i] = ";
-            break;
-          case DATA_FLOAT:
-            code<<"    ((float*)(list["<<id<<"]))[i] = ";
-            break;
-          case DATA_DOUBLE:
-            code<<"    ((double*)(list["<<id<<"]))[i] = ";
-            break;    
-        }
-        code<<__code.str()<<";\n  }\n  return ;\n}}";
+        // JIT source code add function signature
+        code_add_function_signature(code, hash);
+        // JIT source code add const parameters
+        code_add_const(code, int_id, float_id, double_id);
+        // JIT source code add calc_inside
+        code_add_function(code, __code, A->get_data_type(), id);
 
         cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
@@ -603,31 +584,12 @@ namespace oa {
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
         
-        code<<"extern \"C\" {\nvoid kernel_"<<hash;
-        code<<"(void** &list, int size) {\n";
-        for (int i = 0; i < int_id.size(); i++) {
-          code<<"const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
-        }
-        for (int i = 0; i < float_id.size(); i++) {
-          code<<"const float F_"<<i<<" = ((float*)list["<<float_id[i]<<"])[0];\n";
-        }
-        for (int i = 0; i < double_id.size(); i++) {
-          code<<"const double D_"<<i<<" = ((double*)list["<<double_id[i]<<"])[0];\n";
-        }
-
-        code<<"  for (int i = 0; i < size; i++) {\n";
-        switch(A->get_data_type()) {
-          case DATA_INT:
-            code<<"    ((int*)(list["<<id<<"]))[i] = ";
-            break;
-          case DATA_FLOAT:
-            code<<"    ((float*)(list["<<id<<"]))[i] = ";
-            break;
-          case DATA_DOUBLE:
-            code<<"    ((double*)(list["<<id<<"]))[i] = ";
-            break;    
-        }
-        code<<__code.str()<<";\n  }\n  return ;\n}}";
+        // JIT source code add function signature
+        code_add_function_signature_with_op(code, hash);
+        // JIT source code add const parameters
+        code_add_const(code, int_id, float_id, double_id);
+        // JIT source code add calc_inside
+        code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
 
         cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
@@ -825,9 +787,9 @@ namespace oa {
           char pos_k[3] = "ok";
           
           bitset<3> bit = A->get_bitset();
-          ss<<"[calc_id("<<pos_i[bit[0]]<<",";
+          ss<<"[calc_id("<<pos_i[bit[2]]<<",";
           ss<<pos_j[bit[1]]<<",";
-          ss<<pos_k[bit[2]]<<",S"<<S_id<<")]";
+          ss<<pos_k[bit[0]]<<",S"<<S_id<<")]";
           S_id++;
         }
         id++;
@@ -859,7 +821,7 @@ namespace oa {
             // get grid ptr
             ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);
 
-            ss<<"(";
+            ss<<"/(";
             switch(grid_ptr->get_data_type()) {
               case DATA_INT:
                 ss<<"(int*)";
@@ -879,9 +841,9 @@ namespace oa {
             char pos_k[3] = "ok";
             
             bitset<3> bit = grid_ptr->get_bitset();
-            ss<<"[calc_id("<<pos_i[bit[0]]<<",";
+            ss<<"[calc_id("<<pos_i[bit[2]]<<",";
             ss<<pos_j[bit[1]]<<",";
-            ss<<pos_k[bit[2]]<<",S"<<S_id<<")]";
+            ss<<pos_k[bit[0]]<<",S"<<S_id<<")]";
             S_id++;
           }
         }
@@ -989,6 +951,8 @@ namespace oa {
       return out;
     }
 
+
+
     void tree_to_string_stack(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());
 
@@ -1005,6 +969,89 @@ namespace oa {
       ss<<nd.sy;
 
       return ;
+    }
+
+    void code_add_function_signature(stringstream& code, size_t& hash) {
+      code<<"extern \"C\" {\nvoid kernel_"<<hash;
+      code<<"(void** &list, int size) {\n";
+    }
+
+    void code_add_function_signature_with_op(stringstream& code, size_t& hash) {
+      code<<"extern \"C\" {\nvoid kernel_"<<hash;
+      code<<"(void** &list, ) {\n";
+    }
+
+    void code_add_const(stringstream& code, 
+        vector<int>& int_id, vector<int>& float_id, vector<int>& double_id) {
+      for (int i = 0; i < int_id.size(); i++) {
+        code<<"const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
+      }
+      for (int i = 0; i < float_id.size(); i++) {
+        code<<"const float F_"<<i<<" = ((float*)list["<<float_id[i]<<"])[0];\n";
+      }
+      for (int i = 0; i < double_id.size(); i++) {
+        code<<"const double D_"<<i<<" = ((double*)list["<<double_id[i]<<"])[0];\n";
+      }
+      code<<"\n";
+    }
+    
+    void code_add_function(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id) {
+
+      code<<"  for (int i = 0; i < size; i++) {\n";  
+      switch(dt) {
+        case DATA_INT:
+          code<<"    ((int*)(list["<<id<<"]))[i] = ";
+          break;
+        case DATA_FLOAT:
+          code<<"    ((float*)(list["<<id<<"]))[i] = ";
+          break;
+        case DATA_DOUBLE:
+          code<<"    ((double*)(list["<<id<<"]))[i] = ";
+          break;    
+      }
+      code<<__code.str()<<";\n  }\n  return ;\n}}";
+    }
+
+    void code_add_calc_outside(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
+      
+      code<<"  for (int i = 0; i < size; i++) {\n";  
+      switch(dt) {
+        case DATA_INT:
+          code<<"    ((int*)(list["<<id<<"]))[i] = ";
+          break;
+        case DATA_FLOAT:
+          code<<"    ((float*)(list["<<id<<"]))[i] = ";
+          break;
+        case DATA_DOUBLE:
+          code<<"    ((double*)(list["<<id<<"]))[i] = ";
+          break;    
+      }
+      code<<__code.str()<<";\n  }\n  return ;\n}}";
+    }
+
+    void code_add_calc_inside(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
+      
+      code<<"  for (int k = o + lbound[2]; k < o + sp[2] - rbound[2]; k++) {\n";
+      code<<"    for (int j = o + lbound[1]; j < o + sp[1] - rbound[1]; j++) {\n";
+      code<<"      for (int i = o + lbound[0]; i < o + sp[0] - rbound[0]; i++) {\n";
+
+      switch(dt) {
+        case DATA_INT:
+          code<<"        ((int*)(list["<<id<<"]))[calc_id(i,j,k,S"<<S_id<<")] = ";
+          break;
+        case DATA_FLOAT:
+          code<<"        ((float*)(list["<<id<<"]))[calc_id(i,j,k,S"<<S_id<<")] = ";
+          break;
+        case DATA_DOUBLE:
+          code<<"        ((double*)(list["<<id<<"]))[calc_id(i,j,k,S"<<S_id<<")] = ";
+          break;    
+      }
+
+      code<<__code.str()<<";\n      }\n    }\n  }\n  return ;\n}}";
+
     }
     
 

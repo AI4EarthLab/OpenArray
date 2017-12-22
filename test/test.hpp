@@ -1167,15 +1167,22 @@ void test_gen_kernel_JIT_with_op(int m, int n, int k) {
   ArrayPtr ans;
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
   ap1->set_bitset("111");
+  ap1->set_pos(3);
   ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, 1}, 2);
   ap2->set_bitset("110");
+  ap2->set_pos(2);
+  ap2->set_pseudo(true);
+
   
   NodePtr n1 = NODE(ap1);
   NodePtr n2 = NODE(ap2);
+  n1->display("n1");
+  n2->display("n2");
   NodePtr n3 = NodePool::global()->get_seqs_scalar(MPI_COMM_SELF, 1);
   
   NodePtr np = PLUS( MULT(DXF(n1), DYB(n2)), n3 );
   oa::ops::gen_kernels_JIT_with_op(np);
+
 }
 
 #endif

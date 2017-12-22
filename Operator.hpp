@@ -61,6 +61,22 @@ namespace oa {
     string replace_string(string& in, const string& old_str, const string& new_str);
 
     void tree_to_string_stack(NodePtr A, stringstream &ss);
+
+    void code_add_function_signature(stringstream& code, size_t& hash);
+
+    void code_add_function_signature_with_op(stringstream& code, size_t& hash);
+
+    void code_add_const(stringstream& code, 
+        vector<int>& i, vector<int>& f, vector<int>& d);
+    
+    void code_add_function(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id);
+
+    void code_add_calc_outside(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id, int& S_id);
+
+    void code_add_calc_inside(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id, int& S_id);    
   }
 }
 
