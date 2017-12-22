@@ -501,7 +501,6 @@ contains
     ! call display(B, "${o}$(A) = ")
     ///:endfor
 
-    
   end subroutine
 
   subroutine test_shift()
@@ -509,10 +508,11 @@ contains
     type(array) :: A
     type(array) :: B
     
-    A = seqs(6, 8, 3) + 1
+    A = seqs(6, 8, 3)
     ! call display(A, "A")
 
     B = shift(A, 1)
+
     call display(B, "B = ")
     
     B = shift(A, -1)

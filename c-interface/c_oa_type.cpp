@@ -61,7 +61,7 @@ extern "C" {
     if(A == NULL) A = new ArrayPtr();
     
     try{
-      *A = oa::ops::eval(*(NodePtr*)B);      
+      *A = oa::ops::eval(*(NodePtr*)B);
     }catch(const std::exception& e){
       std::cout<<"Execetion caught while "
         "executing eval function. "

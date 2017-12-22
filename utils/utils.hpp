@@ -31,7 +31,7 @@ namespace oa {
         frt_str = "%10d";
       } else if (std::is_same<T, float>::value
         || std::is_same<T, double>::value) {
-        frt_str = "%15.10f";
+        frt_str = "%10.5f";
 
       } else if (std::is_same<T, bool>::value) {
         frt_str = "%4d";

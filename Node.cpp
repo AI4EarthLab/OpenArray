@@ -18,9 +18,10 @@ void Node::display(char const *prefix) {
   if (rank == 0) {
     printf("%s \n", prefix);
     printf("    id : %d\n", id);
+    
     const NodeDesc& nd = oa::ops::get_node_desc(m_type);    
-    printf("  type : %s\n", nd.name.c_str());
-    printf("  hash : %d\n", m_hash);
+    printf("    type : %s\n", nd.name.c_str());
+    printf("    hash : %d\n", m_hash);
     printf("  lbound : [%d %d %d]\n", m_lbound[0], m_lbound[1], m_lbound[2]);
     printf("  rbound : [%d %d %d]\n", m_rbound[0], m_rbound[1], m_rbound[2]);
     printf("  need_update : %s\n", m_update_boundary ? "True" : "False");
@@ -32,7 +33,7 @@ void Node::display(char const *prefix) {
     std::cout<<"\tbitset = "
              << m_bs
              << std::endl;
-
+    printf("m_input.size = %d\n", m_input.size());
     printf(" input : \n");
     for(int i = 0; i < m_input.size(); ++i)
       printf("     %p : %s\n", m_input[i].get(),
@@ -41,7 +42,7 @@ void Node::display(char const *prefix) {
 
   if (m_type == TYPE_DATA) {
     if (!m_is_seqs) m_data->display(prefix);
-    else if (!rank) m_data->display(prefix);
+    else if (rank == 0) m_data->display(prefix);
   }
 }
 

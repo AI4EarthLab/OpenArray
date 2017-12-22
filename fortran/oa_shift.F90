@@ -4,25 +4,27 @@
 module oa_shift
   use iso_c_binding
   use oa_type
-
+  use oa_ops
+  
   interface shift
      ///:for t in ['node', 'array']
      module procedure shift_${t}$
      ///:endfor
   end interface shift
 
-
 contains
 
   ///:for t in ['node', 'array']
   function shift_${t}$(A, x, y, z) result(B)
+    use iso_c_binding
     implicit none
 
     interface
        subroutine c_new_node_shift(o, u, v) &
             bind(C, name = 'c_new_node_shift')
          use iso_c_binding
-         type(c_ptr) :: o, u, v
+         type(c_ptr), intent(inout) :: o
+         type(c_ptr), intent(in) :: u, v
        end subroutine
     end interface
     
@@ -31,8 +33,8 @@ contains
     integer :: x
     integer, optional :: y, z
     integer :: op_y, op_z
-    type(node) :: direction, NA
-    
+    type(node) :: ND, NA
+
     if(present(y)) then
        op_y = y
     else
@@ -45,13 +47,13 @@ contains
        op_z = 0
     end if
 
-    direction = new_local_int3([x, op_y, op_z])
+    ND = new_local_int3([x, op_y, op_z])
     
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)
-    call c_new_node_shift(B%ptr, NA%ptr, direction%ptr)
+    call c_new_node_shift(B%ptr, NA%ptr, ND%ptr)
     ///:else
-    call c_new_node_shift(B%ptr, A%ptr,  direction%ptr)
+    call c_new_node_shift(B%ptr, A%ptr,  ND%ptr)
     ///:endif
     
   end function

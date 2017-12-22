@@ -120,8 +120,9 @@
            type(c_ptr), intent(in) :: A
          end subroutine
       end interface
-
+      
       call c_destroy_node(A%ptr)
+
       !A%ptr = C_NULL_PTR
     end subroutine
 
@@ -274,6 +275,7 @@
       end interface
 
       call c_new_local_int3(A%ptr, v)
+
     end function
 
 

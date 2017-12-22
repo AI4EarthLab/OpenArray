@@ -12,7 +12,7 @@
 module oa_rep
   use iso_c_binding
   use oa_type
-
+  use oa_ops
   interface rep
      ///:for t in ['node', 'array']
      module procedure rep_${t}$
@@ -45,7 +45,7 @@ contains
     end if
     
     ND = new_local_int3([x1,y1,z1])
-    call display(ND, "ND = ")
+
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)
     call c_new_node_op2(B%ptr, TYPE_REP, NA%ptr, ND%ptr)

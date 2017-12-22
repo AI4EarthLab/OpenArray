@@ -176,22 +176,24 @@
 
       call c_array_assign_array(A%ptr, B%ptr, A%lr, B%lr)
       
-      !print *, A%ptr, B%ptr, A%lr, B%lr
     end subroutine
 
     subroutine node_assign_node(A, B)
       implicit none
       type(node), intent(inout) :: A
       type(node), intent(in) :: B
+
       call c_node_assign_node(A%ptr, B%ptr)
-      !print *, A%ptr, B%ptr, A%lr, B%lr
+
     end subroutine
 
     subroutine node_assign_array(A, B)
       implicit none
       type(array), intent(inout) :: A
       type(node), intent(in) :: B
+
       call c_node_assign_array(A%ptr, B%ptr)
+
     end subroutine
 
   end module

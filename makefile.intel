@@ -53,7 +53,7 @@ MAKEFILE = makefile.intel
 AA = $(wildcard *.cpp) $(wildcard modules/*/*.cpp)
 
 debug:
-	@echo ${OBJS}   
+	@echo ${OBJ_FORTRAN}   
 
 %.o: %.cpp
 	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $@
@@ -70,7 +70,7 @@ debug:
 	rm -f $@.$$$$
 
 %.d: %.c
-	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
+	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE}  -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 

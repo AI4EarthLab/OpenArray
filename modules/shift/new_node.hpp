@@ -4,6 +4,6 @@
 namespace oa{
   namespace ops{  
     NodePtr new_node_shift(
-        NodePtr*& u, NodePtr*& v);
+        NodePtr& u, NodePtr& v);
   }
 }
