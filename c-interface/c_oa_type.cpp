@@ -173,7 +173,7 @@ extern "C" {
 
 void c_new_local_int3(NodePtr* &ptr, int* val){
   if (ptr == NULL) ptr = new NodePtr();
-  
+
   *ptr = NodePool::global()->get_local_1d<int, 3>(val);
 }
 

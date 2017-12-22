@@ -1,65 +1,115 @@
+name = main
+compile_thread = -j8
 
-#FC = mpiifort
+#if you put the exteranl libaray in one directory
+EXT_INCLUDE = $(addprefix -I, $(shell find ${EXT_PATH}/include -maxdepth 1 -type d))
+EXT_LIB = -L${EXT_PATH}/lib64/
+JIT_LIB = ${EXT_PATH}/lib64/
 
-#CC = /usr/lib64/openmpi/bin/mpicc  
-CC=mpiicc
-CC_FLAGS = -g -O3 -I${PNETCDF_INC}  -Werror=return-type \
-	  -I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC} 
+#if you put the external library seperately in different directories.
+#use the following configureaton
+# EXT_INC = -I${PNETCDF_INC} -I${ARMA_INC} -I${BOOST_INC} -I${GTEST_INC} -I${JIT_INC}
+# EXT_LIB = -L${PNETCDF_LIB} -L${ARMA_LIB} -L${BOOST_LIB} -I${GTEST_LIB} -L${JIT_LIB}
 
 
-CXX = mpiicpc
-#CXX = /usr/lib64/openmpi/bin/mpicxx  
+EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
+		-lboost_system -ldl -llapack -lblas -lgtest -ljit \
+		-Wl,-rpath=${JIT_LIB}
 
-CXXFLAGS= -g -O3 --std=c++0x -Werror=return-type -I${PNETCDF_INC}  \
-		-I${ARMA_INC} -I${ARMA_LIB} -I${BOOST_INC} -I${GTEST_INC}  \
+oplevel0 = -O0 -g 
+oplevel3 = -O3 
 
-LIBS = -lstdc++ -lpnetcdf \
-	-lboost_program_options -lboost_filesystem \
-	-lboost_system -ldl -llapack -lblas \
-	-lgtest -L${LAPACK} -L${PNETCDF_LIB} -L${GTEST}
+FC = mpiifort ${oplevel0}
+CC = mpiicc  ${oplevel0}
+CXX = mpiicpc ${oplevel0}
 
-OBJS	= Range.o Box.o Partition.o Array.o \
-	  Internal.o Function.o Kernel.o Operator.o \
-	  Node.o IO.o 
+FCFLAGS  = 
 
-OBJS_UTILS = $(addprefix ./utils/, calcTime.o gettimeofday.o \
-	      utils.o)
+CXXFLAGS = 
 
-OBJS_C_INTERFACE = $(addprefix ./c-interface/, c_oa_type.o c_oa_utils.o)
+CFLAGS   = 
 
-OBJ_FORTRAN = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} \
-		$(addprefix ./fortran/, oa_type.o oa_utils.o fortran_main.o)
+LIBS =  -lstdc++ ${EXT_LIB} ${EXT_LIB_LINK} 
 
-OBJ_MAIN  = ${OBJS} ${OBJS_UTILS} ${OBJS_C_INTERFACE} main.o
 
-OBJ_TEST = ${OBJS} ${OBJS_UTILS} \
-	   $(addprefix ./unittest/, test_array.o gtest_main.o)
+OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
+	$(addsuffix .o, $(basename $(wildcard utils/*.cpp))) \
+	$(addsuffix .o, $(basename $(wildcard c-interface/*.cpp))) \
+	$(addsuffix .o, $(basename $(wildcard modules/*/*.cpp)))
 
-OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
-	   $(addprefix ./unittest/, test_perf.o)
+OBJ_FORTRAN = ${OBJS} \
+	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
+
+OBJ_MAIN  = ${OBJS} $(addprefix ./test/, main.o)
+
+OBJ_TEST = ${OBJS} $(addprefix ./unittest/, test_array.o gtest_main.o)
+
+OBJ_TEST_PERF = ${OBJS} $(addprefix ./unittest/, test_perf.o)
 
 .DEFAULT_GOAL := all
 
+MAKEFILE = makefile.intel
+
+AA = $(wildcard *.cpp) $(wildcard modules/*/*.cpp)
+
+debug:
+	@echo ${OBJS}   
+
 %.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $< -o $@
+	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $@
 
 %.o: %.c
-	$(CC) -c $(CCFLAGS) $< -o $@
+	$(CXX) ${EXT_INCLUDE} -c $(CFLAGS) $< -o $@
 
 %.o: %.F90
-	$(FC) -c $< -o $@
+	$(FC) ${FCFLAGS} -c $< -o $@
+
+%.d: %.cpp
+	@set -e; rm -f $@; $(CXX) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+%.d: %.c
+	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+
+%.d: %.F90 
+	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>err; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+
+
+##===##-include $(OBJ_FORTRAN:.o=.d) 
+##===##-include $(OBJ_MAIN:.o=.d) 
+##===##-include $(OBJ_TEST:.o=.d) 
+##===##-include $(OBJ_TEST_PERF:.o=.d) 
+
 
 all:
 	@rm -rf main
 	@echo "Cleaning..."
-	@mkdir -p build 2>/dev/null
+	@mkdir -p build 
 	@./pre.sh
-	@cd build && make clean 
+	@cd build && make clean  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build && make main
+	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make main ${compile_thread} -f ${MAKEFILE} 
 	cp build/main ./
 
-main: ${OBJ_MAIN}
+quick:
+	@rm -rf ${name}
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./test.sh
+	@cd build
+	@echo "Cleaning done."
+	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make ${name} ${compile_thread} -f ${MAKEFILE}
+	@cp build/${name} ./
+	@mpirun -oversubscribe -n 8 ./${name} 6 6 6
+
+main: ${OBJ_MAIN} 
 	-${CXX} -rdynamic -o main ${OBJ_MAIN} ${LIBS}
 
 testall:
@@ -67,58 +117,39 @@ testall:
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
 	@./pre.sh
-	@cd build && make clean 
+	@cd build && make clean  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build && make testall_main
+	@cd build && sed -i "s/##===##//g" ${MAKEFILE} && make testall_main ${compile_thread} -f ${MAKEFILE}
 	@cp build/testall_main ./
 	@mpirun -np 2 ./testall_main 
 
 testall_main : ${OBJ_TEST}
-	-${CXX} -o testall_main ${OBJ_TEST} ${LIBS}
-
-testperf:
-	@rm -rf main
-	@echo "Cleaning..."
-	@mkdir -p build 2>/dev/null
-	@./pre.sh
-	@cd build && make clean 
-	@echo "Cleaning done."
-	@cd build && make test_perf_main
-	@cp build/test_perf_main ./
-	@mpirun -np 1 ./test_perf_main
-
-test_perf_main : ${OBJ_TEST_PERF}
-	-${CXX} -o test_perf_main ${OBJ_TEST_PERF} ${LIBS}
+	-${CXX} -o testall_main ${OBJ_TEST} ${LIBS} 
 
 testfortran:
 	@rm -rf fortran_main
 	@echo "Cleaning..."
 	@mkdir -p build 2>/dev/null
 	@./pre.sh
-	@cd build && make clean 
+	@cd build && make clean  -f ${MAKEFILE}
 	@echo "Cleaning done."
-	@cd build && make fortran_main
+	@cd build &&sed -i "s/##===##//g" ${MAKEFILE} && make fortran_main ${compile_thread} -f ${MAKEFILE} 
 	@cp build/fortran_main ./
 	@mpirun -n 4 ./fortran_main
 
 fortran_main : ${OBJ_FORTRAN}
-	-${CXX} -o fortran_main ${OBJ_FORTRAN} ${LIBS}
+	-${FC} -o fortran_main ${OBJ_FORTRAN} \
+	${EXT_LIB_LINK} ${LIBS}
 
 small:
-	@make all
+	@make all -f ${MAKEFILE}
 	@mpirun -n 4 ./main 4 3 2
 
 clean:
-	@rm -rf *.o 2>/dev/null
-
-quick:
-	@rm -rf testall_main 2>/dev/null
-	@echo "Cleaning..."
-	@mkdir -p build 2>/dev/null
-	@./test.sh
-	@cd build
-	@echo "Cleaning done."
-	@cd build && make testall_main -f makefile.intel
-	@cp build/testall_main ./
-	@mpirun -n 2 ./testall_main
-
+	@find . -name "*.o" \
+	-or -name "*.d*" \
+	-or -name "*.mod" \
+	-or -name "main" \
+	-or -name "fortran_main" \
+	-or -name "testall_main" | \
+	xargs rm -f  &>/dev/null

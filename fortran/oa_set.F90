@@ -137,7 +137,7 @@ contains
     end interface
 
     type(array), intent(inout) :: A
-    ${type[1]}$, target, allocatable, &
+    ${type[1]}$, target, &
          dimension(${dim[1]}$), intent(in) :: B
     integer :: s(${dim[0]}$), s3(3)
 

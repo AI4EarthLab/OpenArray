@@ -177,18 +177,30 @@ contains
 
   subroutine test_math()
     type(array) :: A, B, C, D
+    integer :: i
 
+    A = rands(m, n, k, dt=OA_DOUBLE)
+    B = rands(m, n, k, dt=OA_DOUBLE)
     C = rands(m, n, k, dt=OA_DOUBLE)
+    D = rands(m, n, k, dt=OA_DOUBLE)
     
     ///:for op in [o for o in L if o[3] == 'C']
 
+
     D = ${op[2]}$(C)
+
+    
     call display(D, "${op[2]}$(C) = ")
     
     D = ${op[2]}$(C*0.5)
     call display(D, "${op[2]}$(C*0.5) = ")
     
     ///:endfor
+
+    do i = 0, 10000
+       FSET(A, B + C + D)
+    end do
+
   end subroutine
 
   subroutine test_sub()
@@ -387,11 +399,12 @@ contains
     call set(sub(A,[3,5],[2,5],[1,3]), 2.1_8);
     call display(A, "A = ")
 
-    ///:set fdim1 = [[1,'10'],[2,'5,5'],[3,'5,4,3']]
+    ///:set fdim1 = [[1,'10',':'],[2,'5,5',':,:'],&
+         [3,'5,4,3',':,:,:']]
     ///:for d in fdim1
     ///:for t in scalar_dtype
     allocate(farr_${t[0]}$${d[0]}$(${d[1]}$))
-    farr_${t[0]}$${d[0]}$ = 10
+    farr_${t[0]}$${d[0]}$(${d[2]}$) = 10
     A = farr_${t[0]}$${d[0]}$
     call display(A, "A = ")
     ///:endfor
