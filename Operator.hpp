@@ -43,11 +43,40 @@ namespace oa {
     void gen_kernels_JIT(NodePtr A, 
         bool is_root = true, MPI_Comm comm = MPI_COMM_WORLD);
 
+    void gen_kernels_JIT_with_op(NodePtr A, 
+        bool is_root = true, MPI_Comm comm = MPI_COMM_WORLD);
+
     void tree_to_string(NodePtr A, stringstream &ss);
 
     void tree_to_code(NodePtr A, stringstream &ss, int &id);
 
+    void tree_to_code(NodePtr A, stringstream &ss, int &id,
+      vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
+
+    void tree_to_code_with_op(NodePtr A, stringstream &ss, int &id, int &S_id,
+      vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
+
+    void change_string_with_op(stringstream& ss, string in, const NodeDesc &nd);
+
+    string replace_string(string& in, const string& old_str, const string& new_str);
+
     void tree_to_string_stack(NodePtr A, stringstream &ss);
+
+    void code_add_function_signature(stringstream& code, size_t& hash);
+
+    void code_add_function_signature_with_op(stringstream& code, size_t& hash);
+
+    void code_add_const(stringstream& code, 
+        vector<int>& i, vector<int>& f, vector<int>& d);
+    
+    void code_add_function(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id);
+
+    void code_add_calc_outside(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id, int& S_id);
+
+    void code_add_calc_inside(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id, int& S_id);    
   }
 }
 

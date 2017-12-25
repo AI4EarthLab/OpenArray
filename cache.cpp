@@ -34,7 +34,7 @@ extern "C"{
   }
   
   std::string gen_node_key(const char* file, const int line) {
-    string tmp_node_key;
+    string tmp_node_key = "";
     tmp_node_key = file;
     tmp_node_key += ":";
     tmp_node_key += to_string(line);
@@ -46,6 +46,13 @@ extern "C"{
     if (p == NULL) printf("not found node\n");
     else printf("found node\n");
     return (p != NULL);
+  }
+
+  void clear_cache() {
+    for (auto it = _cached_nodes.begin(); it != _cached_nodes.end(); it++) {
+      cout<<it->first<<" "<<it->second<<endl;
+    }
+    _cached_nodes.clear();
   }
 
 }

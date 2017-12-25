@@ -74,6 +74,7 @@
        ["TYPE_REP",     "rep",     "rep",        "",    "2",  "F", "T",  "rep(A)",     "0"],&
        ["TYPE_SHIFT",   "shift",   "shift",      "",    "2",  "F", "F",  "shift(A)",   "0"]]    
 
+
 #!get folders in ./modules/
 #!:set FUNCS = [name for name in os.listdir('./modules') &
 #!  if os.path.isdir(os.path.join('./modules/', name))]
