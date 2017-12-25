@@ -492,13 +492,13 @@ contains
     
     A = seqs(m, n, k) + 1
     
-    call grid_bind(A, 3)
+    !call grid_bind(A, 3)
 
     call display(A, "A = ")
     
     ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'DXB', 'DXF', 'DYB', 'DYF']
-    ! B = ${o}$(A)
-    ! call display(B, "${o}$(A) = ")
+    B = ${o}$(A)
+    call display(B, "${o}$(A) = ")
     ///:endfor
 
   end subroutine
