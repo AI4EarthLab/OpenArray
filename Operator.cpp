@@ -539,8 +539,9 @@ namespace oa {
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
         
-        code<<"#include <math.h>\n extern \"C\" {\nvoid kernel_"<<hash;
+        code<<"#include <math.h>\n #include <stdio.h>\n extern \"C\" {\nvoid kernel_"<<hash;
         code<<"(void** &list, int size) {\n";
+code<<"#pragma clang loop vectorize(assume_safety)\n";
         code<<"  for (int i = 0; i < size; i++) {\n";
         switch(A->get_data_type()) {
           case DATA_INT:
@@ -589,7 +590,29 @@ namespace oa {
       switch(A->input_size()) {
       case 1:
         if(nd.sy == "abs")
-          ss<<"fabs"<<"("<<child[0].str()<<")";
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"abs"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_FLOAT:
+              ss<<"fabsf"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_DOUBLE:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+            default:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+          }
+        else if(nd.sy == "sqrt")
+          switch(A->get_data_type()) {
+            case DATA_FLOAT:
+              ss<<"sqrtf"<<"("<<child[0].str()<<")";
+              break;
+            default:
+              ss<<"sqrt"<<"("<<child[0].str()<<")";
+              break;    
+          }
         else
           ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
@@ -633,7 +656,29 @@ namespace oa {
       switch(A->input_size()) {
       case 1:
         if(nd.sy == "abs")
-          ss<<"fabs"<<"("<<child[0].str()<<")";
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"abs"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_FLOAT:
+              ss<<"fabsf"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_DOUBLE:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+            default:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+          }
+        else if(nd.sy == "sqrt")
+          switch(A->get_data_type()) {
+            case DATA_FLOAT:
+              ss<<"sqrtf"<<"("<<child[0].str()<<")";
+              break;
+            default:
+              ss<<"sqrt"<<"("<<child[0].str()<<")";
+              break;    
+          }
         else
           ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
