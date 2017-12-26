@@ -17,11 +17,11 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-Wl,-rpath=${JIT_LIB}
 
 oplevel0 = -O0 -g 
-oplevel3 = -O3 
+oplevel3 = -O3 -Ofast -xHost -g
 
-FC = mpiifort ${oplevel0}
-CC = mpiicc  ${oplevel0}
-CXX = mpiicpc ${oplevel0}
+FC = mpiifort ${oplevel3}
+CC = mpiicc  ${oplevel3}
+CXX = mpiicpc ${oplevel3}
 
 FCFLAGS  = 
 

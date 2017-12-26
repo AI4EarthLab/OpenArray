@@ -541,7 +541,8 @@ namespace oa {
         
         code<<"#include <math.h>\n #include <stdio.h>\n extern \"C\" {\nvoid kernel_"<<hash;
         code<<"(void** &list, int size) {\n";
-code<<"#pragma clang loop vectorize(assume_safety)\n";
+        code<<"#pragma clang loop vectorize(assume_safety)\n";
+        code<<"#pragma simd\n";
         code<<"  for (int i = 0; i < size; i++) {\n";
         switch(A->get_data_type()) {
           case DATA_INT:
