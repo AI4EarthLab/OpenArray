@@ -387,14 +387,19 @@ PartitionPtr Partition::sub(const Box& b) const {
 
 
 // static function, gen hash based on [comm, gs(x, y, z), stencil_width]
-size_t Partition::gen_hash(MPI_Comm comm, const Shape &gs, int stencil_width) {
+size_t Partition::gen_hash(MPI_Comm comm,
+        const Shape &gs, int stencil_width) {
   std::hash<string> str_hash;
   std::stringstream sstream;
   
   sstream<<comm<<":";
   sstream<<gs[0];
+
   for (int i = 1; i < gs.size(); i++) 
-  sstream<<","<<gs[i];
+    sstream<<","<<gs[i];
+  
+  for (int i = 0; i < m_default_procs_shape.size(); i++) 
+    sstream<<","<<m_default_procs_shape[i];
   
   sstream<<":"<<stencil_width;
   //cout<<"gen_hash 1: "<<sstream.str()<<endl;
@@ -429,8 +434,6 @@ size_t Partition::gen_hash(MPI_Comm comm, const vector<int> &x, const vector<int
 Shape Partition::m_default_procs_shape = {0,0,0};
 
 Shape Partition::get_default_procs_shape(){
-
-  
   return m_default_procs_shape;
 }
 

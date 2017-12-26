@@ -10,5 +10,5 @@ module oa_mod
   use oa_shift
   use oa_rep
   use oa_cache
-
+  use oa_io
 end module

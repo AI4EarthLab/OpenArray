@@ -319,6 +319,9 @@ namespace oa {
         }        
       }
     }
+
+    ArrayPtr make_psudo3d(const ArrayPtr& B);
+
   }
 }
 

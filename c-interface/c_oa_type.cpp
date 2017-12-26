@@ -1,6 +1,8 @@
 #include "c_oa_type.hpp"
 #include "../Function.hpp"
 #include "../Operator.hpp"
+#include "../Kernel.hpp"
+#include "../op_define.hpp"
 
 extern "C" {
 
@@ -197,5 +199,7 @@ void c_shape_array(ArrayPtr*& A, int* s){
   s[1] = (*A)->shape()[1];
   s[2] = (*A)->shape()[2];
 }
+
+
 }
 

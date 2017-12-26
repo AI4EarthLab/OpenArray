@@ -3,6 +3,8 @@
 #include "utils/utils.hpp"
 #include <fstream>
 #include <mpi.h>
+#include "Kernel.hpp"
+
 using namespace std;
 namespace oa {
   namespace funcs {
@@ -1126,6 +1128,39 @@ namespace oa {
       local = g2l(sub);
     }
 
+    ArrayPtr make_psudo3d(const ArrayPtr& B){
+  
+      Shape ps = B->get_partition()->procs_shape();
+      Shape as = B->shape();
 
+      std::bitset<3> bs;
+      for(int i = 0; i < 3; ++i){
+        if(as[i] != 1) {
+          ps[i] = 1;
+          bs[2-i] = 1;
+        }else{
+          bs[2-i] = 0;
+        }
+      }
+      
+      // if(ps[0] == 1 && ps[1] == 1 && ps[2] == 1){
+      //   THROW_LOGIC_EXCEPTION(
+      //       "cannot make a psudo 3d array for a real 3d array.");
+      // }
+      
+      NodePtr n3 =
+        NodePool::global()->get_local_1d<int, 3>(ps.data());
+
+      std::vector<ArrayPtr> apl;
+      apl.push_back(B);
+      apl.push_back(n3->get_data());
+
+      ArrayPtr ap =
+        oa::kernel::kernel_rep_with_partition(apl, true);
+      
+      ap->set_bitset(bs);
+      ap->set_pseudo(true);
+      return ap;
+    }
   }
 }

@@ -486,10 +486,8 @@ contains
     type(array) :: D, tmp
     print*, "m,n,k=",m,n,k
 
-    call set_procs_shape([2,2,2])
-    print*, "hello1"
     D = zeros(m, n, k)
-    print*, "hello2"
+
     dx = sub(D, ':', ':', 1)  + 0.1
     dy = sub(D, ':', ':', 1)  + 0.2
     dz = sub(D,  1,   1, ':') + 0.15
@@ -502,9 +500,10 @@ contains
     call display(tmp, 'tmp = ')
 
     call grid_init('C', dx, dy, dz)
+ 
+    !A = seqs(m, n, k) + 1
+    A = rands(m, n, k)
 
-    A = seqs(m, n, k) + 1
-    
     call grid_bind(A, 3)
 
     call display(A, "A = ")
@@ -517,8 +516,8 @@ contains
     
     ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', &
          'DXB', 'DXF', 'DYB', 'DYF']
-    !B = ${o}$(A) 
-    !call display(B, "${o}$(A) = ")
+    B = ${o}$(A) 
+    call display(B, "${o}$(A) = ")
     ///:endfor
 
   end subroutine
@@ -542,6 +541,21 @@ contains
     
     ! print*, "after shifted"
     ! call display(A, "A")
+  end subroutine
+
+
+  subroutine test_io()
+    implicit none
+    type(array) :: A
+    type(array) :: B
+    
+    A = seqs(6, 8, 3)
+
+    call save(A, "A.nc", "data")
+
+    B = load("A.nc", "data")
+
+    call display(B, "B = ")
   end subroutine
   
 end module

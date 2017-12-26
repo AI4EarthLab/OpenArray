@@ -41,7 +41,7 @@ namespace oa {
     ArrayPtr t_kernel_${name}$_${grid}$(vector<ArrayPtr> &ops_ap) {
       ArrayPtr u = ops_ap[0];
       ArrayPtr ap;
-      printf("calling kernel ${name}$...\n");
+      //printf("calling kernel ${name}$...\n");
       int dt = oa::utils::to_type<T1>();
 
       ap = ArrayPool::global()->get(u->get_partition(), dt);
@@ -84,7 +84,7 @@ namespace oa {
 
       // get_gridptr
       ArrayPtr gridptr = Grid::global()->get_grid(u->get_pos(), ${type}$);
-      printf("pos:%d, ${type}$, %d\n", u->get_pos(), gridptr == NULL);
+      // printf("pos:%d, ${type}$, %d\n", u->get_pos(), gridptr == NULL);
       // default grid data type
       int grid_dt = DATA_FLOAT;
       void* grid_buffer = NULL;
@@ -92,9 +92,9 @@ namespace oa {
       
       // cout<<"${grid}$"<<endl; 
       if (gridptr != NULL) {
-        gridptr->display("gridptr = ");
-        cout<<"not null"<<endl;
-        cout<<"${grid}$"<<endl;
+        // gridptr->display("gridptr = ");
+        // cout<<"not null"<<endl;
+        // cout<<"${grid}$"<<endl;
         grid_dt = gridptr->get_data_type();
         grid_buffer = gridptr->get_buffer();
         SG = gridptr->buffer_shape();

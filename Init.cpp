@@ -1,16 +1,19 @@
 #include "mpi.h"
 #include "Init.hpp"
+#include "MPI.hpp"
+#include "Partition.hpp"
 
 namespace oa{
-  void init(int argc, char** argv){
-    if(argc > 0){
-      MPI_Init(&argc, &argv);
-    }else{
-      MPI_Init(NULL, NULL);
-    }
+  void init(int comm, Shape procs_shape,
+          int argc, char** argv){
+    MPI::global()->init(comm, argc, argv);
+
+    Partition::set_default_procs_shape(procs_shape);
+    Partition::set_default_stencil_width(1);
   }
 
+  
   void finalize(){
-    MPI_Finalize();
+    MPI::global()->finalize();
   }
 }

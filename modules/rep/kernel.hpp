@@ -12,6 +12,8 @@ using namespace std;
 namespace oa{
   namespace kernel{
     ArrayPtr kernel_rep(vector<ArrayPtr> &ops_ap);
+    ArrayPtr kernel_rep_with_partition(vector<ArrayPtr> &ops_ap,
+            bool same_partition);
   }
 }
 

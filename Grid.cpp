@@ -4,6 +4,8 @@
 #include <boost/throw_exception.hpp>
 #include "common.hpp"
 
+#define PSU3D(x) oa::funcs::make_psudo3d(x)
+
 void Grid::init_grid(char type,
         const ArrayPtr& dx, const ArrayPtr& dy, const ArrayPtr& dz){
 
@@ -11,43 +13,40 @@ void Grid::init_grid(char type,
   NodePtr ndy = oa::ops::new_node(dy);
   NodePtr ndz = oa::ops::new_node(dz);
 
-  dx->display("dx1 = ");
-  dy->display("dy1 = ");
-  dz->display("dz1 = ");
   switch(type){
   case 'C':
-    x_d[0] = EVAL(AYB(ndx));
-    x_d[0] = EVAL(AYB(AXB(ndx)));
-    y_d[0] = EVAL(AYB(AXB(ndy)));
-    z_d[0] = dz;
+    x_d[0] = PSU3D(EVAL(AYB(ndx)));
+    x_d[0] = PSU3D(EVAL(AYB(AXB(ndx))));
+    y_d[0] = PSU3D(EVAL(AYB(AXB(ndy))));
+    z_d[0] = PSU3D(dz);
 
-    x_d[1] = EVAL(AYB(ndx));
-    y_d[1] = EVAL(AYB(ndy));
-    z_d[1] = dz;
+    x_d[1] = PSU3D(EVAL(AYB(ndx)));
+    y_d[1] = PSU3D(EVAL(AYB(ndy)));
+    z_d[1] = PSU3D(dz);
 
-    x_d[2] = EVAL(AXB(ndx));
-    y_d[2] = EVAL(AXB(ndy));
-    z_d[2] = dz;
+    x_d[2] = PSU3D(EVAL(AXB(ndx)));
+    y_d[2] = PSU3D(EVAL(AXB(ndy)));
+    z_d[2] = PSU3D(dz);
 
-    x_d[3] = dx;
-    y_d[3] = dy;
-    z_d[3] = dz;
+    x_d[3] = PSU3D(dx);
+    y_d[3] = PSU3D(dy);
+    z_d[3] = PSU3D(dz);
 
-    x_d[4] = EVAL(AYB(AXB(ndx)));
-    y_d[4] = EVAL(AYB(AXB(ndy)));
-    z_d[4] = EVAL(AZB(ndz));
+    x_d[4] = PSU3D(EVAL(AYB(AXB(ndx))));
+    y_d[4] = PSU3D(EVAL(AYB(AXB(ndy))));
+    z_d[4] = PSU3D(EVAL(AZB(ndz)));
 
-    x_d[5] = EVAL(AYB(ndx));
-    y_d[5] = EVAL(AYB(ndy));
-    z_d[5] = EVAL(AZB(ndz));
+    x_d[5] = PSU3D(EVAL(AYB(ndx)));
+    y_d[5] = PSU3D(EVAL(AYB(ndy)));
+    z_d[5] = PSU3D(EVAL(AZB(ndz)));
 
-    x_d[6] = EVAL(AXB(ndx));
-    y_d[6] = EVAL(AXB(ndy));
-    z_d[6] = EVAL(AZB(ndz));
+    x_d[6] = PSU3D(EVAL(AXB(ndx)));
+    y_d[6] = PSU3D(EVAL(AXB(ndy)));
+    z_d[6] = PSU3D(EVAL(AZB(ndz)));
 
-    x_d[7] = dx;
-    y_d[7] = dy;
-    z_d[7] = EVAL(AZB(ndz));
+    x_d[7] = PSU3D(dx);
+    y_d[7] = PSU3D(dy);
+    z_d[7] = PSU3D(EVAL(AZB(ndz)));
 
     // x_d[1]->display("x_d[0] = ");
     // y_d[1]->display("y_d[0] = ");

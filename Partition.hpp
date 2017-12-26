@@ -50,8 +50,11 @@ private:
   
   public:
   Partition();
-  Partition(MPI_Comm comm, int size, const Shape &gs, int stencil_width = 1);
-  Partition(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
+  Partition(MPI_Comm comm, int size,
+          const Shape &gs, int stencil_width = 1);
+  
+  Partition(MPI_Comm comm, const vector<int> &x,
+          const vector<int> &y, 
     const vector<int> &z, int stencil_width = 1);
   bool equal(const PartitionPtr &par_ptr);
   bool equal(const Partition &par);

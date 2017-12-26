@@ -85,5 +85,9 @@ typedef arma::Cube<double> cube_double;
     A = tmp_node;                                     \
   }
 
+#define THROW_LOGIC_EXCEPTION(msg)                        \
+  BOOST_THROW_EXCEPTION(std::logic_error(msg))
+
+
 #endif
 
