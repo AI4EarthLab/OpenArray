@@ -7,6 +7,8 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include "utils/utils.hpp"
+#include "boost/assert.hpp"
 
 using namespace std;
 
@@ -17,7 +19,8 @@ Partition::Partition() { }
 // find the approriate partition
 Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
   m_comm(comm), m_global_shape(gs), m_stencil_width(sw) {
-  assert(gs[0] > 0 && gs[1] > 0 && gs[2] > 0 && size > 0);
+  BOOST_ASSERT_MSG(gs[0] > 0 && gs[1] > 0 && gs[2] > 0 && size > 0,
+                   "incorrect parameter.");
   double tot = pow(gs[0] * gs[1] * gs[2] * 1.0, 1.0 / 3);
   double fx = gs[0] / tot;
   double fy = gs[1] / tot;
@@ -25,27 +28,50 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
 
   //m_procs_shape = {-1, -1, -1};
   m_procs_shape = Partition::get_default_procs_shape();
-  if(m_procs_shape[0] < 1){
-    double factor = INT_MAX;
-    double tsz = pow(size * 1.0, 1.0 / 3);
-
-    for (int i = 1; i <= size; i++) if (size % i == 0) {
-        int ed = size / i;
-        for (int j = 1; j <= ed; j++) if (ed % j == 0) {
-            int k = ed / j;
-            double dfx = fx - i * 1.0 / tsz;
-            double dfy = fy - j * 1.0 / tsz;
-            double dfz = fz - k * 1.0 / tsz;
-            double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
-            //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
-            if (factor >= new_factor) {
-              m_procs_shape = {i, j, k};
-              factor = new_factor;
-            }
-          }
-      }
-    assert(m_procs_shape[0] > 0);
+  int x; bool x_fixed = false;
+  int y; bool y_fixed = false;
+  int z; bool z_fixed = false;
+  
+  if(m_procs_shape[0] > 0){
+    x = m_procs_shape[0];
+    x_fixed = true;
   }
+  
+  if(m_procs_shape[1] > 0){
+    y = m_procs_shape[1];
+    y_fixed = true;
+  }
+  
+  if(m_procs_shape[2] > 0){
+    z = m_procs_shape[2];
+    z_fixed = true;
+  }
+
+  double factor = INT_MAX;
+  double tsz = pow(size * 1.0, 1.0 / 3);
+
+  for (int i = x_fixed?x:1; i <= (x_fixed?x:size); i++)
+    if (size % i == 0) {
+      int ed = size / i;
+      for (int j = y_fixed?y:1; j <= (y_fixed?y:ed); j++)
+        if (ed % j == 0) {
+          int k = z_fixed?z:(ed / j);
+          if(i * j * k != size) continue;
+          double dfx = fx - i * 1.0 / tsz;
+          double dfy = fy - j * 1.0 / tsz;
+          double dfz = fz - k * 1.0 / tsz;
+          double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
+          //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
+          if (factor >= new_factor) {
+            m_procs_shape = {i, j, k};
+            factor = new_factor;
+          }
+        }
+    }
+
+  BOOST_ASSERT_MSG(m_procs_shape[0] > 0,
+          "can not find proper procs shape.");
+
   
   m_lx = vector<int> (m_procs_shape[0], gs[0] / m_procs_shape[0]);
   m_ly = vector<int> (m_procs_shape[1], gs[1] / m_procs_shape[1]);
@@ -66,7 +92,8 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
 Partition::Partition(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
   const vector<int> &z, int sw) :
   m_comm(comm), m_stencil_width(sw), m_lx(x), m_ly(y), m_lz(z) {
-  assert(m_lx.size() && m_ly.size() && m_lz.size());
+  BOOST_ASSERT_MSG(m_lx.size() && m_ly.size() && m_lz.size(),
+          "incorrect paramter");
   m_procs_shape[0] = m_lx.size();
   m_procs_shape[1] = m_ly.size();
   m_procs_shape[2] = m_lz.size();
@@ -154,7 +181,10 @@ Box Partition::get_local_box() {
 
 // get the box info based on process's coord [px, py, pz]
 Box Partition::get_local_box(const vector<int> &coord) {
-  for (int i = 0; i < 3; i++) assert(0 <= coord[i] && coord[i] < m_procs_shape[i]);
+  for (int i = 0; i < 3; i++)
+    BOOST_ASSERT_MSG(0 <= coord[i]
+            && coord[i] < m_procs_shape[i],
+                     "incorrect parameter.");
   Box box(m_clx[coord[0]], m_clx[coord[0] + 1], 
   m_cly[coord[1]], m_cly[coord[1] + 1],
   m_clz[coord[2]], m_clz[coord[2] + 1]);
@@ -269,10 +299,10 @@ void Partition::split_box_procs(const Box& b,
   int xs, ys, zs, xe, ye, ze;
   b.get_corners(xs, xe, ys, ye, zs, ze);
 
-  assert((xs >= 0 && ys >= 0 && zs >=0
+  BOOST_ASSERT_MSG((xs >= 0 && ys >= 0 && zs >=0
                   && xe <= m_global_shape[0]
                   && ye <= m_global_shape[1]
-                  && ze <= m_global_shape[2]) &&
+                  && ze <= m_global_shape[2]),
           "split_box_procs : the box does not match the partition");
   
   int bxs = std::lower_bound(m_clx.begin(), m_clx.end(), xs) - m_clx.begin();
@@ -399,10 +429,48 @@ size_t Partition::gen_hash(MPI_Comm comm, const vector<int> &x, const vector<int
 Shape Partition::m_default_procs_shape = {0,0,0};
 
 Shape Partition::get_default_procs_shape(){
+
+  
   return m_default_procs_shape;
 }
 
 void Partition::set_default_procs_shape(const Shape& s){
+  int size = oa::utils::get_size(MPI_COMM_WORLD);
+  int t = 1;
+
+  const char* err_msg =
+    "total number of threads must be divided by "
+    "number of procs in each diemsion";
+
+  bool check_total = true;
+  
+  if(s[0] > 0){
+    BOOST_ASSERT_MSG(size % s[0] == 0, err_msg);
+    t = s[0] * t;
+  }else{
+    check_total = false;
+  }
+  
+  if(s[1] > 0){
+    BOOST_ASSERT_MSG(size % s[1] == 0, err_msg);
+    t = s[1] * t;
+  }else{
+    check_total = false;
+  }
+
+  if(s[2] > 0){
+    BOOST_ASSERT_MSG(size % s[2] == 0, err_msg);
+    t = s[2] * t;
+  }else{
+    check_total = false;
+  }
+
+  if(check_total){
+    BOOST_ASSERT_MSG(t == size,
+            "procs shape set by user does not match the number of"
+            " procs in the communicator group.");    
+  }
+
   m_default_procs_shape = s;
 }
 

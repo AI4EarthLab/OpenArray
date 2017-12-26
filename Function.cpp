@@ -138,7 +138,8 @@ namespace oa {
       //         arr_ptr->shape()[1],
       //         arr_ptr->shape()[2]);
 
-      if (!arr_ptr->has_local_data()) return arr_ptr; // don't have local data in process
+      // don't have local data in process
+      if (!arr_ptr->has_local_data()) return arr_ptr; 
       
       int rk = pp->rank();
       vector<int> procs_coord = pp->get_procs_3d(rk);
@@ -157,20 +158,23 @@ namespace oa {
       // different data_type
       switch(ap->get_data_type()) {
       case DATA_INT:
-        oa::internal::get_buffer_subarray<int>((int*) arr_ptr->get_buffer(),
-                                               (int*) ap->get_buffer(),
-                                               sub_box, box,
-                                               pp->get_stencil_width());
+        oa::internal::get_buffer_subarray<int>
+          ((int*) arr_ptr->get_buffer(),
+                (int*) ap->get_buffer(),
+                sub_box, box,
+                pp->get_stencil_width());
         break;
       case DATA_FLOAT:
-        oa::internal::get_buffer_subarray<float>((float*) arr_ptr->get_buffer(),
-                                                 (float*) ap->get_buffer(),
-                                                 sub_box, box, pp->get_stencil_width());
+        oa::internal::get_buffer_subarray<float>
+          ((float*) arr_ptr->get_buffer(),
+                  (float*) ap->get_buffer(),
+                  sub_box, box, pp->get_stencil_width());
         break;
       case DATA_DOUBLE:
-        oa::internal::get_buffer_subarray<double>((double*) arr_ptr->get_buffer(),
-                                                  (double*) ap->get_buffer(), 
-                                                  sub_box, box, pp->get_stencil_width());
+        oa::internal::get_buffer_subarray<double>
+          ((double*) arr_ptr->get_buffer(),
+                  (double*) ap->get_buffer(), 
+                  sub_box, box, pp->get_stencil_width());
         break;
       }
       return arr_ptr;
@@ -348,7 +352,7 @@ namespace oa {
       vector<int> coord = pp->get_procs_3d(pp->rank());
       int xs, ys, zs, xe, ye, ze;
       pp->get_local_box().get_corners(xs, xe, ys, ye, zs, ze);
-
+      //printf("**:%d %d %d %d %d %d\n", xs, xe, ys, ye, zs, ze);
       
       int o_cx[3] = {0, s, s + xe - xs};
       int o_cy[3] = {0, s, s + ye - ys};

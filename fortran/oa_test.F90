@@ -438,22 +438,22 @@ contains
     
   end subroutine
   
-  subroutine test_parition()
+  subroutine test_partition()
     integer :: A(3), B(3), C(3)
 
-    call get_procs_shape(A)
-    print*, "A = ", A
+    ! call get_procs_shape(A)
+    ! print*, "A = ", A
 
-    B = [1,2,3]
-    call set_procs_shape(B)
-    call get_procs_shape(C)
-    print*, "C = ", C
+    ! B = [1,2,3]
+    ! call set_procs_shape(B)
+    ! call get_procs_shape(C)
+    ! print*, "C = ", C
 
-    call set_auto_procs_shape()
-    call get_procs_shape(C)
-    print*, "C = ", C
+    ! call set_auto_procs_shape()
+    ! call get_procs_shape(C)
+    ! print*, "C = ", C
 
-  end subroutine test_parition
+  end subroutine test_partition
 
   subroutine test_cache()
     implicit none
@@ -483,22 +483,42 @@ contains
   subroutine test_grid()
     implicit none
     type(array) :: A, B, C, dx, dy, dz
-    
-    dx = ones(m, n)  * 0.1
-    dy = ones(m, n)  * 0.2
-    dz = ones(1,1,k) * 0.15
+    type(array) :: D, tmp
+    print*, "m,n,k=",m,n,k
+
+    call set_procs_shape([2,2,2])
+    print*, "hello1"
+    D = zeros(m, n, k)
+    print*, "hello2"
+    dx = sub(D, ':', ':', 1)  + 0.1
+    dy = sub(D, ':', ':', 1)  + 0.2
+    dz = sub(D,  1,   1, ':') + 0.15
+
+    call display(dx, 'dx = ')
+    call display(dy, 'dy = ')
+    call display(dz, 'dz = ')
+
+    tmp = rep(dz, 2, 2, 1)
+    call display(tmp, 'tmp = ')
 
     call grid_init('C', dx, dy, dz)
-    
+
     A = seqs(m, n, k) + 1
     
-    !call grid_bind(A, 3)
+    call grid_bind(A, 3)
 
     call display(A, "A = ")
+    print*, "======================="
+    B = AXB(A)
+    call display(B, "AXB(A) = ")
+
+    B = DXB(A)
+    call display(B, "DXB(A) = ")
     
-    ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'DXB', 'DXF', 'DYB', 'DYF']
-    B = ${o}$(A)
-    call display(B, "${o}$(A) = ")
+    ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', &
+         'DXB', 'DXF', 'DYB', 'DYF']
+    !B = ${o}$(A) 
+    !call display(B, "${o}$(A) = ")
     ///:endfor
 
   end subroutine

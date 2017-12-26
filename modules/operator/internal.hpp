@@ -23,7 +23,9 @@ namespace oa{
     void ${name}$_${grid}$_calc_inside(T1* ans, T2* b, T3* g, int3 lbound, int3 rbound, 
             int sw, Shape sp, Shape S, Shape SG) {
       int o = sw;
-
+      ///:if name[0] == 'a'
+      ///:set g = 1
+      ///:endif
       for (int k = sw + lbound[2]; k < sw + sp[2] - rbound[2]; k++) {
         for (int j = sw + lbound[1]; j < sw + sp[1] - rbound[1]; j++) {
           for (int i = sw + lbound[0]; i < sw + sp[0] - rbound[0]; i++) {
@@ -44,6 +46,10 @@ namespace oa{
 
       int o = sw;
 
+      ///:if name[0] == 'a'
+      ///:set g = 1
+      ///:endif
+      
       // update outside one surface (contains boundary, doesn't care)
 
       ///:if name[1:] in ['zb', 'zc']

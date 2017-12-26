@@ -11,8 +11,12 @@ void Grid::init_grid(char type,
   NodePtr ndy = oa::ops::new_node(dy);
   NodePtr ndz = oa::ops::new_node(dz);
 
+  dx->display("dx1 = ");
+  dy->display("dy1 = ");
+  dz->display("dz1 = ");
   switch(type){
   case 'C':
+    x_d[0] = EVAL(AYB(ndx));
     x_d[0] = EVAL(AYB(AXB(ndx)));
     y_d[0] = EVAL(AYB(AXB(ndy)));
     z_d[0] = dz;
@@ -44,6 +48,12 @@ void Grid::init_grid(char type,
     x_d[7] = dx;
     y_d[7] = dy;
     z_d[7] = EVAL(AZB(ndz));
+
+    // x_d[1]->display("x_d[0] = ");
+    // y_d[1]->display("y_d[0] = ");
+    // z_d[1]->display("z_d[0] = ");
+
+    
 
     // // need update ghost of dx, dy, dz
     // for (int i = 0; i < 8; i++) {

@@ -137,7 +137,7 @@ testfortran:
 	@echo "Cleaning done."
 	@cd build &&sed -i "s/##===##//g" ${MAKEFILE} && make fortran_main ${compile_thread} -f ${MAKEFILE} 
 	@cp build/fortran_main ./
-	@mpirun -n 4 ./fortran_main
+	@mpirun --oversubscribe -n 8 ./fortran_main
 
 fortran_main : ${OBJ_FORTRAN}
 	-${CXX} -o fortran_main ${OBJ_FORTRAN} \

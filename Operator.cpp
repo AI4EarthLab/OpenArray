@@ -541,30 +541,12 @@ namespace oa {
         std::hash<string> str_hash;
         size_t hash = str_hash(ss1.str());
         
-<<<<<<< HEAD
-        code<<"#include <math.h>\n extern \"C\" {\nvoid kernel_"<<hash;
-        code<<"(void** &list, int size) {\n";
-        code<<"  for (int i = 0; i < size; i++) {\n";
-        switch(A->get_data_type()) {
-          case DATA_INT:
-            code<<"    ((int*)(list["<<id<<"]))[i] = ";
-            break;
-          case DATA_FLOAT:
-            code<<"    ((float*)(list["<<id<<"]))[i] = ";
-            break;
-          case DATA_DOUBLE:
-            code<<"    ((double*)(list["<<id<<"]))[i] = ";
-            break;    
-        }
-        code<<__code.str()<<";\n  }\n  return ;\n}}";
-=======
         // JIT source code add function signature
         code_add_function_signature(code, hash);
         // JIT source code add const parameters
         code_add_const(code, int_id, float_id, double_id);
         // JIT source code add calc_inside
         code_add_function(code, __code, A->get_data_type(), id);
->>>>>>> 57
 
         cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
@@ -691,8 +673,6 @@ namespace oa {
           ss<<"fabs"<<"("<<child[0].str()<<")";
         else
           ss<<nd.sy<<"("<<child[0].str()<<")";
-<<<<<<< HEAD
-=======
         break;
       case 2:
         ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
@@ -871,7 +851,6 @@ namespace oa {
             S_id++;
           }
         }
->>>>>>> 57
         break;
       case 2:
         ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";

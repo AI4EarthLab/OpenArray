@@ -20,7 +20,7 @@ program main
   
   ! call test_create_node()
 
-  ! call test_parition()
+  ! call test_partition()
 
   ! call test_basic()
 
