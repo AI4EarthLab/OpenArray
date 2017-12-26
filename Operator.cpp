@@ -262,6 +262,7 @@ namespace oa {
       }
     }
 
+    // eval without kernel fusion
     ArrayPtr force_eval(NodePtr A) {
       if (A->has_data()) return A->get_data();
 
@@ -282,6 +283,8 @@ namespace oa {
       return ap;
     }
 
+
+    // prepare kernel fusion parameters
     void get_kernel_parameter(NodePtr A, vector<void*> &list, 
       PartitionPtr &ptr) {
       ArrayPtr ap;
@@ -312,6 +315,60 @@ namespace oa {
       }
     }
 
+    // prepare kernel fusion parameters with operator
+    void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
+      vector<int3> &S, PartitionPtr &ptr) {
+      ArrayPtr ap;
+      // data
+      if (A->has_data()) {
+        ap = A->get_data();
+        list.push_back(ap->get_buffer());
+        if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
+          ptr = ap->get_partition();
+        }
+        if (!A->is_seqs_scalar()) S.push_back(ap->buffer_shape());
+        return ;
+      }
+
+      // not element wise, need eval
+      const NodeDesc &nd = get_node_desc(A->type());
+      if (!nd.ew || A->need_update()) {
+        ArrayPtr ap = eval(A);
+        list.push_back(ap->get_buffer());
+        if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
+          ptr = ap->get_partition();
+        }
+        if (!A->is_seqs_scalar()) S.push_back(ap->buffer_shape());
+        return ;
+      }
+
+      // tree
+      for (int i = 0; i < A->input_size(); i++) {
+        get_kernel_parameter_with_op(A->input(i), list, S, ptr);
+      }
+
+      // bind grid if A.pos != -1
+      if (A->input_size() == 1 && A->get_pos() != -1) {
+        if (nd.type == TYPE_DXC ||
+            nd.type == TYPE_DYC ||
+            nd.type == TYPE_DZC ||
+            nd.type == TYPE_DXB ||
+            nd.type == TYPE_DXF ||
+            nd.type == TYPE_DYB ||
+            nd.type == TYPE_DYF ||
+            nd.type == TYPE_DZB ||
+            nd.type == TYPE_DZF) {
+
+          // get grid ptr
+          ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);          
+          S.push_back(grid_ptr->buffer_shape());
+          list.push_back(grid_ptr->get_buffer());
+        }
+      }
+    }
+
+
+    //
     ArrayPtr eval(NodePtr A) {
       // fusion kernel
       if (A->hash()) {
@@ -366,33 +423,26 @@ namespace oa {
       return ap;
     }
 
-
-    ArrayPtr eval_JIT(NodePtr A) {
-      // data
-      if (A->has_data()) return A->get_data();
-
-      // generate hash
-      if (!A->hash()) {
-        stringstream ss;
-        tree_to_string_stack(A, ss);
-        std::hash<string> str_hash;
-        size_t hash = str_hash(ss.str());
-        A->set_hash(hash);
-      }
-
+    ArrayPtr eval_with_op(NodePtr A) {
       // fusion kernel
       if (A->hash()) {
         FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
         if (fkptr != NULL) {
           vector<void*> list;
+          vector<int3> S;
           PartitionPtr par_ptr;
-          get_kernel_parameter(A, list, par_ptr);
+          get_kernel_parameter_with_op(A, list, S, par_ptr);
           ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
+          S.push_back(ap->buffer_shape());
+          S.push_back(A->get_lbound());
+          S.push_back(A->get_rbound());
+          S.push_back(ap->local_shape());
 
           list.push_back(ap->get_buffer());
+          list.push_back((void*)S.data());
           void** list_pointer = list.data();
-          fkptr(list_pointer, ap->buffer_size());
-          cout<<"fusion-kernel called"<<endl;
+          fkptr(list_pointer, ap->get_stencil_width());
+          //cout<<"fusion-kernel called"<<endl;
           
           //A->set_data(ap);
           ap->set_pseudo(A->is_pseudo());
@@ -403,25 +453,34 @@ namespace oa {
         }
       }
 
+      
+      // data
+      if (A->has_data()) return A->get_data();
+
       // tree
       vector<ArrayPtr> ops_ap;
 
       for (int i = 0; i < A->input_size(); i++) {
-        ops_ap.push_back(eval(A->input(i)));
+        ops_ap.push_back(eval_with_op(A->input(i)));
       }
 
-      const NodeDesc& nd = get_node_desc(A->type());
-      KernelPtr kernel_addr = nd.func;
-      ArrayPtr ap = kernel_addr(ops_ap);
-      //A->set_data(ap);
-      ap->set_pseudo(A->is_pseudo());
-      ap->set_bitset(A->get_bitset());
-      ap->set_pos(A->get_pos());
-
+      //printf("ATYPE=%d\n",A->type());
+      ArrayPtr ap;
+      if(A->type() == TYPE_REF){
+        ap = oa::funcs::subarray(ops_ap[0], A->get_ref());
+      }else{
+        const NodeDesc& nd = get_node_desc(A->type());
+        KernelPtr kernel_addr = nd.func;
+        ap = kernel_addr(ops_ap);
+        //A->set_data(ap);
+        ap->set_pseudo(A->is_pseudo());
+        ap->set_bitset(A->get_bitset());
+        ap->set_pos(A->get_pos());
+      }
+      // ap->display();
 
       return ap;
     }
-
 
     const KernelPtr get_kernel_dict(size_t hash, const char *filename) {
       static bool has_init = false;
@@ -981,20 +1040,28 @@ namespace oa {
     }
 
     void code_add_function_signature_with_op(stringstream& code, size_t& hash) {
-      code<<"extern \"C\" {\nvoid kernel_"<<hash;
-      code<<"(void** &list, ) {\n";
+      code<<"#include <array>\n\n";
+      code<<"typedef std::array<int, 3> int3;\n\n";      
+      code<<"extern \"C\" {\n";
+      code<<"int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
+      code<<"  const int M = S[0];\n";
+      code<<"  const int N = S[1];\n";
+      code<<"  return k * M * N + j * M + i;\n}\n\n";
+      code<<"void kernel_"<<hash;
+      code<<"(void** &list, int o) {\n";
     }
 
     void code_add_const(stringstream& code, 
         vector<int>& int_id, vector<int>& float_id, vector<int>& double_id) {
+      code<<"\n";
       for (int i = 0; i < int_id.size(); i++) {
-        code<<"const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
+        code<<"  const int I_"<<i<<" = ((int*)list["<<int_id[i]<<"])[0];\n";
       }
       for (int i = 0; i < float_id.size(); i++) {
-        code<<"const float F_"<<i<<" = ((float*)list["<<float_id[i]<<"])[0];\n";
+        code<<"  const float F_"<<i<<" = ((float*)list["<<float_id[i]<<"])[0];\n";
       }
       for (int i = 0; i < double_id.size(); i++) {
-        code<<"const double D_"<<i<<" = ((double*)list["<<double_id[i]<<"])[0];\n";
+        code<<"  const double D_"<<i<<" = ((double*)list["<<double_id[i]<<"])[0];\n";
       }
       code<<"\n";
     }
@@ -1038,6 +1105,32 @@ namespace oa {
     void code_add_calc_inside(stringstream& code, 
       stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
       
+      code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
+      for (int i = 0; i <= S_id; i++) {
+        code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
+      }
+      code<<"\n";
+      code<<"  const int3 &lbound = int3_p["<<S_id + 1<<"];\n";
+      code<<"  const int3 &rbound = int3_p["<<S_id + 2<<"];\n";
+      code<<"  const int3 &sp = int3_p["<<S_id + 3<<"];\n\n";
+
+      /*
+        start debug
+      */
+      // code<<"printf(\"%d\\n\", I_0);\n";
+      // code<<"printf(\"S0 %d %d %d\\n\", S0[0], S0[1], S0[2]);\n";
+      // code<<"printf(\"S1 %d %d %d\\n\", S1[0], S1[1], S1[2]);\n";
+      // code<<"printf(\"S2 %d %d %d\\n\", S2[0], S2[1], S2[2]);\n";
+      // code<<"printf(\"S3 %d %d %d\\n\", S3[0], S3[1], S3[2]);\n";
+      // code<<"printf(\"S4 %d %d %d\\n\", S4[0], S4[1], S4[2]);\n";
+      // code<<"printf(\"lbound %d %d %d\\n\", lbound[0], lbound[1], lbound[2]);\n";
+      // code<<"printf(\"rbound %d %d %d\\n\", rbound[0], rbound[1], rbound[2]);\n";
+      // code<<"printf(\"sp %d %d %d\\n\", sp[0], sp[1], sp[2]);\n";
+      /*
+        end debug
+      */
+      
+
       code<<"  for (int k = o + lbound[2]; k < o + sp[2] - rbound[2]; k++) {\n";
       code<<"    for (int j = o + lbound[1]; j < o + sp[1] - rbound[1]; j++) {\n";
       code<<"      for (int i = o + lbound[0]; i < o + sp[0] - rbound[0]; i++) {\n";

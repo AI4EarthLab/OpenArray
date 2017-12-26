@@ -63,7 +63,7 @@ namespace oa {
         bitset<3> bit = Grid::global()->get_grid(pos, ${type}$)->get_bitset();
         id = (int)(bit.to_ulong());
       }
-      printf("id = %d\n", id);
+      // printf("id = %d\n", id);
       ap = kernel_table[u_dt][id](ops_ap);
 
       return ap;
