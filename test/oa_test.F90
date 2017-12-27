@@ -1,6 +1,6 @@
   ///:include "../NodeTypeF.fypp"
 
-#include "config.h"
+#include "../fortran/config.h"
 module oa_test
   use oa_mod
   integer :: m, n, k

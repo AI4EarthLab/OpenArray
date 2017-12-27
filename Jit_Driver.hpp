@@ -34,7 +34,7 @@ private:
   int insert_icc(size_t hash, const stringstream& code){
     //std::cout<<"icc"<<std::endl;
     FusionKernelPtr fk_ptr = get(hash);
-    if (fk_ptr != NULL) return ;
+    if (fk_ptr != NULL) return -1;
     stringstream filename;
     filename<<"/tmp/"<<"kernel_"<<hash<<".cpp";
     stringstream objname;
