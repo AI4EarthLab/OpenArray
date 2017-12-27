@@ -35,7 +35,8 @@ namespace oa {
         ///:set type_out = i[2]
         ///:set type_in = i[3]
         ///:set grid = i[4]
-        kernel_table[0][${id}$] = t_kernel_${name}$_${grid}$<${type_out}$, ${type_in}$>;
+        kernel_table[0][${id}$] =
+          t_kernel_${name}$_${grid}$<${type_out}$, ${type_in}$>;
         ///:endfor
 
         ///:for i in T_FLOAT
@@ -43,7 +44,8 @@ namespace oa {
         ///:set type_out = i[2]
         ///:set type_in = i[3]
         ///:set grid = i[4]
-        kernel_table[1][${id}$] = t_kernel_${name}$_${grid}$<${type_out}$, ${type_in}$>;
+        kernel_table[1][${id}$] =
+          t_kernel_${name}$_${grid}$<${type_out}$, ${type_in}$>;
         ///:endfor
 
         ///:for i in T_DOUBLE
@@ -51,7 +53,8 @@ namespace oa {
         ///:set type_out = i[2]
         ///:set type_in = i[3]
         ///:set grid = i[4]
-        kernel_table[2][${id}$] = t_kernel_${name}$_${grid}$<${type_out}$, ${type_in}$>;
+        kernel_table[2][${id}$] =
+          t_kernel_${name}$_${grid}$<${type_out}$, ${type_in}$>;
         ///:endfor
 
         has_init = true;
@@ -60,9 +63,26 @@ namespace oa {
       int id = 0;
       int pos = u->get_pos();
       if (pos != -1) {
-        bitset<3> bit = Grid::global()->get_grid(pos, ${type}$)->get_bitset();
+        bitset<3> bit =
+          Grid::global()->get_grid(pos, ${type}$)->get_bitset();
         id = (int)(bit.to_ulong());
       }
+      Shape us = u->shape();
+
+      std::string err_msg =
+        (boost::format("unable to perform \"%1%\" "
+                "on array of shape (%2%,%3%,%4%)")
+                % "${name.upper()}$"
+                % us[0] % us[1] % us[2]).str();
+        
+      ///:if name[1].lower()   == 'x'
+      if(us[0] < 2) THROW_LOGIC_EXCEPTION(err_msg);
+      ///:elif name[1].lower() == 'y'
+      if(us[1] < 2) THROW_LOGIC_EXCEPTION(err_msg);
+      ///:elif name[1].lower() == 'z'
+      if(us[2] < 2) THROW_LOGIC_EXCEPTION(err_msg);
+      ///:endif
+      
       // printf("id = %d\n", id);
       ap = kernel_table[u_dt][id](ops_ap);
 

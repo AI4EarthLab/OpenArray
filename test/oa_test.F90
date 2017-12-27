@@ -1,4 +1,4 @@
-  ///:include "NodeTypeF.fypp"
+  ///:include "../NodeTypeF.fypp"
 
 #include "config.h"
 module oa_test
@@ -301,7 +301,8 @@ contains
     call display(A, "A = ")
 
     ///:for o in ['AXB', 'AXF', 'AYB', 'AYF', 'AZB', 'AZF', &
-         'DXB', 'DXF', 'DYB', 'DYF', 'DZB', 'DZF', 'DXC', 'DYC', 'DZC']
+         'DXB', 'DXF', 'DYB', 'DYF', 'DZB', 'DZF', 'DXC', &
+         'DYC', 'DZC']
 
     B = ${o}$(A)
     call display(A, "A = ")
@@ -329,11 +330,12 @@ contains
     call display(A, "A = ")
     call display(B, "${o}$(A)")
     ///:endfor
-    
+
+    A = rands(6, 6, 6)
+    call display(A, "A = ")
     B = DXB(AXF(A))
     call display(B, "DXB(AXF(A))")
-    
-    !call grid_init('C', dx, dy, dz)
+
   end subroutine
   
   subroutine test_set()

@@ -39,8 +39,10 @@ OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard c-interface/*.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard modules/*/*.cpp)))
 
-OBJ_FORTRAN = ${OBJS} \
+OBJ_FORTRAN_LIB = ${OBJS} \
 	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
+
+OBJ_FORTRAN = ${OBJ_FORTRAN_LIB} test/oa_test.o test/oa_main.o 
 
 OBJ_MAIN  = ${OBJS} $(addprefix ./test/, main.o)
 
@@ -142,6 +144,19 @@ testfortran:
 fortran_main : ${OBJ_FORTRAN}
 	-${CXX} -o fortran_main ${OBJ_FORTRAN} \
 	${EXT_LIB_LINK} ${LIBS} -lgfortran
+
+oalib:
+	@rm -rf fortran_main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean  -f ${MAKEFILE}
+	@echo "Cleaning done."
+	@cd build &&sed -i "s/##===##//g" ${MAKEFILE} && make oalib_obj ${compile_thread} -f ${MAKEFILE} 
+	@cp build/libopenarray.a ./
+
+oalib_obj: ${OBJ_FORTRAN_LIB}
+	@ar rcs libopenarray.a ${OBJ_FORTRAN_LIB}
 
 small:
 	@make all -f ${MAKEFILE}

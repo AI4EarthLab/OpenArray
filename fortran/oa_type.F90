@@ -1,5 +1,5 @@
 #include "config.h"
-  ///:include "NodeTypeF.fypp"
+  ///:include "../NodeTypeF.fypp"
   ///:mute
   ///:set TYPE = [['int', 'integer'], &
        ['float',  'real'], ['double', 'real(kind=8)']]

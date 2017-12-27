@@ -1,7 +1,7 @@
 #include "config.h"
   
   ///:mute
-  ///:include "NodeTypeF.fypp"
+  ///:include "../NodeTypeF.fypp"
   ///:set types = [['double','real(8)', 'scalar'],&
        ['float','real', 'scalar'], &
        ['int','integer', 'scalar'], &

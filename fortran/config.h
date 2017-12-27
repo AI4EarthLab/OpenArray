@@ -8,7 +8,7 @@
 
 ///:mute
 ///:set i = 0  
-///:include "NodeTypeF.fypp"
+///:include "../NodeTypeF.fypp"
 ///:endmute
 ///:for i in range(len(L))
 #define  ${L[i][0]}$  ${i}$
