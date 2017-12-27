@@ -5,7 +5,7 @@
 extern "C"{
   void c_load(ArrayPtr*& A, char* file, char* var){
     if(A == NULL) A = new ArrayPtr();
-    *A = oa::io::load(file, var, MPI::global()->comm());
+    *A = oa::io::load(file, var, oa::MPI::global()->comm());
   }
 
   void c_save(ArrayPtr*& A, char* file, char* var){

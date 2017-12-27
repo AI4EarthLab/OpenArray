@@ -116,7 +116,7 @@ extern "C" {
           int data_type) {
 
     if(ptr == NULL) ptr = new ArrayPtr();  
-    MPI_Comm comm = MPI::global()->comm();
+    MPI_Comm comm = oa::MPI::global()->comm();
     Shape s = {m, n, k};
     *ptr = oa::funcs::${f}$(comm, s, stencil_width, data_type);
   }
@@ -133,7 +133,7 @@ extern "C" {
   void c_consts_${t[0]}$(ArrayPtr* &ptr,
           int m, int n, int k, ${t[0]}$ val, 
     int stencil_width) {
-    MPI_Comm comm = MPI::global()->comm();
+    MPI_Comm comm = oa::MPI::global()->comm();
     Shape s = {m, n, k};
 
     if (ptr == NULL) ptr = new ArrayPtr();
