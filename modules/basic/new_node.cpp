@@ -109,7 +109,7 @@ namespace oa{
 
       np->set_shape(u->shape());
 
-      ///:if i[3] == 'C'
+      ///:if op[3] == "C"
       np->set_data_type(u->get_data_type());
       ///:else
       np->set_data_type(DATA_INT);

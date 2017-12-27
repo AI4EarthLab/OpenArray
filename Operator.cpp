@@ -684,7 +684,29 @@ namespace oa {
       switch(A->input_size()) {
       case 1:
         if(nd.sy == "abs")
-          ss<<"fabs"<<"("<<child[0].str()<<")";
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"abs"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_FLOAT:
+              ss<<"fabsf"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_DOUBLE:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+            default:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+          }
+        else if(nd.sy == "sqrt")
+          switch(A->get_data_type()) {
+            case DATA_FLOAT:
+              ss<<"sqrtf"<<"("<<child[0].str()<<")";
+              break;
+            default:
+              ss<<"sqrt"<<"("<<child[0].str()<<")";
+              break;    
+          }
         else
           ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
@@ -728,7 +750,29 @@ namespace oa {
       switch(A->input_size()) {
       case 1:
         if(nd.sy == "abs")
-          ss<<"fabs"<<"("<<child[0].str()<<")";
+          switch(A->get_data_type()) {
+            case DATA_INT:
+              ss<<"abs"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_FLOAT:
+              ss<<"fabsf"<<"("<<child[0].str()<<")";
+              break;
+            case DATA_DOUBLE:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+            default:
+              ss<<"fabs"<<"("<<child[0].str()<<")";
+              break;    
+          }
+        else if(nd.sy == "sqrt")
+          switch(A->get_data_type()) {
+            case DATA_FLOAT:
+              ss<<"sqrtf"<<"("<<child[0].str()<<")";
+              break;
+            default:
+              ss<<"sqrt"<<"("<<child[0].str()<<")";
+              break;    
+          }
         else
           ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
