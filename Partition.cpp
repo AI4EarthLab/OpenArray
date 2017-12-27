@@ -440,7 +440,7 @@ Shape Partition::get_default_procs_shape(){
 
 void Partition::set_default_procs_shape(const Shape& s){
 
-  int size = MPI::global()->size();
+  int size = MPI_SIZE;
 
   int t = 1;
 

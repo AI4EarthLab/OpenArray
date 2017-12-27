@@ -13,7 +13,7 @@ Node::Node(NodePtr u) {}
 Node::~Node() {}
 
 void Node::display(char const *prefix) {
-  int rank = MPI::global()->rank();
+  int rank = MPI_RANK;
   if (rank == 0) {
     printf("%s \n", prefix);
     printf("    id : %d\n", id);

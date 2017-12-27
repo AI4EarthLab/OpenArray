@@ -951,7 +951,7 @@ namespace oa {
       Shape gsp = lsp;
       int sw = lpp->get_stencil_width(); 
       int datatype = lap->get_data_type();
-      gap = zeros(MPI::global()->comm(), gsp, sw, datatype);
+      gap = zeros(oa::MPI::global()->comm(), gsp, sw, datatype);
       PartitionPtr gpp = gap->get_partition();
       Box gbox = gpp->get_local_box();
       int xs, ys, zs, xe, ye, ze;
@@ -1050,7 +1050,7 @@ namespace oa {
 
       MPI_Comm comm = m_par_ptr->get_comm();
       //int my_rank = oa::utils::get_rank(comm);
-      int my_rank = MPI::global()->rank(comm);
+      int my_rank = oa::MPI::global()->rank(comm);
 
       int num_procs = npx * npy * npz;
 

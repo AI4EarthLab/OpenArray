@@ -6,7 +6,7 @@
 namespace oa{
   void init(int comm, Shape procs_shape,
           int argc, char** argv){
-    MPI::global()->init(comm, argc, argv);
+    oa::MPI::global()->init(comm, argc, argv);
 
     Partition::set_default_procs_shape(procs_shape);
     Partition::set_default_stencil_width(1);
@@ -14,6 +14,6 @@ namespace oa{
 
   
   void finalize(){
-    MPI::global()->finalize();
+    oa::MPI::global()->finalize();
   }
 }

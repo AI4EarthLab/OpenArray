@@ -538,7 +538,7 @@ namespace oa {
     }
 
     void gen_kernels(NodePtr A, bool is_root) {
-      if (MPI::global()->rank() != 0) return;
+      if (MPI_RANK != 0) return;
       if (A->has_data()) return ;
       //A->display();
       

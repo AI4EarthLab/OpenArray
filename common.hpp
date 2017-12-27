@@ -88,11 +88,11 @@ typedef arma::Cube<double> cube_double;
 #define THROW_LOGIC_EXCEPTION(msg)                        \
   BOOST_THROW_EXCEPTION(std::logic_error(msg))
 
-#define MPI_ORDER_START MPI::global()->order_start();
-#define MPI_ORDER_END   MPI::global()->order_end();
+#define MPI_ORDER_START oa::MPI::global()->order_start();
+#define MPI_ORDER_END   oa::MPI::global()->order_end();
 
-#define MPI_RANK MPI::global()->rank()
-#define MPI_SIZE MPI::global()->size()
+#define MPI_RANK oa::MPI::global()->rank()
+#define MPI_SIZE oa::MPI::global()->size()
 
 #endif
 
