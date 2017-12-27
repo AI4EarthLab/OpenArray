@@ -67,6 +67,7 @@ namespace oa {
           Grid::global()->get_grid(pos, ${type}$)->get_bitset();
         id = (int)(bit.to_ulong());
       }
+
       Shape us = u->shape();
 
       std::string err_msg =
@@ -83,6 +84,7 @@ namespace oa {
       if(us[2] < 2) THROW_LOGIC_EXCEPTION(err_msg);
       ///:endif
       
+
       // printf("id = %d\n", id);
       ap = kernel_table[u_dt][id](ops_ap);
 

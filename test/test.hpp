@@ -1181,7 +1181,17 @@ void test_gen_kernel_JIT_with_op(int m, int n, int k) {
   NodePtr n3 = NodePool::global()->get_seqs_scalar(MPI_COMM_SELF, 1);
   
   NodePtr np = PLUS( MULT(DXF(n1), DYB(n2)), n3 );
+  
+  // ans = oa::ops::eval(np);
+  // ans->display("force eval");
+
+  // oa::ops::gen_kernels_JIT(np);
+  // ans = oa::ops::eval(np);
+  // ans->display("JIT eval");
+
   oa::ops::gen_kernels_JIT_with_op(np);
+  ans = oa::ops::eval_with_op(np);
+  ans->display("JIT eval with op");
 
 }
 

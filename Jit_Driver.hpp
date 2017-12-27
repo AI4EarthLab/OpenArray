@@ -7,7 +7,7 @@
 #include <sstream>
 #include <functional>
 #include "Jit.hpp"
-
+#include <vector>
 typedef std::shared_ptr<Jit> JitPtr;
 
 using namespace std;
@@ -34,20 +34,20 @@ public:
     FusionKernelPtr fk_ptr = get(hash);
     if (fk_ptr != NULL) return ;
 
-    int fack_argc = 4;
-    char arg0[] = "-O3" ;
-    char arg1[] = "-ffast-math";
-    char arg2[] = "-O3";
-    char arg3[]= ""; //"-I/home/wangdong/comp/llvm.debug/lib/clang/6.0.0/include";
-    //char **fake_argv = new char *[fack_argc+1]{arg0, arg1, arg2, arg3};
-    char **fake_argv = new char*[fack_argc];
-    for (int i = 0; i < fack_argc; i++) {
+    std::vector<string> opvs;
+
+    opvs.push_back("-O3");
+    opvs.push_back("-Ofast");
+    opvs.push_back("-ffast-math");
+    opvs.push_back("-march=core-avx2");
+    opvs.push_back("-m64");
+    opvs.push_back("--std=c++0x");
+    char **fake_argv = new char*[opvs.size()];
+
+    for (int i = 0; i < opvs.size(); i++) {
         fake_argv[i] = new char[256];
+        strcpy(fake_argv[i], opvs[i].c_str());
     }
-    strcpy(fake_argv[0], arg0);
-    strcpy(fake_argv[1], arg1);
-    strcpy(fake_argv[2], arg2);
-    strcpy(fake_argv[3], arg3);
     
     stringstream ss;
     ss<<"kernel_"<<hash;
@@ -62,7 +62,7 @@ public:
     strcpy(ccode, cccode);
     strcpy(cname, ccname);
 
-    JitPtr jit_ptr = JitPtr(new Jit(fack_argc, fake_argv, cname, ccode));
+    JitPtr jit_ptr = JitPtr(new Jit(opvs.size(), fake_argv, cname, ccode));
     m_jit_pool[hash] = jit_ptr;
 
     uint64_t Entry = jit_ptr->compile();
@@ -72,7 +72,7 @@ public:
 
     delete []ccode;
     delete []cname;
-    for (int i = 0; i < fack_argc; i++) delete[] fake_argv[i];
+    for (int i = 0; i < opvs.size(); i++) delete[] fake_argv[i];
     delete[] fake_argv;
 
     return ;

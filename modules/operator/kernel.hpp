@@ -41,7 +41,7 @@ namespace oa {
     ArrayPtr t_kernel_${name}$_${grid}$(vector<ArrayPtr> &ops_ap) {
       ArrayPtr u = ops_ap[0];
       ArrayPtr ap;
-      //printf("calling kernel ${name}$...\n");
+      // printf("calling kernel ${name}$...\n");
       int dt = oa::utils::to_type<T1>();
 
       ap = ArrayPool::global()->get(u->get_partition(), dt);
