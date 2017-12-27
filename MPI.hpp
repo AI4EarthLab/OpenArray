@@ -14,7 +14,7 @@ namespace oa{
 
     MPI();
 
-    void init(MPI_Comm comm, int argc, char** argv);
+    //void init(MPI_Comm comm, int argc, char** argv);
 
     void init(int comm, int argc, char** argv);
   
