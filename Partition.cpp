@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "utils/utils.hpp"
 #include "boost/assert.hpp"
+#include "MPI.hpp"
 
 using namespace std;
 
@@ -438,7 +439,9 @@ Shape Partition::get_default_procs_shape(){
 }
 
 void Partition::set_default_procs_shape(const Shape& s){
-  int size = oa::utils::get_size(MPI_COMM_WORLD);
+
+  int size = MPI::global()->size();
+
   int t = 1;
 
   const char* err_msg =

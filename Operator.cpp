@@ -238,8 +238,9 @@ namespace oa {
       return s.at(type);
     }
 
-    void write_graph(const NodePtr& root, bool is_root, const char *filename) {
-      if (oa::utils::get_rank() > 0) return ;
+    void write_graph(const NodePtr& root, bool is_root,
+            const char *filename) {
+      if (MPI_RANK > 0) return ;
       static std::ofstream ofs;
       if (is_root) {
         ofs.open(filename);
@@ -477,8 +478,8 @@ namespace oa {
       ofs.close();
     }
 
-    void gen_kernels(NodePtr A, bool is_root, MPI_Comm comm) {
-      if (oa::utils::get_rank(comm)) return ;
+    void gen_kernels(NodePtr A, bool is_root) {
+      if (MPI::global()->rank() != 0) return;
       if (A->has_data()) return ;
       //A->display();
       
@@ -517,8 +518,7 @@ namespace oa {
       }
     }
 
-    void gen_kernels_JIT(NodePtr A, bool is_root, MPI_Comm comm) {
-      //if (oa::utils::get_rank(comm)) return ;
+    void gen_kernels_JIT(NodePtr A, bool is_root) {
       if (A->has_data()) return ;
       
       const NodeDesc &nd = get_node_desc(A->type());
@@ -560,8 +560,7 @@ namespace oa {
       }
     }
 
-    void gen_kernels_JIT_with_op(NodePtr A, bool is_root, MPI_Comm comm) {
-      //if (oa::utils::get_rank(comm)) return ;
+    void gen_kernels_JIT_with_op(NodePtr A, bool is_root) {
       if (A->has_data()) return ;
       
       const NodeDesc &nd = get_node_desc(A->type());

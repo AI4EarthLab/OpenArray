@@ -154,15 +154,6 @@ namespace oa {
     
     MPI_Datatype mpi_datatype(int t);
     
-    void mpi_order_start(MPI_Comm comm);
-
-    void mpi_order_end(MPI_Comm comm);
-
-
-    int get_rank(MPI_Comm comm = MPI_COMM_WORLD);
-
-    int get_size(MPI_Comm comm = MPI_COMM_WORLD);
-
     bool is_equal_shape(const Shape& u, const Shape& v);
 
     //convert a given datatype to a string

@@ -4,6 +4,7 @@
 #include "../../NodePool.hpp"
 #include "../../NodeDesc.hpp"
 #include "../../Function.hpp"
+#include "../../MPI.hpp"
 #include "internal.hpp"
 #include <vector>
 using namespace std;
@@ -23,8 +24,8 @@ namespace oa {
       int sw = u->get_partition()->get_stencil_width();
 
       MPI_Comm comm = u->get_partition()->get_comm();
-      int rankID = oa::utils::get_rank(comm);
-      int mpisize =  oa::utils::get_size(comm);
+      const int rankID = MPI::global()->rank(comm);
+      const int mpisize = MPI::global()->size(comm);
 
       T temp1,temp2;
       T *local_sum = &temp1;
@@ -53,8 +54,10 @@ namespace oa {
       int sw = u->get_partition()->get_stencil_width();
 
       MPI_Comm comm = u->get_partition()->get_comm();
-      int rankID = oa::utils::get_rank(comm);
-      int mpisize = oa::utils::get_size(comm);
+
+      const int rankID = MPI::global()->rank(comm);
+      const int mpisize = MPI::global()->size(comm);
+
       MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
 
       PartitionPtr upar = u->get_partition();
@@ -118,8 +121,9 @@ namespace oa {
       int sw = u->get_partition()->get_stencil_width();
 
       MPI_Comm comm = u->get_partition()->get_comm();
-      int rankID = oa::utils::get_rank(comm);
-      int mpisize = oa::utils::get_size(comm);
+      const int rankID = MPI::global()->rank(comm);
+      const int mpisize = MPI::global()->size(comm);
+
       MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
 
       PartitionPtr upar = u->get_partition();
@@ -184,8 +188,10 @@ namespace oa {
       int sw = u->get_partition()->get_stencil_width();
 
       MPI_Comm comm = u->get_partition()->get_comm();
-      int rankID = oa::utils::get_rank(comm);
-      int mpisize = oa::utils::get_size(comm);
+
+      const int rankID = MPI::global()->rank(comm);
+      const int mpisize = MPI::global()->size(comm);
+
       MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
 
       PartitionPtr upar = u->get_partition();

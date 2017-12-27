@@ -4,6 +4,7 @@
 #include "../../NodePool.hpp"
 #include "../../NodeDesc.hpp"
 #include "../../Function.hpp"
+#include "../../MPI.hpp"
 #include "internal.hpp"
 #include <vector>
 using namespace std;
@@ -68,9 +69,12 @@ namespace oa {
 
       MPI_Comm comm = u->get_partition()->get_comm();
 
-      const int size = oa::utils::get_size(comm);
-      const int rank = oa::utils::get_rank(comm);
+      // const int size = oa::utils::get_size(comm);
+      // const int rank = oa::utils::get_rank(comm);
 
+      const int rank = MPI::global()->rank(comm);
+      const int size = MPI::global()->size(comm);
+      
       m_info* global_all = new m_info[size];
 
       MPI_Gather(&local,

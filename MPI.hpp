@@ -1,4 +1,7 @@
 
+#ifndef __MPI_HPP__
+#define __MPI_HPP__
+
 #include <iostream>
 #include "mpi.h"
 
@@ -20,8 +23,17 @@ public:
 
   int rank();
 
+  int rank(MPI_Comm comm);
+
   int size();
-  
+
+  int size(MPI_Comm comm);
+
   static MPI* global();
-  
+
+
+  void order_start();
+  void order_end();
 };
+
+#endif

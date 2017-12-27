@@ -113,7 +113,6 @@ namespace oa{
       int3 v_y = calc_step(vb, 1, sw);
       int3 v_z = calc_step(vb, 2, sw);
 
-      // oa::utils::mpi_order_start(MPI_COMM_WORLD);
       
       // printf("a\n");
       // printf("%d %d %d\n", a_x[0], a_x[1], a_x[2]);
@@ -130,8 +129,6 @@ namespace oa{
       // printf("%d %d %d\n", v_y[0], v_y[1], v_y[2]);
       // printf("%d %d %d\n", v_z[0], v_z[1], v_z[2]);
       
-      // oa::utils::mpi_order_end(MPI_COMM_WORLD);
-
       for (int ka = a_z[0], ku = u_z[0], kv = v_z[0]; 
            ka < a_z[2] && ku < u_z[2] && kv < v_z[2];
            ka += a_z[1], ku += u_z[1], kv += v_z[1]) {

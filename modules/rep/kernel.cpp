@@ -1,11 +1,12 @@
 
-
 #include "kernel.hpp"
+#include "../../MPI.hpp"
 
 namespace oa{
   namespace kernel{
     
-    ArrayPtr kernel_rep_with_partition(vector<ArrayPtr> &ops_ap, bool same_partition)
+    ArrayPtr kernel_rep_with_partition(vector<ArrayPtr> &ops_ap,
+            bool same_partition)
     {
       const ArrayPtr& A = ops_ap[0];
       const ArrayPtr& d = ops_ap[1];
@@ -26,9 +27,9 @@ namespace oa{
       //   ap->display("ap = ");
       //   printf("$$$$*: %d %d %d\n", x, y, z);
       // }else{
-        ap = ArrayPool::global()->get(MPI_COMM_WORLD,
-                {s[0]*x, s[1]*y, s[2]*z}, sw,
-                A->get_data_type());
+      ap = ArrayPool::global()->get(MPI::global()->comm(),
+              {s[0]*x, s[1]*y, s[2]*z}, sw,
+              A->get_data_type());
         //}
       int xs, xe, ys, ye, zs, ze;
       //std::cout<<"sw="<<sw<<std::endl;

@@ -37,14 +37,39 @@ int MPI::rank(){
   return rank;
 }
 
+int MPI::rank(MPI_Comm comm){
+  int rank;
+  MPI_Comm_rank(comm, &rank);
+  return rank;
+}
+
 int MPI::size(){
   int size;
   MPI_Comm_size(m_comm, &size);
   return size;
 }
-  
+
+int MPI::size(MPI_Comm comm){
+  int size;
+  MPI_Comm_size(comm, &size);
+  return size;
+}
+
 MPI* MPI::global(){
   static MPI obj;
   return &obj;
+}
+
+void MPI::order_start() {
+  int r = rank();
+  for (int i = 0; i < r; i++)
+    MPI_Barrier(m_comm);
+}
+
+void MPI::order_end() {
+  int s = size();
+  int r = rank();
+  for (int i = r; i < s; i++)
+    MPI_Barrier(m_comm);
 }
 

@@ -1,7 +1,5 @@
 #include "fusion-kernel.hpp"
 
-// MPI_COMM default is MPI_COMM_WORLD
-#define COMM MPI_COMM_WORLD
 
 // stencil_width default is 1
 #define STENCIL_WIDTH 1
@@ -15,7 +13,7 @@
 ///:set key = line[0]
 ///:set expr = line[1]
 // ArrayPtr kernel_${key}$(vector<ArrayPtr> &ops, const Shape& s, int dt) {
-//   ArrayPtr ap = ArrayPool::global()->get(COMM, s, STENCIL_WIDTH, dt);
+//   ArrayPtr ap = ArrayPool::global()->get(MPI::global()->comm(), s, STENCIL_WIDTH, dt);
 //   int size = ap->buffer_size();
 //   for (int i = 0; i < size; i++) {
 //     ap[i] = 0;

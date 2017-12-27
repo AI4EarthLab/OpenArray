@@ -61,9 +61,9 @@ int main(int argc, char** argv) {
   // tic("2d");
   // test_fusion_op_2d(m, n, p);
   // toc("2d");
-  // oa::utils::mpi_order_start(MPI_COMM_WORLD);
+
   // show_all();
-  // oa::utils::mpi_order_end(MPI_COMM_WORLD);
+
 
   //test_pseudo_3d();
   //test_rand();

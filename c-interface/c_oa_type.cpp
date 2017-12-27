@@ -3,6 +3,7 @@
 #include "../Operator.hpp"
 #include "../Kernel.hpp"
 #include "../op_define.hpp"
+#include "../MPI.hpp"
 
 extern "C" {
 
@@ -112,10 +113,10 @@ extern "C" {
   ///:for f in ['ones', 'zeros', 'rands', 'seqs']
   void c_${f}$(ArrayPtr* & ptr,
           int m, int n, int k, int stencil_width, 
-          int data_type, MPI_Fint fcomm) {
+          int data_type) {
 
     if(ptr == NULL) ptr = new ArrayPtr();  
-    MPI_Comm comm = MPI_Comm_f2c(fcomm);
+    MPI_Comm comm = MPI::global()->comm();
     Shape s = {m, n, k};
     *ptr = oa::funcs::${f}$(comm, s, stencil_width, data_type);
   }
@@ -131,8 +132,8 @@ extern "C" {
   ///:for t in TYPE
   void c_consts_${t[0]}$(ArrayPtr* &ptr,
           int m, int n, int k, ${t[0]}$ val, 
-    int stencil_width, MPI_Fint fcomm) {
-    MPI_Comm comm = MPI_Comm_f2c(fcomm);
+    int stencil_width) {
+    MPI_Comm comm = MPI::global()->comm();
     Shape s = {m, n, k};
 
     if (ptr == NULL) ptr = new ArrayPtr();
@@ -142,12 +143,10 @@ extern "C" {
 
   ///:for t in TYPE
   void c_new_seqs_scalar_node_${t[0]}$(NodePtr* &ptr,
-          ${t[0]}$ val, 
-          MPI_Fint fcomm) {
-    MPI_Comm comm = MPI_Comm_f2c(fcomm);
+          ${t[0]}$ val) {
 
     if (ptr == NULL) ptr = new NodePtr();
-    *ptr = oa::ops::new_seqs_scalar_node(comm, val);
+    *ptr = oa::ops::new_seqs_scalar_node(val);
   }
   ///:endfor
 
@@ -179,14 +178,6 @@ void c_new_local_int3(NodePtr* &ptr, int* val){
   *ptr = NodePool::global()->get_local_1d<int, 3>(val);
 }
 
-  void c_grid_init (char* ch, const ArrayPtr*& A,
-          const ArrayPtr*& B, const ArrayPtr*& C){
-    Grid::global()->init_grid(*ch, *A, *B, *C);
-  }
-
-void c_grid_bind(ArrayPtr*& A, int pos){
-  (*A)->set_pos(pos);
-}
 
 void c_shape_node(NodePtr*& A, int* s){
   s[0] = (*A)->shape()[0];

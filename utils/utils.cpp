@@ -44,34 +44,6 @@ namespace oa {
       }
     }
 
-    void mpi_order_start(MPI_Comm comm) {
-      int rank;
-      MPI_Comm_rank(comm, &rank);
-      for (int i = 0; i < rank; i++)
-        MPI_Barrier(comm);
-    }
-
-    void mpi_order_end(MPI_Comm comm) {
-      int size;
-      int rank;
-      MPI_Comm_rank(comm, &rank);
-      MPI_Comm_size(comm, &size);
-      for (int i = rank; i < size; i++)
-        MPI_Barrier(comm);
-    }
-
-    int get_rank(MPI_Comm comm) {
-      int rank;
-      MPI_Comm_rank(comm, &rank);
-      return rank;
-    }
-
-    int get_size(MPI_Comm comm) {
-      int size;
-      MPI_Comm_size(comm, &size);
-      return size;
-    }
-
     bool is_equal_shape(const Shape& u, const Shape& v) {
       return u[0] == v[0] && u[1] == v[1] && u[2] == v[2];
     }

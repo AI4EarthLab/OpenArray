@@ -4,6 +4,7 @@
 #include <fstream>
 #include <mpi.h>
 #include "Kernel.hpp"
+#include "MPI.hpp"
 
 using namespace std;
 namespace oa {
@@ -950,7 +951,7 @@ namespace oa {
       Shape gsp = lsp;
       int sw = lpp->get_stencil_width(); 
       int datatype = lap->get_data_type();
-      gap = zeros(MPI_COMM_WORLD, gsp, sw, datatype);
+      gap = zeros(MPI::global()->comm(), gsp, sw, datatype);
       PartitionPtr gpp = gap->get_partition();
       Box gbox = gpp->get_local_box();
       int xs, ys, zs, xe, ye, ze;
@@ -964,8 +965,11 @@ namespace oa {
       vector<int> cly = gpp->m_cly;
       vector<int> clz = gpp->m_clz;
 
-      int mpisize = oa::utils::get_size(gpp->get_comm());
-      int myrank = oa::utils::get_rank(gpp->get_comm());
+      // int mpisize = oa::utils::get_size(gpp->get_comm());
+      // int myrank = oa::utils::get_rank(gpp->get_comm());
+
+      int mpisize = MPI_SIZE;
+      int myrank  = MPI_RANK;
 
       vector<int> location = gpp->get_procs_3d(myrank);
 
@@ -1045,7 +1049,8 @@ namespace oa {
       int npz = ps[2];
 
       MPI_Comm comm = m_par_ptr->get_comm();
-      int my_rank = oa::utils::get_rank(comm);
+      //int my_rank = oa::utils::get_rank(comm);
+      int my_rank = MPI::global()->rank(comm);
 
       int num_procs = npx * npy * npz;
 

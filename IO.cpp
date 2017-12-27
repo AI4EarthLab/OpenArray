@@ -73,12 +73,10 @@ namespace oa {
       const int bsy = A->buffer_shape()[1];
       const int bsz = A->buffer_shape()[2];
 
-      // oa::utils::mpi_order_start(MPI_COMM_WORLD);
       // printf("dim: %d, %d, %d\n", gx, gy, gz);
       // printf("start: %d, %d, %d\n", start[0], start[1], start[2]);
       // printf("count: %d, %d, %d\n", count[0], count[1], count[2]);
       // printf("stride: %d, %d, %d\n", stride[0], stride[1], stride[2]);      
-      // oa::utils::mpi_order_end(MPI_COMM_WORLD);
 
       int sw = A->get_partition()->get_stencil_width();
 

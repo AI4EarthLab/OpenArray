@@ -2,7 +2,7 @@
 #define __GRID_HPP__
 
 #include "Array.hpp"
-
+#include <unordered_map>
 class Grid {
   private:
   char grid_type;

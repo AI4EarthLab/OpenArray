@@ -32,7 +32,7 @@ void buffer_${name}$_const(T &val, int* pos, T *A, Box box, int sw) {
   pos[1] = ys;
   pos[2] = zs;
 
-  //oa::utils::mpi_order_start(MPI_COMM_WORLD);
+
   for (int k = sw; k < K-sw; k++) {
     for (int j = sw; j < N-sw; j++) {
       for (int i = sw; i < M-sw; i++) {
@@ -49,7 +49,7 @@ void buffer_${name}$_const(T &val, int* pos, T *A, Box box, int sw) {
       }
     }
   }
-  //oa::utils::mpi_order_end(MPI_COMM_WORLD);
+
                    }
 ///:endfor
 }

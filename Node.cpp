@@ -1,6 +1,7 @@
 #include "Node.hpp"
 #include "NodeDesc.hpp"
 #include "Operator.hpp"
+#include "MPI.hpp"
 
 using namespace std;
 
@@ -12,9 +13,7 @@ Node::Node(NodePtr u) {}
 Node::~Node() {}
 
 void Node::display(char const *prefix) {
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  
+  int rank = MPI::global()->rank();
   if (rank == 0) {
     printf("%s \n", prefix);
     printf("    id : %d\n", id);

@@ -79,13 +79,13 @@ contains
     type(Array) :: A, B, C 
     type(Node) :: X, Y, Z
 
-    call c_new_seqs_scalar_node_int(X%ptr, 1, fcomm)
+    call c_new_seqs_scalar_node_int(X%ptr, 1)
     call display(X, "X")
 
-    call c_new_seqs_scalar_node_float(Y%ptr, 2.1, fcomm)
+    call c_new_seqs_scalar_node_float(Y%ptr, 2.1)
     call display(Y, "Y")
 
-    call c_new_seqs_scalar_node_double(Z%ptr, 3.1_8, fcomm)
+    call c_new_seqs_scalar_node_double(Z%ptr, 3.1_8)
     call display(Z, "Z")
 
   end subroutine

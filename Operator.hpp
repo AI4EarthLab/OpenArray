@@ -10,8 +10,8 @@ namespace oa {
   namespace ops {
 
     template<class T>
-    NodePtr new_seqs_scalar_node(MPI_Comm comm, T val){
-      return(NodePool::global()->get_seqs_scalar(comm, val));
+    NodePtr new_seqs_scalar_node(T val){
+      return(NodePool::global()->get_seqs_scalar(val));
     }
     
     NodePtr new_node(const ArrayPtr &ap);
@@ -38,13 +38,13 @@ namespace oa {
     void insert_kernel_dict(size_t hash, const stringstream &s,
                             const char *filename = "fusion-kernels");
 
-    void gen_kernels(NodePtr A, bool is_root = true, MPI_Comm = MPI_COMM_WORLD);
+    void gen_kernels(NodePtr A, bool is_root = true);
 
     void gen_kernels_JIT(NodePtr A, 
-        bool is_root = true, MPI_Comm comm = MPI_COMM_WORLD);
+        bool is_root = true);
 
     void gen_kernels_JIT_with_op(NodePtr A, 
-        bool is_root = true, MPI_Comm comm = MPI_COMM_WORLD);
+        bool is_root = true);
 
     void tree_to_string(NodePtr A, stringstream &ss);
 

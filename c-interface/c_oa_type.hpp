@@ -28,8 +28,7 @@ extern "C" {
   ///:for f in ['ones', 'zeros', 'rands', 'seqs']
   void c_${f}$(ArrayPtr* & ptr, int m, int n, int k,
           int stencil_width = 1, 
-          int data_type = DATA_DOUBLE, 
-          MPI_Fint fcomm = 0);
+          int data_type = DATA_DOUBLE);
   ///:endfor
   
   ///:mute
@@ -39,13 +38,12 @@ extern "C" {
   ///:for t in TYPE
   void c_consts_${t[0]}$(ArrayPtr* &ptr,
           int m, int n, int k, ${t[0]}$ val, 
-          int stencil_width, MPI_Fint fcomm);
+          int stencil_width);
   ///:endfor
 
   ///:for t in TYPE
   void c_new_seqs_scalar_node_${t[0]}$(NodePtr* &ptr,
-          ${t[0]}$ val, 
-          MPI_Fint fcomm);  
+          ${t[0]}$ val);  
   ///:endfor
 
   void c_new_node_array(NodePtr* &ptr, ArrayPtr* &ap);

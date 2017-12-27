@@ -35,9 +35,9 @@ program main
 
   ! call test_rep()
 
-  ! call test_operator()
+  call test_operator()
 
-  ! call test_grid()
+  !call test_grid()
 
   ! call test_shift()
 
@@ -45,7 +45,7 @@ program main
   
   ! call test_set()
 
-  call test_io()
+  ! call test_io()
   
   call oa_finalize()
   

@@ -43,12 +43,11 @@
     ///:for t in TYPE
     interface
        subroutine c_new_seqs_scalar_node_${t[0]}$ &
-            (ptr, val, comm) &
+            (ptr, val) &
             bind(C, name = 'c_new_seqs_scalar_node_${t[0]}$')
          use iso_c_binding
          type(c_ptr), intent(inout) :: ptr
          ${t[1]}$, intent(in), VALUE :: val
-         integer(c_int), intent(in), VALUE :: comm
        end subroutine
     end interface
     ///:endfor
@@ -238,19 +237,19 @@
     ///:set NAME = [['ones'], ['zeros'], ['rands'], ['seqs']]
     ///:endmute
     ///:for t in NAME
-    function ${t[0]}$(m, n, k, sw, dt, comm) result(A)
-      integer(c_int) :: m, op_n, op_k, op_sw, op_dt, op_comm
-      integer(c_int), optional :: n, k, sw, dt, comm
+    function ${t[0]}$(m, n, k, sw, dt) result(A)
+      integer(c_int) :: m, op_n, op_k, op_sw, op_dt
+      integer(c_int), optional :: n, k, sw, dt
       type(Array) :: A
 
       interface
          subroutine c_${t[0]}$(ptr, m, n, k, &
-              op_sw, op_dt, op_comm) &
+              op_sw, op_dt) &
               bind(C, name = 'c_${t[0]}$')
            use iso_c_binding
            type(c_ptr), intent(inout) :: ptr
            integer(c_int), intent(in), VALUE :: m, n, k, &
-                op_sw, op_dt, op_comm
+                op_sw, op_dt
          end subroutine
       end interface
 
@@ -267,12 +266,6 @@
          op_dt = DATA_TYPE
       endif
 
-      if (present(comm)) then
-         op_comm = comm
-      else
-         op_comm = MPI_COMM_WORLD
-      endif
-
       if(present(n)) then
          op_n = n
       else
@@ -285,27 +278,27 @@
          op_k = 1
       end if
       
-      call c_${t[0]}$(A%ptr, m, op_n, op_k, op_sw, op_dt, op_comm)
+      call c_${t[0]}$(A%ptr, m, op_n, op_k, op_sw, op_dt)
       A%lr = R
 
     end function
     ///:endfor
 
     ///:for t in TYPE
-    function consts_${t[0]}$(m, n, k, val, sw, comm) result(A)
-      integer(c_int) :: m, n, k, op_sw, op_comm
-      integer(c_int), optional :: sw, comm
+    function consts_${t[0]}$(m, n, k, val, sw) result(A)
+      integer(c_int) :: m, n, k, op_sw
+      integer(c_int), optional :: sw
       ${t[1]}$ :: val
       type(Array) :: A
 
       interface
          subroutine c_consts_${t[0]}$ &
-              (ptr, m, n, k, val, op_sw, op_comm) &
+              (ptr, m, n, k, val, op_sw) &
               bind(C, name='c_consts_${t[0]}$')
            use iso_c_binding
            type(c_ptr), intent(inout) :: ptr
            integer(c_int), intent(in), VALUE :: m, n, k, &
-                op_sw, op_comm
+                op_sw
            ${t[1]}$, intent(in), VALUE :: val
          end subroutine
       end interface
@@ -317,14 +310,8 @@
          op_sw = STENCIL_WIDTH
       endif
 
-      if (present(comm)) then
-         op_comm = comm
-      else
-         op_comm = MPI_COMM_WORLD
-      endif
-
       call c_consts_${t[0]}$(A%ptr, &
-           m, n, k, val, op_sw, op_comm)
+           m, n, k, val, op_sw)
       A%lr = R
     end function
     ///:endfor
@@ -488,8 +475,7 @@
       ///:set AC = 'A'
       ///:else
       ///:if type1[2] == 'scalar'
-      call c_new_seqs_scalar_node_${type1[0]}$(C%ptr, &
-           A, MPI_COMM_SELF)
+      call c_new_seqs_scalar_node_${type1[0]}$(C%ptr, A)
       ///:else
       call c_new_node_array(C%ptr, A%ptr)
       ///:endif
@@ -500,8 +486,7 @@
       ///:set BD = 'B'
       ///:else
       ///:if type2[2] == 'scalar'
-      call c_new_seqs_scalar_node_${type2[0]}$(D%ptr, &
-           B, MPI_COMM_SELF)
+      call c_new_seqs_scalar_node_${type2[0]}$(D%ptr, B)
       ///:else
       call c_new_node_array(D%ptr, B%ptr)
       ///:endif

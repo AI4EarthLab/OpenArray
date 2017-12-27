@@ -34,7 +34,7 @@ contains
     integer :: d
     type(node) :: ND, NA
 
-    call c_new_seqs_scalar_node_int(ND%ptr, d, MPI_COMM_SELF)
+    call c_new_seqs_scalar_node_int(ND%ptr, d)
     
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)
@@ -61,7 +61,7 @@ contains
        d1 = d
     end if
     
-    call c_new_seqs_scalar_node_int(ND%ptr, d1, MPI_COMM_SELF)
+    call c_new_seqs_scalar_node_int(ND%ptr, d1)
     
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)

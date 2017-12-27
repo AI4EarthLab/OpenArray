@@ -16,7 +16,7 @@
 #include "../modules/operator/new_node.hpp"
 #include "../utils/utils.hpp"
 #include "../cache.hpp"
-
+#include "../MPI.hpp"
 #include <assert.h>
 
 void test_Range() {
@@ -187,10 +187,10 @@ void test_update_ghost() {
   oa::funcs::update_ghost_start(ap, reqs, -1);
   oa::funcs::update_ghost_end(reqs);
 
-  oa::utils::mpi_order_start(MPI_COMM_WORLD);
+  MPI_ORDER_START
   printf("=====%d======\n", rk);
   oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
-  oa::utils::mpi_order_end(MPI_COMM_WORLD);
+  MPI_ORDER_END
 }
 
 void test_operator() {
@@ -340,7 +340,7 @@ void test_fusion_kernel() {
   oa::ops::force_eval(J)->display("J");
   NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
 
-  //oa::ops::gen_kernels(K,true,MPI_COMM_WORLD);
+  //oa::ops::gen_kernels(K,true);
 
   ArrayPtr ans = oa::ops::force_eval(K);
   ans->display("force_eval");
@@ -517,7 +517,7 @@ void test_gen_kernel_JIT() {
   NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
   NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
 
-  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
+  oa::ops::gen_kernels_JIT(K, true);
 
   G = oa::ops::new_node(TYPE_PLUS, A, B);
   H = oa::ops::new_node(TYPE_MULT, G, C);
@@ -525,7 +525,7 @@ void test_gen_kernel_JIT() {
   J = oa::ops::new_node(TYPE_MINUS, E, F);
   K = oa::ops::new_node(TYPE_PLUS, I, J);
   
-  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
+  oa::ops::gen_kernels_JIT(K, true);
 }
 
 void test_min_max() {
@@ -577,7 +577,7 @@ void test_eval() {
   NodePtr J = oa::ops::new_node(TYPE_MINUS, E, F);
   NodePtr K = oa::ops::new_node(TYPE_PLUS, I, J);
 
-  oa::ops::gen_kernels_JIT(K, true, MPI_COMM_WORLD);
+  oa::ops::gen_kernels_JIT(K, true);
 
   A->display("A");
   B->display("B");
@@ -730,10 +730,10 @@ void test_fusion_operator() {
     oa::funcs::update_ghost_start(ap, reqs, -1);
     oa::funcs::update_ghost_end(reqs);
 
-    oa::utils::mpi_order_start(MPI_COMM_WORLD);
+
     printf("=====%d======\n", rk);
     oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
-    oa::utils::mpi_order_end(MPI_COMM_WORLD);
+
   */}
 
 void test_op() {

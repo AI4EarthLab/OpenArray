@@ -31,9 +31,10 @@ public:
   }
 
   template<class T>
-  NodePtr get_seqs_scalar(MPI_Comm comm, T val) {
+  NodePtr get_seqs_scalar(T val) {
     NodePtr p = NodePool::global()->get();
-    ArrayPtr ap = oa::funcs::consts(comm, {1, 1, 1}, val, 0);
+    ArrayPtr ap = oa::funcs::consts(MPI_COMM_SELF,
+            {1, 1, 1}, val, 0);
     p->clear_input();
     p->set_type(TYPE_DATA);
     p->set_data(ap);
