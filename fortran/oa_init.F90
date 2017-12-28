@@ -1,20 +1,14 @@
-module oa_utils
+module oa_init_fnl
   use iso_c_binding
-
+  use oa_type
+  
   interface
-    subroutine c_get_rank(rank, fcomm) bind(C, name = 'c_get_rank')
-      use iso_c_binding
-      integer(c_int) :: rank
-      integer(c_int), intent(in), VALUE :: fcomm
-    end subroutine
-  end interface
-
-  interface
-     subroutine c_init(comm, ps) &
+     subroutine c_init(comm, ps, cmd) &
           bind(C, name="c_init") 
        use iso_c_binding
        integer(c_int), value :: comm
        integer(c_int) :: ps(3)
+       character(c_char) :: cmd(*)
      end subroutine
   end interface
 
@@ -24,25 +18,22 @@ module oa_utils
        use iso_c_binding
      end subroutine
   end interface
-  
-contains
 
+contains
+  
   subroutine oa_init(comm, ps)
     implicit none
     integer :: comm
     integer :: ps(3)
+    character(len=1000) :: cmd
 
-    call c_init(comm, ps)
+    call get_command(cmd)
+
+    call c_init(comm, ps, string_f2c(cmd))
   end subroutine 
 
   subroutine oa_finalize()
     call c_finalize()
   end subroutine 
-  
-  function get_rank(fcomm) result(rank)
-    integer(c_int), intent(in) :: fcomm
-    integer :: rank
 
-    call c_get_rank(rank, fcomm)
-  end function
-end module
+end module oa_init_fnl

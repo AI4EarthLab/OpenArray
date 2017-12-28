@@ -85,8 +85,11 @@ typedef arma::Cube<double> cube_double;
     A = tmp_node;                                     \
   }
 
-#define THROW_LOGIC_EXCEPTION(msg)                        \
+#define THROW_LOGIC_EXCEPTION(msg)              \
   BOOST_THROW_EXCEPTION(std::logic_error(msg))
+
+#define ENSURE_VALID_PTR(A) \
+  if(A == NULL) THROW_LOGIC_EXCEPTION("pointer is null.");
 
 #define MPI_ORDER_START oa::MPI::global()->order_start();
 #define MPI_ORDER_END   oa::MPI::global()->order_end();

@@ -1,8 +1,8 @@
 
 module oa_mod
   use mpi
+  use oa_mpi  
   use oa_type
-  use oa_utils
   use oa_partition
   use oa_sub
   use oa_set
@@ -11,4 +11,10 @@ module oa_mod
   use oa_rep
   use oa_cache
   use oa_io
+  use oa_init_fnl
+  use oa_option
 end module
+
+module openarray
+  use oa_mod
+end module openarray

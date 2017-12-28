@@ -488,10 +488,19 @@ int Partition::m_default_stencil_width = 1;
 int Partition::get_default_stencil_width(){
   return m_default_stencil_width;
 }
-
 void Partition::set_default_stencil_width(int sw){
   m_default_stencil_width = sw;
 }
+
+int Partition::m_default_stencil_type = STENCIL_BOX;
+void Partition::set_default_stencil_type(int st){
+  m_default_stencil_type = st;
+}
+int Partition::get_default_stencil_type(){
+  return m_default_stencil_type;
+}
+
+
 
 
 

@@ -10,43 +10,51 @@ program main
   use mpi
   use oa_test
   implicit none
-
+  integer :: step
   !no split in z-direction
   call oa_init(MPI_COMM_WORLD, [-1,-1, 1])
- 
+
+  step = oa_option_int("step", -1)
+  print*, "step1 = ", step
+
+  step = oa_option_int("step", -1)
+  print*, "step2 = ", step
+  
   !initialize the test module  
   call test_init(6, 6, 6, MPI_COMM_WORLD) 
   
-  call test_create_array()
+  ! call test_create_array()
   
-  call test_create_node()
+  ! call test_create_node()
 
-  call test_partition()
+  ! call test_partition()
 
-  call test_basic()
+  ! call test_basic()
 
-  call test_compare()
+  ! call test_compare()
 
-  call test_math()
+  ! call test_math()
 
-  call test_sub()
+  ! call test_sub()
 
-  call test_sum()
+  ! call test_sum()
 
-  call test_rep()
+  ! call test_rep()
 
-  call test_operator()
+  ! call test_operator()
 
-  call test_grid()
+  ! call test_grid()
 
-  call test_shift()
+  ! call test_shift()
 
-  call test_cache()
+  ! call test_cache()
   
-  call test_set()
+  ! call test_set()
 
-  call test_io()
-  
+  ! call test_io()
+
+  call test_get_ptr()
+
   call oa_finalize()
   
 end program main

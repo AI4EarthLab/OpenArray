@@ -559,5 +559,31 @@ contains
 
     call display(B, "B = ")
   end subroutine
+
+  subroutine test_get_ptr()
+    implicit none
+    type(array) :: A
+    type(array) :: B
+    real(kind=8), pointer :: p(:,:,:)
+    integer :: i, j, k, s(3)
+    
+    A = ones(4, 3, 2)
+
+    call display(A, "A = ")
+    
+    p => get_buffer_double(A)
+    print*, "shape(p) = ", shape(p)
+
+    ! s = shape(p)
+    ! do k = 1, s(3)
+    !    do j = 1, s(2)
+    !       do i = 1, s(1)
+    !          print*,p(i, j, k)
+    !       end do
+    !    end do
+    ! end do
+    
+    ! print*, "p=", p
+  end subroutine
   
 end module

@@ -34,6 +34,11 @@
        module procedure display_array
     end interface display
 
+    interface disp
+       module procedure display_node
+       module procedure display_array
+    end interface disp
+    
     interface consts
        ///:for t in TYPE
        module procedure consts_${t[0]}$
@@ -150,14 +155,17 @@
     ///:endfor
 
 
-
-
-
-    
-    integer, parameter :: OA_INT = 0
-    integer, parameter :: OA_FLOAT = 1
+    integer, parameter :: OA_INT    = 0
+    integer, parameter :: OA_FLOAT  = 1
     integer, parameter :: OA_DOUBLE = 2
+
+    integer, parameter :: STENCIL_STAR = 0
+    integer, parameter :: STENCIL_BOX  = 1
     
+    integer :: default_data_type     = OA_FLOAT
+    integer :: default_stencil_type  = STENCIL_BOX    
+    integer :: default_stencil_width = 1
+
   contains
 
     subroutine destroy_array(A)
@@ -257,13 +265,13 @@
       if (present(sw)) then
          op_sw = sw
       else
-         op_sw = STENCIL_WIDTH
+         op_sw = default_stencil_width
       endif
 
       if (present(dt)) then
          op_dt = dt
       else
-         op_dt = DATA_TYPE
+         op_dt = default_data_type
       endif
 
       if(present(n)) then
@@ -307,7 +315,7 @@
       if (present(sw)) then
          op_sw = sw
       else
-         op_sw = STENCIL_WIDTH
+         op_sw = default_stencil_width
       endif
 
       call c_consts_${t[0]}$(A%ptr, &
@@ -404,7 +412,76 @@
     ///:endfor
     ///:endfor
 
+    function local_shape(A) result(res)
+      implicit none
+      interface
+         subroutine c_local_shape(A, res) &
+              bind(C, name = "c_local_shape")
+           use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           integer, intent(out) :: res(3)
+         end subroutine
+      end interface
 
+      type(array) :: A
+      integer :: res(3)
+
+      call c_local_shape(A%ptr, res)
+    end function
+
+    function buffer_shape(A) result(res)
+      implicit none
+      interface
+         subroutine c_buffer_shape(A, res) &
+              bind(C, name = "c_buffer_shape")
+           use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           integer, intent(out) :: res(3)
+         end subroutine
+      end interface
+
+      type(array) :: A
+      integer :: res(3)
+
+      call c_buffer_shape(A%ptr, res)
+    end function
+
+    function get_buffer_ptr(A) result(res)
+      implicit none
+      interface
+         subroutine c_get_buffer_ptr(A, res) &
+              bind(C, name = "c_get_buffer_ptr")
+           use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           type(c_ptr), intent(out) :: res
+         end subroutine
+      end interface
+
+      type(array) :: A
+      type(c_ptr) :: res
+
+      call c_get_buffer_ptr(A%ptr, res)
+    end function
+
+    ///:for t in scalar_dtype
+    function get_buffer_${t[0]}$(A) result(res)
+      use iso_c_binding
+      implicit none
+      type(array) :: A
+      ${t[1]}$, dimension(:,:,:), pointer :: res
+      type(c_ptr) :: tmp
+      integer :: s(3)
+      
+      tmp = get_buffer_ptr(A)
+      s = buffer_shape(A)
+
+      call c_f_pointer(tmp, res, [s(1), s(2), s(3)])
+    end function
+    ///:endfor
+    
     function shape_array(A) result(res)
       implicit none
       interface
@@ -565,4 +642,20 @@
 
     end subroutine
 
+    subroutine set_stencil(st, sw)
+      implicit none
+      integer, value :: st, sw
+      
+      default_stencil_width = sw;
+      default_stencil_type = st;
+    end subroutine
+
+    subroutine set_data_type(dt)
+      implicit none
+      integer, value :: dt
+      
+      default_data_type = dt
+    end subroutine
+    
+    
   end module

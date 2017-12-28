@@ -36,10 +36,10 @@ int main(int argc, char** argv){
 
   ArgumentParser ap;
 
-  ap.add_option<int>("m", "m value");  
-  ap.add_option<int>("n", "n value");
-  ap.add_option<int>("k", "k value");
-  ap.add_option<std::string>("sk", "this is a string");
+  ap.add_option<int>("m", 1,"m value");  
+  ap.add_option<int>("n", 1,"n value");
+  ap.add_option<int>("k", 1,"k value");
+  ap.add_option<std::string>("sk", "this is a string", "");
   ap.show();
 
   ap.parse_cmdline(argc, argv);

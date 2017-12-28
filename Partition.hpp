@@ -29,6 +29,7 @@ class Partition {
 private:
   static Shape m_default_procs_shape;
   static int m_default_stencil_width;
+  static int m_default_stencil_type;
   public:
   MPI_Comm m_comm = MPI_COMM_SELF;
   Shape m_global_shape = { {1, 1, 1} };
@@ -106,7 +107,10 @@ private:
   static Shape get_default_procs_shape();
 
   static int  get_default_stencil_width();
-  static void set_default_stencil_width(int);  
+  static void set_default_stencil_width(int);
+
+  static int  get_default_stencil_type();
+  static void set_default_stencil_type(int);  
 };
 
 

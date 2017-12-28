@@ -124,15 +124,13 @@ extern "C" {
 
 
   ///:mute
-  ///:set TYPE = [['int'], &
-                ['float'], &
-                ['double']]
+  ///:set TYPE = [['int'], ['float'], ['double']]
   ///:endmute
 
   ///:for t in TYPE
   void c_consts_${t[0]}$(ArrayPtr* &ptr,
           int m, int n, int k, ${t[0]}$ val, 
-    int stencil_width) {
+          int stencil_width) {
     MPI_Comm comm = oa::MPI::global()->comm();
     Shape s = {m, n, k};
 
@@ -172,25 +170,58 @@ extern "C" {
     *ptr = oa::ops::new_node((NodeType)nodetype, *u);
   }
 
-void c_new_local_int3(NodePtr* &ptr, int* val){
-  if (ptr == NULL) ptr = new NodePtr();
+  void c_new_local_int3(NodePtr* &ptr, int* val){
+    if (ptr == NULL) ptr = new NodePtr();
 
-  *ptr = NodePool::global()->get_local_1d<int, 3>(val);
-}
-
-
-void c_shape_node(NodePtr*& A, int* s){
-  s[0] = (*A)->shape()[0];
-  s[1] = (*A)->shape()[1];
-  s[2] = (*A)->shape()[2];
-}
-
-void c_shape_array(ArrayPtr*& A, int* s){
-  s[0] = (*A)->shape()[0];
-  s[1] = (*A)->shape()[1];
-  s[2] = (*A)->shape()[2];
-}
+    *ptr = NodePool::global()->get_local_1d<int, 3>(val);
+  }
 
 
+  void c_shape_node(NodePtr*& A, int* s){
+    ENSURE_VALID_PTR(A);  
+    s[0] = (*A)->shape()[0];
+    s[1] = (*A)->shape()[1];
+    s[2] = (*A)->shape()[2];
+  }
+
+  void c_shape_array(ArrayPtr*& A, int* s){
+    ENSURE_VALID_PTR(A);    
+    s[0] = (*A)->shape()[0];
+    s[1] = (*A)->shape()[1];
+    s[2] = (*A)->shape()[2];
+  }
+
+  void c_local_shape(ArrayPtr*& A, int* s){
+    ENSURE_VALID_PTR(A);    
+    s[0] = (*A)->local_shape()[0];
+    s[1] = (*A)->local_shape()[1];
+    s[2] = (*A)->local_shape()[2];
+  }
+
+  void c_buffer_shape(ArrayPtr*& A, int* s){
+    ENSURE_VALID_PTR(A);    
+    s[0] = (*A)->buffer_shape()[0];
+    s[1] = (*A)->buffer_shape()[1];
+    s[2] = (*A)->buffer_shape()[2];
+  }
+
+  void c_get_buffer_ptr(ArrayPtr*& A, void*& p){
+    ENSURE_VALID_PTR(A);    
+    p = (*A)->get_buffer();
+  }
+
+  //set stencil width and stencil type
+  void c_set_stencil(int st, int sw){
+    Partition::set_default_stencil_width(sw);
+    Partition::set_default_stencil_type(st);
+  }
+
+  void c_get_stencil_width(int& sw){
+    sw = Partition::get_default_stencil_width();
+  }
+
+  void c_get_stencil_type(int& st){
+    st = Partition::get_default_stencil_width();
+  }
 }
 
