@@ -194,7 +194,7 @@ void test_update_ghost() {
 }
 
 void test_operator() {
-  NodePtr np1 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);
+  NodePtr np1 = oa::ops::new_seqs_scalar_node(3);
   np1->display("===A===");
   
   ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 1}, 1);
@@ -229,8 +229,8 @@ void test_write_graph() {
   NodePtr A = oa::ops::new_node(ap1);
   NodePtr B = oa::ops::new_node(ap2);
   NodePtr C = oa::ops::new_node(ap3);
-  NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
-  NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);
+  NodePtr D = oa::ops::new_seqs_scalar_node(1);
+  NodePtr E = oa::ops::new_seqs_scalar_node(2);
   NodePtr F = oa::ops::new_node(TYPE_PLUS, A, B);
   NodePtr G = oa::ops::new_node(TYPE_MULT, C, D);
   NodePtr H = oa::ops::new_node(TYPE_MINUS, F, G);
@@ -283,8 +283,8 @@ void test_force_eval() {
   //cout<<0/0<<endl;
   //cout<<1/0<<endl;
 
-  NodePtr seq_B = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
-  NodePtr seq_C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2);
+  NodePtr seq_B = oa::ops::new_seqs_scalar_node(1);
+  NodePtr seq_C = oa::ops::new_seqs_scalar_node(2);
 
   SF = oa::ops::new_node(TYPE_PLUS, SA, seq_B);
   SG = oa::ops::new_node(TYPE_MINUS, SF, seq_C);
@@ -301,8 +301,8 @@ void test_fusion_kernel() {
     NodePtr A = oa::ops::new_node(ap1);
     NodePtr B = oa::ops::new_node(ap2);
     NodePtr C = oa::ops::new_node(ap3);
-    NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);
-    NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
+    NodePtr D = oa::ops::new_seqs_scalar_node(1);
+    NodePtr E = oa::ops::new_seqs_scalar_node(2.0);
     NodePtr F = oa::ops::new_node(TYPE_PLUS, A, B);
     NodePtr G = oa::ops::new_node(TYPE_MULT, C, D);
     NodePtr H = oa::ops::new_node(TYPE_MINUS, F, G);
@@ -326,9 +326,9 @@ void test_fusion_kernel() {
   NodePtr A = oa::ops::new_node(ap1);
   NodePtr B = oa::ops::new_node(ap2);
   NodePtr C = oa::ops::new_node(ap3);
-  NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1.0);
-  NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
-  NodePtr F = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, float(1.0));
+  NodePtr D = oa::ops::new_seqs_scalar_node(1.0);
+  NodePtr E = oa::ops::new_seqs_scalar_node(2.0);
+  NodePtr F = oa::ops::new_seqs_scalar_node(float(1.0));
   
   NodePtr G = oa::ops::new_node(TYPE_PLUS, A, B);
   NodePtr H = oa::ops::new_node(TYPE_MULT, G, C);
@@ -492,7 +492,7 @@ void test_math_operator() {
   ans = oa::ops::eval(B);
   ans->display("-(A)");
 
-  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
+  NodePtr C = oa::ops::new_seqs_scalar_node(2.0);
   B = oa::ops::new_node(TYPE_POW, A, C);
   ans = oa::ops::eval(B);
   ans->display("pow(B,A)");
@@ -507,9 +507,9 @@ void test_gen_kernel_JIT() {
   NodePtr A = oa::ops::new_node(ap1);
   NodePtr B = oa::ops::new_node(ap2);
   NodePtr C = oa::ops::new_node(ap3);
-  NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1.0);
-  NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
-  NodePtr F = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, float(1.0));
+  NodePtr D = oa::ops::new_seqs_scalar_node(1.0);
+  NodePtr E = oa::ops::new_seqs_scalar_node(2.0);
+  NodePtr F = oa::ops::new_seqs_scalar_node(float(1.0));
   
   NodePtr G = oa::ops::new_node(TYPE_PLUS, A, B);
   NodePtr H = oa::ops::new_node(TYPE_MULT, G, C);
@@ -542,7 +542,7 @@ void test_csum() {
   ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
   NodePtr EA2 = oa::ops::new_node(eap2);
   EA2->display("EA2");
-  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+  NodePtr C = oa::ops::new_seqs_scalar_node(3);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
   NodePtr EC2 = oa::ops::new_node(TYPE_CSUM, EA2, C);
 
   ArrayPtr esans2 = oa::ops::eval(EC2);
@@ -552,7 +552,7 @@ void test_sum() {
   ArrayPtr eap2 = oa::funcs::seqs(MPI_COMM_WORLD, {8, 8, 8}, 1);
   NodePtr EA2 = oa::ops::new_node(eap2);
   EA2->display("EA2");
-  NodePtr C = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
+  NodePtr C = oa::ops::new_seqs_scalar_node(1);//c=0 scalar, c=1 sum to x, c=2 sum to y, c=3 sum to z
   NodePtr EC2 = oa::ops::new_node(TYPE_SUM, EA2, C);
 
   ArrayPtr esans2 = oa::ops::eval(EC2);
@@ -567,9 +567,9 @@ void test_eval() {
   NodePtr A = oa::ops::new_node(ap1);
   NodePtr B = oa::ops::new_node(ap2);
   NodePtr C = oa::ops::new_node(ap3);
-  NodePtr D = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 1.0);
-  NodePtr E = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 2.0);
-  NodePtr F = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, float(1.0));
+  NodePtr D = oa::ops::new_seqs_scalar_node(1.0);
+  NodePtr E = oa::ops::new_seqs_scalar_node(2.0);
+  NodePtr F = oa::ops::new_seqs_scalar_node(float(1.0));
   
   NodePtr G = oa::ops::new_node(TYPE_PLUS, A, B);
   NodePtr H = oa::ops::new_node(TYPE_MULT, G, C);
@@ -1102,7 +1102,7 @@ void test_cache(int m, int n, int k) {
   std::string tmp_node_key = "";
   NodePtr tmp_node = NULL;
 
-  NodePtr n1 = NodePool::global()->get_seqs_scalar(MPI_COMM_SELF, 1);
+  NodePtr n1 = NodePool::global()->get_seqs_scalar(1);
   NodePtr n2 = NODE(ap2);
   NodePtr n3 = NODE(ap3);
   NodePtr n4 = NODE(ap4);
@@ -1178,7 +1178,7 @@ void test_gen_kernel_JIT_with_op(int m, int n, int k) {
   NodePtr n2 = NODE(ap2);
   n1->display("n1");
   n2->display("n2");
-  NodePtr n3 = NodePool::global()->get_seqs_scalar(MPI_COMM_SELF, 1);
+  NodePtr n3 = NodePool::global()->get_seqs_scalar(1);
   
   NodePtr np = PLUS( MULT(DXF(n1), DYB(n2)), n3 );
   

@@ -400,6 +400,11 @@ namespace oa {
         st_x = st_y = st_z = -1;
         ed_x = ed_y = ed_z = 1;
         break;
+      case 3:
+        bitset<3> bit = ap->get_bitset();
+        if (bit[2] == 0) st_x = ed_x = 0;
+        if (bit[1] == 0) st_y = ed_y = 0;
+        if (bit[0] == 0) st_z = ed_z = 0;
       }
 
       for (int z = st_z; z <= ed_z; ++z) {
@@ -1134,7 +1139,6 @@ namespace oa {
     }
 
     ArrayPtr make_psudo3d(const ArrayPtr& B){
-  
       Shape ps = B->get_partition()->procs_shape();
       Shape as = B->shape();
 
