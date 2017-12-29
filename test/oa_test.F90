@@ -22,7 +22,7 @@ contains
     k = kk
 
     fcomm = comm
-    rank = get_rank(fcomm)
+    rank = get_rank()
   end subroutine
   
   subroutine test_create_array()
@@ -585,5 +585,27 @@ contains
     
     ! print*, "p=", p
   end subroutine
-  
+
+  subroutine test_tic_toc()
+    implicit none
+    integer :: i
+    type(array) :: A, B, C
+    
+    do i = 1, 10
+       call tic("t1")
+       call usleep(10000)
+       call toc("t1")
+    end do
+
+    call tic("t2")
+    A = ones(m, n, k)
+    B = seqs(m, n, k)
+    C = A + B
+    call toc("t2")
+
+    if(get_rank() == 0) then
+       call show_timer()
+    end if
+    
+  end subroutine
 end module

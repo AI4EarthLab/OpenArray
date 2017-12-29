@@ -11,15 +11,12 @@ program main
   use oa_test
   implicit none
   integer :: step
+  
   !no split in z-direction
   call oa_init(MPI_COMM_WORLD, [-1,-1, 1])
 
-  step = oa_option_int("step", -1)
-  print*, "step1 = ", step
-
-  step = oa_option_int("step", -1)
-  print*, "step2 = ", step
-  
+  call oa_get_option(step, "step", -1)
+  print*, "step = ", step
   !initialize the test module  
   call test_init(6, 6, 6, MPI_COMM_WORLD) 
   
@@ -55,6 +52,8 @@ program main
 
   call test_get_ptr()
 
+  call test_tic_toc()
+  
   call oa_finalize()
   
 end program main

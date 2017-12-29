@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <limits.h>
+#include "gettimeofday.h"
 
 using namespace std;
 
@@ -21,15 +22,15 @@ namespace oa {
     map<string, long long> minTime;
     long long tot = 0;
   
-    extern "C"{
-#include "gettimeofday.h"
-      //void gettimeofday1(int *ierr2, long long* val);
+//     extern "C"{
+// #include "gettimeofday.h"
+//       void gettimeofday1(int *ierr2, long long* val);
     
-      void tic(const char* s);
-      void toc(const char* s);
-      void show_time(const char* s);
-      void show_all();
-    }
+//       void tic(const char* s);
+//       void toc(const char* s);
+//       void show_time(const char* s);
+//       void show_all();
+//     }
   
   
     void tic(const char* s) {

@@ -1,24 +1,44 @@
 
 module oa_option
   use oa_type
+  ///:mute
+  ///:set TYPE = [['int','integer','integer(c_int)'], &
+       ['double','real(kind=8)', 'real(kind=c_double)'], &
+       ['float', 'real', 'real(kind=c_float)']]
+  ///:endmute
+  
+  interface oa_get_option
+     ///:for ti in TYPE
+     ///:for tv in TYPE
+     module procedure oa_option_${ti[0]}$_${tv[0]}$
+     ///:endfor
+     ///:endfor
+  end interface oa_get_option
+  
 contains
-  function oa_option_int(key, v) result(i)
+  
+  ///:for ti in TYPE
+  ///:for tv in TYPE
+  subroutine oa_option_${ti[0]}$_${tv[0]}$(i, key, v)
     implicit none
     character(len=*) :: key
-    integer :: v, i !v is default value
+    ${ti[1]}$ :: i 
+    ${tv[1]}$ :: v !v is default value
 
     interface
-       subroutine c_oa_option_int(i, key, v) &
-            bind(C, name = "c_oa_option_int")
+       subroutine c_oa_option_${ti[0]}$_${tv[0]}$(i, key, v) &
+            bind(C, name = "c_oa_option_${ti[0]}$_${tv[0]}$")
          use iso_c_binding
          implicit none
-         integer(c_int) :: i                  
+         ${ti[2]}$ :: i                  
          character(c_char) :: key(*)
-         integer(c_int), value :: v
+         ${tv[2]}$, value :: v
        end subroutine
     end interface
 
-    call c_oa_option_int(i, string_f2c(key), v)
+    call c_oa_option_${ti[0]}$_${tv[0]}$(i, string_f2c(key), v)
     
-  end function
+  end subroutine
+  ///:endfor
+  ///:endfor
 end module

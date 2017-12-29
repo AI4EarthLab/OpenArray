@@ -81,7 +81,7 @@ extern "C" {
         A = NULL;
       }      
     }catch(const std::exception& e){
-      std::cout<<"Exception occured whilg destroying array. "
+      std::cout<<"Exception occured while destroying array. "
         "Message: "<<e.what()<<std::endl;
     }
   }
@@ -93,7 +93,7 @@ extern "C" {
         A = NULL;
       }      
     }catch(const std::exception& e){
-      std::cout<<"Exception occured whilg destroying node. "
+      std::cout<<"Exception occured while destroying node. "
         "Message: "<<e.what()<<std::endl;
     }
   }

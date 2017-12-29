@@ -306,10 +306,11 @@ namespace{
       
       ArrayPtr A1 = oa::funcs::to_rank0(A);
       Shape s = A1->buffer_shape();
-      arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(s, A1->get_buffer())
-                                                       (arma::span(sw, s[0] - sw - 1),
-                                                               arma::span(sw, s[1] - sw - 1),
-                                                               arma::span(sw, s[2] - sw - 1));
+      arma::Cube<${t}$> C = oa::utils::make_cube<${t}$>(
+          s, A1->get_buffer())(
+              arma::span(sw, s[0] - sw - 1),
+              arma::span(sw, s[1] - sw - 1),
+              arma::span(sw, s[2] - sw - 1));
       
 
       // ArrayPtr V2 = oa::ops::eval(NSA);

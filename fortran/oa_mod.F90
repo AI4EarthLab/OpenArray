@@ -13,6 +13,7 @@ module oa_mod
   use oa_io
   use oa_init_fnl
   use oa_option
+  use oa_utils
 end module
 
 module openarray
