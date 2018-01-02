@@ -437,6 +437,15 @@ contains
     farr_double3 = 10
     call set(sub(A,1,1,[1,10]), farr_double3)
     call display(A, "A = ")
+
+    call set(val3, sub(a, 1, 1, 1))
+    print*, "val3 = ", val3
+
+    call set(val3, sub(a, 1, 2, 1))
+    print*, "val3 = ", val3
+    
+    call set(val3, sub(a+a, 3, 2, 2))
+    print*, "val3 = ", val3
     
   end subroutine
   
@@ -572,7 +581,7 @@ contains
     call display(A, "A = ")
     
     p => get_buffer_double(A)
-    print*, "shape(p) = ", shape(p)
+    !print*, "shape(p) = ", shape(p)
 
     ! s = shape(p)
     ! do k = 1, s(3)

@@ -46,13 +46,13 @@ program main
 
   ! call test_cache()
   
-  ! call test_set()
+  call test_set()
 
   ! call test_io()
 
-  call test_get_ptr()
+  ! call test_get_ptr()
 
-  call test_tic_toc()
+  ! call test_tic_toc()
   
   call oa_finalize()
   

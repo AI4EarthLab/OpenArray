@@ -92,4 +92,76 @@ extern "C"{
   }
   ///:endfor
 
+  ///:for type in ['int', 'float', 'double']
+  void c_set_${type}$_array(${type}$& val,ArrayPtr*& ap){
+    ENSURE_VALID_PTR(ap);
+    if((*ap)->shape() != SCALAR_SHAPE){
+      std::cout<<(boost::format("can not covert input "
+              "array of shape (%1%,%2%,%3%) to a scalar.")
+              % (*ap)->shape()[0]
+              % (*ap)->shape()[1]
+              % (*ap)->shape()[2]).str()
+               << std::endl;
+      exit(0);
+    }
+
+    ArrayPtr ap1;
+    
+    if(!(*ap)->is_seqs()){
+      ap1 = oa::funcs::g2l(*ap);    
+    }else{
+      ap1 = *ap;
+    }
+
+    switch(ap1->get_data_type()){
+    case DATA_INT:
+      val = ((int*)ap1->get_buffer())[0];
+      break;
+    case DATA_FLOAT:
+      val = ((float*)ap1->get_buffer())[0];
+      break;
+    case DATA_DOUBLE:
+      val = ((double*)ap1->get_buffer())[0];      
+      break;
+    }
+  }
+  ///:endfor
+
+  ///:for type in ['int', 'float', 'double']
+  void c_set_${type}$_node(${type}$& val, NodePtr*& np){
+    ENSURE_VALID_PTR(np);
+    if((*np)->shape() != SCALAR_SHAPE){
+      std::cout<<(boost::format("can not covert input "
+                      "node of shape (%1%,%2%,%3%) to a scalar.")
+              % (*np)->shape()[0]
+              % (*np)->shape()[1]
+              % (*np)->shape()[2]).str()
+               << std::endl;
+      exit(0);
+    }
+    
+    try{
+      ArrayPtr ap = oa::ops::eval(*np);
+      ArrayPtr ap1 = oa::funcs::g2l(ap);
+    
+      switch(ap1->get_data_type()){
+      case DATA_INT:
+        val = ((int*)ap1->get_buffer())[0];
+        break;
+      case DATA_FLOAT:
+        val = ((float*)ap1->get_buffer())[0];
+        break;
+      case DATA_DOUBLE:
+        val = ((double*)ap1->get_buffer())[0];      
+        break;
+      }
+    }catch(const std::exception& e){
+      std::cout<<"Execetion caught while "
+        "executing eval function. "
+        "Message: "<<e.what()<<std::endl;
+      exit(0);
+    }
+  }
+  ///:endfor
+
 }

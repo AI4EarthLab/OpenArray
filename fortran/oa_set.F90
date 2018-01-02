@@ -1,8 +1,8 @@
 ///:mute
 ///:set types = &
-     [['int',   'integer'], &
-     [ 'float',  'real'], &
-     [ 'double','real(8)']]
+     [['int',    'integer', 'integer(c_int)'], &
+     [ 'float',  'real',    'real(c_float)'], &
+     [ 'double', 'real(8)', 'real(c_double)']]
 ///:endmute
 
 module oa_set
@@ -20,6 +20,12 @@ module oa_set
      ///:for type in types
      module procedure set_array_farray_${type[0]}$_${dim}$
      module procedure set_ref_farray_${type[0]}$_${dim}$
+     ///:endfor
+     ///:endfor
+
+     ///:for type1 in types
+     ///:for type2 in ['node', 'array']
+     module procedure set_${type1[0]}$_${type2}$
      ///:endfor
      ///:endfor
   end interface set
@@ -204,4 +210,27 @@ contains
   ///:endfor
   
 
+  ///:for type1 in types
+  ///:for type2 in ['node', 'array']
+  subroutine set_${type1[0]}$_${type2}$(A, B)
+    use iso_c_binding
+    implicit none
+    ${type1[1]}$, intent(out) :: A
+    type(${type2}$) :: B
+
+    interface
+       subroutine c_set_${type1[0]}$_${type2}$(A, B) &
+            bind(C, name = "c_set_${type1[0]}$_${type2}$")
+         use iso_c_binding
+         implicit none
+         type(c_ptr) :: B
+         ${type1[2]}$, intent(out) :: A
+       end subroutine
+    end interface
+
+    call c_set_${type1[0]}$_${type2}$(A, B%ptr)
+  end subroutine
+  ///:endfor
+  ///:endfor
+  
 end module oa_set
