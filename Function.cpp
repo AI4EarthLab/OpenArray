@@ -1167,5 +1167,86 @@ namespace oa {
       ap->set_pseudo(true);
       return ap;
     }
+
+    void set_with_mask(ArrayPtr& A, 
+                       const Box& sub_box, 
+                       const ArrayPtr& B, 
+                       const ArrayPtr& mask) {
+     
+      bool ifscalar_B = B->is_scalar();
+      if(!ifscalar_B){
+        // sub(A)'shape must equal B's shape
+        assert(B->shape() == sub_box.shape());
+      }
+      // sub(A)'shape must equal mask's shape
+      assert(mask->shape() == sub_box.shape());
+      
+      // sub(A)'s partition
+      vector<int> rsx, rsy, rsz;
+      PartitionPtr pp = A->get_partition();
+
+      PartitionPtr subA_par_ptr = pp->sub(sub_box);
+      
+      ArrayPtr ap;
+      ArrayPtr ms;
+      // if sub(A)'s partition doesn't equal to B's partition,
+      // needs transfer
+      if (!subA_par_ptr->equal(B->get_partition()) && !ifscalar_B) {
+        ap = transfer(B, subA_par_ptr);
+      }else{
+        ap = B;
+      }
+      // if sub(A)'s partition doesn't equal to mask's partition,
+      // needs transfer
+      if (!subA_par_ptr->equal(mask->get_partition()) ) {
+        ms = transfer(mask, subA_par_ptr);
+      }else{
+        ms = mask;
+      }
+
+      // don't have local data in process
+      if (!ap->has_local_data()) return ;
+
+      Box A_local_box = A->get_local_box();
+      Box A_sub_box = A_local_box.get_intersection(sub_box)
+        .ref_box(A_local_box);
+      Shape s = ms->local_shape();
+      //Shape s = ap->local_shape();
+      Box B_sub_box(0, s[0], 0, s[1], 0, s[2]);
+      Box ms_sub_box(0, s[0], 0, s[1], 0, s[2]);
+
+      int sw = A->get_stencil_width();
+      
+      ///:set TYPE = [['DATA_INT', 'int'], ['DATA_FLOAT', 'float'], ['DATA_DOUBLE', 'double']]
+      ///:for i in TYPE
+      ///:for j in TYPE
+      ///:for k in TYPE
+      if (A->get_data_type() == ${i[0]}$
+          && ap->get_data_type() == ${j[0]}$ 
+          && ms->get_data_type() == ${k[0]}$ ) {
+        oa::internal::copy_buffer_with_mask<${i[1]}$, ${j[1]}$, ${k[1]}$>(
+          (${i[1]}$*) A->get_buffer(),
+          A->buffer_shape(),
+          A_sub_box.shift(sw),
+          (${j[1]}$*) ap->get_buffer(),
+          ap->buffer_shape(),
+          B_sub_box.shift(sw),
+          (${k[1]}$*) ms->get_buffer(),
+          ms->buffer_shape(),
+          ms_sub_box.shift(sw),
+          ifscalar_B
+        );
+        return;
+      }
+
+      ///:endfor
+      ///:endfor
+      ///:endfor
+        
+    }
+    void set_with_mask(ArrayPtr& A, const ArrayPtr& B, const ArrayPtr& mask){
+      Box box = A->get_local_box();
+      set_with_mask(A, box, B, mask); 
+    }
   }
 }

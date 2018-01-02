@@ -16,12 +16,12 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_system -ldl -llapack -lblas -lgtest -ljit \
 		-Wl,-rpath=${JIT_LIB}
 
-oplevel0 = -O0 -g 
-oplevel3 = -O3 -Ofast -xHost -g
+oplevel0 = -O0 -w -g 
+oplevel3 = -O3 -Ofast -xHost -w -g 
 
-FC = mpiifort ${oplevel3}
-CC = mpiicc  ${oplevel3}
-CXX = mpiicpc ${oplevel3}
+FC = mpiifort ${oplevel0} 
+CC = mpiicc   ${oplevel0} 
+CXX = mpiicpc ${oplevel0} 
 
 FCFLAGS  = 
 
@@ -37,8 +37,10 @@ OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard c-interface/*.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard modules/*/*.cpp)))
 
-OBJ_FORTRAN = ${OBJS} \
+OBJ_FORTRAN_LIB = ${OBJS} \
 	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
+
+OBJ_FORTRAN = ${OBJ_FORTRAN_LIB} test/oa_test.o test/oa_main.o 
 
 OBJ_MAIN  = ${OBJS} $(addprefix ./test/, main.o)
 
@@ -53,7 +55,7 @@ MAKEFILE = makefile.intel
 AA = $(wildcard *.cpp) $(wildcard modules/*/*.cpp)
 
 debug:
-	@echo ${OBJ_FORTRAN}   
+	@echo ${OBJS}   
 
 %.o: %.cpp
 	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $@
@@ -70,13 +72,13 @@ debug:
 	rm -f $@.$$$$
 
 %.d: %.c
-	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE}  -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
+	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
 
 %.d: %.F90 
-	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>err; \
+	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>/dev/null; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
@@ -124,7 +126,7 @@ testall:
 	@mpirun -np 2 ./testall_main 
 
 testall_main : ${OBJ_TEST}
-	-${CXX} -o testall_main ${OBJ_TEST} ${LIBS} 
+	-${FC} -o testall_main ${OBJ_TEST} ${LIBS} 
 
 testfortran:
 	@rm -rf fortran_main
@@ -139,7 +141,20 @@ testfortran:
 
 fortran_main : ${OBJ_FORTRAN}
 	-${FC} -o fortran_main ${OBJ_FORTRAN} \
-	${EXT_LIB_LINK} ${LIBS}
+	${EXT_LIB_LINK} ${LIBS} -lgfortran
+
+oalib:
+	@rm -rf fortran_main
+	@echo "Cleaning..."
+	@mkdir -p build 2>/dev/null
+	@./pre.sh
+	@cd build && make clean  -f ${MAKEFILE}
+	@echo "Cleaning done."
+	@cd build &&sed -i "s/##===##//g" ${MAKEFILE} && make oalib_obj ${compile_thread} -f ${MAKEFILE} 
+	@cp build/libopenarray.a ./
+
+oalib_obj: ${OBJ_FORTRAN_LIB}
+	@ar rcs libopenarray.a ${OBJ_FORTRAN_LIB}
 
 small:
 	@make all -f ${MAKEFILE}

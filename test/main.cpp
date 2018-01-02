@@ -51,6 +51,7 @@ int main(int argc, char** argv) {
   //test_g2l();
   //test_set_l2g();
   //test_set_g2l();
+  test_set_with_mask();
   //test_fusion_operator();
   //test_op();
 
@@ -76,7 +77,7 @@ int main(int argc, char** argv) {
 
   // show_all();
 
-  test_gen_kernel_JIT_with_op(m, n, p);
+  //test_gen_kernel_JIT_with_op(m, n, p);
 
   if (world_rank == 0) std::cout<<"Finished."<<std::endl;
   // !clear_cache();

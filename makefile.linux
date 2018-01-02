@@ -80,7 +80,7 @@ debug:
 
 
 %.d: %.F90 
-	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>err; \
+	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>/dev/null; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 

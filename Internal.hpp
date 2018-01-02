@@ -99,6 +99,71 @@ namespace oa {
       }
     }
 
+    // 
+    template<typename T1, typename T2, typename T3>
+    void copy_buffer_with_mask(
+        T1* A_buf,
+        const Shape& A_buf_shape,
+        const Box&  A_window,
+        T2* B_buf,
+        const Shape& B_buf_shape,
+        const Box& B_window, 
+        T3* C_buf,
+        const Shape& C_buf_shape,
+        const Box& C_window,
+        bool ifscalar_B
+        ) {
+
+      Shape sp = A_window.shape();
+      const int M = sp[0];
+      const int N = sp[1];
+      const int P = sp[2];
+      
+      const int M1 = A_buf_shape[0];
+      const int N1 = A_buf_shape[1];
+
+      const int M2 = C_buf_shape[0];
+      const int N2 = C_buf_shape[1];      
+
+      int xs1, xe1, ys1, ye1, zs1, ze1;
+      A_window.get_corners(xs1, xe1, ys1, ye1, zs1, ze1);
+
+      int xs2, xe2, ys2, ye2, zs2, ze2;
+      C_window.get_corners(xs2, xe2, ys2, ye2, zs2, ze2);
+
+      //ref_box.display("ref_box");
+      if(!ifscalar_B){
+        int cnt = 0;
+        for (int k = 0; k < P; k++) {
+          for (int j = 0; j < N; j++) {
+            for (int i = 0; i < M; i++) {
+              if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)//wangdong
+                A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] =
+                  B_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2];
+              //cout<<buffer[cnt-1]<<" ";
+            }
+            //cout<<endl;
+          }
+          //cout<<endl;
+        }
+      }
+      else{
+        int cnt = 0;
+        for (int k = 0; k < P; k++) {
+          for (int j = 0; j < N; j++) {
+            for (int i = 0; i < M; i++) {
+              if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)//wangdong
+                A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] = B_buf[0];
+              //cout<<buffer[cnt-1]<<" ";
+            }
+            //cout<<endl;
+          }
+          //cout<<endl;
+        }
+      }
+
+    }
+
     // set sub(A) = const
     template<typename T1, typename T2>
     void set_buffer_subarray_const(T1* buffer, T2 val, const Box &box, 

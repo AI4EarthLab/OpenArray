@@ -238,6 +238,9 @@ namespace oa {
     // local_A (MPI_COMM_SELF)= sub(global_B)
     void set_g2l(ArrayPtr& local, const Box& sub_box, ArrayPtr& global); 
 
+    void set_with_mask(ArrayPtr& A, const Box& sub_box, const ArrayPtr& B, const ArrayPtr& mask);
+    void set_with_mask(ArrayPtr& A, const ArrayPtr& B, const ArrayPtr& mask);
+
     // rep arry_B = rep_A(arryA, 1, 2, 3)
     ArrayPtr rep(ArrayPtr& A, int x, int y, int z);
 
