@@ -22,6 +22,11 @@ namespace oa {
     ArrayPtr kernel_${k[1]}$(vector<ArrayPtr> &ops_ap);
     ///:endfor
 
+    ///:for k in [i for i in L if i[3] == 'I']
+    ///:set name = k[1]
+    ArrayPtr kernel_${name}$(vector<ArrayPtr> &ops_ap);
+    ///:endfor
+    
     ///:for k in [i for i in L if i[3] == 'E']
     ///:set name = k[1]
     ///:set kernel_name = k[2]
@@ -133,6 +138,57 @@ namespace oa {
       return ap;
     }
 
+    ///:endfor
+
+
+    ///:for k in [i for i in L if i[3] == 'I']
+    ///:set name = k[1]
+    ///:set kernel_name = k[2]
+    // A = ${sy}$ U
+    template<typename TC, typename TA, typename TB>
+    ArrayPtr t_kernel_${name}$(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr u = ops_ap[0];
+      ArrayPtr v = ops_ap[1];      
+
+      ArrayPtr a = ArrayPool::global()->get(
+          u->get_partition(),
+          oa::utils::to_type<TC>());
+      
+      if(!a->get_partition()->equal(v->get_partition())){
+        ArrayPtr v1 = oa::funcs::transfer(v, a->get_partition());
+        v = v1;
+      }
+
+      const int sw_u = u->get_partition()->get_stencil_width();
+      const int sw_v = v->get_partition()->get_stencil_width();
+      const int sw_a = a->get_partition()->get_stencil_width();
+      
+      const Box bu(sw_u, u->buffer_shape()[0] - sw_u,
+              sw_u, u->buffer_shape()[1] - sw_u,
+              sw_u, u->buffer_shape()[2] - sw_u);
+
+      const Box bv(sw_v, v->buffer_shape()[0] - sw_v,
+              sw_v, v->buffer_shape()[1] - sw_v,
+              sw_v, v->buffer_shape()[2] - sw_v);
+
+      const Box ba(sw_a, a->buffer_shape()[0] - sw_a,
+              sw_a, a->buffer_shape()[1] - sw_a,
+              sw_a, a->buffer_shape()[2] - sw_a);
+
+
+      if(u->has_local_data()){
+        oa::internal::buffer_${kernel_name}$<TC, TA, TB>(
+            (TC*)a->get_buffer(),
+            (TA*)u->get_buffer(),
+            (TB*)v->get_buffer(),
+            a->buffer_shape(),
+            u->buffer_shape(),
+            v->buffer_shape(),
+            ba,bu,bv);
+      }
+
+      return a;
+    }
     ///:endfor
   }
 }

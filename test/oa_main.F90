@@ -36,6 +36,8 @@ program main
 
   ! call test_sum()
 
+  call test_min_max()
+  
   ! call test_rep()
 
   ! call test_operator()
@@ -46,7 +48,7 @@ program main
 
   ! call test_cache()
   
-  call test_set()
+  ! call test_set()
 
   ! call test_io()
 

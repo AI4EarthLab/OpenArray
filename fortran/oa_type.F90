@@ -205,6 +205,7 @@
       use iso_c_binding
       character(len=*):: f_string
       CHARACTER(LEN=LEN_TRIM(f_string)+1,KIND=C_CHAR) :: c_string
+
       c_string = trim(f_string) // C_NULL_CHAR
     end function
     

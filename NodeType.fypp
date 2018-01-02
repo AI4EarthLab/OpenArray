@@ -32,7 +32,9 @@
        ["TYPE_ABS_MAX",    "abs_max", "abs_max",       "E",   "1",  "F", "F",  "",        "0"],&
        ["TYPE_ABS_MIN",    "abs_min", "abs_min",       "E",   "1",  "F", "F",  "",        "0"],&
        ["TYPE_ABS_MAX_AT", "abs_max_at", "abs_max",    "E",   "1",  "F", "F",  "",        "0"],&
-       ["TYPE_ABS_MIN_AT", "abs_min_at", "abs_min",    "E",   "1",  "F", "F",  "",        "0"],&     
+       ["TYPE_ABS_MIN_AT", "abs_min_at", "abs_min",    "E",   "1",  "F", "F",  "",        "0"],&
+       ["TYPE_MIN2",        "min2",     "min2",        "I",   "2",  "F", "F",  "min",        "0"],&
+       ["TYPE_MAX2",        "max2",     "max2",        "I",   "2",  "F", "F",  "max",        "0"],&
        ["TYPE_POW",     "pow",     "pow",        "H",   "1",  "T", "F",  "(A)**M",     "2"],&
        ["TYPE_EXP",     "exp",     "exp",        "C",   "1", "T", "F",  "exp(A)",     "2"],&
        ["TYPE_SIN",     "sin",     "sin",        "C",   "1", "T", "F",  "sin(A)",     "2"],&

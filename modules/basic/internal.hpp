@@ -26,7 +26,7 @@ namespace oa{
         for (int j = sw; j < N-sw; j++)      
           for (int i = sw; i < M-sw; i++) {
             const int index = i + j * M + k * M * N;
-            A[index] = (T1)B[index] ${sy}$ (T1)val;
+            A[index] = B[index] ${sy}$ val;
           }
 
       // for (int i = 0; i < size; i++) {
@@ -48,7 +48,7 @@ namespace oa{
         for (int j = sw; j < N-sw; j++)      
           for (int i = sw; i < M-sw; i++) {
             const int index = i + j * M + k * M * N;
-            A[index] = (T1)val ${sy}$ (T1)B[index];
+            A[index] = val ${sy}$ B[index];
           }
 
       // for (int i = 0; i < size; i++) {
@@ -83,7 +83,7 @@ namespace oa{
         for (int j = sw; j < N-sw; j++)      
           for (int i = sw; i < M-sw; i++) {
             const int index = i + j * M + k * M * N;
-            A[index] = (T1)U[index] ${sy}$ (T1)V[index];
+            A[index] = U[index] ${sy}$ V[index];
           }
 
       // #pragma omp parallel for

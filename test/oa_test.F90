@@ -291,6 +291,26 @@ contains
     
   end subroutine test_sum
 
+  subroutine test_min_max()
+    implicit none
+    type(array) :: A, B, C, D
+
+    A = rands(4, 3, 2)
+    B = rands(4, 3, 2)
+    call display(A, "A = ")
+    call display(B, "B = ")
+
+    C = min(A, B)
+    call display(C, "min(A, B) = ")
+    
+    C = max(A, B)
+    call display(C, "max(A, B) = ")
+
+    C = max(A*2, B)
+    call display(C, "man(A*2, B) = ")
+    
+  end subroutine
+  
   subroutine test_operator()
     implicit none
     type(array) :: A, B, C
