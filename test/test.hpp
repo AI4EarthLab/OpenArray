@@ -1149,6 +1149,8 @@ void test_cache(int m, int n, int k) {
 void test_gen_kernel_JIT_with_op(int m, int n, int k) {
   m = n = k = 6;
 
+  // Partition::set_default_procs_shape({2, 2, 2});
+
   ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {6, 6, 1}, 1, 2);
   ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {6, 6, 1}, 1, 2);
   ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1, 6}, 1, 2);
@@ -1161,6 +1163,10 @@ void test_gen_kernel_JIT_with_op(int m, int n, int k) {
   dy->set_bitset("110");
   dz->set_bitset("001");
   
+  // dx->display("dx");
+  // dy->display("dy");
+  // dz->display("dz");
+
   Grid::global()->init_grid('C', dx, dy, dz);
 
 
@@ -1168,7 +1174,9 @@ void test_gen_kernel_JIT_with_op(int m, int n, int k) {
   ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
   ap1->set_bitset("111");
   ap1->set_pos(3);
+
   ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, 1}, 2);
+  // ArrayPtr ap2 = PSU3D(oa::funcs::seqs(MPI_COMM_WORLD, {m, n, 1}, 2));
   ap2->set_bitset("110");
   ap2->set_pos(2);
   ap2->set_pseudo(true);
@@ -1177,9 +1185,20 @@ void test_gen_kernel_JIT_with_op(int m, int n, int k) {
   NodePtr n1 = NODE(ap1);
   NodePtr n2 = NODE(ap2);
   n1->display("n1");
+  
+  // NodePtr t1 = DXF(n1);
+  // ans = oa::ops::eval(t1);
+  // ans->display("t1");
+
   n2->display("n2");
   NodePtr n3 = NodePool::global()->get_seqs_scalar(1);
   
+  // NodePtr t2 = DYB(n2);
+  // ans = oa::ops::eval(t2);
+  // ans->display("t2");
+
+
+
   NodePtr np = PLUS( MULT(DXF(n1), DYB(n2)), n3 );
   
   // ans = oa::ops::eval(np);

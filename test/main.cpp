@@ -3,7 +3,7 @@
 #include <string>
 #include <mpi.h>
 #include "test.hpp"
-#include "MPI.hpp"
+#include "../MPI.hpp"
 
 using namespace std;
 

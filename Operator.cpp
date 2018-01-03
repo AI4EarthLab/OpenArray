@@ -1294,8 +1294,8 @@ namespace oa {
       // code<<"printf(\"S2 %d %d %d\\n\", S2[0], S2[1], S2[2]);\n";
       // code<<"printf(\"S3 %d %d %d\\n\", S3[0], S3[1], S3[2]);\n";
       // code<<"printf(\"S4 %d %d %d\\n\", S4[0], S4[1], S4[2]);\n";
-      // code<<"printf(\"lbound %d %d %d\\n\", lbound[0], lbound[1], lbound[2]);\n";
-      // code<<"printf(\"rbound %d %d %d\\n\", rbound[0], rbound[1], rbound[2]);\n";
+      code<<"printf(\"lbound %d %d %d\\n\", lbound[0], lbound[1], lbound[2]);\n";
+      code<<"printf(\"rbound %d %d %d\\n\", rbound[0], rbound[1], rbound[2]);\n";
       // code<<"printf(\"sp %d %d %d\\n\", sp[0], sp[1], sp[2]);\n";
       /*
         end debug

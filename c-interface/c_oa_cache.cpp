@@ -33,7 +33,7 @@ extern "C"{
         "Maybe hash conflicted?"<<std::endl;
     }else{
       cached_nodes[std::string(key)] = *p;
-      oa::ops::gen_kernels_JIT(*p);
+      oa::ops::gen_kernels_JIT_with_op(*p);
     }
   }
 

@@ -402,9 +402,9 @@ namespace oa {
         break;
       case 3:
         bitset<3> bit = ap->get_bitset();
-        if (bit[2] == 0) st_x = ed_x = 0;
-        if (bit[1] == 0) st_y = ed_y = 0;
-        if (bit[0] == 0) st_z = ed_z = 0;
+        if (bit[2] != 0) st_x = -1, ed_x = 1;
+        if (bit[1] != 0) st_y = -1, ed_y = 1;
+        if (bit[0] != 0) st_z = -1, ed_z = 1;
       }
 
       for (int z = st_z; z <= ed_z; ++z) {
