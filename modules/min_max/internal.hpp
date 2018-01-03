@@ -1,4 +1,5 @@
 
+#include <iostream>
 
 namespace oa{
   namespace internal{
@@ -8,44 +9,41 @@ namespace oa{
     ///:set sy = k[1]
     template<typename T>
     void buffer_${name}$_const(T &val, int* pos, T *A,
-            Box box, int sw) {
-      int x = 0, y = 0, z = 0;
+            const Shape& as,
+            Box win) {
+
       int xs, xe, ys, ye, zs, ze;
-      box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+      win.get_corners(xs, xe, ys, ye, zs, ze);
 
-      int M = xe - xs;
-      int N = ye - ys;
-      int K = ze - zs;
-
-      //std::cout<<"MNK:"<<M<<" "<<N<<" "<<" "<<K<<" sw="<<sw<<std::endl;
+      // printf("(%d-%d,%d-%d,%d-%d)\n", xs, xe, ys, ye, zs, ze);
+      // printf("(%d,%d,%d)\n", pos[0], pos[1], pos[2]);
       
+      int M = as[0];
+      int N = as[1];
+      int K = as[2];
+
       ///:mute
-      ///:if k[0:3] == 'abs'
-      ///:set op = "abs"
+      ///:if k[0][0:3] == 'abs'
+      ///:set op = "std::abs"
       ///:else
       ///:set op = ""
       ///:endif
       ///:endmute
       
-      val = ${op}$(A[sw * M * N + sw * M + sw]);
+      val = ${op}$(A[zs * M * N + ys * M + xs]);
 
       pos[0] = xs;
       pos[1] = ys;
       pos[2] = zs;
 
-
-      for (int k = sw; k < K-sw; k++) {
-        for (int j = sw; j < N-sw; j++) {
-          for (int i = sw; i < M-sw; i++) {
-            //printf("(%d,%d,%d) = %d"
-            // std::cout<<"("<<i<<","<<j<<","<<k<<")="
-            //          <<A[i + j * M + k * M * N]<<std::endl;
-            
-            if (A[i + j * M + k * M * N] ${sy}$ ${op}$(val)) {
-              val = A[i + j * M + k * M * N];
-              pos[0] = i - sw + xs;
-              pos[1] = j - sw + ys;
-              pos[2] = k - sw + zs;
+      for (int k = zs; k < ze; k++) {
+        for (int j = ys; j < ye; j++) {
+          for (int i = xs; i < xe; i++) {
+            if (${op}$(A[i + j * M + k * M * N]) ${sy}$ val) {
+              val = ${op}$(A[i + j * M + k * M * N]);
+              pos[0] = i; 
+              pos[1] = j;
+              pos[2] = k;
             }
           }
         }
@@ -53,6 +51,7 @@ namespace oa{
 
     }
     ///:endfor
+
 
 
     ///:for k in [['max2','>'],['min2','<']]

@@ -93,6 +93,79 @@ extern "C"{
   ///:endfor
 
   ///:for type in ['int', 'float', 'double']
+  ///:for src_type in [['node', 'NodePtr'], ['array', 'ArrayPtr']]
+  void c_set_farray_${src_type[0]}$_${type}$(${type}$*& arr,
+          ${src_type[1]}$*& p, int* s){
+    
+    Shape arr_sh;
+    arr_sh[0] = s[0]; arr_sh[1] = s[1]; arr_sh[2] = s[2];
+
+    if(arr_sh != (*p)->shape()){
+      THROW_LOGIC_EXCEPTION(
+          (boost::format("src shape(%1%,%2%,%3%) "
+                  "and dst shape(%4%,%5%,%6%) does not match.") %
+                  (*p)->shape()[0] %
+                  (*p)->shape()[1] %
+                  (*p)->shape()[2] %
+                  arr_sh[0] %
+                  arr_sh[1] %
+                  arr_sh[2]).str());
+    }
+    
+    const Box arr_box(0, arr_sh[0], 0, arr_sh[1], 0, arr_sh[2]);
+    
+    ArrayPtr ap1, ap;
+
+    ///:if src_type[0] == 'array'
+    ap = *p;
+    ///:else
+    try{
+      ap = oa::ops::eval(*p);
+    }catch(const std::exception& e){
+      std::cout<<"Execetion caught while "
+        "executing eval function. "
+        "Message: "<<e.what()<<std::endl;
+      exit(0);
+    }
+    ///:endif
+
+    if(ap->is_seqs()){
+      ap1 = ap;
+    }else{
+      ap1 = oa::funcs::g2l(ap);
+    }
+    
+    void * buf = ap1->get_buffer();
+    const int sw = ap1->get_partition()->get_stencil_width();
+    const Shape& ap_shape = ap1->buffer_shape();
+    const Box ap_box(sw, ap_shape[0]-sw,
+            sw, ap_shape[1]-sw,
+            sw, ap_shape[2]-sw);
+
+    const DataType dt = ap->get_data_type();
+    
+    switch(dt){
+    case DATA_INT:
+      oa::internal::copy_buffer<${type}$, int>(arr,
+              arr_sh, arr_box,
+              (int*)buf, ap_shape, ap_box);
+      break;
+    case DATA_FLOAT:
+      oa::internal::copy_buffer<${type}$, float>(arr,
+              arr_sh, arr_box,
+              (float*)buf, ap_shape, ap_box);
+      break;
+    case DATA_DOUBLE:
+      oa::internal::copy_buffer<${type}$, double>(arr,
+              arr_sh, arr_box,
+              (double*)buf, ap_shape, ap_box);
+      break;      
+    }
+  }
+  ///:endfor
+  ///:endfor
+  
+  ///:for type in ['int', 'float', 'double']
   void c_set_${type}$_array(${type}$& val,ArrayPtr*& ap){
     ENSURE_VALID_PTR(ap);
     if((*ap)->shape() != SCALAR_SHAPE){

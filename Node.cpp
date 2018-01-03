@@ -21,6 +21,8 @@ void Node::display(char const *prefix) {
     const NodeDesc& nd = oa::ops::get_node_desc(m_type);    
     printf("    type : %s\n", nd.name.c_str());
     printf("    hash : %d\n", m_hash);
+    printf("   shape : [%d %d %d]\n",
+            shape()[0], shape()[1], shape()[2]);
     printf("  lbound : [%d %d %d]\n", m_lbound[0], m_lbound[1], m_lbound[2]);
     printf("  rbound : [%d %d %d]\n", m_rbound[0], m_rbound[1], m_rbound[2]);
     printf("  need_update : %s\n", m_update_boundary ? "True" : "False");

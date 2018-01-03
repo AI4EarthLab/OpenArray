@@ -20,6 +20,13 @@ class Box {
   Box(Range x, Range y, Range z);
   Box(int* starts, int* counts);
   Box(int sx, int ex, int sy, int ey, int sz, int ez);
+
+  int xs() const;
+  int ys() const;
+  int zs() const;
+  int xe() const;
+  int ye() const;
+  int ze() const;
   
   Range get_range_x();
   Range get_range_y();
@@ -50,7 +57,7 @@ class Box {
   Shape shape(int sw = 0) const;
 
   // return shape_x * shape_y * shape_z
-  int size(int stencil_width = 0);
+  int size(int stencil_width = 0) const;
 
   int3 starts() const;
   int3 counts() const;

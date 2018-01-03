@@ -16,10 +16,14 @@ module oa_set
      ///:endfor
      module procedure set_ref_array
      module procedure set_ref_ref
+     
      ///:for dim in ['1d','2d','3d']
      ///:for type in types
      module procedure set_array_farray_${type[0]}$_${dim}$
      module procedure set_ref_farray_${type[0]}$_${dim}$
+
+     module procedure set_farray_array_${type[0]}$_${dim}$
+     module procedure set_farray_node_${type[0]}$_${dim}$
      ///:endfor
      ///:endfor
 
@@ -125,26 +129,35 @@ contains
   end subroutine
 
   
+
+
   ///:for dim in [[1,':'],[2,':,:'],[3,':,:,:']]
   ///:for type in types
-  subroutine set_array_farray_${type[0]}$_${dim[0]}$d(A, B)
+  ///:for at in [['ref','node'], ['array', 'array']]
+  subroutine set_${at[0]}$_farray_${type[0]}$_${dim[0]}$d(A, B)
     use iso_c_binding
     implicit none
 
     interface
-       subroutine c_set_array_farray_${type[0]}$(A, arr, s) &
-            bind(C, name = 'c_set_array_farray_${type[0]}$')
+       subroutine c_set_${at[0]}$_farray_${type[0]}$(A, arr, s) &
+            bind(C, name = 'c_set_${at[0]}$_farray_${type[0]}$')
          use iso_c_binding
          implicit none
-         type(c_ptr) :: A !returned array object
+         type(c_ptr),intent(in) :: A !returned array object
          type(c_ptr) :: arr !fortran array
          integer :: s(3) !shape
        end subroutine
     end interface
 
-    type(array), intent(inout) :: A
-    ${type[1]}$, target, &
-         dimension(${dim[1]}$), intent(in) :: B
+    ///:if at[0] == 'array'
+    type(${at[1]}$), intent(inout) :: A
+    ///:else
+    type(${at[1]}$), intent(in) :: A
+    ///:endif
+    ${type[1]}$, dimension(${dim[1]}$), target, intent(in) :: B
+    
+    ! ${type[1]}$, target, allocatable, &
+    !      dimension(${dim[1]}$) :: B
     integer :: s(${dim[0]}$), s3(3)
 
     s = shape(B)
@@ -160,36 +173,39 @@ contains
     s3 = s
     ///:endif
 
-    call c_set_array_farray_${type[0]}$(A%ptr, c_loc(B), s3)
+    call c_set_${at[0]}$_farray_${type[0]}$(A%ptr, c_loc(B), s3)
   end subroutine
-  
-  !module procedure set_ref_farray_${type[0]}$_${dim}$
-  ///:endfor
-  ///:endfor
 
+  ///:endfor
+  ///:endfor
+  ///:endfor  
 
   ///:for dim in [[1,':'],[2,':,:'],[3,':,:,:']]
   ///:for type in types
-  subroutine set_ref_farray_${type[0]}$_${dim[0]}$d(A, B)
+  ///:for at in [['node','node'], ['array', 'array']]
+  subroutine set_farray_${at[0]}$_${type[0]}$_${dim[0]}$d(A, B)
     use iso_c_binding
     implicit none
 
     interface
-       subroutine c_set_ref_farray_${type[0]}$(A, arr, s) &
-            bind(C, name = 'c_set_ref_farray_${type[0]}$')
+       subroutine c_set_farray_${at[0]}$_${type[0]}$(A, B, s) &
+            bind(C, name = 'c_set_farray_${at[0]}$_${type[0]}$')
          use iso_c_binding
          implicit none
-         type(c_ptr) :: A !returned array object
-         type(c_ptr) :: arr !fortran array
+         type(c_ptr) :: A !fortran array
+         type(c_ptr) :: B !Array object 
          integer :: s(3) !shape
        end subroutine
     end interface
 
-    type(node) :: A
-    ${type[1]}$, target, allocatable, dimension(${dim[1]}$) :: B
+    ${type[1]}$, target,&
+         dimension(${dim[1]}$), intent(out) :: A
+
+    type(${at[1]}$), intent(in) :: B
+    
     integer :: s(${dim[0]}$), s3(3)
 
-    s = shape(B)
+    s = shape(A)
     ///:if dim[0] == 1
     s3(1) = s(1)
     s3(2) = 1
@@ -202,14 +218,15 @@ contains
     s3 = s
     ///:endif
 
-    call c_set_ref_farray_${type[0]}$(A%ptr, c_loc(B), s3)
+    call c_set_farray_${at[0]}$_${type[0]}$(c_loc(A), B%ptr, s3)
   end subroutine
-  
-  !module procedure set_ref_farray_${type[0]}$_${dim}$
-  ///:endfor
-  ///:endfor
-  
 
+  ///:endfor
+  ///:endfor
+  ///:endfor  
+
+
+  
   ///:for type1 in types
   ///:for type2 in ['node', 'array']
   subroutine set_${type1[0]}$_${type2}$(A, B)

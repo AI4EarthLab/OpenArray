@@ -99,6 +99,8 @@ namespace oa {
       }
     }
 
+
+
     // set sub(A) = const
     template<typename T1, typename T2>
     void set_buffer_subarray_const(T1* buffer, T2 val, const Box &box, 

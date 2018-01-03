@@ -294,7 +294,10 @@ contains
   subroutine test_min_max()
     implicit none
     type(array) :: A, B, C, D
-
+    real :: v1
+    real(kind=8) :: v2
+    integer :: v3(3)
+    
     A = rands(4, 3, 2)
     B = rands(4, 3, 2)
     call display(A, "A = ")
@@ -308,6 +311,60 @@ contains
 
     C = max(A*2, B)
     call display(C, "man(A*2, B) = ")
+
+    call set(v1, max(A))
+
+    if(rank == 0) &
+         print*, "v1 = ", v1
+    
+    call set(v2, min(A))
+
+    if(rank == 0) &
+         print*, "v2 = ", v2
+
+
+    A = rands(4,3,2) - 0.5
+
+    call display(A, "A = ")
+    call set(v1, max(A))
+    if(rank == 0) then
+       print*, "max(A) = ", v1
+    end if
+
+    call set(v1, min(A))
+    if(rank == 0) then
+       print*, "min(A) = ", v1
+    end if
+   
+    call set(v1, abs_max(A))
+    if(rank == 0) then
+       print*, "abs_max(A) = ", v1
+    end if
+
+    call set(v1, abs_min(A))
+    if(rank == 0) then
+       print*, "abs_min(A) = ", v1
+    end if
+    
+    call set(v3, max_at(A))
+    if(rank == 0) then
+       print*, "max_at(A) = ", v3
+    end if
+
+    call set(v3, min_at(A))
+    if(rank == 0) then
+       print*, "min_at(A) = ", v3
+    end if
+
+    call set(v3, abs_max_at(A))
+    if(rank == 0) then
+       print*, "abs_max_at(A) = ", v3
+    end if
+
+    call set(v3, abs_min_at(A))
+    if(rank == 0) then
+       print*, "abs_min_at(A) = ", v3
+    end if
     
   end subroutine
   
@@ -448,7 +505,10 @@ contains
     deallocate(farr_double3)
     allocate(farr_double3(1,5,5))
     farr_double3 = 10
-    call set(sub(A,1,[1,5],[1,5]), farr_double3)
+    !call set(sub(A,1,[1,5],[1,5]), farr_double3)
+
+    call set_ref_farray_double_3d(sub(A,1,[1,5],[1,5]), &
+         farr_double3)
     call display(A, "A = ")
 
     A = seqs(10,10,10)

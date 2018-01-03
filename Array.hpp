@@ -46,8 +46,8 @@ class Array {
   void display(const char *prefix = "");
   void set_local_box();
   Box get_local_box() const;
-  Shape buffer_shape();
-  int buffer_size();
+  Shape buffer_shape() const;
+  int buffer_size() const;
   Shape local_shape();
   int local_size() const;
   Shape shape();
@@ -71,6 +71,7 @@ class Array {
   int get_stencil_width() const;
   int get_stencil_type() const;
   void set_zeros();
+  Box local_data_win() const;
 };
 
 

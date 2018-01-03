@@ -44,7 +44,7 @@ namespace oa {
 
     ///:set op = ""
     ///:if name[:3] =='abs'
-    ///:set op = abs
+    ///:set op = 'std::abs'
     ///:endif
     ///:endmute
 
@@ -63,11 +63,21 @@ namespace oa {
 
       m_info local, global;
       if(u->has_local_data()){
+        // oa::internal::buffer_${kernel_name}$_const(local.value,
+        //         local.pos,
+        //         (T*) u->get_buffer(),
+        //         u->get_local_box(),
+        //         sw);
         oa::internal::buffer_${kernel_name}$_const(local.value,
                 local.pos,
                 (T*) u->get_buffer(),
-                u->get_local_box(),
-                sw);
+                u->buffer_shape(),
+                u->local_data_win());
+        
+        local.pos[0] += u->get_local_box().xs();
+        local.pos[1] += u->get_local_box().ys();
+        local.pos[2] += u->get_local_box().zs();
+        
       }else{
         local.pos[0]=local.pos[1]=local.pos[2]=-1;
       }
@@ -102,6 +112,7 @@ namespace oa {
 
       if(rank == 0){
         global = local;
+
         for(int i = 0; i < size; ++i){
 
           // std::cout<<"rank="<<rank
@@ -109,9 +120,10 @@ namespace oa {
           //          <<global_all[i].pos[0]<<" "
           //          <<global_all[i].pos[1]<<" "
           //          <<global_all[i].pos[2]<<std::endl;
+          
           if(global_all[i].pos[0] < 0) continue;
 
-          if(global_all[i].value ${sy}$ global.value){
+          if(${op}$(global_all[i].value) ${sy}$ global.value){
             global = global_all[i];
           }
         }
@@ -131,9 +143,10 @@ namespace oa {
       p[2] = global.pos[2];
       ///:else
       ap = oa::funcs::get_seq_scalar(global.value);
+      ///:endif
+
       // if(rank == 0)
       //   ap->display("ap = ");
-      ///:endif
 
       return ap;
     }

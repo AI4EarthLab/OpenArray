@@ -171,12 +171,12 @@ Box Array::get_local_box() const{
   return m_corners;
 }
 
-Shape Array::buffer_shape() {
+Shape Array::buffer_shape() const{
   int sw = m_par_ptr->get_stencil_width();
   return m_corners.shape(sw);
 }
 
-int Array::buffer_size() {
+int Array::buffer_size() const {
   int sw = m_par_ptr->get_stencil_width();
   return m_corners.size(sw);
 }
@@ -190,6 +190,12 @@ Shape Array::local_shape() {
 int Array::local_size() const{
   Box box = get_local_box();
   return box.size();
+}
+
+Box Array::local_data_win() const{
+  const int sw = m_par_ptr->get_stencil_width();
+  const Shape bs = this->buffer_shape();
+  return Box(sw, bs[0]-sw, sw, bs[1]-sw, sw, bs[2]-sw);
 }
 
 // return global shape of Array

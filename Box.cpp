@@ -7,6 +7,31 @@ using namespace std;
 
 Box::Box() {}
 
+int Box::xs() const{
+  return m_rx.get_lower();
+}
+
+int Box::xe() const{
+  return m_rx.get_upper();
+}
+
+int Box::ys() const{
+  return m_ry.get_lower();
+}
+
+int Box::ye() const{
+  return m_ry.get_upper();
+}
+
+int Box::zs() const{
+  return m_rz.get_lower();
+}
+
+int Box::ze() const{
+  return m_rz.get_upper();
+}
+
+
 Box::Box(Range x, Range y, Range z) :
   m_rx(x), m_ry(y), m_rz(z) {}
 
@@ -114,7 +139,7 @@ Shape Box::shape(int sw) const {
 }
 
 // return shape_x * shape_y * shape_z
-int Box::size(int sw) {
+int Box::size(int sw) const{
   return (m_rx.size() + 2 * sw) * (m_ry.size() + 2 * sw) * 
   (m_rz.size() + 2 * sw);
 }
