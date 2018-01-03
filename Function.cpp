@@ -332,6 +332,7 @@ namespace oa {
     }
 
     void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction) {
+      // oa::internal::set_ghost_consts((float*)ap->get_buffer(), ap->local_shape(), (float)0, 1); // only for test, wuqi
 
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();

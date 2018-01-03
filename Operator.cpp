@@ -644,7 +644,7 @@ namespace oa {
         // JIT source code add calc_inside
         code_add_function(code, __code, A->get_data_type(), id);
 
-        cout<<code.str()<<endl;
+        // cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
 
@@ -687,7 +687,7 @@ namespace oa {
         // JIT source code add calc_inside
         code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
 
-        cout<<code.str()<<endl;
+        // cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
 
@@ -704,7 +704,7 @@ namespace oa {
           code_add_function_signature_with_op(code_out, hash_out);
           code_add_const(code_out, int_id, float_id, double_id);
           code_add_calc_outside(code_out, __code, A->get_data_type(), id, S_id);
-          cout<<code_out.str()<<endl;
+          // cout<<code_out.str()<<endl;
           Jit_Driver::global()->insert(hash_out, code_out);
         }
       }
@@ -1021,69 +1021,69 @@ namespace oa {
       case TYPE_DXC:
         new_str1 = replace_string(in, "i,", "1+i,");
         new_str2 = replace_string(in, "i,", "-1+i,");
-        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        ss<<"0.5*(("<<new_str1<<")-("<<new_str2<<"))";
         break;
       case TYPE_DYC:
         new_str1 = replace_string(in, "j,", "1+j,");
         new_str2 = replace_string(in, "j,", "-1+j,");
-        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        ss<<"0.5*(("<<new_str1<<")-("<<new_str2<<"))";
         break;
       case TYPE_DZC:
         new_str1 = replace_string(in, "k,", "1+k,");
         new_str2 = replace_string(in, "k,", "-1+k,");
-        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        ss<<"0.5*(("<<new_str1<<")-("<<new_str2<<"))";
         break;
 
       // average operator
       case TYPE_AXB:
         new_str = replace_string(in, "i,", "-1+i,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AXF:
         new_str = replace_string(in, "i,", "1+i,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AYB:
         new_str = replace_string(in, "j,", "-1+j,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AYF:
         new_str = replace_string(in, "j,", "1+j,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AZB:
         new_str = replace_string(in, "k,", "-1+k,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AZF:
         new_str = replace_string(in, "k,", "1+k,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
 
       // difference operator
       case TYPE_DXB:
         new_str = replace_string(in, "i,", "-1+i,");
-        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        ss<<"1.0*(("<<in<<")-("<<new_str<<"))";
         break;
       case TYPE_DXF:
         new_str = replace_string(in, "i,", "1+i,");
-        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        ss<<"1.0*(("<<new_str<<")-("<<in<<"))";
         break;
       case TYPE_DYB:
         new_str = replace_string(in, "j,", "-1+j,");
-        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        ss<<"1.0*(("<<in<<")-("<<new_str<<"))";
         break;
       case TYPE_DYF:
         new_str = replace_string(in, "j,", "1+j,");
-        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        ss<<"1.0*(("<<new_str<<")-("<<in<<"))";
         break;
       case TYPE_DZB:
         new_str = replace_string(in, "k,", "-1+k,");
-        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        ss<<"1.0*(("<<in<<")-("<<new_str<<"))";
         break;
       case TYPE_DZF:
         new_str = replace_string(in, "k,", "1+k,");
-        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        ss<<"1.0*(("<<new_str<<")-("<<in<<"))";
         break;
 
       // abs operator
@@ -1294,8 +1294,8 @@ namespace oa {
       // code<<"printf(\"S2 %d %d %d\\n\", S2[0], S2[1], S2[2]);\n";
       // code<<"printf(\"S3 %d %d %d\\n\", S3[0], S3[1], S3[2]);\n";
       // code<<"printf(\"S4 %d %d %d\\n\", S4[0], S4[1], S4[2]);\n";
-      code<<"printf(\"lbound %d %d %d\\n\", lbound[0], lbound[1], lbound[2]);\n";
-      code<<"printf(\"rbound %d %d %d\\n\", rbound[0], rbound[1], rbound[2]);\n";
+      // code<<"printf(\"lbound %d %d %d\\n\", lbound[0], lbound[1], lbound[2]);\n";
+      // code<<"printf(\"rbound %d %d %d\\n\", rbound[0], rbound[1], rbound[2]);\n";
       // code<<"printf(\"sp %d %d %d\\n\", sp[0], sp[1], sp[2]);\n";
       /*
         end debug

@@ -37,8 +37,10 @@ OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard c-interface/*.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard modules/*/*.cpp)))
 
-OBJ_FORTRAN = ${OBJS} \
+OBJ_FORTRAN_LIB = ${OBJS} \
 	$(addsuffix .o, $(basename $(wildcard fortran/*.F90)))
+
+OBJ_FORTRAN = ${OBJ_FORTRAN_LIB} test/oa_test.o test/oa_main.o 
 
 OBJ_MAIN  = ${OBJS} $(addprefix ./test/, main.o)
 
@@ -53,7 +55,7 @@ MAKEFILE = makefile.intel
 AA = $(wildcard *.cpp) $(wildcard modules/*/*.cpp)
 
 debug:
-	@echo ${OBJ_FORTRAN}   
+	@echo ${OBJS}   
 
 %.o: %.cpp
 	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $@
@@ -82,10 +84,10 @@ debug:
 
 
 
-##===##-include $(OBJ_FORTRAN:.o=.d) 
-##===##-include $(OBJ_MAIN:.o=.d) 
-##===##-include $(OBJ_TEST:.o=.d) 
-##===##-include $(OBJ_TEST_PERF:.o=.d) 
+-include $(OBJ_FORTRAN:.o=.d) 
+-include $(OBJ_MAIN:.o=.d) 
+-include $(OBJ_TEST:.o=.d) 
+-include $(OBJ_TEST_PERF:.o=.d) 
 
 
 all:
