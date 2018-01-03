@@ -6,6 +6,7 @@ module oa_mod
   use oa_partition
   use oa_sub
   use oa_set
+  use oa_set_with_mask
   use oa_sum
   use oa_min_max  
   use oa_shift

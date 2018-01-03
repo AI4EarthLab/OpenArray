@@ -1167,5 +1167,66 @@ namespace oa {
       ap->set_pseudo(true);
       return ap;
     }
+
+    void set_with_mask(ArrayPtr& A, 
+                       const ArrayPtr& B, 
+                       const ArrayPtr& M) {
+     
+      bool ifscalar_B = B->is_seqs_scalar();
+      if(!ifscalar_B){
+        assert(B->shape() == A->shape());
+      }
+      
+      assert(M->shape() == A->shape());
+      
+      ArrayPtr B1, M1;
+      
+      // needs transfer
+      if (!A->get_partition()->equal(
+                  B->get_partition()) && !ifscalar_B) {
+        B1 = transfer(B, A->get_partition());
+      }else{
+        B1 = B;
+      }
+      
+      // needs transfer
+      if (!A->get_partition()->equal(M->get_partition()) ) {
+        M1 = transfer(M, A->get_partition());
+      }else{
+        M1 = M;
+      }
+
+      // don't have local data in process
+      if (!A->has_local_data())
+        return ;
+
+      ///:set TYPE = [['DATA_INT', 'int'], ['DATA_FLOAT', 'float'], ['DATA_DOUBLE', 'double']]
+      ///:for i in TYPE
+      ///:for j in TYPE
+      ///:for k in TYPE
+      if (A->get_data_type() == ${i[0]}$
+          && B1->get_data_type() == ${j[0]}$ 
+          && M1->get_data_type() == ${k[0]}$ ) {
+        oa::internal::copy_buffer_with_mask<${i[1]}$, ${j[1]}$, ${k[1]}$>(
+          (${i[1]}$*) A->get_buffer(),
+          A->buffer_shape(),
+          A->local_data_win(),
+          (${j[1]}$*) B1->get_buffer(),
+          B1->buffer_shape(),
+          B1->local_data_win(),
+          (${k[1]}$*) M1->get_buffer(),
+          M1->buffer_shape(),
+          M1->local_data_win(),
+          ifscalar_B
+        );
+        return;
+      }
+
+      ///:endfor
+      ///:endfor
+      ///:endfor
+        
+    }
+
   }
 }

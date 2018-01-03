@@ -529,6 +529,61 @@ contains
     
   end subroutine
   
+  subroutine test_set_with_mask()
+    implicit none
+    type(array) :: A, B, C
+    type(array) :: mask
+    type(array) :: temparray
+    type(node) :: node_mask
+    integer :: val1
+    real  :: val2
+    real(kind=8)  :: val3
+
+    
+    val1 = 9
+    val2 = 9.900
+    val3 = 9.9900
+
+
+    ///:for t in [['OA_INT','val1'], &
+        ['OA_FLOAT','val2'], &
+        ['OA_DOUBLE','val3']]
+
+    A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    B = seqs(m, n, k, dt = ${t[0]}$);
+    
+    mask = seqs(m, n, k, dt = ${t[0]}$);
+    node_mask = mask + mask
+
+    A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    call set(A, ${t[1]}$, mask)
+    call display(A, "A1 = ")
+
+    A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    call set(A, ${t[1]}$, A > val1)
+    call display(A, "A2 = ")
+
+    A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    call set(A, B, A > B)
+    call display(A, "A3 = ")
+
+    A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    call set(A, B, A < B)
+    call display(A, "A4 = ")
+
+    A = ones(m, n, k, dt = ${t[0]}$) * 30;    
+    call set(A, B * 2, mask)
+    call display(A, "A5 = ")
+
+    A = ones(m, n, k, dt = ${t[0]}$) * 30;    
+    call set(A, B * 2, A > B * 2)
+    call display(A, "A6 = ")
+
+    ///:endfor
+
+    
+  end subroutine
+
   subroutine test_partition()
     integer :: A(3), B(3), C(3)
 
