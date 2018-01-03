@@ -440,6 +440,53 @@ contains
     
   end subroutine
   
+  subroutine test_set_with_mask()
+    implicit none
+    type(array) :: A, B, C
+    type(array) :: mask
+    type(array) :: temparray
+    type(node) :: node_mask
+    integer :: val1
+    real  :: val2
+    real(kind=8)  :: val3
+
+    
+    val1 = 9
+    val2 = 9.900
+    val3 = 9.9900
+
+
+    ///:for t in [['OA_INT','val1'], &
+        ['OA_FLOAT','val2'], &
+        ['OA_DOUBLE','val3']]
+
+    A = zeros(6, 6, 6, dt = ${t[0]}$);
+    mask = seqs(6, 6, 6, dt = ${t[0]}$);
+    node_mask = mask + mask
+
+    call set_with_mask(A, ${t[1]}$, mask)
+    call display(A, "A = ")
+
+    call set_with_mask(A, ${t[1]}$, node_mask)
+    call display(A, "A = ")
+
+    call set_with_mask(A, mask, mask)
+    call display(A, "A = ")
+
+    call set_with_mask(A, mask, mask+mask)
+    call display(A, "A = ")
+
+    call set_with_mask(A, node_mask, mask)
+    call display(A, "A = ")
+
+    call set_with_mask(A, node_mask, node_mask)
+    call display(A, "A = ")
+
+    ///:endfor
+
+    
+  end subroutine
+
   subroutine test_partition()
     integer :: A(3), B(3), C(3)
 

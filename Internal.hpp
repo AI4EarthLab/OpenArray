@@ -137,14 +137,11 @@ namespace oa {
         for (int k = 0; k < P; k++) {
           for (int j = 0; j < N; j++) {
             for (int i = 0; i < M; i++) {
-              if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)//wangdong
+              if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)// >0
                 A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] =
                   B_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2];
-              //cout<<buffer[cnt-1]<<" ";
             }
-            //cout<<endl;
           }
-          //cout<<endl;
         }
       }
       else{
@@ -152,13 +149,10 @@ namespace oa {
         for (int k = 0; k < P; k++) {
           for (int j = 0; j < N; j++) {
             for (int i = 0; i < M; i++) {
-              if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)//wangdong
+              if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)// >0
                 A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] = B_buf[0];
-              //cout<<buffer[cnt-1]<<" ";
             }
-            //cout<<endl;
           }
-          //cout<<endl;
         }
       }
 
