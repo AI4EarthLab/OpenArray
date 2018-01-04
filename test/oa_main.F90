@@ -11,7 +11,6 @@ program main
   use mpi
   use oa_test
   implicit none
-<<<<<<< HEAD
   integer :: step
   
   !no split in z-direction
