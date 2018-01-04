@@ -51,11 +51,11 @@ program main
   
   ! call test_set()
 
-  call test_set_with_mask()
+  ! call test_set_with_mask()
   
   ! call test_io()
 
-  ! call test_get_ptr()
+  call test_get_ptr()
 
   ! call test_tic_toc()
 

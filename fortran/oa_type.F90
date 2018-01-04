@@ -154,7 +154,12 @@
     end interface ${b}$ 
     ///:endfor
 
-
+    interface get_local_buffer
+       ///:for t in scalar_dtype
+       module procedure get_local_buffer_${t[0]}$
+       ///:endfor
+    end interface get_local_buffer
+ 
     integer, parameter :: OA_INT    = 0
     integer, parameter :: OA_FLOAT  = 1
     integer, parameter :: OA_DOUBLE = 2
@@ -468,19 +473,34 @@
     end function
 
     ///:for t in scalar_dtype
-    function get_buffer_${t[0]}$(A) result(res)
+    subroutine get_local_buffer_${t[0]}$(res, A)
       use iso_c_binding
       implicit none
       type(array) :: A
-      ${t[1]}$, dimension(:,:,:), pointer :: res
+      ${t[1]}$, dimension(:,:,:), pointer, intent(out) :: res
       type(c_ptr) :: tmp
       integer :: s(3)
+      integer :: flag
+      interface
+         subroutine c_is_array_${t[0]}$(flag, A) &
+              bind(C, name = "c_is_array_${t[0]}$")
+           use iso_c_binding
+           type(c_ptr) :: A
+           integer(c_int) :: flag
+         end subroutine
+      end interface
       
       tmp = get_buffer_ptr(A)
-      s = buffer_shape(A)
+      s   = buffer_shape(A)
 
-      call c_f_pointer(tmp, res, [s(1), s(2), s(3)])
-    end function
+      call c_is_array_${t[0]}$ (flag, A%ptr)
+      if(flag > 0) then
+         call c_f_pointer(tmp, res, [s(1), s(2), s(3)])
+      else
+         print*, "Error: pointer does not match array's data type"
+         stop
+      end if
+    end subroutine
     ///:endfor
     
     function shape_array(A) result(res)

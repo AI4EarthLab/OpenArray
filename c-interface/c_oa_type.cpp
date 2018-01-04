@@ -223,5 +223,17 @@ extern "C" {
   void c_get_stencil_type(int& st){
     st = Partition::get_default_stencil_width();
   }
+
+  ///:for t in ['int', 'float', 'double']
+  void c_is_array_${t}$(int& flag, ArrayPtr*& A){
+    ENSURE_VALID_PTR(A);
+    if((*A)->get_data_type() == DATA_${t.upper()}$){
+      flag = 1;
+    }else {
+      flag = 0;
+    }
+  }
+  ///:endfor
+  
 }
 

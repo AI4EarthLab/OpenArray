@@ -708,15 +708,15 @@
       implicit none
       type(array) :: A
       type(array) :: B
-      real(kind=8), pointer :: p(:,:,:)
+      real, pointer :: p(:,:,:)
       integer :: i, j, k, s(3)
 
       A = ones(4, 3, 2)
 
       call display(A, "A = ")
 
-      p => get_buffer_double(A)
-      !print*, "shape(p) = ", shape(p)
+      call get_local_buffer(p, A)
+      print*, "shape(p) = ", shape(p)
 
       ! s = shape(p)
       ! do k = 1, s(3)
