@@ -36,6 +36,9 @@ namespace oa {
 
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
       vector<int3> &S, PartitionPtr &ptr);
+
+    void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
+      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr);
     
     const KernelPtr get_kernel_dict(size_t hash, 
                                     const char *filename = "fusion-kernels");

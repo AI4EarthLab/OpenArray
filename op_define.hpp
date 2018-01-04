@@ -79,6 +79,7 @@
 ///:endfor
 
 
+#define PSU3D(x)          oa::funcs::make_psudo3d(x)
 #define EVAL(x)           oa::ops::eval(x)
 
 #endif 

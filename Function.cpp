@@ -332,6 +332,7 @@ namespace oa {
     }
 
     void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction) {
+      // oa::internal::set_ghost_consts((float*)ap->get_buffer(), ap->local_shape(), (float)0, 1); // only for test, wuqi
 
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();
@@ -400,6 +401,11 @@ namespace oa {
         st_x = st_y = st_z = -1;
         ed_x = ed_y = ed_z = 1;
         break;
+      case 3:
+        bitset<3> bit = ap->get_bitset();
+        if (bit[2] != 0) st_x = -1, ed_x = 1;
+        if (bit[1] != 0) st_y = -1, ed_y = 1;
+        if (bit[0] != 0) st_z = -1, ed_z = 1;
       }
 
       for (int z = st_z; z <= ed_z; ++z) {
@@ -1134,7 +1140,6 @@ namespace oa {
     }
 
     ArrayPtr make_psudo3d(const ArrayPtr& B){
-  
       Shape ps = B->get_partition()->procs_shape();
       Shape as = B->shape();
 

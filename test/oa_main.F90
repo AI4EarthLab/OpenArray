@@ -1,3 +1,4 @@
+#include "../fortran/config.h"
 module test
   use iso_c_binding
   use oa_mod
@@ -10,6 +11,7 @@ program main
   use mpi
   use oa_test
   implicit none
+<<<<<<< HEAD
   integer :: step
   
   !no split in z-direction
@@ -57,7 +59,7 @@ program main
   ! call test_get_ptr()
 
   ! call test_tic_toc()
-  
+
   call oa_finalize()
-  
+
 end program main

@@ -6,14 +6,14 @@ namespace oa{
     m_comm = MPI_COMM_NULL;
   }
 
-  // void MPI::init(MPI_Comm comm, int argc, char** argv){
-  //   if(argc > 0){
-  //     MPI_Init(&argc, &argv);
-  //   }else{
-  //     MPI_Init(NULL, NULL);
-  //   }
-  //   m_comm = comm;
-  // }
+  void MPI::c_init(MPI_Comm comm, int argc, char** argv){
+    if(argc > 0){
+      MPI_Init(&argc, &argv);
+    }else{
+      MPI_Init(NULL, NULL);
+    }
+    m_comm = comm;
+  }
 
   void MPI::init(int comm, int argc, char** argv){
     if(argc > 0){

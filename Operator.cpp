@@ -318,7 +318,7 @@ namespace oa {
 
     // prepare kernel fusion parameters with operator
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
-      vector<int3> &S, PartitionPtr &ptr) {
+      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr) {
       ArrayPtr ap;
       // data
       if (A->has_data()) {
@@ -327,7 +327,10 @@ namespace oa {
         if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
           ptr = ap->get_partition();
         }
-        if (!A->is_seqs_scalar()) S.push_back(ap->buffer_shape());
+        if (!A->is_seqs_scalar()) {
+          S.push_back(ap->buffer_shape());
+          update_list.push_back(ap);
+        }
         return ;
       }
 
@@ -339,13 +342,16 @@ namespace oa {
         if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
           ptr = ap->get_partition();
         }
-        if (!A->is_seqs_scalar()) S.push_back(ap->buffer_shape());
+        if (!A->is_seqs_scalar()) {
+          S.push_back(ap->buffer_shape());
+          update_list.push_back(ap);
+        }
         return ;
       }
 
       // tree
       for (int i = 0; i < A->input_size(); i++) {
-        get_kernel_parameter_with_op(A->input(i), list, S, ptr);
+        get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr);
       }
 
       // bind grid if A.pos != -1
@@ -424,15 +430,31 @@ namespace oa {
       return ap;
     }
 
+    // treat operator as element wise
     ArrayPtr eval_with_op(NodePtr A) {
       // fusion kernel
       if (A->hash()) {
+        // use A->hash() to get inside fusion kernel
         FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
         if (fkptr != NULL) {
           vector<void*> list;
           vector<int3> S;
+          vector<ArrayPtr> update_list;
           PartitionPtr par_ptr;
-          get_kernel_parameter_with_op(A, list, S, par_ptr);
+          get_kernel_parameter_with_op(A, list, update_list, S, par_ptr);
+
+          int3 lb = A->get_lbound();
+          int3 rb = A->get_rbound();
+          
+          int sb = lb[0] + lb[1] + lb[2] + rb[0] + rb[1] + rb[2];
+          int sz = update_list.size();
+          vector< vector<MPI_Request> > reqs_list (sz, vector<MPI_Request>());
+          // step 1:  start of update boundary
+          if (sb) {
+            for (int i = 0; i < sz; i++) 
+              oa::funcs::update_ghost_start(update_list[i], reqs_list[i], 3);
+          }
+
           ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
           S.push_back(ap->buffer_shape());
           S.push_back(A->get_lbound());
@@ -442,7 +464,22 @@ namespace oa {
           list.push_back(ap->get_buffer());
           list.push_back((void*)S.data());
           void** list_pointer = list.data();
+          
+          // step 2:  calc_inside
           fkptr(list_pointer, ap->get_stencil_width());
+          
+          if (sb) {
+            // step 3:  end of update boundary
+            for (int i = 0; i < sz; i++) 
+              oa::funcs::update_ghost_end(reqs_list[i]);
+
+            // step 4:  calc_outside
+            // use A->hash() + 1 to get outside fusion kernel
+            FusionKernelPtr out_fkptr = Jit_Driver::global()->get(A->hash() + 1);
+            if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
+          }
+
+
           //cout<<"fusion-kernel called"<<endl;
           
           //A->set_data(ap);
@@ -607,7 +644,7 @@ namespace oa {
         // JIT source code add calc_inside
         code_add_function(code, __code, A->get_data_type(), id);
 
-        cout<<code.str()<<endl;
+        // cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
 
@@ -650,11 +687,26 @@ namespace oa {
         // JIT source code add calc_inside
         code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
 
-        cout<<code.str()<<endl;
+        // cout<<code.str()<<endl;
         // Add fusion kernel into JIT map
         Jit_Driver::global()->insert(hash, code);
 
         A->set_hash(hash);
+
+        int3 lb = A->get_lbound();
+        int3 rb = A->get_rbound();
+        int sb = lb[0] + lb[1] + lb[2] + rb[0] + rb[1] + rb[2];
+
+        // Add calc_outside
+        if (sb) {
+          stringstream code_out;
+          size_t hash_out = hash + 1;
+          code_add_function_signature_with_op(code_out, hash_out);
+          code_add_const(code_out, int_id, float_id, double_id);
+          code_add_calc_outside(code_out, __code, A->get_data_type(), id, S_id);
+          // cout<<code_out.str()<<endl;
+          Jit_Driver::global()->insert(hash_out, code_out);
+        }
       }
 
       for (int i = 0; i < A->input_size(); i++) {
@@ -967,71 +1019,71 @@ namespace oa {
       switch(nd.type) {
       // Central difference operator
       case TYPE_DXC:
-        new_str1 = replace_string(in, "i,", "+1+i,");
+        new_str1 = replace_string(in, "i,", "1+i,");
         new_str2 = replace_string(in, "i,", "-1+i,");
-        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        ss<<"0.5*(("<<new_str1<<")-("<<new_str2<<"))";
         break;
       case TYPE_DYC:
-        new_str1 = replace_string(in, "j,", "+1+j,");
+        new_str1 = replace_string(in, "j,", "1+j,");
         new_str2 = replace_string(in, "j,", "-1+j,");
-        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        ss<<"0.5*(("<<new_str1<<")-("<<new_str2<<"))";
         break;
       case TYPE_DZC:
-        new_str1 = replace_string(in, "k,", "+1+k,");
+        new_str1 = replace_string(in, "k,", "1+k,");
         new_str2 = replace_string(in, "k,", "-1+k,");
-        ss<<"0.5*("<<new_str1<<"-"<<new_str2<<")";
+        ss<<"0.5*(("<<new_str1<<")-("<<new_str2<<"))";
         break;
 
       // average operator
       case TYPE_AXB:
         new_str = replace_string(in, "i,", "-1+i,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AXF:
-        new_str = replace_string(in, "i,", "+1+i,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        new_str = replace_string(in, "i,", "1+i,");
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AYB:
         new_str = replace_string(in, "j,", "-1+j,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AYF:
-        new_str = replace_string(in, "j,", "+1+j,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        new_str = replace_string(in, "j,", "1+j,");
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AZB:
         new_str = replace_string(in, "k,", "-1+k,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
       case TYPE_AZF:
-        new_str = replace_string(in, "k,", "+1+k,");
-        ss<<"0.5*("<<in<<"+"<<new_str<<")";
+        new_str = replace_string(in, "k,", "1+k,");
+        ss<<"0.5*(("<<in<<")+("<<new_str<<"))";
         break;
 
       // difference operator
       case TYPE_DXB:
         new_str = replace_string(in, "i,", "-1+i,");
-        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        ss<<"1.0*(("<<in<<")-("<<new_str<<"))";
         break;
       case TYPE_DXF:
-        new_str = replace_string(in, "i,", "+1+i,");
-        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        new_str = replace_string(in, "i,", "1+i,");
+        ss<<"1.0*(("<<new_str<<")-("<<in<<"))";
         break;
       case TYPE_DYB:
         new_str = replace_string(in, "j,", "-1+j,");
-        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        ss<<"1.0*(("<<in<<")-("<<new_str<<"))";
         break;
       case TYPE_DYF:
-        new_str = replace_string(in, "j,", "+1+j,");
-        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        new_str = replace_string(in, "j,", "1+j,");
+        ss<<"1.0*(("<<new_str<<")-("<<in<<"))";
         break;
       case TYPE_DZB:
         new_str = replace_string(in, "k,", "-1+k,");
-        ss<<"1.0*("<<in<<"-"<<new_str<<")";
+        ss<<"1.0*(("<<in<<")-("<<new_str<<"))";
         break;
       case TYPE_DZF:
-        new_str = replace_string(in, "k,", "+1+k,");
-        ss<<"1.0*("<<new_str<<"-"<<in<<")";
+        new_str = replace_string(in, "k,", "1+k,");
+        ss<<"1.0*(("<<new_str<<")-("<<in<<"))";
         break;
 
       // abs operator
@@ -1086,7 +1138,7 @@ namespace oa {
       code<<"#include <array>\n\n";
       code<<"typedef std::array<int, 3> int3;\n\n";      
       code<<"extern \"C\" {\n";
-      code<<"int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
+      code<<"inline int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
       code<<"  const int M = S[0];\n";
       code<<"  const int N = S[1];\n";
       code<<"  return k * M * N + j * M + i;\n}\n\n";
@@ -1130,19 +1182,95 @@ namespace oa {
     void code_add_calc_outside(stringstream& code, 
       stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
       
-      code<<"  for (int i = 0; i < size; i++) {\n";  
-      switch(dt) {
-        case DATA_INT:
-          code<<"    ((int*)(list["<<id<<"]))[i] = ";
-          break;
-        case DATA_FLOAT:
-          code<<"    ((float*)(list["<<id<<"]))[i] = ";
-          break;
-        case DATA_DOUBLE:
-          code<<"    ((double*)(list["<<id<<"]))[i] = ";
-          break;    
+      code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
+      for (int i = 0; i <= S_id; i++) {
+        code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
       }
-      code<<__code.str()<<";\n  }\n  return ;\n}}";
+      code<<"\n";
+      code<<"  const int3 &lbound = int3_p["<<S_id + 1<<"];\n";
+      code<<"  const int3 &rbound = int3_p["<<S_id + 2<<"];\n";
+      code<<"  const int3 &sp = int3_p["<<S_id + 3<<"];\n\n";
+
+      string ans_type[3];
+      ans_type[DATA_INT] = "(int*)";
+      ans_type[DATA_FLOAT] = "(float*)";
+      ans_type[DATA_DOUBLE] = "(double*)";
+
+      // lbound[2]
+      code<<"  if (lbound[2]) {\n";
+      code<<"    for (int k = o; k < o + lbound[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
+                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+      
+      // rbound[2]
+      code<<"  if (rbound[2]) {\n";
+      code<<"    for (int k = o + sp[2] - rbound[2]; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
+                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+
+
+      // lbound[1]
+      code<<"  if (lbound[1]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + lbound[1]; j++) {\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
+                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+      
+      // rbound[1]
+      code<<"  if (rbound[1]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o + sp[1] - rbound[1]; j < o + sp[1]; j++) {\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
+                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+
+      // lbound[0]
+      code<<"  if (lbound[0]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"        for (int i = o; i < o + lbound[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
+                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+      
+      // rbound[0]
+      code<<"  if (rbound[0]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"        for (int i = o + sp[0] - rbound[0]; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
+                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+
+      code<<"  return ;\n}}";
+
     }
 
     void code_add_calc_inside(stringstream& code, 

@@ -3,11 +3,15 @@
 #include <string>
 #include <mpi.h>
 #include "test.hpp"
+#include "../MPI.hpp"
 
 using namespace std;
 
 int main(int argc, char** argv) {
-  MPI_Init(NULL, NULL);
+  
+  // MPI_Init(NULL, NULL);
+  oa::MPI::global()->c_init(MPI_COMM_WORLD, 0, NULL);
+
   int m = stol(argv[1]);
   int n = stol(argv[2]);
   int p = stol(argv[3]);

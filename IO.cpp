@@ -18,7 +18,7 @@ namespace oa {
     void save(const ArrayPtr& A,
               const std::string& filename,
               const std::string& varname) {
-      
+      /*
       DataType dt = A->get_data_type();
       int ncid;
       MPI_Comm comm = A->get_partition()->get_comm();
@@ -111,12 +111,13 @@ namespace oa {
         break;
       }
       ncmpi_close(ncid);
+      */
     }
 
     ArrayPtr load(const std::string& filename, 
                   const std::string& varname,
                   const MPI_Comm& comm) {
-      
+      /*
       int status;
       int ncid, varid;
       nc_type var_type;
@@ -212,6 +213,8 @@ namespace oa {
 
       ncmpi_close(ncid);
       return A;
+      */
+      return NULL;
     }
   }
 }

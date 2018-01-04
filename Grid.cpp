@@ -15,7 +15,6 @@ void Grid::init_grid(char type,
 
   switch(type){
   case 'C':
-    x_d[0] = PSU3D(EVAL(AYB(ndx)));
     x_d[0] = PSU3D(EVAL(AYB(AXB(ndx))));
     y_d[0] = PSU3D(EVAL(AYB(AXB(ndy))));
     z_d[0] = PSU3D(dz);

@@ -1196,11 +1196,11 @@
 //}
 void test_set_with_mask() {
   // A
+
   ArrayPtr A = oa::funcs::zeros(MPI_COMM_WORLD,  {6, 6, 6}, {1}, 1);
   ArrayPtr B = oa::funcs::consts(MPI_COMM_WORLD,  {6, 6, 6}, 199, 1);
   //ArrayPtr B = oa::funcs::consts(MPI_COMM_WORLD,  {1, 1, 1}, 199, 1);
   ArrayPtr mask = oa::funcs::seqs(MPI_COMM_WORLD,  {6, 6, 6}, {1}, 1);
-
 
   A->display("======A======");
   B->display("====B====");

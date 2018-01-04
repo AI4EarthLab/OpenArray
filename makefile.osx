@@ -1,5 +1,5 @@
 name = main
-compile_thread = -j8
+compile_thread = #-j8
 
 #if you put the exteranl libaray in one directory
 EXT_INCLUDE = $(addprefix -I, $(shell find ${EXT_PATH}/include -maxdepth 1 -type d))
@@ -19,9 +19,9 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 oplevel0 = -O0 -g 
 oplevel3 = -O3
 
-FC = mpif90 ${oplevel3}
-CC = mpicc  ${oplevel3}
-CXX = mpicxx ${oplevel3}
+FC = mpif90 ${oplevel0}
+CC = mpicc  ${oplevel0}
+CXX = mpicxx ${oplevel0}
 
 FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans -ffree-line-length-0
 
