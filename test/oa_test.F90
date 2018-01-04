@@ -91,7 +91,7 @@
     end subroutine
 
     subroutine test_basic()
-      type(array) :: A, B, C
+      type(array) :: A, B, C, D, E
       integer :: si
       real :: sr
       real(kind=8) :: sr8
@@ -128,6 +128,20 @@
       ///:endfor
       ///:endfor
 
+      A = rands(m, n, k)
+      B = A > 0.2
+      C = A < 0.7
+
+      call display(B, "B = ")
+      call display(C, "C = ")
+      
+      D = B .and. C
+      call display(D, 'B .and. C = ')
+
+      call display(A, "A = ")
+      D = (A > 0.8) .or. (A < 0.2)
+      call display(D, '(A > 0.8 .or A < 0.2) = ')
+      
     end subroutine
 
 

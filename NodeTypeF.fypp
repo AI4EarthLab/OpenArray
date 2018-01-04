@@ -71,7 +71,7 @@
        ["TYPE_SUM",     "sum",     "sum",        "",    "",  "F", "F",  "sum",     "0"],&
        ["TYPE_CSUM",    "csum",    "csum",       "",    "",  "F", "F",  "csum(A)",    "0"],&
        ["TYPE_OR",      "or",      ".or.",         "F",   "A", "F", "F",  "A.or.B",     "0"],&
-       ["TYPE_AND",     "and",     "&&",         "F",   "A", "F", "F",  "A.and.B",    "0"],& 
+       ["TYPE_AND",     "and",     ".and.",         "F",   "A", "F", "F",  "A.and.B",    "0"],& 
        ["TYPE_NOT",     "not",     ".not.",          "G",   "B", "F", "F",  ".not.B",     "0"],&
        ["TYPE_REP",     "rep",     "rep",        "",    "",  "F", "T",  "rep(A)",     "0"],&
        ["TYPE_SHIFT",   "shift",   "shift",      "",    "",  "F", "F",  "shift(A)",   "0"]]    

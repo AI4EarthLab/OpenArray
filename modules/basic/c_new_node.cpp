@@ -8,7 +8,7 @@
 using namespace oa::ops;
 
 extern "C"{
-  ///:for op in [i for i in L if i[3] in ['A','B']]
+  ///:for op in [i for i in L if i[3] in ['A','B','F']]
   void c_new_node_${op[1]}$(NodePtr*& A,
           const NodePtr*& u, const NodePtr*& v){
     c_destroy_node((void*&)A);

@@ -19,7 +19,7 @@ program main
   call oa_get_option(step, "step", -1)
   print*, "step = ", step
   !initialize the test module  
-  call test_init(6, 6, 6, MPI_COMM_WORLD) 
+  call test_init(4, 3, 2, MPI_COMM_WORLD) 
   
   ! call test_create_array()
   
@@ -27,7 +27,7 @@ program main
 
   ! call test_partition()
 
-  ! call test_basic()
+  call test_basic()
 
   ! call test_compare()
 
@@ -55,7 +55,7 @@ program main
   
   ! call test_io()
 
-  call test_get_ptr()
+  ! call test_get_ptr()
 
   ! call test_tic_toc()
 

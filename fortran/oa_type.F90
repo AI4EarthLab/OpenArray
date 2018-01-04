@@ -130,7 +130,7 @@
        end subroutine
     end interface
 
-    ///:for op in [o for o in L if o[3] == 'A' or o[3] == 'B']
+    ///:for op in [o for o in L if o[3] in ['A','B','F']]
     interface operator (${op[2]}$)
        ///:for type1 in types
        ///:for type2 in types
@@ -154,6 +154,7 @@
     end interface ${b}$ 
     ///:endfor
 
+    
     interface get_local_buffer
        ///:for t in scalar_dtype
        module procedure get_local_buffer_${t[0]}$
@@ -540,7 +541,7 @@
     end function
 
 
-    ///:for e in [x for x in L if x[3] == 'A' or x[3] == 'B']
+    ///:for e in [x for x in L if x[3] in ['A','B','F']]
     ///:set op = e[1]
     ///:for type1 in types
     ///:for type2 in types
