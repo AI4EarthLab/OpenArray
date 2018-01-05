@@ -14,8 +14,10 @@ Array::Array(const PartitionPtr &ptr, int data_type) :
   int sw = ptr->get_stencil_width();
   int size_in = box.size();
   int size = box.size(sw);
+
   // if box.size() == 0, there is no need to contain stencil
   if (size_in == 0) size = 0;
+  
   switch (m_data_type) {
   case DATA_INT:
     m_buffer = (void*) new int[size];
