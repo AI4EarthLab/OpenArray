@@ -72,6 +72,8 @@ namespace oa {
     
     void update_ghost_end(vector<MPI_Request> &reqs);
 
+    void set_ghost_zeros(ArrayPtr ap);
+
     inline int calc_id(int i, int j, int k, int3 S);
 
     void calc_inside(ArrayPtr &ap, ArrayPtr &A, int3 lbound, int3 rbound);

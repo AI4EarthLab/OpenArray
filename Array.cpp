@@ -12,7 +12,10 @@ Array::Array(const PartitionPtr &ptr, int data_type) :
   set_local_box();
   Box box = get_local_box();
   int sw = ptr->get_stencil_width();
-  int size = box.size(sw);    
+  int size_in = box.size();
+  int size = box.size(sw);
+  // if box.size() == 0, there is no need to contain stencil
+  if (size_in == 0) size = 0;
   switch (m_data_type) {
   case DATA_INT:
     m_buffer = (void*) new int[size];
@@ -269,6 +272,17 @@ void Array::set_bitset(bitset<3> bs) {
   m_bs = bs;
 }
 
+// set_bitset based on global shape
+void Array::set_bitset() {
+  for (int i = 0; i < 3; i++) {
+    if (m_par_ptr->shape()[i] != 1) m_bs[2 - i] = 1;
+    else {
+      m_bs[2 - i] = 0;
+      m_is_pseudo = true;
+    }
+  }
+}
+
 bitset<3> Array::get_bitset() {
   return m_bs;
 }
@@ -295,4 +309,8 @@ void Array::set_zeros(){
       ((double*)m_buffer, buffer_size(), 0);
     break;
   }
+}
+
+ArrayPtr Array::get_pseudo_3d() {
+  return m_pseudo_3d;
 }

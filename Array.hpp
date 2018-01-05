@@ -34,7 +34,7 @@ class Array {
   //GridPtr grid;
   bool m_is_pseudo = false;
   std::bitset<3> m_bs = std::bitset<3>(std::string("111"));
-
+  ArrayPtr m_pseudo_3d;
 
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
@@ -68,10 +68,12 @@ class Array {
   void set_bitset(std::string);
   bitset<3> get_bitset();
   void set_bitset(bitset<3> bs);
+  void set_bitset();
   int get_stencil_width() const;
   int get_stencil_type() const;
   void set_zeros();
   Box local_data_win() const;
+  ArrayPtr get_pseudo_3d();
 };
 
 
