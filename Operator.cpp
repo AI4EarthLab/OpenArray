@@ -487,6 +487,12 @@ namespace oa {
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
 
+          // oa::internal::set_ghost_consts(
+          //     (float*)ap->get_buffer(), 
+          //     ap->local_shape(), 
+          //     (float)0, 
+          //     1); // only for test, wuqi
+
           return ap;
         }
       }
@@ -1135,8 +1141,9 @@ namespace oa {
     }
 
     void code_add_function_signature_with_op(stringstream& code, size_t& hash) {
-      code<<"#include <array>\n\n";
-      code<<"typedef std::array<int, 3> int3;\n\n";      
+      // code<<"#include <array>\n\n";
+      // code<<"typedef std::array<int, 3> int3;\n\n";      
+      code<<"typedef int int3[3];\n\n";
       code<<"extern \"C\" {\n";
       code<<"inline int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
       code<<"  const int M = S[0];\n";

@@ -55,9 +55,13 @@ program main
   
   ! call test_io()
 
-  call test_get_ptr()
+  ! call test_get_ptr()
 
   ! call test_tic_toc()
+
+  ! call test_fusion_operator()
+  
+  call test_internal_q()
 
   call oa_finalize()
 
