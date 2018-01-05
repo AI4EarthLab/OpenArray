@@ -611,6 +611,7 @@ namespace oa {
       }
     }
 
+    // set ghost to zeros, in order to check correctness
     void set_ghost_zeros(ArrayPtr ap) {
       void* buffer = ap->get_buffer();
       Shape ls = ap->local_shape();
