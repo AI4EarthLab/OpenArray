@@ -154,6 +154,13 @@
     end interface ${b}$ 
     ///:endfor
 
+    interface operator(**)
+       ///:for t1 in ['node', 'array']
+       ///:for t2 in scalar_dtype
+       module procedure ops_pow_${t1}$_${t2[0]}$
+       ///:endfor
+       ///:endfor
+    end interface operator(**)
     
     interface get_local_buffer
        ///:for t in scalar_dtype
@@ -637,6 +644,39 @@
     ///:endfor
     ///:endfor
 
+    ///:for t1 in ['node', 'array']
+    ///:for t2 in scalar_dtype
+    function ops_pow_${t1}$_${t2[0]}$ (A, B) result(C)
+      implicit none
+      type(${t1}$), intent(in) :: A
+      ${t2[1]}$, intent(in) :: B
+      type(node) :: C, NA, NB
+
+      interface
+         subroutine c_new_node_pow(A, U, V) &
+              bind(C, name='c_new_node_pow')
+           use iso_c_binding
+           type(c_ptr), intent(inout) :: A
+           type(c_ptr), intent(in) :: U
+           type(c_ptr), intent(in) :: V           
+         end subroutine
+      end interface
+
+      ///:if t1 == 'node'
+      ///:set A = 'A'
+      ///:else
+      call c_new_node_array(NA%ptr, A%ptr)
+      ///:set A = 'NA'
+      ///:endif
+
+      call c_new_seqs_scalar_node_${t2[0]}$(NB%ptr, B)
+
+      call c_new_node_pow(C%ptr, ${A}$%ptr, NB%ptr)
+    end function
+    ///:endfor
+    ///:endfor
+
+       
     subroutine array_assign_array(A, B)
       implicit none
       type(array), intent(inout) :: A

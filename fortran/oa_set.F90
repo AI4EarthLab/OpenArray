@@ -27,6 +27,7 @@ module oa_set
      ///:endfor
      ///:endfor
 
+     !set array/node to a fortran scalar
      ///:for type1 in types
      ///:for type2 in ['node', 'array']
      module procedure set_${type1[0]}$_${type2}$
@@ -39,9 +40,25 @@ module oa_set
      module procedure set_array_const_${type1[0]}$
      ///:endfor
 
+     !set fortran array to array object
      ///:for dim in ['1d','2d','3d']
      ///:for type in types
      module procedure set_array_farray_${type[0]}$_${dim}$
+     ///:endfor
+     ///:endfor
+
+     !set array/node to a fortran array
+     ///:for dim in ['1d','2d','3d']
+     ///:for type in types
+     module procedure set_farray_array_${type[0]}$_${dim}$
+     module procedure set_farray_node_${type[0]}$_${dim}$
+     ///:endfor
+     ///:endfor
+
+     !set array/node to a fortran scalar
+     ///:for type1 in types
+     ///:for type2 in ['node', 'array']
+     module procedure set_${type1[0]}$_${type2}$
      ///:endfor
      ///:endfor     
   end interface assignment(=)
@@ -232,8 +249,8 @@ contains
   subroutine set_${type1[0]}$_${type2}$(A, B)
     use iso_c_binding
     implicit none
-    ${type1[1]}$, intent(out) :: A
-    type(${type2}$) :: B
+    ${type1[1]}$, intent(inout) :: A
+    type(${type2}$),intent(in) :: B
 
     interface
        subroutine c_set_${type1[0]}$_${type2}$(A, B) &

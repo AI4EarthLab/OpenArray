@@ -27,7 +27,7 @@ program main
 
   ! call test_partition()
 
-  call test_basic()
+  ! call test_basic()
 
   ! call test_compare()
 
@@ -51,6 +51,8 @@ program main
   
   ! call test_set()
 
+  call test_pow()
+  
   ! call test_set_with_mask()
   
   ! call test_io()

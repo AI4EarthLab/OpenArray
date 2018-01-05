@@ -128,6 +128,34 @@
       ///:endfor
       ///:endfor
 
+    end subroutine
+
+    subroutine test_pow()
+      implicit none
+      type(array) :: A, B
+
+      ///:for t in ['OA_INT', 'OA_FLOAT', 'OA_DOUBLE']
+      A = seqs(m, n, k, dt=${t}$)
+
+      B = A**(0.5)
+      call display(B, "A**(0.5) = ")
+
+      B = A**(0.5_8)
+      call display(B, "A**(0.5_8) = ")
+      
+      B = A**2
+      call display(B, "A**(2) = ")
+
+      B = A**0
+      call display(B, "A**(0) = ")
+      ///:endfor
+      
+    end subroutine
+    
+    subroutine test_logic()
+      implicit none
+      type(array) :: A, B, C, D
+      
       A = rands(m, n, k)
       B = A > 0.2
       C = A < 0.7
@@ -143,7 +171,7 @@
       call display(D, '(A > 0.8 .or A < 0.2) = ')
       
     end subroutine
-
+    
 
     subroutine test_compare()
       type(array) :: A, B, C
@@ -541,6 +569,10 @@
       call set(val3, sub(a+a, 3, 2, 2))
       print*, "val3 = ", val3
 
+      farr_double3 = sub(A, 1,2,[1,10])
+      if(rank == 0) &
+           print*, "farr_double3 = ", farr_double3
+      
     end subroutine
 
     subroutine test_set_with_mask()
