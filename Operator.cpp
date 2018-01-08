@@ -318,13 +318,13 @@ namespace oa {
 
     // prepare kernel fusion parameters with operator
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
-      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr) {
+      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, bitset<3> &bt) {
       ArrayPtr ap;
       // data
       if (A->has_data()) {
         ap = A->get_data();
         list.push_back(ap->get_buffer());
-        if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
+        if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
         }
         if (!A->is_seqs_scalar()) {
@@ -339,7 +339,7 @@ namespace oa {
       if (!nd.ew || A->need_update()) {
         ArrayPtr ap = eval(A);
         list.push_back(ap->get_buffer());
-        if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
+        if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
         }
         if (!A->is_seqs_scalar()) {
@@ -351,7 +351,7 @@ namespace oa {
 
       // tree
       for (int i = 0; i < A->input_size(); i++) {
-        get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr);
+        get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr, bt);
       }
 
       // bind grid if A.pos != -1
@@ -441,7 +441,9 @@ namespace oa {
           vector<int3> S;
           vector<ArrayPtr> update_list;
           PartitionPtr par_ptr;
-          get_kernel_parameter_with_op(A, list, update_list, S, par_ptr);
+          bitset<3> bt = A->get_bitset();
+          get_kernel_parameter_with_op(A, 
+            list, update_list, S, par_ptr, bt);
 
           int3 lb = A->get_lbound();
           int3 rb = A->get_rbound();
@@ -486,6 +488,12 @@ namespace oa {
           ap->set_pseudo(A->is_pseudo());
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
+
+          // oa::internal::set_ghost_consts(
+          //     (float*)ap->get_buffer(), 
+          //     ap->local_shape(), 
+          //     (float)0, 
+          //     1); // only for test, wuqi
 
           return ap;
         }
@@ -671,41 +679,52 @@ namespace oa {
         stringstream ss1;
         stringstream code;
         stringstream __code;
-        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
-        int id = 0;
-        int S_id = 0;
-        vector<int> int_id, float_id, double_id;
-        tree_to_code_with_op(A, __code, id, S_id, int_id, float_id, double_id);
+        
+        // generate hash code for tree
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
+        // cout<<ss1.str()<<endl;
         size_t hash = str_hash(ss1.str());
         
-        // JIT source code add function signature
-        code_add_function_signature_with_op(code, hash);
-        // JIT source code add const parameters
-        code_add_const(code, int_id, float_id, double_id);
-        // JIT source code add calc_inside
-        code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
+        // if already have kernel function ptr, do nothing
+        if (Jit_Driver::global()->get(hash) != NULL) {
+          A->set_hash(hash);
+          return ;
+        } 
+        else {
+          // else generate kernel function by JIT_Driver
+          int id = 0;
+          int S_id = 0;
+          vector<int> int_id, float_id, double_id;
+          tree_to_code_with_op(A, __code, id, S_id, int_id, float_id, double_id);
+          
+          // JIT source code add function signature
+          code_add_function_signature_with_op(code, hash);
+          // JIT source code add const parameters
+          code_add_const(code, int_id, float_id, double_id);
+          // JIT source code add calc_inside
+          code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
 
-        // cout<<code.str()<<endl;
-        // Add fusion kernel into JIT map
-        Jit_Driver::global()->insert(hash, code);
+          // cout<<code.str()<<endl;
+          // Add fusion kernel into JIT map
+          Jit_Driver::global()->insert(hash, code);
 
-        A->set_hash(hash);
+          A->set_hash(hash);
 
-        int3 lb = A->get_lbound();
-        int3 rb = A->get_rbound();
-        int sb = lb[0] + lb[1] + lb[2] + rb[0] + rb[1] + rb[2];
+          int3 lb = A->get_lbound();
+          int3 rb = A->get_rbound();
+          int sb = lb[0] + lb[1] + lb[2] + rb[0] + rb[1] + rb[2];
 
-        // Add calc_outside
-        if (sb) {
-          stringstream code_out;
-          size_t hash_out = hash + 1;
-          code_add_function_signature_with_op(code_out, hash_out);
-          code_add_const(code_out, int_id, float_id, double_id);
-          code_add_calc_outside(code_out, __code, A->get_data_type(), id, S_id);
-          // cout<<code_out.str()<<endl;
-          Jit_Driver::global()->insert(hash_out, code_out);
+          // Add calc_outside
+          if (sb) {
+            stringstream code_out;
+            size_t hash_out = hash + 1;
+            code_add_function_signature_with_op(code_out, hash_out);
+            code_add_const(code_out, int_id, float_id, double_id);
+            code_add_calc_outside(code_out, __code, A->get_data_type(), id, S_id);
+            // cout<<code_out.str()<<endl;
+            Jit_Driver::global()->insert(hash_out, code_out);
+          }
         }
       }
 
@@ -1116,7 +1135,9 @@ namespace oa {
 
       if (A->has_data() || !nd.ew || A->need_update()) {
         if (A->is_seqs_scalar()) ss<<"S";
-        else ss<<"A";
+        else {
+          ss<<"A"<<A->get_bitset();
+        }
         ss<<A->get_data_type();
         return ;
       }
@@ -1135,8 +1156,9 @@ namespace oa {
     }
 
     void code_add_function_signature_with_op(stringstream& code, size_t& hash) {
-      code<<"#include <array>\n\n";
-      code<<"typedef std::array<int, 3> int3;\n\n";      
+      // code<<"#include <array>\n\n";
+      // code<<"typedef std::array<int, 3> int3;\n\n";      
+      code<<"typedef int int3[3];\n\n";
       code<<"extern \"C\" {\n";
       code<<"inline int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
       code<<"  const int M = S[0];\n";

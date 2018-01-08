@@ -51,6 +51,9 @@ public:
       it->second->pop_back();
     }
 
+    // set bitset based on array global shape [m, n, k]
+    ap->set_bitset();
+
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
                     [](Array* arr_p) {
@@ -82,6 +85,9 @@ public:
       it->second->pop_back();
     }
 
+    // set bitset based on array global shape [m, n, k]
+    ap->set_bitset();
+
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
                     [](Array* arr_p) {
@@ -106,6 +112,9 @@ public:
       ap = it->second->back();
       it->second->pop_back();
     }
+
+    // set bitset based on array global shape [m, n, k]
+    ap->set_bitset();
 
     return ArrayPtr(ap, [](Array* arr_p) {
                       ArrayPool::global()->dispose(arr_p);

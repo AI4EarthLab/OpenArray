@@ -332,8 +332,9 @@ namespace oa {
     }
 
     void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction) {
-      // oa::internal::set_ghost_consts((float*)ap->get_buffer(), ap->local_shape(), (float)0, 1); // only for test, wuqi
-
+      // set ghost to zeros, then eval's answer equal to eval_with_op      
+      set_ghost_zeros(ap); 
+      
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();
       int gx = arr_shape[0];
@@ -607,6 +608,25 @@ namespace oa {
       //cout<<reqs.size()<<endl;
       if (reqs.size() > 0) {
         MPI_Waitall(reqs.size(), reqs.data(), MPI_STATUSES_IGNORE);
+      }
+    }
+
+    // set ghost to zeros, in order to check correctness
+    void set_ghost_zeros(ArrayPtr ap) {
+      void* buffer = ap->get_buffer();
+      Shape ls = ap->local_shape();
+      int sw = ap->get_stencil_width();
+      
+      switch (ap->get_data_type()) {
+        case DATA_INT:
+          oa::internal::set_ghost_consts((int*)buffer, ls, (int)0, sw);
+          break;
+        case DATA_FLOAT:
+          oa::internal::set_ghost_consts((float*)buffer, ls, (float)0, sw);
+          break;
+        case DATA_DOUBLE:
+          oa::internal::set_ghost_consts((double*)buffer, ls, (double)0, sw);
+          break;
       }
     }
 
