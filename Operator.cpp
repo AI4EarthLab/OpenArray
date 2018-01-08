@@ -1157,7 +1157,9 @@ namespace oa {
 
     void code_add_function_signature_with_op(stringstream& code, size_t& hash) {
       // code<<"#include <array>\n\n";
-      // code<<"typedef std::array<int, 3> int3;\n\n";      
+      // code<<"typedef std::array<int, 3> int3;\n\n";
+      code<<"#include \"math.h\"\n\n";
+      
       code<<"typedef int int3[3];\n\n";
       code<<"extern \"C\" {\n";
       code<<"inline int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
