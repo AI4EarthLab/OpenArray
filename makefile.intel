@@ -84,10 +84,10 @@ debug:
 
 
 
--include $(OBJ_FORTRAN:.o=.d) 
--include $(OBJ_MAIN:.o=.d) 
--include $(OBJ_TEST:.o=.d) 
--include $(OBJ_TEST_PERF:.o=.d) 
+##===##-include $(OBJ_FORTRAN:.o=.d) 
+##===##-include $(OBJ_MAIN:.o=.d) 
+##===##-include $(OBJ_TEST:.o=.d) 
+##===##-include $(OBJ_TEST_PERF:.o=.d) 
 
 
 all:
