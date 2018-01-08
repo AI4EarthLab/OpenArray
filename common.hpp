@@ -97,5 +97,7 @@ typedef arma::Cube<double> cube_double;
 #define MPI_RANK oa::MPI::global()->rank()
 #define MPI_SIZE oa::MPI::global()->size()
 
+extern bool g_cache;
+
 #endif
 

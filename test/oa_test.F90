@@ -949,28 +949,29 @@ contains
     dt      = rands(m, n, 1, dt = OA_FLOAT, sw=1)
     mat_ones = ones(m, n, k, dt = OA_FLOAT, sw=1)
 
-    drhox=ramp*AXB(dt)*mat_ones
-
-    call display(drhox, "==============drhox===============")
-    
-    FSET(drhox, ramp*AXB(dt)*mat_ones)
-
-    call display(drhox, "==============drhox===============")
-    
-
-
-
-
-    do s = 1 , step
-      q2f1=DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d)
-      FSET(q2f,DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d))
+    do s = 1, 3
+      drhox=ramp*AXB(dt)*mat_ones
+      FSET(drhox, ramp*AXB(dt)*mat_ones)
+      call display(drhox, "==============drhox===============")
     end do
+    
+    
+    !call display(drhox, "==============drhox===============")
+    
 
 
-    call cpu_time(finish)
-    call display(q2f1, "==============q2f1===============")
-    call display(q2f, "==============q2f===============")
-    print '(" ",f6.3,"")',finish-start
+
+
+    !do s = 1 , step
+    !  q2f1=DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d)
+    !  FSET(q2f,DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d))
+    !end do
+
+
+    !call cpu_time(finish)
+    !call display(q2f1, "==============q2f1===============")
+    !call display(q2f, "==============q2f===============")
+    !print '(" ",f6.3,"")',finish-start
 
   end subroutine
 

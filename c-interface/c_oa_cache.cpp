@@ -9,6 +9,8 @@ typedef std::unordered_map<std::string, NodePtr> CachedNodes;
 
 CachedNodes cached_nodes;
 
+bool g_cache = false;
+
 extern "C"{
   
   void c_find_node(NodePtr*& p, char* key){
@@ -18,6 +20,7 @@ extern "C"{
     if (it != cached_nodes.end()) {
       *p = it->second;
       //std::cout<<"found in cache!"<<std::endl;
+      g_cache = true;
     }else{
       *p = NULL;
       //std::cout<<"not found in cache!"<<std::endl;
@@ -34,6 +37,7 @@ extern "C"{
     }else{
       cached_nodes[std::string(key)] = *p;
       oa::ops::gen_kernels_JIT_with_op(*p);
+      g_cache = true;
     }
   }
 
