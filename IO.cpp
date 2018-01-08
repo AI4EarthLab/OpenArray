@@ -18,7 +18,7 @@ namespace oa {
     void save(const ArrayPtr& A,
               const std::string& filename,
               const std::string& varname) {
-      /*
+      
       DataType dt = A->get_data_type();
       int ncid;
       MPI_Comm comm = A->get_partition()->get_comm();
@@ -43,15 +43,18 @@ namespace oa {
       
       switch(dt) {
       case(DATA_INT):
-        err = ncmpi_def_var(ncid, varname.c_str(), NC_INT, 3, dimid, &varid);
+        err = ncmpi_def_var(ncid, varname.c_str(),
+                NC_INT, 3, dimid, &varid);
         CHECK_ERR(err);
         break;
       case(DATA_FLOAT):
-        err = ncmpi_def_var(ncid, varname.c_str(), NC_FLOAT, 3, dimid, &varid);
+        err = ncmpi_def_var(ncid, varname.c_str(),
+                NC_FLOAT, 3, dimid, &varid);
         CHECK_ERR(err);
         break;
       case(DATA_DOUBLE):
-        err = ncmpi_def_var(ncid, varname.c_str(), NC_DOUBLE, 3, dimid, &varid);
+        err = ncmpi_def_var(ncid, varname.c_str(),
+                NC_DOUBLE, 3, dimid, &varid);
         CHECK_ERR(err);
         break;
       }
@@ -74,9 +77,9 @@ namespace oa {
       const int bsz = A->buffer_shape()[2];
 
       // printf("dim: %d, %d, %d\n", gx, gy, gz);
-      // printf("start: %d, %d, %d\n", start[0], start[1], start[2]);
-      // printf("count: %d, %d, %d\n", count[0], count[1], count[2]);
-      // printf("stride: %d, %d, %d\n", stride[0], stride[1], stride[2]);      
+      // printf("start: %d, %d, %d\n", start[0],start[1],start[2]);
+      // printf("count: %d, %d, %d\n", count[0],count[1],count[2]);
+      // printf("stride: %d, %d, %d\n",stride[0],stride[1],stride[2]);      
 
       int sw = A->get_partition()->get_stencil_width();
 
@@ -89,14 +92,14 @@ namespace oa {
         ///:for T in [['INT','int'], ['FLOAT','float'], ['DOUBLE','double']]
       case (DATA_${T[0]}$):
         if(has_valid_data){
-          c_${T[1]}$ = utils::make_cube<${T[1]}$>(A->buffer_shape(), 
-                                                  A->get_buffer())
-                                                 (arma::span(sw, bsx-sw-1),
-                                                  arma::span(sw, bsy-sw-1),
-                                                  arma::span(sw, bsz-sw-1));
+          c_${T[1]}$ = utils::make_cube<${T[1]}$>(
+              A->buffer_shape(), 
+              A->get_buffer())(arma::span(sw, bsx-sw-1),
+                      arma::span(sw, bsy-sw-1),
+                      arma::span(sw, bsz-sw-1));
           
           err = ncmpi_put_vara_${T[1]}$_all(ncid, varid, start,
-                                            count, c_${T[1]}$.memptr());
+                  count, c_${T[1]}$.memptr());
           CHECK_ERR(err);
         }else{
           start[0] = start[1] = start[2] = 0;
@@ -111,13 +114,12 @@ namespace oa {
         break;
       }
       ncmpi_close(ncid);
-      */
     }
 
     ArrayPtr load(const std::string& filename, 
                   const std::string& varname,
                   const MPI_Comm& comm) {
-      /*
+      
       int status;
       int ncid, varid;
       nc_type var_type;
@@ -179,14 +181,16 @@ namespace oa {
         is_valid = (counts[0] * counts[1] * counts[2] > 0);
 
         if(is_valid){
-          c1_${T[1]}$ = oa::utils::make_cube<${T[1]}$>(A->buffer_shape(),
-                                                       A->get_buffer());
+          c1_${T[1]}$ = oa::utils::make_cube<${T[1]}$>(
+              A->buffer_shape(),
+              A->get_buffer());
         
-          c2_${T[1]}$ = oa::utils::make_cube<${T[1]}$>(A->local_shape());
+          c2_${T[1]}$ = oa::utils::make_cube<${T[1]}$>(
+              A->local_shape());
         
           status = ncmpi_get_vara_${T[1]}$_all(ncid, varid,
-                                               starts, counts,
-                                               c2_${T[1]}$.memptr());
+                  starts, counts,
+                  c2_${T[1]}$.memptr());
           CHECK_ERR(status);
       
           bsx = A->buffer_shape()[0];
@@ -194,15 +198,14 @@ namespace oa {
           bsz = A->buffer_shape()[2];
   
           c1_${T[1]}$(arma::span(sw, bsx-sw-1),
-                      arma::span(sw, bsy-sw-1),
-                      arma::span(sw, bsz-sw-1)) = c2_${T[1]}$;        
+                  arma::span(sw, bsy-sw-1),
+                  arma::span(sw, bsz-sw-1)) = c2_${T[1]}$;        
         
         }else{
           starts[0] = starts[1] = starts[2] = 0;
           counts[0] = counts[1] = counts[2] = 0;
           status = ncmpi_get_vara_${T[1]}$_all(ncid, varid,
-                                               starts, counts,
-                                               NULL);
+                  starts, counts, NULL);
           CHECK_ERR(status);
         }
         break;
@@ -213,8 +216,7 @@ namespace oa {
 
       ncmpi_close(ncid);
       return A;
-      */
-      return NULL;
+
     }
   }
 }

@@ -4,6 +4,9 @@
 #define L 0
 #define R 1
 
+#define LVALUE 0
+#define RVALUE 1
+
 ///:mute
 ///:set i = 0  
 ///:include "../NodeTypeF.fypp"

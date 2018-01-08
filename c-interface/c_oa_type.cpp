@@ -14,14 +14,18 @@ extern "C" {
     // printf("A=%p\n", A);
     // printf("B=%p\n", B);
     
-    if(B == NULL) return;
-
+    if(B == NULL) {
+      A = NULL;
+      return;
+    }
+    
     //(*(ArrayPtr*&)B)->display("B = ");
     
     if (pb == R) {
       *A = *B;
       *B = NULL;
     } else {
+      //need to rewrite!
       int dt = (*(ArrayPtr*) B)->get_data_type();
       *A = ArrayPool::global()->get(
           (*(ArrayPtr*) B)->get_partition(), dt);
@@ -234,6 +238,12 @@ extern "C" {
     }
   }
   ///:endfor
-  
+
+  void c_make_psudo3d(ArrayPtr*& A, ArrayPtr*& B){
+    if(A == NULL) A = new ArrayPtr();
+    ENSURE_VALID_PTR(B);
+    *A = oa::funcs::make_psudo3d(*B);
+    // (*A)->display("AAA=");
+  }
 }
 

@@ -12,6 +12,21 @@ module oa_utils
 
 contains
 
+  !> convert an integer to string
+  function i2s(i, frt) result(str)
+    implicit none
+    integer, intent(in) :: i
+    character(len=200) :: str
+    character(len=*), intent(in), optional :: frt
+    character(len=*), parameter :: frt1='(I0.1)'
+
+    if(present(frt)) then
+       write(str, frt) i
+    else
+       write(str, frt1) i
+    end if
+  end function
+  
   ///:for t in ['tic', 'toc']
   subroutine ${t}$(key)
     use iso_c_binding

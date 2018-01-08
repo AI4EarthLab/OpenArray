@@ -38,6 +38,8 @@ contains
 
     call c_load(A%ptr, &
          string_f2c(file), string_f2c(var))
+
+    call set_rvalue(A)
   end function
   
 end module

@@ -86,6 +86,7 @@
        end subroutine
     end interface
 
+    
     ///:for n in [i for i in L if i[3] == 'D']
     interface ${n[2]}$    
     ///:for t in ['node', 'array']
@@ -301,8 +302,8 @@
       end if
       
       call c_${t[0]}$(A%ptr, m, op_n, op_k, op_sw, op_dt)
-      A%lr = R
-
+      call set_rvalue(A)
+      
     end function
     ///:endfor
 
@@ -334,7 +335,7 @@
 
       call c_consts_${t[0]}$(A%ptr, &
            m, n, k, val, op_sw)
-      A%lr = R
+      call set_rvalue(A)
     end function
     ///:endfor
 
@@ -718,6 +719,38 @@
       
       default_data_type = dt
     end subroutine
+
+    subroutine set_rvalue(A)
+      implicit none
+      type(array), intent(inout) :: A
+
+      A%lr = RVALUE
+    end subroutine
+
+    subroutine set_lvalue(A)
+      implicit none
+      type(array), intent(inout) :: A
+
+      A%lr = LVALUE
+    end subroutine
     
     
+    function make_psudo3d(A) result(B)
+      implicit none
+      type(array),intent(in) :: A
+      type(array) :: B
+      interface
+         subroutine c_make_psudo3d(dst, src) &
+              bind(C, name='c_make_psudo3d')
+           use iso_c_binding
+           implicit none
+           type(c_ptr), intent(inout) :: dst           
+           type(c_ptr), intent(in) :: src
+         end subroutine
+      end interface
+
+      call c_make_psudo3d(B%ptr, A%ptr)
+
+      call set_rvalue(B)
+    end function
   end module
