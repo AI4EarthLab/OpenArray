@@ -916,6 +916,9 @@ contains
     type(array) ::  v
     type(array) ::  dvm_3d
 
+    type(array) :: drhox, dt, mat_ones
+    real :: ramp
+
     call test_init(6, 6, 6, MPI_COMM_WORLD)
 
     step = 1
@@ -937,6 +940,25 @@ contains
     !FSET(q2f,a1+a2*u)
 
     call cpu_time(start)
+
+    
+
+    ramp = 0.1
+
+    drhox   = rands(m, n, k, dt = OA_FLOAT, sw=1)
+    dt      = rands(m, n, 1, dt = OA_FLOAT, sw=1)
+    mat_ones = ones(m, n, k, dt = OA_FLOAT, sw=1)
+
+    drhox=ramp*AXB(dt)*mat_ones
+
+    call display(drhox, "==============drhox===============")
+    
+    FSET(drhox, ramp*AXB(dt)*mat_ones)
+
+    call display(drhox, "==============drhox===============")
+    
+
+
 
 
     do s = 1 , step

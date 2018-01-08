@@ -318,13 +318,13 @@ namespace oa {
 
     // prepare kernel fusion parameters with operator
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
-      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr) {
+      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, bitset<3> &bt) {
       ArrayPtr ap;
       // data
       if (A->has_data()) {
         ap = A->get_data();
         list.push_back(ap->get_buffer());
-        if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
+        if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
         }
         if (!A->is_seqs_scalar()) {
@@ -339,7 +339,7 @@ namespace oa {
       if (!nd.ew || A->need_update()) {
         ArrayPtr ap = eval(A);
         list.push_back(ap->get_buffer());
-        if (ptr == NULL && ap->get_bitset() == A->get_bitset()) {
+        if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
         }
         if (!A->is_seqs_scalar()) {
@@ -351,7 +351,7 @@ namespace oa {
 
       // tree
       for (int i = 0; i < A->input_size(); i++) {
-        get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr);
+        get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr, bt);
       }
 
       // bind grid if A.pos != -1
@@ -441,7 +441,9 @@ namespace oa {
           vector<int3> S;
           vector<ArrayPtr> update_list;
           PartitionPtr par_ptr;
-          get_kernel_parameter_with_op(A, list, update_list, S, par_ptr);
+          bitset<3> bt = A->get_bitset();
+          get_kernel_parameter_with_op(A, 
+            list, update_list, S, par_ptr, bt);
 
           int3 lb = A->get_lbound();
           int3 rb = A->get_rbound();
