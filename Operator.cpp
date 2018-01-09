@@ -782,7 +782,12 @@ namespace oa {
           ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
       case 2:
-        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        if (nd.type == TYPE_POW) {
+          ss<<"pow("<<child[0].str()<<","<<child[1].str()<<")";
+        }
+        else {
+          ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        }
         break;
       }
 
@@ -848,7 +853,15 @@ namespace oa {
           ss<<nd.sy<<"("<<child[0].str()<<")";
         break;
       case 2:
-        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+
+        if (nd.type == TYPE_POW) {
+          ss<<"pow("<<child[0].str()<<","<<child[1].str()<<")";
+        }
+        else {
+          ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        }
+        
+        // ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
         break;
       }
 
@@ -1026,7 +1039,12 @@ namespace oa {
         }
         break;
       case 2:
-        ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        if (nd.type == TYPE_POW) {
+          ss<<"pow("<<child[0].str()<<","<<child[1].str()<<")";
+        }
+        else {
+          ss<<"("<<child[0].str()<<")"<<nd.sy<<"("<<child[1].str()<<")";
+        }
         break;
       }
 
