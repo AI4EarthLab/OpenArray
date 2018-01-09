@@ -1,5 +1,6 @@
 
 #include "MPI.hpp"
+#include "c-interface/c_oa_cache.hpp"
 
 namespace oa{
   MPI::MPI(){
@@ -25,6 +26,7 @@ namespace oa{
   }
 
   void MPI::finalize(){
+    c_clear_cache();
     MPI_Finalize();
   }
   

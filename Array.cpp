@@ -16,7 +16,7 @@ Array::Array(const PartitionPtr &ptr, int data_type) :
   int size = box.size(sw);
 
   // if box.size() == 0, there is no need to contain stencil
-  if (size_in == 0) size = 0;
+  // if (size_in == 0) size = 0;
   
   switch (m_data_type) {
   case DATA_INT:
@@ -313,6 +313,20 @@ void Array::set_zeros(){
   }
 }
 
+bool Array::has_pseudo_3d() {
+  return m_has_pseudo_3d;
+}
+
+void Array::reset_pseudo_3d() {
+  m_has_pseudo_3d = false;
+  m_pseudo_3d = NULL;
+}
+
 ArrayPtr Array::get_pseudo_3d() {
   return m_pseudo_3d;
+}
+
+void Array::set_pseudo_3d(ArrayPtr ap) {
+  m_pseudo_3d = ap;
+  m_has_pseudo_3d = true;
 }

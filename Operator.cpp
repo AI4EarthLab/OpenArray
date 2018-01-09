@@ -323,6 +323,15 @@ namespace oa {
       // data
       if (A->has_data()) {
         ap = A->get_data();
+        
+        // ap is a pseudo 3d, need to make_pseudo_3d
+        if (ap->get_bitset() != bt) {
+          if (ap->has_pseudo_3d() == false) {
+            ap->set_pseudo_3d(oa::funcs::make_psudo3d(ap));
+          }
+          ap = ap->get_pseudo_3d();
+        }
+
         list.push_back(ap->get_buffer());
         if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
@@ -337,7 +346,16 @@ namespace oa {
       // not element wise, need eval
       const NodeDesc &nd = get_node_desc(A->type());
       if (!nd.ew || A->need_update()) {
-        ArrayPtr ap = eval(A);
+        ArrayPtr ap = eval_with_op(A);
+
+        // ap is a pseudo 3d, need to make_pseudo_3d
+        if (ap->get_bitset() != bt) {
+          if (ap->has_pseudo_3d() == false) {
+            ap->set_pseudo_3d(oa::funcs::make_psudo3d(ap));
+          }
+          ap = ap->get_pseudo_3d();
+        }
+
         list.push_back(ap->get_buffer());
         if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
@@ -705,7 +723,7 @@ namespace oa {
           // JIT source code add calc_inside
           code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
 
-          // cout<<code.str()<<endl;
+          cout<<code.str()<<endl;
           // Add fusion kernel into JIT map
           Jit_Driver::global()->insert(hash, code);
 
@@ -1178,7 +1196,7 @@ namespace oa {
       // code<<"#include <array>\n\n";
       // code<<"typedef std::array<int, 3> int3;\n\n";
       code<<"#include \"math.h\"\n\n";
-      
+            
       code<<"typedef int int3[3];\n\n";
 
       code<<"extern \"C\" {\n";

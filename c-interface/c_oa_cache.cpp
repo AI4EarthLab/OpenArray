@@ -1,4 +1,5 @@
 
+#include "c_oa_cache.hpp"
 #include <map>
 #include <string>
 #include "../Node.hpp"
@@ -48,6 +49,13 @@ extern "C"{
     }else{
       *i = 1;
     }
+  }
+
+  void c_clear_cache() {
+    for (auto it = cached_nodes.begin(); it != cached_nodes.end(); it++) {
+      cout<<it->first<<" "<<it->second<<endl;
+    }
+    cached_nodes.clear();
   }
   
 }
