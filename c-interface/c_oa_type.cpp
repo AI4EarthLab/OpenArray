@@ -23,7 +23,8 @@ extern "C" {
     
     if (pb == R) {
       *A = *B;
-      *B = NULL;
+      ArrayPtr np;
+      *B = np;
     } else {
       //need to rewrite!
       int dt = (*(ArrayPtr*) B)->get_data_type();

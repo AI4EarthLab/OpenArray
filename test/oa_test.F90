@@ -570,15 +570,13 @@ contains
     call set(val3, sub(a+a, 3, 2, 2))
     print*, "val3 = ", val3
 
-<<<<<<< HEAD
-      farr_double3 = sub(A, 1,2,[1,10])
-      if(rank == 0) &
-           print*, "farr_double3 = ", farr_double3
+
+    farr_double3 = sub(A, 1,2,[1,10])
+    if(rank == 0) &
+         print*, "farr_double3 = ", farr_double3
       
     end subroutine
-=======
-  end subroutine
->>>>>>> 57
+
 
   subroutine test_set_with_mask()
     implicit none

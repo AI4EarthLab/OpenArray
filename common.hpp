@@ -68,7 +68,7 @@ typedef arma::Cube<int>  cube_int;
 typedef arma::Cube<float> cube_float;
 typedef arma::Cube<double> cube_double;
 
-#define SCALAR_SHAPE Shape({1,1,1})
+#define SCALAR_SHAPE Shape({{1,1,1}})
 
 #define WITHOUT_FUSION_KERNEL 0
 #define WITH_FUSION_KERNEL 1

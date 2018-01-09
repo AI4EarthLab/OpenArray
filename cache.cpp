@@ -17,7 +17,8 @@ extern "C"{
     if (it != _cached_nodes.end()) {
       p = it->second;
     }else{
-      p = NULL;
+      NodePtr np;
+      p = np;
     }
     return;
   }
@@ -37,7 +38,8 @@ extern "C"{
     string tmp_node_key = "";
     tmp_node_key = file;
     tmp_node_key += ":";
-    tmp_node_key += to_string(line);
+    int templine = line;
+    tmp_node_key += to_string((long long)templine);
     std::cout<<tmp_node_key<<endl;
     return tmp_node_key;
   }

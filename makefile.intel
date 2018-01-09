@@ -16,8 +16,8 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_system -ldl -llapack -lblas -lgtest -ljit \
 		-Wl,-rpath=${JIT_LIB}
 
-oplevel0 = -O0 -w -g 
-oplevel3 = -O3 -Ofast -xHost -w -g 
+oplevel0 = -O0 -w -g  -std=c++0x
+oplevel3 = -O3 -Ofast -xHost -w -g  -std=c++0x
 
 FC = mpiifort ${oplevel0} 
 CC = mpiicc   ${oplevel0} 
@@ -84,10 +84,10 @@ debug:
 
 
 
--include $(OBJ_FORTRAN:.o=.d) 
--include $(OBJ_MAIN:.o=.d) 
--include $(OBJ_TEST:.o=.d) 
--include $(OBJ_TEST_PERF:.o=.d) 
+##===##-include $(OBJ_FORTRAN:.o=.d) 
+##===##-include $(OBJ_MAIN:.o=.d) 
+##===##-include $(OBJ_TEST:.o=.d) 
+##===##-include $(OBJ_TEST_PERF:.o=.d) 
 
 
 all:

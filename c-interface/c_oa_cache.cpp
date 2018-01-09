@@ -22,7 +22,8 @@ extern "C"{
       //std::cout<<"found in cache!"<<std::endl;
       g_cache = true;
     }else{
-      *p = NULL;
+      NodePtr np;
+      *p = np;
       //std::cout<<"not found in cache!"<<std::endl;
     }
     return;

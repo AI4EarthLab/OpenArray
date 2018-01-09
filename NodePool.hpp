@@ -34,7 +34,7 @@ public:
   NodePtr get_seqs_scalar(T val) {
     NodePtr p = NodePool::global()->get();
     ArrayPtr ap = oa::funcs::consts(MPI_COMM_SELF,
-            {1, 1, 1}, val, 0);
+            {{1, 1, 1}}, val, 0);
     p->clear_input();
     p->set_type(TYPE_DATA);
     p->set_data(ap);
@@ -49,7 +49,7 @@ public:
   NodePtr get_local_1d(T* val) {
     NodePtr p = NodePool::global()->get();
     ArrayPtr ap = oa::funcs::consts(MPI_COMM_SELF,
-            {size,1,1}, 0, DATA_INT);
+            {{size,1,1}}, 0, DATA_INT);
     oa::internal::copy_buffer((T*)ap->get_buffer(), val, size);
     p->clear_input();
     p->set_type(TYPE_DATA);

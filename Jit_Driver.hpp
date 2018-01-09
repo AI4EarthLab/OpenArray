@@ -44,7 +44,8 @@ private:
     sourcefile<<code.str();
     sourcefile.close();
     stringstream cmd;
-    cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast  -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
+    cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
+    //cmd<<"pwd";
     
     if(system(cmd.str().c_str()) != 0)
     {
@@ -85,7 +86,7 @@ public:
   }
 
   void testicc(){
-    if(system("icc -v 2> /tmp/haveicc.log") == 0)
+    if(system("icc -v 2> /dev/null") == 0)
     {
       haveicc = 1;
       std::cout<<"use icc."<<std::endl;
@@ -116,6 +117,11 @@ public:
     opvs.push_back("-march=core-avx2");
     opvs.push_back("-m64");
     opvs.push_back("--std=c++0x");
+    //opvs.push_back("-Rpass-missed=loop-vectorize");
+    //opvs.push_back("-Rpass=loop-vectorize");
+    //opvs.push_back("-Rpass=inline");
+    //opvs.push_back("-Rpass-missed=inline");
+    //opvs.push_back("-m64");
 
     char **fake_argv = new char*[opvs.size()];
 

@@ -15,7 +15,7 @@ NodePtr new_node_${name}$ (const NodePtr& p)
   np->add_input(0, p);
 
   ///:if (n3 == '_at')
-  np->set_shape(Shape({3,1,1}));
+  np->set_shape(Shape({{3,1,1}}));
   ///:else
   np->set_shape(SCALAR_SHAPE);
   ///:endif

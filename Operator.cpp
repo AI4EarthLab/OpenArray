@@ -60,8 +60,8 @@ namespace oa {
         np->set_lbound(u->get_lbound(), v->get_lbound());
         np->set_rbound(u->get_rbound(), v->get_rbound());
       } else {
-        np->set_lbound({0, 0, 0});
-        np->set_rbound({0, 0, 0});
+        np->set_lbound({{0, 0, 0}});
+        np->set_rbound({{0, 0, 0}});
         np->set_update();
         np->set_data_type(dt);
       }
@@ -104,33 +104,33 @@ namespace oa {
           switch (type) {
             case TYPE_AXB:
             case TYPE_DXB:
-              lb = {1, 0, 0};
-              rb = {0, 0, 0};
+              lb = {{1, 0, 0}};
+              rb = {{0, 0, 0}};
               break;
             case TYPE_AXF:
             case TYPE_DXF:
-              lb = {0, 0, 0};
-              rb = {1, 0, 0}; 
+              lb = {{0, 0, 0}};
+              rb = {{1, 0, 0}}; 
               break;
             case TYPE_AYB:
             case TYPE_DYB:
-              lb = {0, 1, 0};
-              rb = {0, 0, 0}; 
+              lb = {{0, 1, 0}};
+              rb = {{0, 0, 0}}; 
               break;
             case TYPE_AYF:
             case TYPE_DYF:
-              lb = {0, 0, 0};
-              rb = {0, 1, 0}; 
+              lb = {{0, 0, 0}};
+              rb = {{0, 1, 0}}; 
               break;
             case TYPE_AZB:
             case TYPE_DZB:
-              lb = {0, 0, 1};
-              rb = {0, 0, 0}; 
+              lb = {{0, 0, 1}};
+              rb = {{0, 0, 0}}; 
               break;
             case TYPE_AZF:
             case TYPE_DZF:
-              lb = {0, 0, 0};
-              rb = {0, 0, 1}; 
+              lb = {{0, 0, 0}};
+              rb = {{0, 0, 1}}; 
               break;
           }
 
@@ -162,8 +162,8 @@ namespace oa {
 
       } else {
         // to do set data_type && shape
-        np->set_lbound({0, 0, 0});
-        np->set_rbound({0, 0, 0});
+        np->set_lbound({{0, 0, 0}});
+        np->set_rbound({{0, 0, 0}});
         np->set_update();
         np->set_data_type(dt);
       }
@@ -1174,11 +1174,13 @@ namespace oa {
     }
 
     void code_add_function_signature_with_op(stringstream& code, size_t& hash) {
+
       // code<<"#include <array>\n\n";
       // code<<"typedef std::array<int, 3> int3;\n\n";
       code<<"#include \"math.h\"\n\n";
       
       code<<"typedef int int3[3];\n\n";
+
       code<<"extern \"C\" {\n";
       code<<"inline int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
       code<<"  const int M = S[0];\n";
@@ -1242,6 +1244,10 @@ namespace oa {
       code<<"  if (lbound[2]) {\n";
       code<<"    for (int k = o; k < o + lbound[2]; k++) {\n";
       code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
       code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
                        <<S_id<<")] = "<<__code.str()<<";\n";
@@ -1254,6 +1260,10 @@ namespace oa {
       code<<"  if (rbound[2]) {\n";
       code<<"    for (int k = o + sp[2] - rbound[2]; k < o + sp[2]; k++) {\n";
       code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
       code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
                        <<S_id<<")] = "<<__code.str()<<";\n";
@@ -1267,6 +1277,10 @@ namespace oa {
       code<<"  if (lbound[1]) {\n";
       code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
       code<<"      for (int j = o; j < o + lbound[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
       code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
                        <<S_id<<")] = "<<__code.str()<<";\n";
@@ -1279,6 +1293,10 @@ namespace oa {
       code<<"  if (rbound[1]) {\n";
       code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
       code<<"      for (int j = o + sp[1] - rbound[1]; j < o + sp[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
       code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
                        <<S_id<<")] = "<<__code.str()<<";\n";
@@ -1346,6 +1364,10 @@ namespace oa {
 
       code<<"  for (int k = o + lbound[2]; k < o + sp[2] - rbound[2]; k++) {\n";
       code<<"    for (int j = o + lbound[1]; j < o + sp[1] - rbound[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"      for (int i = o + lbound[0]; i < o + sp[0] - rbound[0]; i++) {\n";
 
       switch(dt) {
