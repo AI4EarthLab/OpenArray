@@ -69,7 +69,7 @@ extern "C" {
     if(A == NULL) A = new ArrayPtr();
     
     try{
-      cout<<g_cache<<endl;
+      // cout<<g_cache<<endl;
       if (!g_cache) oa::ops::gen_kernels_JIT_with_op(*(NodePtr*)B);
       *A = oa::ops::eval_with_op(*(NodePtr*)B);
       g_cache = false;

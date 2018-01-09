@@ -723,7 +723,7 @@ namespace oa {
           // JIT source code add calc_inside
           code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
 
-          cout<<code.str()<<endl;
+          // cout<<code.str()<<endl;
           // Add fusion kernel into JIT map
           Jit_Driver::global()->insert(hash, code);
 

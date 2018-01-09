@@ -40,7 +40,8 @@ namespace oa{
       int dt = oa::utils::cast_data_type(u_dt, v_dt);
 
       // support pseudo array calculation
-      if (u->is_pseudo() || v->is_pseudo()) {
+      if ( (u->is_pseudo() && !v->is_pseudo()) || 
+           (!u->is_pseudo() && v->is_pseudo()) ) {
         int su = oa::utils::get_shape_dimension(u->local_shape());
         int sv = oa::utils::get_shape_dimension(v->local_shape());
 
@@ -50,6 +51,7 @@ namespace oa{
         
         ap = ArrayPool::global()->get(pp, dt);
 
+        printf("before pseudo plus\n");
         oa::internal::pseudo_buffer_${name}$_buffer(
             (T1*) ap->get_buffer(),
             (T2*) u->get_buffer(),
@@ -62,6 +64,7 @@ namespace oa{
             v->buffer_shape(),
             pp->get_stencil_width());
 
+        printf("after pseudo plus\n");
       } else {
         if (u->is_seqs_scalar()) {
           // (1) u is a scalar
