@@ -1,4 +1,5 @@
 
+#include "c_oa_cache.hpp"
 #include <map>
 #include <string>
 #include "../Node.hpp"
@@ -22,7 +23,8 @@ extern "C"{
       //std::cout<<"found in cache!"<<std::endl;
       g_cache = true;
     }else{
-      *p = NULL;
+      NodePtr np;
+      *p = np;
       //std::cout<<"not found in cache!"<<std::endl;
     }
     return;
@@ -47,6 +49,13 @@ extern "C"{
     }else{
       *i = 1;
     }
+  }
+
+  void c_clear_cache() {
+    for (auto it = cached_nodes.begin(); it != cached_nodes.end(); it++) {
+      cout<<it->first<<" "<<it->second<<endl;
+    }
+    cached_nodes.clear();
   }
   
 }

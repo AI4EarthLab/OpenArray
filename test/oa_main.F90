@@ -14,8 +14,8 @@ program main
   integer :: step
   
   !no split in z-direction
-  ! call oa_init(MPI_COMM_WORLD, [-1,-1, 1])
-  call oa_init(MPI_COMM_WORLD, [2, 2, 2])
+   call oa_init(MPI_COMM_WORLD, [-1,-1, 1])
+  !call oa_init(MPI_COMM_WORLD, [2, 2, 2])
 
   call oa_get_option(step, "step", -1)
   print*, "step = ", step
@@ -66,7 +66,9 @@ program main
   
   ! call test_internal_q()
 
-  call test_pseudo()
+  ! call test_pseudo()
+
+  call test_simple_stmt()
 
   call oa_finalize()
 

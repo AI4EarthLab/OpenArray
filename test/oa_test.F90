@@ -1022,5 +1022,653 @@ contains
 
   end subroutine
 
+  subroutine test_simple_stmt
+
+  implicit none
+
+  integer ierr, num_procs, my_id
+  CHARACTER(len=32) :: arg
+  integer di,dj,dk
+  integer step
+  integer s
+  type(array) :: A, B, C
+  real :: start, finish
+
+  type(array) ::  a1
+  type(array) ::  a2
+  type(array) ::  a3
+  type(array) ::  a4
+  type(array) ::  a5
+  type(array) ::  a6
+  type(array) ::  a7
+  type(array) ::  a8
+  type(array) ::  a9
+  type(array) :: a10
+  type(array) :: a11
+  type(array) :: a12
+  type(array) :: a13
+  type(array) :: a14
+  type(array) :: a15
+  type(array) :: res
+  real :: temp
+  real :: X1=1,X2=1,X3=1,X4=1,X5=1,X6=1,X7=1,X8=1,X9=1,X10=1
+  real :: Y1=1,Y2=1,Y3=1,Y4=1,Y5=1,Y6=1,Y7=1,Y8=1,Y9=1,Y10=1
+  integer :: N1=2,N2=2,N3=2
+  integer :: i_error
+
+  step = 10 
+
+
+!  call test_init(di, dj, dk, MPI_COMM_WORLD) 
+m=512
+n=256
+k=48
+   a1 = seqs(m, n, k, dt = OA_FLOAT)
+   a2 = seqs(m, n, k, dt = OA_FLOAT)
+   a3 = seqs(m, n, k, dt = OA_FLOAT)
+   a4 = seqs(m, n, k, dt = OA_FLOAT)
+   a5 = seqs(m, n, k, dt = OA_FLOAT)
+   a6 = seqs(m, n, k, dt = OA_FLOAT)
+   a7 = seqs(m, n, k, dt = OA_FLOAT)
+   a8 = seqs(m, n, k, dt = OA_FLOAT)
+   a9 = seqs(m, n, k, dt = OA_FLOAT)
+  a10 = seqs(m, n, k, dt = OA_FLOAT)
+  a11 = seqs(m, n, k, dt = OA_FLOAT)
+  a12 = seqs(m, n, k, dt = OA_FLOAT)
+  a13 = seqs(m, n, k, dt = OA_FLOAT)
+  a14 = seqs(m, n, k, dt = OA_FLOAT)
+  a15 = seqs(m, n, k, dt = OA_FLOAT)
+  res = seqs(m, n, k, dt = OA_FLOAT)
+  
+    FSET(res, X1*(-((a1)*(a2))))
+    FSET(res, ((((X1*a1+Y1)-(X2*a2))+(X3*a3))-(X4*a4))+((X5*a5)*(a6)))
+    FSET(res, (((X1*a1+Y1)+(X2*a2))-(X3*a3))+(X4*a4+Y2))
+    FSET(res, (a1)+(((X1*a2)/((a3)*(a4)))*(X3*((X2*a5)/((a6)*(a7)))+Y1)))
+    FSET(res, (a1)*(sqrt(a2)))
+    FSET(res, ((X1*a1)*(a2))*(a3))
+    FSET(res, (-(((a1)*(a2))*(a3)))+((((a4)*(a5))*(a6))*(a7)))
+    FSET(res, (X1*a1)+((a2)*(a3)))
+    FSET(res, ((a1)*(a2))+(X1*a3))
+    FSET(res, -((a1)*(a2+Y1)))
+    FSET(res, (((a1)*(a2))-((a3)*(a4)))/((a5)*(a6)))
+    FSET(res, ((a1)+(a2))-(a3))
+    FSET(res, ((a1)*(a2))-((X1*((a3)*(a4)))*(a5)))
+    FSET(res, ((a1)*(a2))-(((a3)*(a4))*((a5)+(a6))))
+    FSET(res, ((a1)*(a2))*(a3))
+    FSET(res, ((a1)+(a2))+(a3))
+    FSET(res, ((a1)*(a2))*((a3)+(a4)))
+    FSET(res, ((a1)*(a2))-(((X1*a3)*(a4))*(a5)))
+    FSET(res, ((a1)*(a2))-(a3))
+    FSET(res, (a1)-(X1*(((a2)+(a3))-(a4))))
+    FSET(res, (((a1)*(a2))-(X4*((((((a3)+(a4))-(a5))+((X1*a6)*(((X2*a7)+(X3*((a8)+(a9))))+(a10))))+(a11))+((a12)-(a13)))))/(a14))
+    FSET(res, X3*((a1)+((X2*(sqrt(X1*(1.0/a2))))*((a3)-(a4)))))
+    FSET(res, X3*((a1)-((X2*(sqrt(X1*(1.0/a2))))*((a3)-(a4)))))
+    FSET(res, (((a1)*(a2))-(X4*((((((a3)+(a4))+(a5))+((X1*a6)*(((X2*a7)+(X3*((a8)+(a9))))+(a10))))+(a11))+((a12)-(a13)))))/(a14))
+    FSET(res, (a1)+(X2*(((a2)-(X1*a3))+(a4))))
+    FSET(res, (a1)+(X2*((X1*a2)*(a3))))
+    FSET(res, ((a1)+(X1*a2))*(a3))
+    FSET(res, ((a1)-(a2))+((a3)/(X1*a4)))
+    FSET(res, (a1)*(((a2)+(a3))+(a4)))
+    FSET(res, ((a1)+(a2))*(a3))
+    FSET(res, (((a1)*((a2)+(a3)))-(X1*(((-(a4))+(a5))+(a6))))/((a7)+(a8)))
+    FSET(res, (((a1)*(a2))*(a3))-((((a4)*(a5))*(a6))*(a7)))
+    FSET(res, -((X1*a1+Y1)/((((a2)*(a3))*(a4))*(a5))))
+    FSET(res, -((X1*a1+Y1)/(((a2)*(a3))*(a4))))
+    FSET(res, (-((X1*a1)/(a2)))+(X2*(1.0/a3)))
+    FSET(res, ((a1)*(a2))+((a3)*(a4)))
+    FSET(res, (sqrt(a1))/(X1*a2+Y1))
+    FSET(res, (X1*a1+Y1)/(X3*((X2*(1.0/a2)+Y2)*(a3))+Y3))
+    FSET(res, ((X1*a1+Y1)+((X2*a2)*(a3)))/(X3*a4+Y2))
+    FSET(res, (a1)*(sqrt(abs(a2))))
+    FSET(res, X2*(((X1*a1)*(a2))+(a3)))
+    FSET(res, X1*(((a1)*(a2))+(a3)))
+    FSET(res, (a1)+(X2*(((a2)+(a3))-(X1*a4))))
+    FSET(res, ((((a1)+(a2))*(a3))-(X1*(((a4)+(a5))-(a6))))/((a7)+(a8)))
+    FSET(res, (((a1)*(a2))*(a3))-(((X1*((a4)*(a5)))*(a6))*(a7)))
+    FSET(res, (a1)/((((a2)*(a3))*(a4))*(a5)))
+    FSET(res, ((-((X1*a1)/(-(X2*a2))))-(a3))/(a4+Y1))
+    FSET(res, (a1)-(X3*((((X1*((a2)-(abs(a3))))*((a4)-(a5)))/(a6))+((X2*((a7)+(abs(a8))))*(a9)))))
+    FSET(res, (a1)+(((((((X1*((a2)+(abs(a3))))/(a4))*(a5))/(a6))*(a7))*(a8))/(a9)))
+    FSET(res, (a1)-(X3*((((X1*((a2)+(abs(a3))))*((a4)-(a5)))/(a6))+((((X2*((a7)-(abs(a8))))*(a9))*(a10))/(a11)))))
+    FSET(res, (a1)+(((((((X1*((a2)-(abs(a3))))/(a4))*(a5))/(a6))*(a7))*(a8))/(a9)))
+    FSET(res, (((a1)*(a2))-(X4*(((((a3)+(a4))-(a5))+(X3*((X1*a6)*((a7)+(X2*a8)))))-(a9))))/(a10))
+    FSET(res, (((X1*a1)/((a2)*(a3)))-(a4))/(a5+Y1))
+    FSET(res, -((a1)*(a2)))
+    FSET(res, ((sqrt(X1*a1))*(a2))+((X3*(sqrt(X2*a3))+Y1)*(a4)))
+    FSET(res, (((a1)*(a2))-(X4*(((((a3)+(a4))+(a5))+(X3*((X1*a6)*((a7)+(X2*a8)))))-(a9))))/(a10))
+    FSET(res, (a1)+(X2*((((a2)+(a3))-(X1*a4))-(a5))))
+    FSET(res, (((a1)+(a2))-(X1*a3))*(a4))
+
+  !call MPI_Barrier(MPI_COMM_WORLD,i_error)
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, X1*(-((a1)*(a2))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("1 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((((X1*a1+Y1)-(X2*a2))+(X3*a3))-(X4*a4))+((X5*a5)*(a6)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("2 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((X1*a1+Y1)+(X2*a2))-(X3*a3))+(X4*a4+Y2))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("4 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)+(((X1*a2)/((a3)*(a4)))*(X3*((X2*a5)/((a6)*(a7)))+Y1)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("5 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)*(sqrt(a2)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("6 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((X1*a1)*(a2))*(a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("7 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (-(((a1)*(a2))*(a3)))+((((a4)*(a5))*(a6))*(a7)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("8 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (X1*a1)+((a2)*(a3)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("10 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))+(X1*a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("11 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, -((a1)*(a2+Y1)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("12 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*(a2))-((a3)*(a4)))/((a5)*(a6)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("13 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)+(a2))-(a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("14 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))-((X1*((a3)*(a4)))*(a5)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("15 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))-(((a3)*(a4))*((a5)+(a6))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("16 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))*(a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("17 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)+(a2))+(a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("18 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))*((a3)+(a4)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("20 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))-(((X1*a3)*(a4))*(a5)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("21 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))-(a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("22 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)-(X1*(((a2)+(a3))-(a4))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("23 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*(a2))-(X4*((((((a3)+(a4))-(a5))+((X1*a6)*(((X2*a7)+(X3*((a8)+(a9))))+(a10))))+(a11))+((a12)-(a13)))))/(a14))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("24 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, X3*((a1)+((X2*(sqrt(X1*(1.0/a2))))*((a3)-(a4)))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("25 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, X3*((a1)-((X2*(sqrt(X1*(1.0/a2))))*((a3)-(a4)))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("26 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*(a2))-(X4*((((((a3)+(a4))+(a5))+((X1*a6)*(((X2*a7)+(X3*((a8)+(a9))))+(a10))))+(a11))+((a12)-(a13)))))/(a14))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("27 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)+(X2*(((a2)-(X1*a3))+(a4))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("28 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)+(X2*((X1*a2)*(a3))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("29 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)+(X1*a2))*(a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("30 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)-(a2))+((a3)/(X1*a4)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("31 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)*(((a2)+(a3))+(a4)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("32 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)+(a2))*(a3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("33 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*((a2)+(a3)))-(X1*(((-(a4))+(a5))+(a6))))/((a7)+(a8)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("34 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*(a2))*(a3))-((((a4)*(a5))*(a6))*(a7)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("35 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, -((X1*a1+Y1)/((((a2)*(a3))*(a4))*(a5))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("36 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, -((X1*a1+Y1)/(((a2)*(a3))*(a4))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("37 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (-((X1*a1)/(a2)))+(X2*(1.0/a3)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("41 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((a1)*(a2))+((a3)*(a4)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("42 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (sqrt(a1))/(X1*a2+Y1))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("45 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (X1*a1+Y1)/(X3*((X2*(1.0/a2)+Y2)*(a3))+Y3))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("46 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((X1*a1+Y1)+((X2*a2)*(a3)))/(X3*a4+Y2))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("47 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)*(sqrt(abs(a2))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("48 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, X2*(((X1*a1)*(a2))+(a3)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("49 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, X1*(((a1)*(a2))+(a3)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("50 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)+(X2*(((a2)+(a3))-(X1*a4))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("51 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((((a1)+(a2))*(a3))-(X1*(((a4)+(a5))-(a6))))/((a7)+(a8)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("52 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*(a2))*(a3))-(((X1*((a4)*(a5)))*(a6))*(a7)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("53 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)/((((a2)*(a3))*(a4))*(a5)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("54 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((-((X1*a1)/(-(X2*a2))))-(a3))/(a4+Y1))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("55 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)-(X3*((((X1*((a2)-(abs(a3))))*((a4)-(a5)))/(a6))+((X2*((a7)+(abs(a8))))*(a9)))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("56 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)+(((((((X1*((a2)+(abs(a3))))/(a4))*(a5))/(a6))*(a7))*(a8))/(a9)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("57 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)-(X3*((((X1*((a2)+(abs(a3))))*((a4)-(a5)))/(a6))+((((X2*((a7)-(abs(a8))))*(a9))*(a10))/(a11)))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("58 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)+(((((((X1*((a2)-(abs(a3))))/(a4))*(a5))/(a6))*(a7))*(a8))/(a9)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("59 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*(a2))-(X4*(((((a3)+(a4))-(a5))+(X3*((X1*a6)*((a7)+(X2*a8)))))-(a9))))/(a10))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("60 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((X1*a1)/((a2)*(a3)))-(a4))/(a5+Y1))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("61 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, -((a1)*(a2)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("63 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, ((sqrt(X1*a1))*(a2))+((X3*(sqrt(X2*a3))+Y1)*(a4)))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("64 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)*(a2))-(X4*(((((a3)+(a4))+(a5))+(X3*((X1*a6)*((a7)+(X2*a8)))))-(a9))))/(a10))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("65 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (a1)+(X2*((((a2)+(a3))-(X1*a4))-(a5))))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("66 Time(seconds) = ",f6.3,"")',finish-start
+
+  !call cpu_time(start)
+  !do s = 1 , step
+  !  FSET(res, (((a1)+(a2))-(X1*a3))*(a4))
+  !  call MPI_Barrier(MPI_COMM_WORLD,i_error)
+  !end do
+  !call cpu_time(finish)
+  !print '(" ",f6.3,"")',finish-start
+  !!print '("67 Time(seconds) = ",f6.3,"")',finish-start
+
+print * , "~~~~~~~~~~~~~"
+
+
+!  call oa_finalize()
+
+  end 
+
 
 end module
