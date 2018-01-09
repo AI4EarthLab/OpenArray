@@ -570,15 +570,11 @@ contains
     call set(val3, sub(a+a, 3, 2, 2))
     print*, "val3 = ", val3
 
-<<<<<<< HEAD
       farr_double3 = sub(A, 1,2,[1,10])
       if(rank == 0) &
            print*, "farr_double3 = ", farr_double3
       
-    end subroutine
-=======
   end subroutine
->>>>>>> 57
 
   subroutine test_set_with_mask()
     implicit none
@@ -994,35 +990,35 @@ contains
 
     
 
-    ramp = 0.1
+    ! ramp = 0.1
+ 
+    ! drhox   = rands(m, n, k, dt = OA_FLOAT, sw=1)
+    ! dt      = rands(m, n, 1, dt = OA_FLOAT, sw=1)
+    ! mat_ones = ones(m, n, k, dt = OA_FLOAT, sw=1)
+ 
+    ! do s = 1, 3
+    !   drhox=(AXB(dt)*mat_ones)**ramp
+    !   ! FSET(drhox, ramp*AXB(dt)*mat_ones)
+    !   call display(drhox, "==============drhox===============")
+    ! end do
+    ! 
+    ! 
+    ! !call display(drhox, "==============drhox===============")
+    
 
-    drhox   = rands(m, n, k, dt = OA_FLOAT, sw=1)
-    dt      = rands(m, n, 1, dt = OA_FLOAT, sw=1)
-    mat_ones = ones(m, n, k, dt = OA_FLOAT, sw=1)
 
-    do s = 1, 3
-      drhox=ramp*AXB(dt)*mat_ones
-      FSET(drhox, ramp*AXB(dt)*mat_ones)
-      call display(drhox, "==============drhox===============")
+
+
+    do s = 1 , step
+      q2f1=DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d)
+      FSET(q2f,DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d))
     end do
-    
-    
-    !call display(drhox, "==============drhox===============")
-    
 
 
-
-
-    !do s = 1 , step
-    !  q2f1=DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d)
-    !  FSET(q2f,DZB(AZF(w*q2))+DXF(AXB(q2)*AXB(dt_3d)*AZB(U)-AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)+DYF(AYB(q2)*AYB(dt_3d)*AZB(v)-AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d))
-    !end do
-
-
-    !call cpu_time(finish)
-    !call display(q2f1, "==============q2f1===============")
-    !call display(q2f, "==============q2f===============")
-    !print '(" ",f6.3,"")',finish-start
+    call cpu_time(finish)
+    call display(q2f1, "==============q2f1===============")
+    call display(q2f, "==============q2f===============")
+    print '(" ",f6.3,"")',finish-start
 
   end subroutine
 

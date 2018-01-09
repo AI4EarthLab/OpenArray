@@ -33,6 +33,7 @@ class Array {
   int pos = -1;
   //GridPtr grid;
   bool m_is_pseudo = false;
+  bool m_has_pseudo_3d = false;
   std::bitset<3> m_bs = std::bitset<3>(std::string("111"));
   ArrayPtr m_pseudo_3d;
 
@@ -73,7 +74,10 @@ class Array {
   int get_stencil_type() const;
   void set_zeros();
   Box local_data_win() const;
+  bool has_pseudo_3d();
+  void reset_pseudo_3d();
   ArrayPtr get_pseudo_3d();
+  void set_pseudo_3d(ArrayPtr ap);
 };
 
 

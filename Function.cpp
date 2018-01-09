@@ -864,6 +864,10 @@ namespace oa {
     // sub(A) = A(A_box) and set sub(A) = B
     void set(ArrayPtr& A, const Box& sub_box,
             const ArrayPtr& B) {
+
+      // need reset pseudo_3d
+      A->reset_pseudo_3d();
+
       // sub(A)'shape must equal B's shape
       assert(B->shape() == sub_box.shape());
       // A->display("AAAA=");
@@ -950,7 +954,7 @@ namespace oa {
 
       ///:endfor
       ///:endfor
-      
+    
       // A->display("AAAA1111=");
     }
 
@@ -1196,7 +1200,9 @@ namespace oa {
     void set_with_mask(ArrayPtr& A, 
                        const ArrayPtr& B, 
                        const ArrayPtr& M) {
-     
+      // need reset pseudo_3d
+      A->reset_pseudo_3d();
+
       bool ifscalar_B = B->is_seqs_scalar();
       if(!ifscalar_B){
         assert(B->shape() == A->shape());
