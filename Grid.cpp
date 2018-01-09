@@ -102,7 +102,8 @@ ArrayPtr Grid::get_grid_dz(int pos){
 }
 
 ArrayPtr Grid::get_grid(int pos, NodeType t) {
-  if (pos == -1) return NULL;
+  ArrayPtr np;
+  if (pos == -1) return np;
   switch (t) {
   case TYPE_AXB:
   case TYPE_DXB:
@@ -126,7 +127,7 @@ ArrayPtr Grid::get_grid(int pos, NodeType t) {
     return Grid::global()->get_grid_dz(pos);
     break;
   }
-  return NULL;
+  return np;
 }
 
 int Grid::get_pos(int pos, NodeType t){

@@ -31,32 +31,32 @@ namespace oa{
       int3 lb, rb;
     
       ///:if name in ['axb', 'dxb']
-      lb = {1, 0, 0};
-      rb = {0, 0, 0};
+      lb = {{1, 0, 0}};
+      rb = {{0, 0, 0}};
       ///:elif name in ['axf', 'dxf']
-      lb = {0, 0, 0};
-      rb = {1, 0, 0};
+      lb = {{0, 0, 0}};
+      rb = {{1, 0, 0}};
       ///:elif name in ['ayb', 'dyb']
-      lb = {0, 1, 0};
-      rb = {0, 0, 0};
+      lb = {{0, 1, 0}};
+      rb = {{0, 0, 0}};
       ///:elif name in ['ayf', 'dyf']
-      lb = {0, 0, 0};
-      rb = {0, 1, 0};
+      lb = {{0, 0, 0}};
+      rb = {{0, 1, 0}};
       ///:elif name in ['azb', 'dzb']
-      lb = {0, 0, 1};
-      rb = {0, 0, 0};
+      lb = {{0, 0, 1}};
+      rb = {{0, 0, 0}};
       ///:elif name in ['azf', 'dzf']
-      lb = {0, 0, 0};
-      rb = {0, 0, 1};
+      lb = {{0, 0, 0}};
+      rb = {{0, 0, 1}};
       ///:elif name in ['dxc']
-      lb = {1, 0, 0};
-      rb = {1, 0, 0};
+      lb = {{1, 0, 0}};
+      rb = {{1, 0, 0}};
       ///:elif name in ['dyc']
-      lb = {0, 1, 0};
-      rb = {0, 1, 1};
+      lb = {{0, 1, 0}};
+      rb = {{0, 1, 1}};
       ///:elif name in ['dzc']
-      lb = {0, 0, 1};
-      rb = {0, 0, 1};  
+      lb = {{0, 0, 1}};
+      rb = {{0, 0, 1}};  
       ///:endif
 
       int3 new_lb = u->get_lbound();

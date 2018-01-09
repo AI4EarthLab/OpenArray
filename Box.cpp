@@ -134,7 +134,7 @@ Box Box::boundary_box(int sw) const {
 
 // return [shape_x, shape_y, shape_z]
 Shape Box::shape(int sw) const {
-  Shape s{m_rx.size() + 2 * sw, m_ry.size() + 2 * sw, m_rz.size() + 2 * sw};
+  Shape s{{m_rx.size() + 2 * sw, m_ry.size() + 2 * sw, m_rz.size() + 2 * sw}};
   return s; 
 }
 
@@ -145,11 +145,11 @@ int Box::size(int sw) const{
 }
 
 int3 Box::starts() const{
-  return {m_rx.get_lower(),
+  return {{m_rx.get_lower(),
       m_ry.get_lower(),
-      m_rz.get_lower()};
+      m_rz.get_lower()}};
 }
 
 int3 Box::counts() const{
-  return {m_rx.size(), m_ry.size(), m_rz.size()};
+  return {{m_rx.size(), m_ry.size(), m_rz.size()}};
 }

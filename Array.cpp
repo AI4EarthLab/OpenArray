@@ -212,7 +212,7 @@ int Array::rank() {
 }
 
 bool Array::is_scalar() {
-  return (m_par_ptr->shape() == Shape({1,1,1}));
+  return (m_par_ptr->shape() == Shape({{1,1,1}}));
 }
 
 bool Array::is_seqs() {

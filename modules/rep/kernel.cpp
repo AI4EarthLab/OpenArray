@@ -28,7 +28,7 @@ namespace oa{
       //   printf("$$$$*: %d %d %d\n", x, y, z);
       // }else{
       ap = ArrayPool::global()->get(MPI::global()->comm(),
-              {s[0]*x, s[1]*y, s[2]*z}, sw,
+              {{s[0]*x, s[1]*y, s[2]*z}}, sw,
               A->get_data_type());
         //}
       int xs, xe, ys, ye, zs, ze;

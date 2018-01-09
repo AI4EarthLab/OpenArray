@@ -64,7 +64,7 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
           double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
           //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
           if (factor >= new_factor) {
-            m_procs_shape = {i, j, k};
+            m_procs_shape = {{i, j, k}};
             factor = new_factor;
           }
         }
@@ -432,7 +432,7 @@ size_t Partition::gen_hash(MPI_Comm comm, const vector<int> &x, const vector<int
 }
 
 //initialize the default process shape to invilid shape
-Shape Partition::m_default_procs_shape = {0,0,0};
+Shape Partition::m_default_procs_shape = {{0,0,0}};
 
 Shape Partition::get_default_procs_shape(){
   return m_default_procs_shape;
@@ -481,7 +481,7 @@ void Partition::set_default_procs_shape(const Shape& s){
 }
 
 void Partition::set_auto_procs_shape(){
-  m_default_procs_shape = {0,0,0};
+  m_default_procs_shape = {{0,0,0}};
 }
 
 int Partition::m_default_stencil_width = 1;

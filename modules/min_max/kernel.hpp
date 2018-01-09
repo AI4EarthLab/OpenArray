@@ -136,7 +136,7 @@ namespace oa {
       ArrayPtr ap;
 
       ///:if pos_mode == True
-      ap = oa::funcs::ones(MPI_COMM_SELF, {3,1,1}, 0, DATA_INT);
+      ap = oa::funcs::ones(MPI_COMM_SELF, {{3,1,1}}, 0, DATA_INT);
       int* p = (int*)ap->get_buffer();
       p[0] = global.pos[0];
       p[1] = global.pos[1];

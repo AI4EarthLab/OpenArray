@@ -11,10 +11,10 @@ extern "C"{
   };
   
   void c_set_default_procs_shape(int* s){
-    Partition::set_default_procs_shape({s[0], s[1], s[2]});
+    Partition::set_default_procs_shape({{s[0], s[1], s[2]}});
   };
   
   void c_set_auto_procs_shape(){
-    Partition::set_default_procs_shape({0, 0, 0});
+    Partition::set_default_procs_shape({{0, 0, 0}});
   };
 }

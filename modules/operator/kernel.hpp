@@ -50,29 +50,29 @@ namespace oa {
       Shape sp = u->local_shape();
       Shape S = u->buffer_shape();
 
-      int3 lbound = {0, 0, 0};
-      int3 rbound = {0, 0, 0};
+      int3 lbound = {{0, 0, 0}};
+      int3 rbound = {{0, 0, 0}};
       ///:if name[1:] == "xb"
-      lbound = {1, 0, 0};
+      lbound = {{1, 0, 0}};
       ///:elif name[1:] == "xf"
-      rbound = {1, 0, 0};
+      rbound = {{1, 0, 0}};
       ///:elif name[1:] == "yb"
-      lbound = {0, 1, 0};
+      lbound = {{0, 1, 0}};
       ///:elif name[1:] == "yf"
-      rbound = {0, 1, 0};
+      rbound = {{0, 1, 0}};
       ///:elif name[1:] == "zb"
-      lbound = {0, 0, 1};
+      lbound = {{0, 0, 1}};
       ///:elif name[1:] == "zf"
-      rbound = {0, 0, 1};
+      rbound = {{0, 0, 1}};
       ///:elif name[1:] == 'xc'
-      lbound = {1, 0, 0};
-      rbound = {1, 0, 0};
+      lbound = {{1, 0, 0}};
+      rbound = {{1, 0, 0}};
       ///:elif name[1:] == 'yc'
-      lbound = {0, 1, 0};
-      rbound = {0, 1, 0};
+      lbound = {{0, 1, 0}};
+      rbound = {{0, 1, 0}};
       ///:elif name[1:] == 'zc'      
-      lbound = {0, 0, 1};
-      rbound = {0, 0, 1};
+      lbound = {{0, 0, 1}};
+      rbound = {{0, 0, 1}};
       ///:endif
 
       T1* ans = (T1*) ap->get_buffer();

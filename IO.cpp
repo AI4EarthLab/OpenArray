@@ -214,7 +214,8 @@ namespace oa {
       ncmpi_close(ncid);
       return A;
       */
-      return NULL;
+      ArrayPtr np;
+      return np;
     }
   }
 }

@@ -112,7 +112,9 @@ bool Node::has_data() {
 }
 
 void Node::clear_data(){
-  m_data = NULL;
+  //m_data = NULL;
+  m_data.reset();
+
 }
 
 void Node::reset() {

@@ -20,7 +20,8 @@ extern "C" {
     
     if (pb == R) {
       *A = *B;
-      *B = NULL;
+      ArrayPtr np;
+      *B = np;
     } else {
       int dt = (*(ArrayPtr*) B)->get_data_type();
       *A = ArrayPool::global()->get(
