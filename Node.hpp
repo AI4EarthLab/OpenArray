@@ -133,6 +133,8 @@ public:
 
   void set_bitset(string s);
 
+  void set_bitset();
+
   void set_bitset(bitset<3> bs);
 
   bitset<3> get_bitset();

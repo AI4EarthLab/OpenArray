@@ -253,7 +253,7 @@
          end subroutine
       end interface
 
-      call c_display_node(A%ptr, prefix)
+      call c_display_node(A%ptr, string_f2c(prefix))
     end subroutine
 
     ///:mute

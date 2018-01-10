@@ -237,6 +237,16 @@ void Node::set_bitset(bitset<3> bs) {
   m_bs = bs;
 }
 
+void Node::set_bitset() {
+  for (int i = 0; i < 3; i++) {
+    if (m_global_shape[i] != 1) m_bs[2 - i] = 1;
+    else {
+      m_bs[2 - i] = 0;
+      m_is_pseudo = true;
+    }
+  }
+}
+
 bitset<3> Node::get_bitset() {
   return m_bs;
 }

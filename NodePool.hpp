@@ -43,6 +43,7 @@ public:
     p->set_data_type(ap->get_data_type());
     p->set_shape(ap->shape());
     p->set_bitset(ap->get_bitset());
+    p->set_pseudo(ap->is_pseudo());
     return p;
   }
 
@@ -59,6 +60,7 @@ public:
     p->set_data_type(ap->get_data_type());
     p->set_shape(ap->shape());
     p->set_bitset(ap->get_bitset());
+    p->set_pseudo(ap->is_pseudo());
     return p;
   }
   

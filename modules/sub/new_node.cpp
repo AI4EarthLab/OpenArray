@@ -23,6 +23,7 @@ namespace oa{
       np->set_lbound(u->get_lbound());
       np->set_rbound(u->get_rbound());
       
+      np->set_bitset();
       return np;
     }
 
@@ -40,6 +41,8 @@ namespace oa{
       np->set_shape(b.shape(0));
 
       np->set_data_type(u->get_data_type());
+
+      np->set_bitset();
 
       return np;
     }
