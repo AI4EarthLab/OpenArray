@@ -106,6 +106,14 @@ public:
         return;
     }
     //std::cout<<"llvm"<<std::endl;
+
+    stringstream filename;
+    filename<<"/home/siofive/GOMO/tmp/"<<"kernel_"<<hash<<".cpp";
+    ofstream sourcefile;
+    sourcefile.open(filename.str());
+    sourcefile<<code.str();
+    sourcefile.close();
+
     FusionKernelPtr fk_ptr = get(hash);
     if (fk_ptr != NULL) return ;
 
