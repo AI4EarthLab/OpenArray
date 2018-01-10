@@ -42,6 +42,7 @@ public:
     p->set_seqs();
     p->set_data_type(ap->get_data_type());
     p->set_shape(ap->shape());
+    p->set_bitset(ap->get_bitset());
     return p;
   }
 
@@ -57,6 +58,7 @@ public:
     p->set_seqs();
     p->set_data_type(ap->get_data_type());
     p->set_shape(ap->shape());
+    p->set_bitset(ap->get_bitset());
     return p;
   }
   

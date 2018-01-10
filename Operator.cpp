@@ -452,6 +452,7 @@ namespace oa {
     ArrayPtr eval_with_op(NodePtr A) {
       // fusion kernel
       if (A->hash()) {
+        // A->display();
         // use A->hash() to get inside fusion kernel
         FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
         if (fkptr != NULL) {

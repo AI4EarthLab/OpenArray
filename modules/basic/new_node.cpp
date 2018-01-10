@@ -48,6 +48,7 @@ namespace oa{
 
       np->set_bitset(u->get_bitset() | v->get_bitset());
 
+      // np->display();
       return np;
     }
     ///:endfor
