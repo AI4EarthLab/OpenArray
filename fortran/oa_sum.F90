@@ -38,9 +38,11 @@ contains
     
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)
-    call c_new_node_op2(B%ptr, TYPE_CSUM, NA%ptr, ND%ptr)
+    ! call c_new_node_op2(B%ptr, TYPE_CSUM, NA%ptr, ND%ptr)
+    call c_new_node_csum(B%ptr, NA%ptr, ND%ptr)
     ///:else
-    call c_new_node_op2(B%ptr, TYPE_CSUM, A%ptr, ND%ptr)    
+    ! call c_new_node_op2(B%ptr, TYPE_CSUM, A%ptr, ND%ptr)    
+    call c_new_node_csum(B%ptr, A%ptr, ND%ptr)    
     ///:endif
     
   end function
@@ -65,9 +67,11 @@ contains
     
     ///:if t == 'array'
     call c_new_node_array(NA%ptr, A%ptr)
-    call c_new_node_op2(B%ptr, TYPE_SUM, NA%ptr, ND%ptr)
+    ! call c_new_node_op2(B%ptr, TYPE_SUM, NA%ptr, ND%ptr)
+    call c_new_node_sum(B%ptr, NA%ptr, ND%ptr)
     ///:else
-    call c_new_node_op2(B%ptr, TYPE_SUM, A%ptr, ND%ptr)    
+    ! call c_new_node_op2(B%ptr, TYPE_SUM, A%ptr, ND%ptr)    
+    call c_new_node_sum(B%ptr, A%ptr, ND%ptr)    
     ///:endif
     
   end function

@@ -86,7 +86,24 @@
        end subroutine
     end interface
 
+    interface
+       subroutine c_new_node_csum(A, U, V) &
+            bind(C, name='c_new_node_csum')
+         use iso_c_binding
+         type(c_ptr), intent(inout) :: A
+         type(c_ptr), intent(in) :: U, V 
+       end subroutine
+    end interface
     
+    interface
+       subroutine c_new_node_sum(A, U, V) &
+            bind(C, name='c_new_node_sum')
+         use iso_c_binding
+         type(c_ptr), intent(inout) :: A
+         type(c_ptr), intent(in) :: U, V 
+       end subroutine
+    end interface
+
     ///:for n in [i for i in L if i[3] == 'D']
     interface ${n[2]}$    
     ///:for t in ['node', 'array']
