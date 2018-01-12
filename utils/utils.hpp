@@ -55,10 +55,13 @@ namespace oa {
             std::cout<< " * 1E"<<factor<<std::endl;
             val  = val / pow(10, factor);
           }
+        } else if (std::abs(max) < 0.001 && std::abs(max) > 0) {
+
+          int factor = (int)log10(std::abs(max));
 
           if (factor <= -3) {
-            std::cout<< " * 1E"<<factor-1<<std::endl;
-            val  = val / pow(10, factor-1);
+            std::cout<< " * 1E"<<factor<<std::endl;
+            val  = val / pow(10, factor);
           }
         }
 
