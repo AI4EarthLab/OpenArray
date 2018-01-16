@@ -119,7 +119,7 @@ public:
 
   void set_rbound(int3 left_rb, int3 ribht_rb);
 
-  void set_update();
+  void set_update(bool flag = true);
 
   bool need_update();
 

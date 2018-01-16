@@ -346,7 +346,11 @@ namespace oa {
       // not element wise, need eval
       const NodeDesc &nd = get_node_desc(A->type());
       if (!nd.ew || A->need_update()) {
+        // need change need_update's state
+        bool flag = A->need_update();
+        A->set_update(false);
         ArrayPtr ap = eval_with_op(A);
+        A->set_update(flag);
 
         // ap is a pseudo 3d, need to make_pseudo_3d
         if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
@@ -683,10 +687,21 @@ namespace oa {
       if (A->has_data()) return ;
       
       const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew || A->need_update()) {
+      
+      // not element wise
+      if (!nd.ew) {
         for (int i = 0; i < A->input_size(); i++) {
           gen_kernels_JIT_with_op(A->input(i), true);
         }
+        return ;
+      }
+
+      // need update
+      if (A->need_update()) {
+        // should set update to false in order to generate kernels
+        A->set_update(false);
+        gen_kernels_JIT_with_op(A, true);
+        A->set_update(true);
         return ;
       }
 
@@ -698,8 +713,9 @@ namespace oa {
         // generate hash code for tree
         tree_to_string_stack(A, ss1);
         std::hash<string> str_hash;
-        // cout<<ss1.str()<<endl;
         size_t hash = str_hash(ss1.str());
+        if (g_debug) cout<<ss1.str()<<endl;
+        if (g_debug) cout<<hash<<endl;
         
         // if already have kernel function ptr, do nothing
         if (Jit_Driver::global()->get(hash) != NULL) {
@@ -1174,6 +1190,8 @@ namespace oa {
           ss<<"A"<<A->get_bitset();
         }
         ss<<A->get_data_type();
+
+        // if (A->need_update()) ss<<nd.sy;
         return ;
       }
 

@@ -205,8 +205,8 @@ void Node::set_rbound(int3 b1, int3 b2) {
 }
 
 
-void Node::set_update() {
-  m_update_boundary = true;
+void Node::set_update(bool flag) {
+  m_update_boundary = flag;
 }
 
 bool Node::need_update() {
