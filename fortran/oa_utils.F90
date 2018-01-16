@@ -60,4 +60,32 @@ contains
     call c_show_timer()
   end subroutine
 
+  subroutine open_debug()
+    use iso_c_binding
+    implicit none
+
+    interface
+      subroutine c_open_debug() &
+          bind(C, name="c_open_debug")
+        implicit none
+      end subroutine
+    end interface
+
+    call c_open_debug()
+  end subroutine
+
+  subroutine close_debug()
+    use iso_c_binding
+    implicit none
+
+    interface
+      subroutine c_close_debug() &
+          bind(C, name="c_close_debug")
+        implicit none
+      end subroutine
+    end interface
+
+    call c_close_debug()
+  end subroutine
+
 end module oa_utils

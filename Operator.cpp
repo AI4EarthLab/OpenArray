@@ -325,7 +325,7 @@ namespace oa {
         ap = A->get_data();
         
         // ap is a pseudo 3d, need to make_pseudo_3d
-        if (ap->get_bitset() != bt) {
+        if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
           if (ap->has_pseudo_3d() == false) {
             ap->set_pseudo_3d(oa::funcs::make_psudo3d(ap));
           }
@@ -349,7 +349,7 @@ namespace oa {
         ArrayPtr ap = eval_with_op(A);
 
         // ap is a pseudo 3d, need to make_pseudo_3d
-        if (ap->get_bitset() != bt) {
+        if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
           if (ap->has_pseudo_3d() == false) {
             ap->set_pseudo_3d(oa::funcs::make_psudo3d(ap));
           }
@@ -508,12 +508,7 @@ namespace oa {
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
 
-          // oa::internal::set_ghost_consts(
-          //     (float*)ap->get_buffer(), 
-          //     ap->local_shape(), 
-          //     (float)0, 
-          //     1); // only for test, wuqi
-
+          // oa::funcs::set_ghost_zeros(ap); // add by 57
           return ap;
         }
       }
@@ -544,6 +539,7 @@ namespace oa {
       }
       // ap->display();
 
+      // oa::funcs::set_ghost_zeros(ap); // add by 57
       return ap;
     }
 
@@ -724,7 +720,9 @@ namespace oa {
           // JIT source code add calc_inside
           code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
 
-          // cout<<code.str()<<endl;
+          // for debug
+          if (g_debug) cout<<code.str()<<endl;
+
           // Add fusion kernel into JIT map
           Jit_Driver::global()->insert(hash, code);
 

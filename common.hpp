@@ -101,6 +101,7 @@ typedef arma::Cube<double> cube_double;
 #define MPI_SIZE oa::MPI::global()->size()
 
 extern bool g_cache;
+extern bool g_debug;
 
 #endif
 

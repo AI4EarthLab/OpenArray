@@ -12,6 +12,7 @@ namespace oa {
       np->set_lbound({{0, 0, 0}});
       np->set_rbound({{0, 0, 0}});
       np->set_update();
+      // u->set_update();
       np->set_data_type(u->get_data_type());
       
       np->set_pos(u->get_pos());
@@ -38,6 +39,7 @@ namespace oa {
       np->set_lbound({{0, 0, 0}});
       np->set_rbound({{0, 0, 0}});
       np->set_update();
+      // u->set_update();
       np->set_data_type(u->get_data_type());
       
       np->set_pos(u->get_pos());

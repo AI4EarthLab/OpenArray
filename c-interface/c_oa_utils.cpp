@@ -5,6 +5,8 @@
 #include "../common.hpp"
 #include "../MPI.hpp"
 
+bool g_debug = false;
+
 extern "C" {
   // void c_get_rank(int* rank, MPI_Fint fcomm) {
   //     MPI_Comm comm = MPI_Comm_f2c(fcomm);
@@ -33,5 +35,13 @@ extern "C" {
 
   void c_show_timer(){
     oa::utils::show_all();
+  }
+
+  void c_open_debug() {
+    g_debug = true;
+  }
+
+  void c_close_debug() {
+    g_debug = false;
   }
 }
