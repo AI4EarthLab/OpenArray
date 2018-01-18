@@ -30,6 +30,9 @@ extern "C" {
       int dt = (*(ArrayPtr*) B)->get_data_type();
       *A = ArrayPool::global()->get(
           (*(ArrayPtr*) B)->get_partition(), dt);
+      
+      // should copy pos from B
+      (*(ArrayPtr*) A)->set_pos( (*(ArrayPtr*)B)->get_pos() );
 
       switch(dt) {
       case DATA_INT:

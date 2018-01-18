@@ -28,10 +28,10 @@ namespace oa {
 
       std::string frt_str;
       if (std::is_same<T, int>::value) {
-        frt_str = "%10d";
+        frt_str = "%11d";
       } else if (std::is_same<T, float>::value
         || std::is_same<T, double>::value) {
-        frt_str = "%10.6f";
+        frt_str = "%20.15f";
 
       } else if (std::is_same<T, bool>::value) {
         frt_str = "%4d";
