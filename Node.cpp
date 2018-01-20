@@ -20,7 +20,8 @@ void Node::display(char const *prefix) {
     
     const NodeDesc& nd = oa::ops::get_node_desc(m_type);    
     printf("    type : %s\n", nd.name.c_str());
-    printf("    hash : %d\n", m_hash);
+    std::cout<<"    hash : "<<m_hash<<endl; 
+    //printf("    hash : %d\n", m_hash);
     printf("   shape : [%d %d %d]\n",
             shape()[0], shape()[1], shape()[2]);
     printf("  lbound : [%d %d %d]\n", m_lbound[0], m_lbound[1], m_lbound[2]);
@@ -124,6 +125,8 @@ void Node::reset() {
   m_hash = 0;
   id = -1;
   m_depth = 0;
+  m_lbound = {{0, 0, 0}};
+  m_rbound = {{0, 0, 0}};
 }
 
 bool Node::is_scalar() const {

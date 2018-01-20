@@ -719,8 +719,9 @@ namespace oa {
         
         // if already have kernel function ptr, do nothing
         if (Jit_Driver::global()->get(hash) != NULL) {
+          if (g_debug) cout<<hash<<endl;
           A->set_hash(hash);
-          return ;
+          // return ;   shouldn't return!!!!
         } 
         else {
           // else generate kernel function by JIT_Driver
