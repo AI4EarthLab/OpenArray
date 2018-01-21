@@ -78,6 +78,7 @@ class Array {
   void reset_pseudo_3d();
   ArrayPtr get_pseudo_3d();
   void set_pseudo_3d(ArrayPtr ap);
+  void reset();
 };
 
 

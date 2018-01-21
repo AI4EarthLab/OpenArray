@@ -317,6 +317,12 @@ bool Array::has_pseudo_3d() {
   return m_has_pseudo_3d;
 }
 
+void Array::reset() {
+  m_hash = 0;
+  pos = -1;
+  reset_pseudo_3d();
+}
+
 void Array::reset_pseudo_3d() {
   m_has_pseudo_3d = false;
   m_pseudo_3d = NULL;
