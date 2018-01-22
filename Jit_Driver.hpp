@@ -1,6 +1,7 @@
 #ifndef __JIT_DRIVER_HPP__
 #define __JIT_DRIVER_HPP__
-
+#include<unistd.h>
+#include<fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -40,29 +41,39 @@ private:
     stringstream objname;
     objname<<"/tmp/"<<"kernel_"<<hash<<".so";
     ofstream sourcefile;
-    sourcefile.open(filename.str());
-    sourcefile<<code.str();
-    sourcefile.close();
     stringstream cmd;
-    cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
+    cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -qopenmp -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
     //cmd<<"pwd";
-    
-    if(system(cmd.str().c_str()) != 0)
-    {
-      std::cout<<"icc compile err"<<std::endl;
-      haveicc = 0;
-      return -1;
-    }
-    
+
+    //cout<<objname.str().c_str()<<endl;
+
+    if(access(filename.str().c_str(), F_OK) == -1)
+    {  
+      sourcefile.open(filename.str());
+      sourcefile<<code.str();
+      sourcefile.close();
+    }   
+    if(access(objname.str().c_str(), F_OK) == -1)
+    {  
+      if(system(cmd.str().c_str()) != 0)
+      {
+        std::cout<<"icc compile err"<<std::endl;
+        haveicc = 0;
+        return -1;
+      }
+    }   
     uint64_t Entry ;
     void *dlHandle = NULL;  
 
     stringstream funcname;
     funcname<<"kernel_"<<hash;
     dlHandle = dlopen(objname.str().c_str(), RTLD_LAZY);  
+    int dltime = 0;
     while(dlHandle == NULL)  
     {  
+      dltime++;
       dlHandle = dlopen(objname.str().c_str(), RTLD_LAZY);  
+      std::cout<<"dlopen again "<<dltime<<std::endl;
     }  
     char *error = NULL;
     Entry = (uint64_t)dlsym(dlHandle, funcname.str().c_str());  
