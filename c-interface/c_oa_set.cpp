@@ -51,10 +51,18 @@ extern "C"{
     assert(A != NULL && *A != NULL && "null pointer found!");
     assert(B != NULL && *B != NULL && "null pointer found!");
     
-    ArrayPtr& p1 = (*A)->input(0)->get_data();
-    ArrayPtr& p2 = (*B)->input(0)->get_data();
+    if ((*B)->is_ref()) {
+      ArrayPtr& p1 = (*A)->input(0)->get_data();
+      ArrayPtr& p2 = (*B)->input(0)->get_data();
     
-    oa::funcs::set(p1, (*A)->get_ref(), p2, (*B)->get_ref());
+      oa::funcs::set(p1, (*A)->get_ref(), p2, (*B)->get_ref());
+    } else {
+      ArrayPtr& p1 = (*A)->input(0)->get_data();
+      oa::ops::gen_kernels_JIT_with_op(*B);
+      ArrayPtr p2 = oa::ops::eval_with_op(*B);
+
+      oa::funcs::set(p1, (*A)->get_ref(), p2);
+    }
   }
 
 

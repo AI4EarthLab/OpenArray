@@ -122,6 +122,7 @@ void Node::reset() {
   clear_data();
   clear_input();
   m_type = TYPE_UNKNOWN;
+  m_data_type = TYPE_UNKNOWN;
   m_hash = 0;
   id = -1;
   m_depth = 0;
@@ -263,7 +264,7 @@ Box& Node::get_ref(){
 }
 
 bool Node::is_ref() const{
-  return m_data_type == TYPE_REF;
+  return m_type == TYPE_REF;
 }
 
 bool Node::is_ref_data() const{
