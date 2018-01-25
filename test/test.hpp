@@ -796,96 +796,104 @@
 //}
 //
 //
-//void test_fusion_op_3d(int m, int n, int k, int i) {
-//  // ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-//  // ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
-//  // ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
-//  // // ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
-//  
-//  // dx->set_pseudo(true);
-//  // dy->set_pseudo(true);
-//  // dz->set_pseudo(true);
-//
-//  // dx->set_bitset("110");
-//  // dy->set_bitset("110");
-//  // dz->set_bitset("001");
-//  
-//  // // // Grid::global()->init_grid('C', NULL, NULL, NULL);
-//  // Grid::global()->init_grid('C', dx, dy, dz);
-//
-//  // // 3d 
-//  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap3 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap6 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap7 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap8 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
-//  ArrayPtr ap10 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
-//  
-//  NodePtr w = NODE(ap1);
-//  NodePtr q2 = NODE(ap2);
-//  NodePtr dt_3d = NODE(ap3);
-//  NodePtr u = NODE(ap4);
-//  NodePtr aam = NODE(ap5);
-//  NodePtr h_3d = NODE(ap6);
-//  NodePtr q2b = NODE(ap7);
-//  NodePtr dum_3d = NODE(ap8);
-//  NodePtr v = NODE(ap9);
-//  NodePtr dvm_3d = NODE(ap10);
-//  
-//  ArrayPtr gg;
-//  
-//  NodePtr a1 = MULT(w, q2);
-//  NodePtr a2 = AZF(a1);
-//  NodePtr a3 = DZF(a2);
-//  NodePtr a4 = AXB(q2);
-//  NodePtr a5 = AXB(dt_3d);
-//  NodePtr a6 = MULT(a4, a5);
-//  NodePtr a7 = AZB(u);
-//  NodePtr a8 = MULT(a6, a7);
-//  NodePtr a9 = AXB(aam);
-//  NodePtr a10 = AZB(a9);
-//  NodePtr a11 = AXB(h_3d);
-//  NodePtr a12 = MULT(a10, a11);
-//  NodePtr a13 = DXB(q2b);
-//  NodePtr a14 = MULT(a12, a13);
-//  NodePtr a15 = MULT(a14, dum_3d);
-//  NodePtr a16 = MINUS(a8, a15);
-//  NodePtr a17 = DXF(a16);
-//  NodePtr a18 = PLUS(a3, a17);
-//  NodePtr a19 = AYB(q2);
-//  NodePtr a20 = AYB(dt_3d);
-//  NodePtr a21 = MULT(a19, a20);
-//  NodePtr a22 = AZB(v);
-//  NodePtr a23 = MULT(a21, a22);
-//  NodePtr a24 = AYB(aam);
-//  NodePtr a25 = AZB(a24);
-//  NodePtr a26 = AYB(h_3d);
-//  NodePtr a27 = MULT(a25, a26);
-//  NodePtr a28 = DYB(q2b);
-//  NodePtr a29 = MULT(a27, a28);
-//  NodePtr a30 = MULT(a29, dvm_3d);
-//  NodePtr a31 = MINUS(a23, a30);
-//  NodePtr a32 = DYF(a31);
-//  NodePtr a33 = PLUS(a18, a32);
-//  
-//  oa::ops::gen_kernels_JIT(a33);
-//  ArrayPtr gao = EVAL(a33);
-//  //gao->display("gao");
-//  
-//  //oa::ops::write_graph(a33);  
-//  
-//  
-//
-//
-//  // q2f= DZB(AZF(w*q2)) 
-//  // + DXF(AXB(q2)*AXB(dt_3d)*AZB(u) - AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)
-//  // + DYF(AYB(q2)*AYB(dt_3d)*AZB(v) - AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d)
-//
-//}
+void test_fusion_op_3d(int m, int n, int k, int i) {
+  // ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  // ArrayPtr dy = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);
+  // ArrayPtr dz = oa::funcs::consts(MPI_COMM_WORLD, {1, 1}, {1, 1}, {3, 3}, 1, 2);
+  // // ArrayPtr A = oa::funcs::seqs(MPI_COMM_WORLD, {6, 6, 6}, 2);
+  
+  // dx->set_pseudo(true);
+  // dy->set_pseudo(true);
+  // dz->set_pseudo(true);
+
+  // dx->set_bitset("110");
+  // dy->set_bitset("110");
+  // dz->set_bitset("001");
+  
+  // // // Grid::global()->init_grid('C', NULL, NULL, NULL);
+  // Grid::global()->init_grid('C', dx, dy, dz);
+
+  // // 3d 
+  ArrayPtr ap1 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap2 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap3 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap4 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap5 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap6 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap7 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap8 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap9 = oa::funcs::seqs(MPI_COMM_WORLD, {m, n, k}, 2);
+  ArrayPtr ap10 = oa::funcs::ones(MPI_COMM_WORLD, {m, n, k}, 2);
+  
+  NodePtr w = NODE(ap1);
+  NodePtr q2 = NODE(ap2);
+  NodePtr dt_3d = NODE(ap3);
+  NodePtr u = NODE(ap4);
+  NodePtr aam = NODE(ap5);
+  NodePtr h_3d = NODE(ap6);
+  NodePtr q2b = NODE(ap7);
+  NodePtr dum_3d = NODE(ap8);
+  NodePtr v = NODE(ap9);
+  NodePtr dvm_3d = NODE(ap10);
+  NodePtr dhf = NODE(ap10);
+  NodePtr dhb = NODE(ap10);
+  NodePtr dti2 = oa::ops::new_seqs_scalar_node(1);
+  
+  ArrayPtr gg;
+  
+  NodePtr a1 = MULT(w, q2);
+  NodePtr a2 = AZF(a1);
+  NodePtr a3 = DZF(a2);
+  NodePtr a4 = AXB(q2);
+  NodePtr a5 = AXB(dt_3d);
+  NodePtr a6 = MULT(a4, a5);
+  NodePtr a7 = AZB(u);
+  NodePtr a8 = MULT(a6, a7);
+  NodePtr a9 = AXB(aam);
+  NodePtr a10 = AZB(a9);
+  NodePtr a11 = AXB(h_3d);
+  NodePtr a12 = MULT(a10, a11);
+  NodePtr a13 = DXB(q2b);
+  NodePtr a14 = MULT(a12, a13);
+  NodePtr a15 = MULT(a14, dum_3d);
+  NodePtr a16 = MINUS(a8, a15);
+  NodePtr a17 = DXF(a16);
+  NodePtr axx = UMINUS(a3);
+  NodePtr a18 = PLUS(axx, a17);
+  NodePtr a19 = AYB(q2);
+  NodePtr a20 = AYB(dt_3d);
+  NodePtr a21 = MULT(a19, a20);
+  NodePtr a22 = AZB(v);
+  NodePtr a23 = MULT(a21, a22);
+  NodePtr a24 = AYB(aam);
+  NodePtr a25 = AZB(a24);
+  NodePtr a26 = AYB(h_3d);
+  NodePtr a27 = MULT(a25, a26);
+  NodePtr a28 = DYB(q2b);
+  NodePtr a29 = MULT(a27, a28);
+  NodePtr a30 = MULT(a29, dvm_3d);
+  NodePtr a31 = MINUS(a23, a30);
+  NodePtr a32 = DYF(a31);
+  NodePtr a33 = PLUS(a18, a32);
+  NodePtr a34 = MULT(a33, dti2);
+  NodePtr a35 = MULT(q2b, dhb);
+  NodePtr a36 = MINUS(a35, a34);
+  NodePtr a37 = DIVD(a36, dhf);
+  
+  //oa::ops::gen_kernels_JIT(a33);
+  //ArrayPtr gao = EVAL(a33);
+  //gao->display("gao");
+  
+  oa::ops::write_graph(a37);  
+  
+  
+
+
+  // q2f= DZB(AZF(w*q2)) 
+  // + DXF(AXB(q2)*AXB(dt_3d)*AZB(u) - AZB(AXB(aam))*AXB(h_3d)*DXB(q2b)*dum_3d)
+  // + DYF(AYB(q2)*AYB(dt_3d)*AZB(v) - AZB(AYB(aam))*AYB(h_3d)*DYB(q2b)*dvm_3d)
+
+}
 //
 //void test_fusion_op_2d(int m, int n, int k) {
 //  // ArrayPtr dx = oa::funcs::consts(MPI_COMM_WORLD, {3, 3}, {3, 3}, {1, 1}, 1, 2);

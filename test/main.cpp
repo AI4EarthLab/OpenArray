@@ -55,13 +55,13 @@ int main(int argc, char** argv) {
   //test_g2l();
   //test_set_l2g();
   //test_set_g2l();
-  test_set_with_mask();
+  //test_set_with_mask();
   //test_fusion_operator();
   //test_op();
 
   // tic("3d");
   // for (int i = 0; i < 10; i++)
-  //   test_fusion_op_3d(m, n, p, i);
+     test_fusion_op_3d(m, n, p, 1);
   // toc("3d");
   // tic("2d");
   // test_fusion_op_2d(m, n, p);
