@@ -64,6 +64,8 @@ class Box {
 
   Box shift(int i);
 
+  Box shift(int x, int y, int z);
+  
 };
 
 typedef std::shared_ptr<Box> BoxPtr;

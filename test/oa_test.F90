@@ -599,35 +599,42 @@ contains
       ['OA_FLOAT','val2'], &
       ['OA_DOUBLE','val3']]
 
-    A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    A = ones(m, n, k, dt = ${t[0]}$) * 100;
     B = seqs(m, n, k, dt = ${t[0]}$);
+    
+    ! call display(B, "B = ")
+    
+    ! B = seqs(m, n, k, dt = ${t[0]}$);
 
-    mask = seqs(m, n, k, dt = ${t[0]}$);
+    ! ! mask = seqs(m, n, k, dt = ${t[0]}$);
+    mask = (rands(m, n, k) > rands(m, n, k))
     node_mask = mask + mask
 
-    A = ones(m, n, k, dt = ${t[0]}$) * 30;
-    call set(A, ${t[1]}$, mask)
-    call display(A, "A1 = ")
+    call display(mask, "mask = ")
+    
+    ! A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    ! call set(A, ${t[1]}$, mask)
+    ! call display(A, "A1 = ")
+
+    ! A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    ! call set(A, ${t[1]}$, A > val1)
+    ! call display(A, "A2 = ")
+
+    ! A = ones(m, n, k, dt = ${t[0]}$) * 30;
+    ! call set(A, B, A > B)
+    ! call display(A, "A3 = ")
 
     A = ones(m, n, k, dt = ${t[0]}$) * 30;
-    call set(A, ${t[1]}$, A > val1)
-    call display(A, "A2 = ")
-
-    A = ones(m, n, k, dt = ${t[0]}$) * 30;
-    call set(A, B, A > B)
-    call display(A, "A3 = ")
-
-    A = ones(m, n, k, dt = ${t[0]}$) * 30;
-    call set(A, B, A < B)
+    call set(A, B, mask)
     call display(A, "A4 = ")
 
-    A = ones(m, n, k, dt = ${t[0]}$) * 30;    
-    call set(A, B * 2, mask)
-    call display(A, "A5 = ")
+    ! A = ones(m, n, k, dt = ${t[0]}$) * 30;    
+    ! call set(A, B * 2, mask)
+    ! call display(A, "A5 = ")
 
-    A = ones(m, n, k, dt = ${t[0]}$) * 30;    
-    call set(A, B * 2, A > B * 2)
-    call display(A, "A6 = ")
+    ! A = ones(m, n, k, dt = ${t[0]}$) * 30;    
+    ! call set(A, B * 2, A > B * 2)
+    ! call display(A, "A6 = ")
 
     ///:endfor
 
@@ -721,7 +728,7 @@ contains
   subroutine test_shift()
     implicit none
     type(array) :: A
-    type(array) :: B
+    type(array) :: B, C
 
     A = seqs(6, 8, 3)
     ! call display(A, "A")
@@ -733,6 +740,31 @@ contains
     B = shift(A, -1)
     call display(B, "B = ")
 
+    C = circshift(A, 1)
+    call display(C, "circshift(A, 1) = ")
+
+    C = circshift(A, 0, 1, 0)
+    call display(C, "circshift(A, 0, 1, 0) = ")
+    
+    C = circshift(A, 0, 0, 1)
+    call display(C, "circshift(A, 0, 0, 1) = ")
+
+    C = circshift(A, -1)
+    call display(C, "circshift(A, -1) = ")
+
+    C = circshift(A, 0, -1)
+    call display(C, "circshift(A, 0, -1) = ")
+    
+    C = circshift(A, 0, 0, -1)
+    call display(C, "circshift(A, 0, 0, -1) = ")
+
+    C = circshift(A, 1, -1, 0)
+    call display(C, "circshift(A, 1, -1, 0) = ")
+
+    C = circshift(A, -1, 0, 1)
+    call display(C, "circshift(A, -1, 0, 1) = ")
+    
+    
     ! B = shift(A, 1, 2,0)
 
     ! print*, "after shifted"

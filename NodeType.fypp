@@ -74,7 +74,8 @@
        ["TYPE_AND",     "and",     "&&",         "F",   "2", "F", "F",  "A.and.B",    "0"],& 
        ["TYPE_NOT",     "not",     "!",          "G",   "1", "F", "F",  ".not.B",     "0"],&
        ["TYPE_REP",     "rep",     "rep",        "",    "2",  "F", "T",  "rep(A)",     "0"],&
-       ["TYPE_SHIFT",   "shift",   "shift",      "",    "2",  "F", "F",  "shift(A)",   "0"]]    
+       ["TYPE_SHIFT",   "shift",   "shift",      "",    "2",  "F", "F",  "shift(A)",   "0"],&
+       ["TYPE_CIRCSHIFT",  "circshift",   "circshift",      "",    "2",  "F", "F",  "circshift(A)",   "0"]]
 
 
 #!get folders in ./modules/

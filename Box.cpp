@@ -126,6 +126,14 @@ Box Box::shift(int i){
   return Box(rx, ry, rz);
 }
 
+Box Box::shift(int x, int y, int z){
+  Range rx = m_rx, ry = m_ry, rz = m_rz;
+  rx.shift(x);
+  ry.shift(y);
+  rz.shift(z);
+  return Box(rx, ry, rz);
+}
+
 Box Box::boundary_box(int sw) const {
   int xs, xe, ys, ye, zs, ze;
   get_corners(xs, xe, ys, ye, zs, ze, sw);

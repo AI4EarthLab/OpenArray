@@ -535,13 +535,15 @@ namespace oa {
       }else{
         const NodeDesc& nd = get_node_desc(A->type());
         KernelPtr kernel_addr = nd.func;
+
+        // ops_ap[0]->display("left = ");
+        // ops_ap[1]->display("right = ");        
         ap = kernel_addr(ops_ap);
         //A->set_data(ap);
         ap->set_pseudo(A->is_pseudo());
         ap->set_bitset(A->get_bitset());
         ap->set_pos(A->get_pos());
       }
-      // ap->display();
 
       // oa::funcs::set_ghost_zeros(ap); // add by 57
       return ap;

@@ -7,4 +7,9 @@ extern "C"{
     if(o == NULL) o = new NodePtr();
     *o = SHIFT(*u, *v);
   }
+
+  void c_new_node_circshift(NodePtr*& o, NodePtr*& u, NodePtr*& v){
+    if(o == NULL) o = new NodePtr();
+    *o = CIRCSHIFT(*u, *v);
+  }  
 }

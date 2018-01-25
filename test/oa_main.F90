@@ -54,7 +54,7 @@ program main
 
   ! call test_pow()
   
-  ! call test_set_with_mask()
+  call test_set_with_mask()
   
   ! call test_io()
 
