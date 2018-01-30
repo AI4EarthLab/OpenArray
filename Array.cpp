@@ -283,10 +283,6 @@ void Array::set_bitset() {
       m_is_pseudo = true;
     }
   }
-
-  if(m_par_ptr->get_comm() == MPI_COMM_SELF){
-    m_is_pseudo = false;
-  }
 }
 
 bitset<3> Array::get_bitset() {

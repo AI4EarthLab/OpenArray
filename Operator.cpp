@@ -332,6 +332,7 @@ namespace oa {
           ap = ap->get_pseudo_3d();
         }
 
+        // if (g_debug) ap->display("test");
         list.push_back(ap->get_buffer());
         if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
@@ -392,6 +393,7 @@ namespace oa {
           ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);          
           S.push_back(grid_ptr->buffer_shape());
           list.push_back(grid_ptr->get_buffer());
+          // if (g_debug) grid_ptr->display("test grid");
         }
       }
     }
