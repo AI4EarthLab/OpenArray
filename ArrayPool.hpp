@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <list>
 #include <vector>
+#include "log.hpp"
 
 using namespace std;
 
@@ -28,6 +29,8 @@ public:
   // [comm, process_size, (gx, gy, gz), stencil_width, buffer_data_type]
   ArrayPtr get(MPI_Comm comm, const Shape& gs, int stencil_width = 1, 
                int data_type = DATA_DOUBLE) {
+    //oa::logging::write_log_error(1, "get ArrayPtr from ArrayPool");
+    
     Array* ap;
     size_t par_hash = Partition::gen_hash(comm, gs, stencil_width);
     
@@ -46,6 +49,7 @@ public:
         get(comm, size, gs, stencil_width, par_hash);
       ap = new Array(par_ptr, data_type);
       ap->set_hash(array_hash);
+      //cout<<"ones new array"<<endl;
     } else {
       ap = it->second->back();
       it->second->pop_back();
@@ -103,14 +107,16 @@ public:
 
     ArrayPoolMap::iterator it = m_pools.find(array_hash);
 
-    //printf("array get called. hash : %d\n", array_hash);
+    //cout<<"array get called. hash : "<<array_hash<<endl;
 
     if (it == m_pools.end() || it->second->size() < 1) {
       ap = new Array(pp, data_type);
       ap->set_hash(array_hash);
+      //cout<<"new array"<<endl;
     } else {
       ap = it->second->back();
       it->second->pop_back();
+      //cout<<"array from list"<<endl;
     }
 
     // set bitset based on array global shape [m, n, k]
@@ -122,8 +128,8 @@ public:
   }
 
   void dispose(Array* ap){
-    //cout<<"ArrayPool dispose called!\n"<<endl;
     size_t array_hash = ap->get_hash();
+    //cout<<array_hash<<" ArrayPool dispose called!\n"<<endl;
     ap->reset();
 
     ArrayPoolMap::iterator it = m_pools.find(array_hash);
@@ -133,6 +139,7 @@ public:
       m_pools[array_hash] = al;
     } else{
       it->second->push_back(ap);  
+      //cout<<"arraylist has: "<<it->second->size()<<endl;
     }
 
     //printf("array disposed called. hash:%d\n", array_hash);

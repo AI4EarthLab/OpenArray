@@ -2,6 +2,7 @@
 #include "../Array.hpp"
 #include "../Init.hpp"
 #include "../ArgumentParser.hpp"
+#include "../log.hpp"
 
 extern "C"{
   void c_init(int fcomm, int* procs_shape, char* cmdline){
@@ -12,5 +13,6 @@ extern "C"{
     oa::init(fcomm, ps);
 
     ArgumentParser::global()->set_cmdline(cmdline);
+    //oa::logging::logging_start(1);
   }
 }
