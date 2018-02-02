@@ -23,6 +23,7 @@ typedef unordered_map<size_t, ArrayList*> ArrayPoolMap;
 class ArrayPool{
 private:
   ArrayPoolMap m_pools;
+  int global_count = 0;
   
 public:
   // get an ArrayPtr from m_pools based on hash created by key:
@@ -48,6 +49,8 @@ public:
       PartitionPtr par_ptr = PartitionPool::global()->
         get(comm, size, gs, stencil_width, par_hash);
       ap = new Array(par_ptr, data_type);
+      add_count();
+      if (g_debug) cout<<"ArrayPool.size() = "<<count()<<endl;
       ap->set_hash(array_hash);
       //cout<<"ones new array"<<endl;
     } else {
@@ -83,6 +86,8 @@ public:
       PartitionPtr par_ptr = PartitionPool::global()->
         get(comm, x, y, z, stencil_width, par_hash);
       ap = new Array(par_ptr, data_type);
+      add_count();
+      if (g_debug) cout<<"ArrayPool.size() = "<<count()<<endl;
       ap->set_hash(array_hash);
     } else {
       ap = it->second->back();
@@ -111,6 +116,8 @@ public:
 
     if (it == m_pools.end() || it->second->size() < 1) {
       ap = new Array(pp, data_type);
+      add_count();
+      if (g_debug) cout<<"ArrayPool.size() = "<<count()<<endl;
       ap->set_hash(array_hash);
       //cout<<"new array"<<endl;
     } else {
@@ -150,6 +157,20 @@ public:
     static ArrayPool ap;
     return &ap;
   }
+
+  static ArrayPtr* global_Array() {
+    static ArrayPtr ap;
+    return &ap;
+  }
+
+  int count() {
+    return global_count;
+  }
+
+  void add_count() {
+    global_count += 1;
+  }
+
 };
 
 

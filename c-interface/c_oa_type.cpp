@@ -11,19 +11,14 @@ extern "C" {
           int & pa, int & pb) {
     if(A == NULL) A = new ArrayPtr();
     
-    // printf("A=%p\n", A);
-    // printf("B=%p\n", B);
-    
     if(B == NULL) {
       A = NULL;
       return;
     }
     
-    //(*(ArrayPtr*&)B)->display("B = ");
-    
     if (pb == R) {
       *A = *B;
-      ArrayPtr np;
+      ArrayPtr np = NULL;
       *B = np;
     } else {
       //need to rewrite!
@@ -55,9 +50,6 @@ extern "C" {
             (*A)->buffer_size());
         break;
       }
-      // ArrayPtr* tmp = new ArrayPtr();
-      // *tmp = ap;
-      // A = (void*) tmp;
     }
     pa = L;
   }
@@ -75,6 +67,7 @@ extern "C" {
       // cout<<g_cache<<endl;
       if (!g_cache) oa::ops::gen_kernels_JIT_with_op(*(NodePtr*)B);
       *A = oa::ops::eval_with_op(*(NodePtr*)B);
+      if (!g_cache) *(NodePtr*)B = NULL;
       g_cache = false;
     }catch(const std::exception& e){
       std::cout<<"Execetion caught while "
@@ -126,7 +119,7 @@ extern "C" {
           int m, int n, int k, int stencil_width, 
           int data_type) {
 
-    if(ptr == NULL) ptr = new ArrayPtr();  
+    if(ptr == NULL) ptr = ArrayPool::global_Array(); 
     MPI_Comm comm = oa::MPI::global()->comm();
     Shape s = {m, n, k};
     *ptr = oa::funcs::${f}$(comm, s, stencil_width, data_type);
@@ -145,7 +138,7 @@ extern "C" {
     MPI_Comm comm = oa::MPI::global()->comm();
     Shape s = {m, n, k};
 
-    if (ptr == NULL) ptr = new ArrayPtr();
+    if(ptr == NULL) ptr = ArrayPool::global_Array(); 
     *ptr = oa::funcs::consts(comm, s, val, stencil_width);
   }
   ///:endfor
