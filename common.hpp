@@ -103,5 +103,7 @@ typedef arma::Cube<double> cube_double;
 extern bool g_cache;
 extern bool g_debug;
 
+#define DEBUG
+
 #endif
 

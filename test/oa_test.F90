@@ -14,9 +14,36 @@ module oa_test
 
 contains
 
+  subroutine test_memleak()
+    implicit none
+    type(array) :: A, B, C
+    integer :: i, N
+
+    N = 10
+    
+    do i = 1, N
+       A = ones(100, 10, 10)
+       call usleep(10000)
+    end do
+
+
+    ! do i = 1, N
+    !    A = ones(100, 10, 10)
+    !    B = ones(100, 10, 10)
+    !    ! C = A
+    !    ! C = B
+       
+    !    C = A + B
+
+    !    call usleep(10000)
+    ! end do
+    
+  end subroutine
+  
   subroutine test_init(mm, nn, kk, comm)
     integer :: mm, nn, kk
     integer(c_int) :: comm
+    
     m = mm
     n = nn
     k = kk

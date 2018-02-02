@@ -11,9 +11,6 @@ extern "C" {
           int & pa, int & pb) {
     if(A == NULL) A = new ArrayPtr();
     
-    // printf("A=%p\n", A);
-    // printf("B=%p\n", B);
-    
     if(B == NULL) {
       A = NULL;
       return;
@@ -23,41 +20,52 @@ extern "C" {
     
     if (pb == R) {
       *A = *B;
-      ArrayPtr np;
-      *B = np;
+
+#ifdef DEBUG            
+      ArrayPool::global()->show_status("x1");
+      printf("B's hash = %d\n", (*B)->get_hash());
+#endif
+
+      //drop object B
+      *B = nullptr;
+      
+#ifdef DEBUG      
+      ArrayPool::global()->show_status("x2");
+#endif
+      
     } else {
       //need to rewrite!
-      int dt = (*(ArrayPtr*) B)->get_data_type();
-      *A = ArrayPool::global()->get(
-          (*(ArrayPtr*) B)->get_partition(), dt);
-      
-      // should copy pos from B
-      (*(ArrayPtr*) A)->set_pos( (*(ArrayPtr*)B)->get_pos() );
+      // Array::copy(*A, *B);
 
-      switch(dt) {
-      case DATA_INT:
-        oa::internal::copy_buffer(
-            (int*) ((*A)->get_buffer()),
-            (int*) ((*(ArrayPtr*) B)->get_buffer()),
-            (*A)->buffer_size());
-        break;
-      case DATA_FLOAT:
-        oa::internal::copy_buffer(
-            (float*) ((*A)->get_buffer()),
-            (float*) ((*(ArrayPtr*) B)->get_buffer()),
-            (*A)->buffer_size()
-                                  );
-        break;
-      case DATA_DOUBLE:
-        oa::internal::copy_buffer(
-            (double*) ((*A)->get_buffer()),
-            (double*) ((*(ArrayPtr*) B)->get_buffer()),
-            (*A)->buffer_size());
-        break;
-      }
-      // ArrayPtr* tmp = new ArrayPtr();
-      // *tmp = ap;
-      // A = (void*) tmp;
+      
+      // int dt = (*(ArrayPtr*) B)->get_data_type();
+      
+      // *A = ArrayPool::global()->get(
+      //     (*(ArrayPtr*) B)->get_partition(), dt);
+      
+      // // should copy pos from B
+      // (*(ArrayPtr*) A)->set_pos( (*(ArrayPtr*)B)->get_pos() );
+
+      // switch(dt) {
+      // case DATA_INT:
+      //   oa::internal::copy_buffer(
+      //       (int*) ((*A)->get_buffer()),
+      //       (int*) ((*(ArrayPtr*) B)->get_buffer()),
+      //       (*A)->buffer_size());
+      //   break;
+      // case DATA_FLOAT:
+      //   oa::internal::copy_buffer(
+      //       (float*) ((*A)->get_buffer()),
+      //       (float*) ((*(ArrayPtr*) B)->get_buffer()),
+      //       (*A)->buffer_size());
+      //   break;
+      // case DATA_DOUBLE:
+      //   oa::internal::copy_buffer(
+      //       (double*) ((*A)->get_buffer()),
+      //       (double*) ((*(ArrayPtr*) B)->get_buffer()),
+      //       (*A)->buffer_size());
+      //   break;
+      // }
     }
     pa = L;
   }
@@ -85,7 +93,9 @@ extern "C" {
   }
   
   void c_destroy_array(void*& A) {
-    //cout<<"destroy_array called"<<endl;
+    cout<<"destroy_array called"<<endl;
+    ArrayPool::global()->show_status("y1");
+    
     try{
       if (A != NULL) {
         delete((ArrayPtr*) A);
@@ -95,6 +105,7 @@ extern "C" {
       std::cout<<"Exception occured while destroying array. "
         "Message: "<<e.what()<<std::endl;
     }
+    ArrayPool::global()->show_status("y2");     
   }
 
   void c_destroy_node(void*& A) {

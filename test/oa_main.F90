@@ -19,8 +19,11 @@ program main
 
   call oa_get_option(step, "step", -1)
   print*, "step = ", step
+
+  call test_memleak()
+  
   !initialize the test module  
-  call test_init(4, 3, 2, MPI_COMM_WORLD) 
+  ! call test_init(4, 3, 2, MPI_COMM_WORLD) 
   
   ! call test_create_array()
   
@@ -54,7 +57,7 @@ program main
 
   ! call test_pow()
   
-  call test_set_with_mask()
+  ! call test_set_with_mask()
   
   ! call test_io()
 
@@ -68,7 +71,7 @@ program main
 
   ! call test_pseudo()
 
-  call test_simple_stmt()
+  ! call test_simple_stmt()
 
   call oa_finalize()
 

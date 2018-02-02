@@ -38,6 +38,21 @@
        module procedure display_node
        module procedure display_array
     end interface disp
+
+    interface set_rvalue
+       module procedure set_rvalue_array
+       module procedure set_rvalue_node
+    end interface set_rvalue
+
+    interface destroy
+       module procedure destroy_node
+       module procedure destroy_array
+    end interface destroy
+
+    interface try_destroy
+       module procedure try_destroy_node
+       module procedure try_destroy_array
+    end interface try_destroy
     
     interface consts
        ///:for t in TYPE
@@ -185,7 +200,12 @@
        module procedure get_local_buffer_${t[0]}$
        ///:endfor
     end interface get_local_buffer
- 
+
+    interface is_rvalue
+       module procedure is_rvalue_node
+       module procedure is_rvalue_array
+    end interface is_rvalue
+    
     integer, parameter :: OA_INT    = 0
     integer, parameter :: OA_FLOAT  = 1
     integer, parameter :: OA_DOUBLE = 2
@@ -199,6 +219,22 @@
 
   contains
 
+    function is_rvalue_array(A) result(res)
+      implicit none
+      type(Array), intent(in) :: A
+      logical :: res
+      
+      res = (A%lr .eq. RVALUE)
+    end function
+
+    function is_rvalue_node(A) result(res)
+      implicit none
+      type(Node), intent(in) :: A
+      logical :: res
+      
+      res = (A%lr .eq. RVALUE)
+    end function
+    
     subroutine destroy_array(A)
       use iso_c_binding
       type(Array), intent(inout) :: A
@@ -207,7 +243,7 @@
          subroutine c_destroy_array(A) &
               bind(C, name = 'c_destroy_array')
            use iso_c_binding
-           type(c_ptr), intent(in) :: A
+           type(c_ptr), intent(inout) :: A
          end subroutine
       end interface
 
@@ -223,7 +259,7 @@
          subroutine c_destroy_node(A) &
               bind(C, name = 'c_destroy_node')
            use iso_c_binding
-           type(c_ptr), intent(in) :: A
+           type(c_ptr), intent(inout) :: A
          end subroutine
       end interface
       
@@ -232,6 +268,22 @@
       !A%ptr = C_NULL_PTR
     end subroutine
 
+    subroutine try_destroy_array(A)
+      use iso_c_binding
+      type(Array), intent(inout) :: A
+
+      if(is_rvalue(A)) call destroy(A)
+      
+    end subroutine
+
+    subroutine try_destroy_node(A)
+      use iso_c_binding
+      type(Node), intent(inout) :: A
+
+      if(is_rvalue(A)) call destroy(A)
+      
+    end subroutine
+    
     function string_f2c(f_string) result(c_string)
       use iso_c_binding
       character(len=*):: f_string
@@ -373,6 +425,7 @@
 
       call c_new_local_int3(A%ptr, v)
 
+      call set_rvalue(A)
     end function
 
 
@@ -440,6 +493,11 @@
       call c_new_node_${name}$(B%ptr, A%ptr)
       ///:endif
       !!B%ptr = C_NULL_PTR
+
+      call set_rvalue(B)
+      
+      call try_destroy(A)
+      call try_destroy(NA)
     end function
     ///:endfor
     ///:endfor
@@ -496,6 +554,9 @@
       type(c_ptr) :: res
 
       call c_get_buffer_ptr(A%ptr, res)
+
+      call destroy(A)
+      
     end function
 
     ///:for t in scalar_dtype
@@ -515,6 +576,8 @@
            integer(c_int) :: flag
          end subroutine
       end interface
+
+      call assert(.not. is_rvalue(A), "A must be lvalue type.")
       
       tmp = get_buffer_ptr(A)
       s   = buffer_shape(A)
@@ -544,7 +607,10 @@
       type(array) :: A
       integer :: res(3)
       
-      call c_shape_array(A%ptr, res)   
+      call c_shape_array(A%ptr, res)
+
+      call try_destroy(A)
+
     end function
 
     function shape_node(A) result(res)
@@ -562,7 +628,10 @@
       type(node) :: A
       integer :: res(3)
       
-      call c_shape_node(A%ptr, res)   
+      call c_shape_node(A%ptr, res)
+
+      call try_destroy(A)
+      
     end function
 
 
@@ -619,6 +688,18 @@
 
       call c_new_node_${op}$(res%ptr, ${AC}$%ptr, ${BD}$%ptr)
 
+      call set_rvalue(res)
+
+      call try_destroy(A)
+      call try_destroy(B)
+
+      ///:if type1[0] != 'node'
+      call try_destroy(C)
+      ///:endif
+      ///:if type2[0] != 'node'
+      call try_destroy(D)
+      ///:endif
+      
     end function
 
     ///:endif
@@ -643,7 +724,7 @@
          end subroutine
       end interface
 
-      ${type1[1]}$, intent(in) :: A
+      ${type1[1]}$, intent(inout) :: A
       type(node) :: res
       ///:if type1[0] != 'node'
       type(node) :: C
@@ -656,6 +737,14 @@
       ///:endif
       call c_new_node_${op}$(res%ptr, ${AC}$%ptr)
 
+      call set_rvalue(res)
+
+      call try_destroy(A)
+
+      ///:if type1[0] != 'node'
+      call try_destroy(C)      
+      ///:endif
+
     end function
 
     ///:endif
@@ -666,8 +755,8 @@
     ///:for t2 in scalar_dtype
     function ops_pow_${t1}$_${t2[0]}$ (A, B) result(C)
       implicit none
-      type(${t1}$), intent(in) :: A
-      ${t2[1]}$, intent(in) :: B
+      type(${t1}$), intent(inout) :: A
+      ${t2[1]}$, intent(inout) :: B
       type(node) :: C, NA, NB
 
       interface
@@ -690,6 +779,13 @@
       call c_new_seqs_scalar_node_${t2[0]}$(NB%ptr, B)
 
       call c_new_node_pow(C%ptr, ${A}$%ptr, NB%ptr)
+
+      call set_rvalue(C)
+
+      call try_destroy(A)
+      call try_destroy(B)
+      call try_destroy(NA)
+      call try_destroy(NB)
     end function
     ///:endfor
     ///:endfor
@@ -698,10 +794,11 @@
     subroutine array_assign_array(A, B)
       implicit none
       type(array), intent(inout) :: A
-      type(array), intent(in) :: B
+      type(array), intent(inout) :: B
 
       call c_array_assign_array(A%ptr, B%ptr, A%lr, B%lr)
-      
+
+      call try_destroy(B)
     end subroutine
 
     subroutine node_assign_node(A, B)
@@ -737,13 +834,20 @@
       default_data_type = dt
     end subroutine
 
-    subroutine set_rvalue(A)
+    subroutine set_rvalue_array(A)
       implicit none
       type(array), intent(inout) :: A
 
       A%lr = RVALUE
     end subroutine
 
+    subroutine set_rvalue_node(A)
+      implicit none
+      type(node), intent(inout) :: A
+
+      A%lr = RVALUE
+    end subroutine
+    
     subroutine set_lvalue(A)
       implicit none
       type(array), intent(inout) :: A

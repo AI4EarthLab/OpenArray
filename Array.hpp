@@ -79,6 +79,8 @@ class Array {
   ArrayPtr get_pseudo_3d();
   void set_pseudo_3d(ArrayPtr ap);
   void reset();
+
+  // static void copy(ArrayPtr& dst, const ArrayPtr& src);
 };
 
 
