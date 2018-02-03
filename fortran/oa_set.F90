@@ -84,6 +84,7 @@ contains
 
     call c_set_ref_const_${type1[0]}$(A%ptr, val)
 
+    call try_destroy(A)
   end subroutine
 
 
@@ -105,9 +106,10 @@ contains
     print*, "set array const..."
     call c_set_array_const_${type1[0]}$(A%ptr, val)
 
+    call try_destroy(A)
+
   end subroutine
   ///:endfor
-
 
    subroutine set_ref_array(A, B)
      implicit none
@@ -125,7 +127,9 @@ contains
     type(array) :: B
     
     call c_set_ref_array(A%ptr, B%ptr)
-    
+
+    call try_destroy(A)
+    call try_destroy(B)
   end subroutine
   
   subroutine set_ref_ref(A, B)
@@ -142,7 +146,9 @@ contains
     type(node), intent(in) :: A, B
 
     call c_set_ref_ref(A%ptr, B%ptr)
-             
+    
+    call try_destroy(A)
+    call try_destroy(B)
   end subroutine
 
   
@@ -191,6 +197,9 @@ contains
     ///:endif
 
     call c_set_${at[0]}$_farray_${type[0]}$(A%ptr, c_loc(B), s3)
+
+    call try_destroy(A)
+
   end subroutine
 
   ///:endfor
@@ -236,6 +245,8 @@ contains
     ///:endif
 
     call c_set_farray_${at[0]}$_${type[0]}$(c_loc(A), B%ptr, s3)
+
+    call try_destroy(B)
   end subroutine
 
   ///:endfor
@@ -263,6 +274,8 @@ contains
     end interface
 
     call c_set_${type1[0]}$_${type2}$(A, B%ptr)
+    
+    call try_destroy(B)
   end subroutine
   ///:endfor
   ///:endfor

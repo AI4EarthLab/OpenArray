@@ -85,6 +85,8 @@ extern "C" {
       }
 
       if (!g_cache) oa::ops::gen_kernels_JIT_with_op(*(NodePtr*)B);
+      if(g_debug)
+	printf("******B:%p\n", B);
       *A = oa::ops::eval_with_op(*(NodePtr*)B);
       g_cache = false;
     }catch(const std::exception& e){
