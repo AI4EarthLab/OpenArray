@@ -128,6 +128,7 @@ void Node::reset() {
   m_depth = 0;
   m_lbound = {{0, 0, 0}};
   m_rbound = {{0, 0, 0}};
+  m_update_boundary = false;
 }
 
 bool Node::is_scalar() const {

@@ -153,7 +153,7 @@ public:
   void dispose(Array* ap){
     //cout<<"ArrayPool dispose called!\n"<<endl;
     size_t array_hash = ap->get_hash();
-    // ap->reset();
+    ap->reset();
 
     ArrayPoolMap::iterator it = m_pools.find(array_hash);
     if (it == m_pools.end()){

@@ -35,36 +35,36 @@ extern "C" {
       
     } else {
       //need to rewrite!
-      Array::copy(*A, *B);
+      //Array::copy(*A, *B);
 
-      // int dt = (*(ArrayPtr*) B)->get_data_type();
+      int dt = (*(ArrayPtr*) B)->get_data_type();
       
-      // *A = ArrayPool::global()->get(
-      //     (*(ArrayPtr*) B)->get_partition(), dt);
+      *A = ArrayPool::global()->get(
+          (*(ArrayPtr*) B)->get_partition(), dt);
       
-      // // should copy pos from B
-      // (*(ArrayPtr*) A)->set_pos( (*(ArrayPtr*)B)->get_pos() );
+      // should copy pos from B
+      (*(ArrayPtr*) A)->set_pos( (*(ArrayPtr*)B)->get_pos() );
 
-      // switch(dt) {
-      // case DATA_INT:
-      //   oa::internal::copy_buffer(
-      //       (int*) ((*A)->get_buffer()),
-      //       (int*) ((*(ArrayPtr*) B)->get_buffer()),
-      //       (*A)->buffer_size());
-      //   break;
-      // case DATA_FLOAT:
-      //   oa::internal::copy_buffer(
-      //       (float*) ((*A)->get_buffer()),
-      //       (float*) ((*(ArrayPtr*) B)->get_buffer()),
-      //       (*A)->buffer_size());
-      //   break;
-      // case DATA_DOUBLE:
-      //   oa::internal::copy_buffer(
-      //       (double*) ((*A)->get_buffer()),
-      //       (double*) ((*(ArrayPtr*) B)->get_buffer()),
-      //       (*A)->buffer_size());
-      //   break;
-      // }
+      switch(dt) {
+      case DATA_INT:
+        oa::internal::copy_buffer(
+            (int*) ((*A)->get_buffer()),
+            (int*) ((*(ArrayPtr*) B)->get_buffer()),
+            (*A)->buffer_size());
+        break;
+      case DATA_FLOAT:
+        oa::internal::copy_buffer(
+            (float*) ((*A)->get_buffer()),
+            (float*) ((*(ArrayPtr*) B)->get_buffer()),
+            (*A)->buffer_size());
+        break;
+      case DATA_DOUBLE:
+        oa::internal::copy_buffer(
+            (double*) ((*A)->get_buffer()),
+            (double*) ((*(ArrayPtr*) B)->get_buffer()),
+            (*A)->buffer_size());
+        break;
+      }
     }
     pa = L;
   }
@@ -80,6 +80,10 @@ extern "C" {
     
     try{
       // cout<<g_cache<<endl;
+      if(g_debug) {
+	oa::ops::write_graph(*B, true, "B.dot");
+      }
+
       if (!g_cache) oa::ops::gen_kernels_JIT_with_op(*(NodePtr*)B);
       *A = oa::ops::eval_with_op(*(NodePtr*)B);
       g_cache = false;
