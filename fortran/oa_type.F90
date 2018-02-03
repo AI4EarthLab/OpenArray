@@ -10,6 +10,7 @@
   module oa_type
     use iso_c_binding
     use mpi
+    use oa_utils
     type Array
        type(c_ptr) :: ptr = C_NULL_PTR
        integer :: lr = L ! lvalue or rvalue
@@ -24,6 +25,9 @@
        final :: destroy_node
     end type Node
 
+    ! private :: try_destroy, try_destroy_array, try_destroy_node
+    ! private :: set_rvalue, set_rvalue_array, set_rvalue_node
+    
     interface shape
        module procedure shape_node
        module procedure shape_array
@@ -126,7 +130,6 @@
     ///:endfor
     end interface ${n[2]}$    
     ///:endfor
-
 
     interface assignment(=)
        module procedure array_assign_array
@@ -234,16 +237,18 @@
       
       res = (A%lr .eq. RVALUE)
     end function
-    
+
+    !> destroy the associated shared_ptr in C++
+    !> intent(in) is used for trick
     subroutine destroy_array(A)
       use iso_c_binding
-      type(Array), intent(inout) :: A
+      type(Array), intent(in) :: A
 
       interface
          subroutine c_destroy_array(A) &
               bind(C, name = 'c_destroy_array')
            use iso_c_binding
-           type(c_ptr), intent(inout) :: A
+           type(c_ptr), intent(in) :: A
          end subroutine
       end interface
 
@@ -251,46 +256,44 @@
 
     end subroutine
 
+    !> destroy the associated shared_ptr in C++
+    !> intent(in) is used for trick.
+    !> this subroutine is used ONLY for local variables
     subroutine destroy_node(A)
       use iso_c_binding 
-      type(Node), intent(inout) :: A
+      type(Node), intent(in) :: A
 
       interface
          subroutine c_destroy_node(A) &
               bind(C, name = 'c_destroy_node')
            use iso_c_binding
-           type(c_ptr), intent(inout) :: A
+           type(c_ptr), intent(in) :: A
          end subroutine
       end interface
       
       call c_destroy_node(A%ptr)
 
-      !A%ptr = C_NULL_PTR
     end subroutine
 
+    !> destroy the object if it is 'rvalue'
+    !> this subroutine is used to destroy the parameter
     subroutine try_destroy_array(A)
       use iso_c_binding
-      type(Array), intent(inout) :: A
+      type(Array), intent(in) :: A
 
       if(is_rvalue(A)) call destroy(A)
       
     end subroutine
 
+    !> destroy the object if it is 'rvalue'
+    !> this subroutine is used to destroy the parameter
     subroutine try_destroy_node(A)
       use iso_c_binding
-      type(Node), intent(inout) :: A
+      type(Node), intent(in) :: A
 
       if(is_rvalue(A)) call destroy(A)
       
     end subroutine
-    
-    function string_f2c(f_string) result(c_string)
-      use iso_c_binding
-      character(len=*):: f_string
-      CHARACTER(LEN=LEN_TRIM(f_string)+1,KIND=C_CHAR) :: c_string
-
-      c_string = trim(f_string) // C_NULL_CHAR
-    end function
     
     subroutine display_array(A, prefix)
       use iso_c_binding
@@ -305,6 +308,7 @@
          end subroutine
       end interface
 
+      !ASSERT_LVALUE(A)      
       call c_display_array(A%ptr, string_f2c(prefix))
     end subroutine
     
@@ -371,6 +375,7 @@
       end if
       
       call c_${t[0]}$(A%ptr, m, op_n, op_k, op_sw, op_dt)
+      
       call set_rvalue(A)
       
     end function
@@ -443,6 +448,10 @@
          end subroutine
       end interface
 
+      !ASSERT_LVALUE(A)
+      !ASSERT_LVALUE(B)
+      !ASSERT_LVALUE(C)
+      
       call c_grid_init(ch, A%ptr, B%ptr, C%ptr)
 
     end subroutine
@@ -460,6 +469,8 @@
          end subroutine
       end interface
 
+      !ASSERT_LVALUE(A)
+      
       call c_grid_bind(A%ptr, pos)
 
     end subroutine
@@ -497,7 +508,7 @@
       call set_rvalue(B)
       
       call try_destroy(A)
-      call try_destroy(NA)
+      call destroy(NA)
     end function
     ///:endfor
     ///:endfor
@@ -517,6 +528,8 @@
       type(array) :: A
       integer :: res(3)
 
+      !ASSERT_LVALUE(A)
+      
       call c_local_shape(A%ptr, res)
     end function
 
@@ -535,6 +548,8 @@
       type(array) :: A
       integer :: res(3)
 
+      !ASSERT_LVALUE(A)
+      
       call c_buffer_shape(A%ptr, res)
     end function
 
@@ -553,9 +568,9 @@
       type(array) :: A
       type(c_ptr) :: res
 
+      !ASSERT_LVALUE(A)
+      
       call c_get_buffer_ptr(A%ptr, res)
-
-      call destroy(A)
       
     end function
 
@@ -577,7 +592,7 @@
          end subroutine
       end interface
 
-      call assert(.not. is_rvalue(A), "A must be lvalue type.")
+      !ASSERT_LVALUE(A)
       
       tmp = get_buffer_ptr(A)
       s   = buffer_shape(A)
@@ -606,10 +621,10 @@
 
       type(array) :: A
       integer :: res(3)
+
+      !ASSERT_LVALUE(A)
       
       call c_shape_array(A%ptr, res)
-
-      call try_destroy(A)
 
     end function
 
@@ -627,10 +642,10 @@
 
       type(node) :: A
       integer :: res(3)
+
+      !ASSERT_LVALUE(A)
       
       call c_shape_node(A%ptr, res)
-
-      call try_destroy(A)
       
     end function
 
@@ -690,14 +705,20 @@
 
       call set_rvalue(res)
 
+      ///:if type1[2] != 'scalar'
       call try_destroy(A)
-      call try_destroy(B)
-
-      ///:if type1[0] != 'node'
-      call try_destroy(C)
       ///:endif
+
+      ///:if type2[2] != 'scalar'
+      call try_destroy(B)
+      ///:endif
+      
+      ///:if type1[0] != 'node'
+      call destroy(C)
+      ///:endif
+      
       ///:if type2[0] != 'node'
-      call try_destroy(D)
+      call destroy(D)
       ///:endif
       
     end function
@@ -724,7 +745,7 @@
          end subroutine
       end interface
 
-      ${type1[1]}$, intent(inout) :: A
+      ${type1[1]}$, intent(in) :: A
       type(node) :: res
       ///:if type1[0] != 'node'
       type(node) :: C
@@ -742,7 +763,7 @@
       call try_destroy(A)
 
       ///:if type1[0] != 'node'
-      call try_destroy(C)      
+      call destroy(C)
       ///:endif
 
     end function
@@ -755,8 +776,8 @@
     ///:for t2 in scalar_dtype
     function ops_pow_${t1}$_${t2[0]}$ (A, B) result(C)
       implicit none
-      type(${t1}$), intent(inout) :: A
-      ${t2[1]}$, intent(inout) :: B
+      type(${t1}$), intent(in) :: A
+      ${t2[1]}$, intent(in) :: B
       type(node) :: C, NA, NB
 
       interface
@@ -783,9 +804,8 @@
       call set_rvalue(C)
 
       call try_destroy(A)
-      call try_destroy(B)
-      call try_destroy(NA)
-      call try_destroy(NB)
+      call destroy(NA)
+      call destroy(NB)
     end function
     ///:endfor
     ///:endfor
@@ -794,7 +814,7 @@
     subroutine array_assign_array(A, B)
       implicit none
       type(array), intent(inout) :: A
-      type(array), intent(inout) :: B
+      type(array), intent(in) :: B
 
       call c_array_assign_array(A%ptr, B%ptr, A%lr, B%lr)
 
@@ -808,6 +828,7 @@
 
       call c_node_assign_node(A%ptr, B%ptr)
 
+      call try_destroy(B)
     end subroutine
 
     subroutine node_assign_array(A, B)
@@ -817,6 +838,7 @@
 
       call c_node_assign_array(A%ptr, B%ptr)
 
+      call try_destroy(B)
     end subroutine
 
     subroutine set_stencil(st, sw)
@@ -855,7 +877,6 @@
       A%lr = LVALUE
     end subroutine
     
-    
     function make_psudo3d(A) result(B)
       implicit none
       type(array),intent(in) :: A
@@ -873,5 +894,7 @@
       call c_make_psudo3d(B%ptr, A%ptr)
 
       call set_rvalue(B)
+
+      call try_destroy(A)
     end function
   end module

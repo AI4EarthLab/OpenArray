@@ -44,6 +44,11 @@ contains
     ! call c_new_node_op2(B%ptr, TYPE_CSUM, A%ptr, ND%ptr)    
     call c_new_node_csum(B%ptr, A%ptr, ND%ptr)    
     ///:endif
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
+    call destroy(ND)    
     
   end function
   ///:endfor
@@ -73,6 +78,11 @@ contains
     ! call c_new_node_op2(B%ptr, TYPE_SUM, A%ptr, ND%ptr)    
     call c_new_node_sum(B%ptr, A%ptr, ND%ptr)    
     ///:endif
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
+    call destroy(ND)    
     
   end function
   ///:endfor

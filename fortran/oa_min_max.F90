@@ -64,7 +64,12 @@ contains
     
     call c_new_node_op2(C%ptr, TYPE_${name[1]}$, &
          ${A}$%ptr, ${B}$%ptr)
-    
+
+    call set_rvalue(C)
+    call try_destroy(A)
+    call try_destroy(B)
+    call destroy(NA)
+    call destroy(NB)
   end function
   ///:endfor
   ///:endfor
@@ -99,8 +104,12 @@ contains
     ///:endif
 
     call c_new_node_${name}$(B%ptr, ${A}$%ptr)
-    
-    !call c_new_node_op1(B%ptr, TYPE_${name.upper()}$, ${A}$%ptr)
+
+    call set_rvalue(B)
+
+    call try_destroy(A)
+    call destroy(NA)
+
   end function
   ///:endfor
   ///:endfor

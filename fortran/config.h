@@ -27,4 +27,11 @@
   A = tmp_node__;                               \
   end if;
 
+
+#define ASSERT(cond, msg)                       \
+  call assert(cond, __FILE__, __LINE__, msg);
+
+#define ASSERT_LVALUE(A)                                        \
+   ASSERT(.not. is_rvalue(A), "object must be lvalue.");
+
 #endif

@@ -60,7 +60,11 @@ contains
     ///:else
     call c_new_node_shift(B%ptr, A%ptr,  ND%ptr)
     ///:endif
-    
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
+    call destroy(ND)
   end function
   ///:endfor
 
@@ -106,7 +110,11 @@ contains
     ///:else
     call c_new_node_circshift(B%ptr, A%ptr,  ND%ptr)
     ///:endif
-    
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
+    call destroy(ND)
   end function
   ///:endfor
   

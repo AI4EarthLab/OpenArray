@@ -19,25 +19,30 @@ contains
     type(array) :: A, B, C
     integer :: i, N
 
-    N = 10
+    N = 10000000
     
+    ! do i = 1, N
+    !    A = ones(100, 10, 10)
+    !    call usleep(1000)
+    ! end do
+
+
     do i = 1, N
-       A = ones(100, 10, 10)
+       A = ones(10, 10, 10)
+       B = ones(10, 10, 10)
+       ! C = A
+       ! C = B
+       
+       C = A + B
+
        call usleep(10000)
     end do
 
-
-    ! do i = 1, N
-    !    A = ones(100, 10, 10)
-    !    B = ones(100, 10, 10)
-    !    ! C = A
-    !    ! C = B
-       
-    !    C = A + B
-
-    !    call usleep(10000)
-    ! end do
+    call destroy(A)
+    call destroy(B)
+    call destroy(C)
     
+    ! call disp(C, "C = ")
   end subroutine
   
   subroutine test_init(mm, nn, kk, comm)
@@ -249,28 +254,37 @@ contains
     type(array) :: A, B, C, D
     integer :: i
 
-    A = rands(m, n, k, dt=OA_DOUBLE)
-    B = rands(m, n, k, dt=OA_DOUBLE)
-    C = rands(m, n, k, dt=OA_DOUBLE)
-    D = rands(m, n, k, dt=OA_DOUBLE)
+    A = ones(m, n, k, dt=OA_DOUBLE)
+    B = ones(m, n, k, dt=OA_DOUBLE)
+    C = ones(m, n, k, dt=OA_DOUBLE)
+    D = seqs(m, n, k, dt=OA_DOUBLE)
 
     ///:for op in [o for o in L if o[3] == 'C']
 
-
     D = ${op[2]}$(C)
 
+    ! call display(D, "${op[2]}$(C) = ")
 
-    call display(D, "${op[2]}$(C) = ")
-
+    ///:if op[2] != 'rcp'
     D = ${op[2]}$(C*0.5)
-    call display(D, "${op[2]}$(C*0.5) = ")
-
+    ! call display(D, "${op[2]}$(C*0.5) = ")
+    ///:endif
+    
     ///:endfor
 
-    do i = 0, 10000
+    D = seqs(m, n, k, dt=OA_DOUBLE)
+    
+    do i = 0, 100
+       ! A = B + C + D
       FSET(A, B + C + D)
     end do
 
+    call disp(A, 'A = ')
+    
+    call destroy(A)
+    call destroy(B)
+    call destroy(C)
+    call destroy(D)
   end subroutine
 
   subroutine test_sub()
@@ -887,7 +901,7 @@ contains
     type(array) ::  v
     type(array) ::  dvm_3d
 
-    !call test_init(6, 6, 3, MPI_COMM_WORLD)
+    ! call test_init(6, 6, 6, MPI_COMM_WORLD)
     call test_init(10, 10, 10, MPI_COMM_WORLD)
 
     step = 1

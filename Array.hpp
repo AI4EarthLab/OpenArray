@@ -80,7 +80,7 @@ class Array {
   void set_pseudo_3d(ArrayPtr ap);
   void reset();
 
-  // static void copy(ArrayPtr& dst, const ArrayPtr& src);
+  static void copy(ArrayPtr& dst, const ArrayPtr& src);
 };
 
 

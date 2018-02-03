@@ -51,7 +51,11 @@ contains
     ///:else
     call c_new_node_op2(B%ptr, TYPE_REP, A%ptr, ND%ptr)    
     ///:endif
-    
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
+    call destroy(ND)
   end function
   ///:endfor
 end module

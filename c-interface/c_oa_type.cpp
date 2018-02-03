@@ -35,9 +35,8 @@ extern "C" {
       
     } else {
       //need to rewrite!
-      // Array::copy(*A, *B);
+      Array::copy(*A, *B);
 
-      
       // int dt = (*(ArrayPtr*) B)->get_data_type();
       
       // *A = ArrayPool::global()->get(
@@ -93,8 +92,8 @@ extern "C" {
   }
   
   void c_destroy_array(void*& A) {
-    cout<<"destroy_array called"<<endl;
-    ArrayPool::global()->show_status("y1");
+    // cout<<"destroy_array called"<<endl;
+    // ArrayPool::global()->show_status("y1");
     
     try{
       if (A != NULL) {
@@ -105,7 +104,7 @@ extern "C" {
       std::cout<<"Exception occured while destroying array. "
         "Message: "<<e.what()<<std::endl;
     }
-    ArrayPool::global()->show_status("y2");     
+    // ArrayPool::global()->show_status("y2");     
   }
 
   void c_destroy_node(void*& A) {
