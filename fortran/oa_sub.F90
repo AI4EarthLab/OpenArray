@@ -96,7 +96,10 @@ contains
     ///:else
     call c_new_node_sub_node(B%ptr, A%ptr, rx1, ry1, rz1)
     ///:endif
-    
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
   end function
   ///:endfor
   ///:endfor
@@ -141,6 +144,10 @@ contains
     ///:else
     call c_new_node_sub_node(B%ptr, A%ptr, rx1, ry1, rz1)
     ///:endif
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
     
   end function
   ///:endfor
@@ -195,6 +202,9 @@ contains
     call c_new_node_sub_node(B%ptr, A%ptr, rx1, ry1, rz1)
     ///:endif
 
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
     
   end function
   ///:endfor

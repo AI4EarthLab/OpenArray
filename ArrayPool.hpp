@@ -26,6 +26,26 @@ private:
   int global_count = 0;
   
 public:
+
+  void show_status(char* tag){
+    printf("\n==========MEMORY POOL STATUS (%s)===============\n", tag);
+    printf("memory pool size : %d\n", m_pools.size());
+    printf("cached objects : \n");
+    
+    for (ArrayPoolMap::iterator it=m_pools.begin();
+         it!=m_pools.end(); ++it){
+
+      std::cout << "  " << it->first << " => " << it->second << '\n';
+
+      int i = 0;
+      for(ArrayList::iterator lit = it->second->begin();
+          lit != it->second->end(); ++lit){
+        std::cout << "    ("<<i<<") : "<< *lit << '\n';
+        i++;
+      }
+    }
+  }
+  
   // get an ArrayPtr from m_pools based on hash created by key:
   // [comm, process_size, (gx, gy, gz), stencil_width, buffer_data_type]
   ArrayPtr get(MPI_Comm comm, const Shape& gs, int stencil_width = 1, 
@@ -53,9 +73,18 @@ public:
       if (g_debug) cout<<"ArrayPool.size() = "<<count()<<endl;
       ap->set_hash(array_hash);
       //cout<<"ones new array"<<endl;
+#ifdef DEBUG      
+      printf("not found in memory pool!\n");
+#endif
     } else {
       ap = it->second->back();
       it->second->pop_back();
+
+#ifdef DEBUG
+      printf("found in memory pool!\n");
+      printf("ap'hash is %d\n", ap->get_hash());
+#endif
+      
     }
 
     // set bitset based on array global shape [m, n, k]
@@ -71,7 +100,8 @@ public:
   // get an ArrayPtr from m_pools based on hash created by key:
   // [comm, lx, ly, lz, stencil_width, buffer_data_type]
   ArrayPtr get(MPI_Comm comm, const vector<int> &x, const vector<int> &y, 
-               const vector<int> &z, int stencil_width = 1, int data_type = DATA_DOUBLE) {
+          const vector<int> &z, int stencil_width = 1, 
+          int data_type = DATA_DOUBLE) {
     Array* ap;
     size_t par_hash = Partition::gen_hash(comm, x, y, z, stencil_width);
     
@@ -100,8 +130,7 @@ public:
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
                     [](Array* arr_p) {
-                      ArrayPool::global()->dispose(arr_p);
-                    });
+                      ArrayPool::global()->dispose(arr_p);});
   }
 
   // get an ArrayPtr from m_pools based on partitionptr pp

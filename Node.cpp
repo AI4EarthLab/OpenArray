@@ -128,6 +128,12 @@ void Node::reset() {
   m_depth = 0;
   m_lbound = {{0, 0, 0}};
   m_rbound = {{0, 0, 0}};
+  m_update_boundary = false;
+  m_is_pseudo = false;
+  m_is_seqs = false;
+  m_is_scalar = false;
+  pos = -1;
+  m_bs = std::bitset<3>(7);
 }
 
 bool Node::is_scalar() const {

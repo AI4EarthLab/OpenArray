@@ -16,13 +16,29 @@ extern "C" {
       return;
     }
     
+    //(*(ArrayPtr*&)B)->display("B = ");
+    
     if (pb == R) {
       *A = *B;
-      ArrayPtr np = NULL;
-      *B = np;
+
+#ifdef DEBUG            
+      ArrayPool::global()->show_status("x1");
+      printf("B's hash = %d\n", (*B)->get_hash());
+#endif
+
+      //drop object B
+      *B = nullptr;
+      
+#ifdef DEBUG      
+      ArrayPool::global()->show_status("x2");
+#endif
+      
     } else {
       //need to rewrite!
+      //Array::copy(*A, *B);
+
       int dt = (*(ArrayPtr*) B)->get_data_type();
+      
       *A = ArrayPool::global()->get(
           (*(ArrayPtr*) B)->get_partition(), dt);
       
@@ -40,8 +56,7 @@ extern "C" {
         oa::internal::copy_buffer(
             (float*) ((*A)->get_buffer()),
             (float*) ((*(ArrayPtr*) B)->get_buffer()),
-            (*A)->buffer_size()
-                                  );
+            (*A)->buffer_size());
         break;
       case DATA_DOUBLE:
         oa::internal::copy_buffer(
@@ -65,9 +80,14 @@ extern "C" {
     
     try{
       // cout<<g_cache<<endl;
+      if(g_debug) {
+	oa::ops::write_graph(*B, true, "B.dot");
+      }
+
       if (!g_cache) oa::ops::gen_kernels_JIT_with_op(*(NodePtr*)B);
+      if(g_debug)
+	printf("******B:%p\n", B);
       *A = oa::ops::eval_with_op(*(NodePtr*)B);
-      if (!g_cache) *(NodePtr*)B = NULL;
       g_cache = false;
     }catch(const std::exception& e){
       std::cout<<"Execetion caught while "
@@ -78,7 +98,9 @@ extern "C" {
   }
   
   void c_destroy_array(void*& A) {
-    //cout<<"destroy_array called"<<endl;
+    // cout<<"destroy_array called"<<endl;
+    // ArrayPool::global()->show_status("y1");
+    
     try{
       if (A != NULL) {
         delete((ArrayPtr*) A);
@@ -88,6 +110,7 @@ extern "C" {
       std::cout<<"Exception occured while destroying array. "
         "Message: "<<e.what()<<std::endl;
     }
+    // ArrayPool::global()->show_status("y2");     
   }
 
   void c_destroy_node(void*& A) {
@@ -119,7 +142,7 @@ extern "C" {
           int m, int n, int k, int stencil_width, 
           int data_type) {
 
-    if(ptr == NULL) ptr = ArrayPool::global_Array(); 
+    if(ptr == NULL) ptr = new ArrayPtr();  
     MPI_Comm comm = oa::MPI::global()->comm();
     Shape s = {m, n, k};
     *ptr = oa::funcs::${f}$(comm, s, stencil_width, data_type);
@@ -138,7 +161,7 @@ extern "C" {
     MPI_Comm comm = oa::MPI::global()->comm();
     Shape s = {m, n, k};
 
-    if(ptr == NULL) ptr = ArrayPool::global_Array(); 
+    if (ptr == NULL) ptr = new ArrayPtr();
     *ptr = oa::funcs::consts(comm, s, val, stencil_width);
   }
   ///:endfor

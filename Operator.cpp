@@ -250,7 +250,13 @@ namespace oa {
       ofs<<id;
 
       const NodeDesc & nd = get_node_desc(root->type());
-      ofs<<boost::format("[label=\"[%s]\\n id=%d\"];") % nd.name % id<<endl;
+
+      ofs<<boost::format("[label=\"[%s]\\n id=%d \n (ref:%d) "
+			 "\n (lb:%d %d %d) \n (rb: %d %d %d) \n (up: %d)\"];") 
+	% nd.name % id % root.use_count()
+	% root->get_lbound()[0] % root->get_lbound()[1] % root->get_lbound()[2]
+	% root->get_rbound()[0] % root->get_rbound()[1] % root->get_rbound()[2] 
+	% root->need_update() <<endl;
 
       for (int i = 0; i < root->input_size(); i++) {
         write_graph(root->input(i), false, filename);
@@ -332,7 +338,7 @@ namespace oa {
           ap = ap->get_pseudo_3d();
         }
 
-        // if (g_debug) ap->display("test");
+        if (g_debug) ap->display("test");
         list.push_back(ap->get_buffer());
         if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
@@ -393,7 +399,7 @@ namespace oa {
           ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);          
           S.push_back(grid_ptr->buffer_shape());
           list.push_back(grid_ptr->get_buffer());
-          // if (g_debug) grid_ptr->display("test grid");
+          if (g_debug) grid_ptr->display("test grid");
         }
       }
     }

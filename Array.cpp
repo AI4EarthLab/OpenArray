@@ -3,6 +3,7 @@
 #include "common.hpp"
 #include "utils/utils.hpp"
 #include "ArrayPool.hpp"
+#include "Function.hpp"
 
 using namespace std;
 
@@ -336,3 +337,41 @@ void Array::set_pseudo_3d(ArrayPtr ap) {
   m_pseudo_3d = ap;
   m_has_pseudo_3d = true;
 }
+
+void Array::copy(ArrayPtr& dst, const ArrayPtr& src){
+
+  //same datatype, same stencil width
+  if(dst->get_hash() == src->get_hash()){
+
+    dst->set_pos(src->get_pos());
+    dst->set_pseudo(src->is_pseudo());
+    dst->set_bitset(src->get_bitset());
+    
+    DataType dt = src->get_data_type();
+
+    switch(dt) {
+    case DATA_INT:
+      oa::internal::copy_buffer(
+          (int*) (dst->get_buffer()),
+          (int*) (src->get_buffer()),
+          dst->buffer_size());
+      break;
+    case DATA_FLOAT:
+      oa::internal::copy_buffer(
+          (float*) (dst->get_buffer()),
+          (float*) (src->get_buffer()),
+          dst->buffer_size());
+      break;
+    case DATA_DOUBLE:
+      oa::internal::copy_buffer(
+          (double*) (dst->get_buffer()),
+          (double*) (src->get_buffer()),
+          dst->buffer_size());
+      break;
+    }
+  }else{
+    ArrayPtr dst1 = oa::funcs::transfer(src, dst->get_partition());
+    dst = dst1;
+  }
+}
+

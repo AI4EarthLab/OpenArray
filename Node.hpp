@@ -31,7 +31,7 @@ private:
   bool m_update_boundary = false;
   int pos = -1;
   bool m_is_pseudo = false;
-  std::bitset<3> m_bs = std::bitset<3>(std::string("111"));
+  std::bitset<3> m_bs = std::bitset<3>(7);
 
   Box m_ref;
 

@@ -1,6 +1,5 @@
 
 module oa_utils
-  use oa_type
 
   interface 
      subroutine usleep(useconds) bind(C)
@@ -11,6 +10,15 @@ module oa_utils
   end interface
 
 contains
+
+  !> convert a fortran string to C string
+  function string_f2c(f_string) result(c_string)
+    use iso_c_binding
+    character(len=*):: f_string
+    CHARACTER(LEN=LEN_TRIM(f_string)+1,KIND=C_CHAR) :: c_string
+
+    c_string = trim(f_string) // C_NULL_CHAR
+  end function
 
   !> convert an integer to string
   function i2s(i, frt) result(str)
@@ -71,6 +79,11 @@ contains
       end subroutine
     end interface
 
+    interface
+       subroutine abort() bind(C, name="abort")
+       end subroutine abort
+    end interface
+
     call c_open_debug()
   end subroutine
 
@@ -87,5 +100,24 @@ contains
 
     call c_close_debug()
   end subroutine
+
+  subroutine assert(condition, file, linenum, msg)
+    implicit none
+    logical :: condition
+    integer, optional :: linenum
+    character(len=*), optional :: msg
+    character(len=*), optional :: file
+
+    if(.not. condition) then
+       write(*,"(A)", advance="no") &
+            "Error: assertation failed"
+       if(present(linenum)) then
+          write(*,"(A, A, A, I0, A)", advance="no") &
+               " in ", file, " at line ",linenum, '.'
+       endif
+       if(present(msg)) write(*,*) "Reason: ", msg
+       call abort()
+    endif
+  end subroutine assert
 
 end module oa_utils

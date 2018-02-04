@@ -19,9 +19,9 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 oplevel0 = -O0 -g  -DBOOST_LOG_DYN_LINK
 oplevel3 = -O3 -ffast-math -DBOOST_LOG_DYN_LINK
 
-FC = mpif90 ${oplevel0}
-CC = mpicc  ${oplevel0}
-CXX = mpicxx ${oplevel0}
+FC = mpif90 ${oplevel3}
+CC = mpicc  ${oplevel3}
+CXX = mpicxx ${oplevel3}
 
 FCFLAGS  = -J${CURDIR}/ -fno-trapping-math -fno-signaling-nans -ffree-line-length-0
 
@@ -139,7 +139,7 @@ testfortran:
 	@echo "Cleaning done."
 	@cd build &&sed -i "s/##===##//g" ${MAKEFILE} && make fortran_main ${compile_thread} -f ${MAKEFILE} 
 	@cp build/fortran_main ./
-	@mpirun --oversubscribe -n 8 ./fortran_main
+	@mpirun --oversubscribe -n 1 ./fortran_main
 
 fortran_main : ${OBJ_FORTRAN}
 	-${CXX} -o fortran_main ${OBJ_FORTRAN} \
