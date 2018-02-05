@@ -275,8 +275,8 @@ contains
     D = seqs(m, n, k, dt=OA_DOUBLE)
     
     do i = 0, 100
-       ! A = B + C + D
-      FSET(A, B + C + D)
+       A = B + C + D
+      ! FSET(A, B + C + D)
     end do
 
     call disp(A, 'A = ')
@@ -505,13 +505,14 @@ contains
     integer :: val1
     real  :: val2
     real(kind=8)  :: val3
-
     ///:for d in fdim
     ///:for t in scalar_dtype
     ${t[1]}$, allocatable :: farr_${t[0]}$${d[0]}$(${d[1]}$)
     ///:endfor
     ///:endfor
 
+    call format_short()
+    
     val1 = 9
     val2 = 9.900
     val3 = 9.9900
@@ -521,41 +522,41 @@ contains
       ['OA_FLOAT','val2'], &
       ['OA_DOUBLE','val3']]
 
-    A = seqs(8, 8, 4, dt = ${t[0]}$);
-    !call set(A, [3,5], [2,5],[1,3], ${t[1]}$)
-    call set(sub(A,[3,5],[2,5],[1,3]), ${t[1]}$)
-    !call set_with_const(A, [3,5], [2,5],[1,3], ${t[1]}$)
-    call display(A, "A = ")
+    ! A = seqs(8, 8, 4, dt = ${t[0]}$);
+    ! !call set(A, [3,5], [2,5],[1,3], ${t[1]}$)
+    ! call set(sub(A,[3,5],[2,5],[1,3]), ${t[1]}$)
+    ! !call set_with_const(A, [3,5], [2,5],[1,3], ${t[1]}$)
+    ! call display(A, "A = ")
 
     ///:endfor
-
 
     ///:for t in [['OA_INT','val1'], &
       ['OA_FLOAT','val2'], &
       ['OA_DOUBLE','val3']]
 
-    A = seqs(8, 8, 4, dt = ${t[0]}$);
-    B = seqs(3, 4, 3, dt = ${t[0]}$);
-    !call set(A, [3,5], [2,5],[1,3], B)
-    call set(sub(A, [3,5], [2,5],[1,3]), B)
+    ! A = seqs(8, 8, 4, dt = ${t[0]}$);
+    ! B = seqs(3, 4, 3, dt = ${t[0]}$);
+    ! !call set(A, [3,5], [2,5],[1,3], B)
+    ! call set(sub(A, [3,5], [2,5],[1,3]), B)
 
-    call display(A, "A = ")
+    ! call display(A, "A = ")
 
     ///:endfor
-
 
     ///:for t in [['OA_INT','val1'], &
       ['OA_FLOAT','val2'], &
       ['OA_DOUBLE','val3']]
 
-    A = seqs(8, 8, 4, dt = ${t[0]}$);
-    B = ones(8, 8, 4, dt = ${t[0]}$);
-    call set(sub(A, [3,5], [2,5],[1,3]), &
-      sub(B, [1,3], [1,4], [1,3]))
-    call display(A, "A = ")
+    ! A = seqs(8, 8, 4, dt = ${t[0]}$);
+    ! B = ones(8, 8, 4, dt = ${t[0]}$);
+    ! call set(sub(A, [3,5], [2,5],[1,3]), &
+    !   sub(B, [1,3], [1,4], [1,3]))
+    ! call display(A, "A = ")
 
     ///:endfor
 
+
+    A = ones(8, 8, 4)
     A = 1.1;
     call display(A, "A = ")
 
@@ -566,22 +567,39 @@ contains
       [3,'5,4,3',':,:,:']]
     ///:for d in fdim1
     ///:for t in scalar_dtype
-    allocate(farr_${t[0]}$${d[0]}$(${d[1]}$))
-    farr_${t[0]}$${d[0]}$(${d[2]}$) = 10
-    A = farr_${t[0]}$${d[0]}$
-    call display(A, "A = ")
+    
+    ! allocate(farr_${t[0]}$${d[0]}$(${d[1]}$))
+    ! farr_${t[0]}$${d[0]}$(${d[2]}$) = 10
+    ! A = farr_${t[0]}$${d[0]}$
+    ! call display(A, "A = ")
+    
     ///:endfor
     ///:endfor
 
+    
     A = seqs(10,10,10)
-    call set(sub(A, [1,10],[1,1],[1,1]),  farr_double1)
-    call display(A, "A = ")
+
+    if(allocated(farr_double1)) deallocate(farr_double1)
+    allocate(farr_double1(10))
+    farr_double1 = 10
+    
+    call set(sub(A, [1,10],1, 1),  farr_double1)
 
     A = seqs(10,10,10)
+
+    if(allocated(farr_double2)) deallocate(farr_double2)
+    allocate(farr_double2(5, 5))
+    farr_double1 = 10
+    
     call set(sub(A, [1,5], [1,5],[1,1]),  farr_double2)
     call display(A, "A = ")
 
     A = seqs(10,10,10)
+
+    if(allocated(farr_double3)) deallocate(farr_double3)
+    allocate(farr_double3(5, 4, 3))
+    farr_double1 = 10
+    
     call set(sub(A, [1,5], [1,4],[1,3]),  farr_double3)
     call display(A, "A = ")
 
@@ -589,7 +607,7 @@ contains
     deallocate(farr_double3)
     allocate(farr_double3(1,5,5))
     farr_double3 = 10
-    !call set(sub(A,1,[1,5],[1,5]), farr_double3)
+    call set(sub(A,1,[1,5],[1,5]), farr_double3)
 
     call set_ref_farray_double_3d(sub(A,1,[1,5],[1,5]), &
       farr_double3)
@@ -597,11 +615,11 @@ contains
 
     A = seqs(10,10,10)
     deallocate(farr_double3)
-    allocate(farr_double3(1,1,10))
+    allocate(farr_double3(1,1,5))
     farr_double3 = 10
-    call set(sub(A,1,1,[1,10]), farr_double3)
+    call set(sub(A,1,1,[1,5]), farr_double3)
     call display(A, "A = ")
-
+    
     call set(val3, sub(a, 1, 1, 1))
     print*, "val3 = ", val3
 
@@ -611,12 +629,16 @@ contains
     call set(val3, sub(a+a, 3, 2, 2))
     print*, "val3 = ", val3
 
-
+    if(allocated(farr_double3)) &
+         deallocate(farr_double3)
+    
+    allocate(farr_double3(1,1,10))
+    
     farr_double3 = sub(A, 1,2,[1,10])
     if(rank == 0) &
          print*, "farr_double3 = ", farr_double3
       
-    end subroutine
+  end subroutine
 
 
 
@@ -1059,7 +1081,7 @@ contains
     v       = rands(m, n, k, dt = OA_FLOAT, sw=1)
     dvm_3d  = rands(m, n, 1, dt = OA_FLOAT, sw=1)
 
-    call display(dt_3d, "==============dt_3d===============")
+    ! call display(dt_3d, "==============dt_3d===============")
     !FSET(q2f,a1+a2*u)
 
     call cpu_time(start)

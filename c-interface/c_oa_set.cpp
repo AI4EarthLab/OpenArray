@@ -96,7 +96,14 @@ extern "C"{
     //oa::utils::print_data(arr, sh,
     //   oa::utils::to_type<${type}$>());
 
+    // std::cout<<"##"<<s[0]<<"  "<<s[1]<<" "<<s[2]<<std::endl;
+    // for(int i = 0; i < s[0] * s[1] * s[2]; ++i){
+    //   std::cout<<i<<" : "<<arr[i]<<std::endl;
+    // }
+    // ref_box.display("ref_box");
+    
     oa::funcs::set<${type}$>(ap, ref_box, arr, sh);
+
   }
   ///:endfor
 

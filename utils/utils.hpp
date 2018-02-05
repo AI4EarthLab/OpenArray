@@ -17,8 +17,13 @@ extern "C" {
   void show_all();
 }
 
+
 namespace oa {
   namespace utils {
+
+    void set_disp_format(int flag);
+    int& get_disp_format();
+
     template<class T>
     void print_data_t(T* buf, const Shape& shape) {
       const int M = shape[0];
@@ -31,8 +36,10 @@ namespace oa {
         frt_str = "%11d";
       } else if (std::is_same<T, float>::value
         || std::is_same<T, double>::value) {
-        frt_str = "%20.15f";
-
+        if(get_disp_format() == 1)
+          frt_str = "%20.15f";
+        else
+          frt_str = "%12.4f";
       } else if (std::is_same<T, bool>::value) {
         frt_str = "%4d";
       }

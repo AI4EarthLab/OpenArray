@@ -19,8 +19,8 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 debug:
 	@echo ${EXT_INCLUDE}   
 
-FC = mpiif90
-CC = mpiicc  
+FC = mpiifort
+CC = mpiicc
 CXX = mpiicpc
 
 FCFLAGS  =
@@ -51,16 +51,16 @@ OBJ_TEST_PERF = ${OBJS} ${OBJS_UTILS} \
 
 .DEFAULT_GOAL := all
 
-MAKEFILE = makefile.linux
+MAKEFILE = makefile.linux-intel
 
 %.o: %.cpp
-	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $@
+	${CXX} ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $@
 
 %.o: %.c
-	$(CXX) ${EXT_INCLUDE} -c $(CFLAGS) $< -o $@
+	${CXX} ${EXT_INCLUDE} -c $(CFLAGS) $< -o $@
 
 %.o: %.F90
-	$(FC) -c $< -o $@
+	${FC} -c $< -o $@
 
 all:
 	@rm -rf main

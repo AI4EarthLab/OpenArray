@@ -213,22 +213,17 @@ namespace oa {
                   rsy[idy * 3], rsy[idy * 3 + 1], 
                   rsz[idz * 3], rsz[idz * 3 + 1]);
 
-      // different data_type
-
-      ///:set TYPE = [['DATA_INT', 'int'], ['DATA_FLOAT', 'float'], ['DATA_DOUBLE', 'double']]
-      ///:for i in TYPE
-      if (A->get_data_type() == ${i[0]}$) {
-        oa::internal::set_buffer_subarray_const<${i[1]}$, T>(
-          (${i[1]}$*) A->get_buffer(),
+      ///:for i in ['int', 'float', 'double']
+      if (A->get_data_type() == DATA_${i.upper()}$) {
+        oa::internal::set_buffer_subarray_const<${i}$, T>(
+          (${i}$*) A->get_buffer(),
           val,
           box,
           sub_box,
           pp->get_stencil_width()
         );
       }
-
       ///:endfor
-      
     }
 
     ArrayPtr l2g(ArrayPtr& lap);
@@ -282,6 +277,11 @@ namespace oa {
     void set(ArrayPtr& A, const Box& ref_box,
             T* buf, Shape& buf_shape){
 
+      int num = buf_shape[0] * buf_shape[1] * buf_shape[2];
+      for(int i = 0; i < num; ++i){
+        std::cout<<" "<< buf[i] << " ";
+      }
+      
       assert(ref_box.shape() == buf_shape);
       
       Box local_box = A->get_local_box();
@@ -306,22 +306,28 @@ namespace oa {
 
       Shape bs = A->buffer_shape();
 
-      T* dst_buf = (T*)A->get_buffer();
-
       const int sw = A->get_partition()->get_stencil_width();
+
+      void* dst_buf = A->get_buffer();
       
-      for(int k = 0; k < P; ++k){
-        for(int j = 0; j < N; ++j){
-          for(int i = 0; i < M; ++i){
-            int idx1 = (i + sw + x1) +
-              (j + sw + y1) * bs[0] +
-              (k + sw + z1) * bs[0] * bs[1];
-            int idx2 = (i + x2) +
-              (j + y2) * buf_shape[0] +
-              (k + z2) * buf_shape[0] * buf_shape[1];
-            dst_buf[idx1] = buf[idx2];
+      switch(A->get_data_type()){
+        ///:for t in ['int', 'float', 'double']
+      case (DATA_${t.upper()}$):
+        for(int k = 0; k < P; ++k){
+          for(int j = 0; j < N; ++j){
+            for(int i = 0; i < M; ++i){
+              int idx1 = (i + sw + x1) +
+                (j + sw + y1) * bs[0] +
+                (k + sw + z1) * bs[0] * bs[1];
+              int idx2 = (i + x2) +
+                (j + y2) * buf_shape[0] +
+                (k + z2) * buf_shape[0] * buf_shape[1];
+              ((${t}$*)dst_buf)[idx1] = buf[idx2];
+            }
           }
-        }        
+        } 
+        break;
+      ///:endfor
       }
     }
 

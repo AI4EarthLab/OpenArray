@@ -24,7 +24,7 @@ program main
 
   call test_init(4, 3, 2, MPI_COMM_WORLD)
   
-  do i = 1, 1000000
+  do i = 1, 100000000
      print*, "i = ", i
      !initialize the test module  
 
@@ -35,45 +35,45 @@ program main
 
      ! call test_partition()
 
-     ! call test_basic()
+     call test_basic()
 
-     ! call test_compare()
+     call test_compare()
 
-     ! call test_math()
+     call test_math()
 
-     ! call test_sub()
+     call test_sub()
 
-     ! call test_sum()
+     call test_sum()
 
-     ! call test_min_max()
+     call test_min_max()
 
-     ! call test_rep()
+     call test_rep()
 
-     ! call test_operator()
+     call test_operator()
 
-     ! call test_grid()
+     call test_grid()
 
-     ! call test_shift()
+     call test_shift()
 
-     ! call test_cache()
+     call test_cache()
 
-     ! call test_set()
+     call test_set()
 
-     ! call test_pow()
+     call test_pow()
 
-     ! call test_set_with_mask()
+     call test_set_with_mask()
 
-     ! call test_io()
+     call test_io()
 
-     ! call test_get_ptr()
+     call test_get_ptr()
 
-     ! call test_tic_toc()
+     call test_tic_toc()
 
      call test_fusion_operator()
 
      call test_internal_q()
 
-     ! call test_pseudo()
+     call test_pseudo()
 
      ! call test_simple_stmt()
 

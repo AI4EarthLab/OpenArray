@@ -268,5 +268,9 @@ extern "C" {
     *A = oa::funcs::make_psudo3d(*B);
     // (*A)->display("AAA=");
   }
+
+  void c_format_short(int flag){
+    oa::utils::set_disp_format(flag);
+  }
 }
 

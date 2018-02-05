@@ -222,6 +222,32 @@
 
   contains
 
+    subroutine format_short()
+      implicit none
+      interface
+         subroutine c_set_disp_format(f) &
+              bind(C, name = 'c_format_short')
+              use iso_c_binding
+              integer(c_int), value :: f
+         end subroutine
+      end interface
+
+      call c_set_disp_format(0)
+    end subroutine
+
+    subroutine format_long()
+      implicit none
+      interface
+         subroutine c_set_disp_format(f) &
+              bind(C, name = 'c_format_short')
+              use iso_c_binding
+              integer(c_int), value :: f
+         end subroutine
+      end interface
+
+      call c_set_disp_format(1)
+    end subroutine
+    
     function is_rvalue_array(A) result(res)
       implicit none
       type(Array), intent(in) :: A

@@ -1,7 +1,19 @@
 #include "utils.hpp"
 
+
+
 namespace oa {
   namespace utils {
+
+    int& get_disp_format(){
+      static int flag = 1;
+      return flag;
+    }
+    
+    void set_disp_format(int flag){
+      get_disp_format() = flag;      
+    }
+    
     //! display array for a buffer. 
     void print_data(void* buf, const Shape& shape, DATA_TYPE dt) {
       switch(dt){
