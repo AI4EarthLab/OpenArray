@@ -10,6 +10,7 @@
 class NodePool {
   typedef std::list<Node*> NodeList;
   NodeList m_list;
+  int global_count = 0;
 
 public:
 
@@ -22,6 +23,8 @@ public:
       m_list.pop_back();
     }else{
       p = new Node();
+      add_count();
+      if (g_debug) cout<<"NodePool.size() = "<<count()<<endl;
     }
     p->set_id(NodePool::global_id());
 
@@ -80,6 +83,14 @@ public:
     static int m_global_id = 0;
     m_global_id += 1;
     return m_global_id;
+  }
+
+  int count() {
+    return global_count;
+  }
+
+  void add_count() {
+    global_count += 1;
   }
 
 };

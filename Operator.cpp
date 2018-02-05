@@ -322,9 +322,57 @@ namespace oa {
       }
     }
 
+    int3 change_lbound(NodeType type, int3 lb) {
+      switch (type) {
+        case TYPE_AXB:
+        case TYPE_DXB:
+        case TYPE_DXC:
+          lb[0] = 1;
+          break;
+        case TYPE_AYB:
+        case TYPE_DYB:
+        case TYPE_DYC:
+          lb[1] = 1;
+          break;
+        case TYPE_AZB:
+        case TYPE_DZB:
+        case TYPE_DZC:
+          lb[2] = 1;
+          break;
+        default:
+          break;
+      }
+      return lb;
+    }
+
+    int3 change_rbound(NodeType type, int3 rb) {
+      switch (type) {
+        case TYPE_AXF:
+        case TYPE_DXF:
+        case TYPE_DXC:
+          rb[0] = 1;
+          break;
+        case TYPE_AYF:
+        case TYPE_DYF:
+        case TYPE_DYC:
+          rb[1] = 1;
+          break;
+        case TYPE_AZF:
+        case TYPE_DZF:
+        case TYPE_DZC:
+          rb[2] = 1;
+          break;
+        default:
+          break;
+      }
+      return rb;
+    }
+
     // prepare kernel fusion parameters with operator
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
-      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, bitset<3> &bt) {
+      vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, 
+      bitset<3> &bt, vector<int3> &lb_list, vector<int3> &rb_list,
+      int3 lb_now, int3 rb_now) {
       ArrayPtr ap;
       // data
       if (A->has_data()) {
@@ -346,6 +394,8 @@ namespace oa {
         if (!A->is_seqs_scalar()) {
           S.push_back(ap->buffer_shape());
           update_list.push_back(ap);
+          lb_list.push_back(lb_now);
+          rb_list.push_back(rb_now);
         }
         return ;
       }
@@ -374,13 +424,16 @@ namespace oa {
         if (!A->is_seqs_scalar()) {
           S.push_back(ap->buffer_shape());
           update_list.push_back(ap);
+          lb_list.push_back(lb_now);
+          rb_list.push_back(rb_now);
         }
         return ;
       }
 
       // tree
       for (int i = 0; i < A->input_size(); i++) {
-        get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr, bt);
+        get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr, bt,
+            lb_list, rb_list, change_lbound(nd.type, lb_now), change_rbound(nd.type, rb_now));
       }
 
       // bind grid if A.pos != -1
@@ -473,8 +526,13 @@ namespace oa {
           vector<ArrayPtr> update_list;
           PartitionPtr par_ptr;
           bitset<3> bt = A->get_bitset();
+          vector<int3> lb_list;
+          vector<int3> rb_list;
+          int3 lb_now = {{0,0,0}};
+          int3 rb_now = {{0,0,0}};
           get_kernel_parameter_with_op(A, 
-            list, update_list, S, par_ptr, bt);
+            list, update_list, S, par_ptr, bt,
+            lb_list, rb_list, lb_now, rb_now);
 
           int3 lb = A->get_lbound();
           int3 rb = A->get_rbound();
@@ -485,7 +543,7 @@ namespace oa {
           // step 1:  start of update boundary
           if (sb) {
             for (int i = 0; i < sz; i++) 
-              oa::funcs::update_ghost_start(update_list[i], reqs_list[i], 3);
+              oa::funcs::update_ghost_start(update_list[i], reqs_list[i], 4, lb_list[i], rb_list[i]);
           }
 
           ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());

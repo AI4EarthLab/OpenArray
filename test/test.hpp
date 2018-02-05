@@ -167,31 +167,31 @@
 //  tf_ap->display("======transfer_array======");
 //}
 //
-//void test_update_ghost() {
-//  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
-//  oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 1);
-//  int rk = ap->rank();
-//  //int size = ap->get_local_box().size(1);
-//  //oa::internal::set_buffer_consts((int*)ap->get_buffer(), size, rk);
-//
-//  ap->display("A");
-//
-//  Shape sp = ap->local_shape();
-//  sp[0] += 2;
-//  sp[1] += 2;
-//  sp[2] += 2;
-//
-//  ap->get_partition()->set_stencil_type(STENCIL_BOX);
-//
-//  vector<MPI_Request> reqs;
-//  oa::funcs::update_ghost_start(ap, reqs, -1);
-//  oa::funcs::update_ghost_end(reqs);
-//
-//  MPI_ORDER_START
-//  printf("=====%d======\n", rk);
-//  oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
-//  MPI_ORDER_END
-//}
+void test_update_ghost() {
+  ArrayPtr ap = oa::funcs::seqs(MPI_COMM_WORLD, {4, 4, 4}, 1);
+  oa::internal::set_ghost_consts((int*)ap->get_buffer(), ap->local_shape(), 0, 1);
+  int rk = ap->rank();
+  //int size = ap->get_local_box().size(1);
+  //oa::internal::set_buffer_consts((int*)ap->get_buffer(), size, rk);
+
+  ap->display("A");
+
+  Shape sp = ap->local_shape();
+  sp[0] += 2;
+  sp[1] += 2;
+  sp[2] += 2;
+
+  ap->get_partition()->set_stencil_type(STENCIL_BOX);
+
+  vector<MPI_Request> reqs;
+  oa::funcs::update_ghost_start(ap, reqs, 4, {1,0,0}, {0,1,0});
+  oa::funcs::update_ghost_end(reqs);
+
+  MPI_ORDER_START
+  printf("=====%d======\n", rk);
+  oa::utils::print_data(ap->get_buffer(), sp, DATA_INT);
+  MPI_ORDER_END
+}
 //
 //void test_operator() {
 //  NodePtr np1 = oa::ops::new_seqs_scalar_node(MPI_COMM_SELF, 3);
