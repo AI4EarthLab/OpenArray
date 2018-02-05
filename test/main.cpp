@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
   // mpirun -n 6 for test_transfer 
   //test_transfer();
-  //test_update_ghost();
+  test_update_ghost();
 
   //test_operator();
   //test_io();
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
 
   // tic("3d");
   // for (int i = 0; i < 10; i++)
-     test_fusion_op_3d(m, n, p, 1);
+  // test_fusion_op_3d(m, n, p, 1);
   // toc("3d");
   // tic("2d");
   // test_fusion_op_2d(m, n, p);

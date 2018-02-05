@@ -68,7 +68,8 @@ namespace oa {
      * direction = 1, dimension y
      * direction = 2, dimension z
      */
-    void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction = -1);
+    void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction = -1, 
+        int3 lb = {{0,0,0}}, int3 rb = {{0,0,0}}); 
     
     void update_ghost_end(vector<MPI_Request> &reqs);
 

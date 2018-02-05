@@ -331,7 +331,7 @@ namespace oa {
       return ap;
     }
 
-    void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction) {
+    void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction, int3 lb, int3 rb) {
       // set ghost to zeros, then eval's answer equal to eval_with_op      
       set_ghost_zeros(ap); 
       
@@ -377,7 +377,8 @@ namespace oa {
 
       int total_send_size = 0;
       int neighbour_procs[27][3];
-      bool update_bound[27] = {false};
+      bool update_bound_send[27] = {false};
+      bool update_bound_recv[27] = {false};
 
       Box i_box[27], o_box[27];
 
@@ -387,6 +388,8 @@ namespace oa {
 
       int st_x, st_y, st_z, ed_x, ed_y, ed_z;
       st_x = st_y = st_z = ed_x = ed_y = ed_z = 0;
+
+      bitset<3> bit = ap->get_bitset();
 
       switch (direction) {
       case 0:
@@ -403,19 +406,25 @@ namespace oa {
         ed_x = ed_y = ed_z = 1;
         break;
       case 3:
-        bitset<3> bit = ap->get_bitset();
         if (bit[2] != 0) st_x = -1, ed_x = 1;
         if (bit[1] != 0) st_y = -1, ed_y = 1;
         if (bit[0] != 0) st_z = -1, ed_z = 1;
+        break;
+      case 4:
+        st_x = -rb[0], ed_x = lb[0];
+        st_y = -rb[1], ed_y = lb[1];
+        st_z = -rb[2], ed_z = lb[2];
+        break;
       }
 
+      // update_bound_send
       for (int z = st_z; z <= ed_z; ++z) {
         for (int y = st_y; y <= ed_y; ++y) {  
           for (int x = st_x; x <= ed_x; ++x) {
 
             int cnt = x+1 + (y+1)*3 + (z+1)*9;
 
-            update_bound[cnt] = true;
+            update_bound_send[cnt] = true;
             
             //get neigbhour proc coordincate.
             neighbour_procs[cnt][0] = coord[0] + x;
@@ -424,14 +433,14 @@ namespace oa {
 
             //center block, not edge, does not need to update
             if (x == 0 && y == 0 && z == 0) {
-              update_bound[cnt] = false;
+              update_bound_send[cnt] = false;
               continue;
             }
 
             //if STENCIL_STAR, does not update corner blocks    
             int stencil_flag = abs(x) + abs(y) + abs(z);
             if (st == STENCIL_STAR && stencil_flag != 1) {
-              update_bound[cnt] = false;
+              update_bound_send[cnt] = false;
               continue;
             }
 
@@ -440,7 +449,7 @@ namespace oa {
               if (bx == BOUNDARY_PERIODIC) {
                 neighbour_procs[cnt][0] = px - 1;
               } else {
-                update_bound[cnt] = false;
+                update_bound_send[cnt] = false;
                 continue;
               }
             }
@@ -449,7 +458,7 @@ namespace oa {
               if (bx == BOUNDARY_PERIODIC) {
                 neighbour_procs[cnt][0] = 0;
               } else {
-                update_bound[cnt] = false;
+                update_bound_send[cnt] = false;
                 continue;
               }
             }
@@ -458,7 +467,7 @@ namespace oa {
               if (by == BOUNDARY_PERIODIC) {
                 neighbour_procs[cnt][1] = py - 1;
               } else {
-                update_bound[cnt] = false;
+                update_bound_send[cnt] = false;
                 continue;
               }
             }
@@ -467,7 +476,7 @@ namespace oa {
               if (by == BOUNDARY_PERIODIC) {
                 neighbour_procs[cnt][1] = 0;
               } else {
-                update_bound[cnt] = false;
+                update_bound_send[cnt] = false;
                 continue;
               }
             }
@@ -476,7 +485,7 @@ namespace oa {
               if (bz == BOUNDARY_PERIODIC) {
                 neighbour_procs[cnt][2] = pz - 1;
               } else {
-                update_bound[cnt] = false;
+                update_bound_send[cnt] = false;
                 continue;
               }
             }
@@ -485,7 +494,7 @@ namespace oa {
               if (bz == BOUNDARY_PERIODIC) {
                 neighbour_procs[cnt][2] = 0;
               } else {
-                update_bound[cnt] = false;
+                update_bound_send[cnt] = false;
                 continue;
               }
             }
@@ -509,7 +518,7 @@ namespace oa {
       int sw = s;
 
       for (int i = 0; i < 27; ++i) {
-        if (!update_bound[i]) continue;
+        if (!update_bound_send[i]) continue;
         
         int xs1, ys1, zs1, xe1, ye1, ze1;
         i_box[i].get_corners(xs1, xe1, ys1, ye1, zs1, ze1);
@@ -554,11 +563,116 @@ namespace oa {
         MPI_Type_free(&target_sub_array);
       }
 
-      // for (int i = 0; i < 27; ++i) {
+      // update_bound_recv
+      if (direction != 4) {
+        for (int i = 0; i < 27; i++) update_bound_recv[i] = update_bound_send[i];
+      } else {
+        st_x = -lb[0], ed_x = rb[0];
+        st_y = -lb[1], ed_y = rb[1];
+        st_z = -lb[2], ed_z = rb[2];
+
+        for (int z = st_z; z <= ed_z; ++z) {
+          for (int y = st_y; y <= ed_y; ++y) {  
+            for (int x = st_x; x <= ed_x; ++x) {
+
+              int cnt = x+1 + (y+1)*3 + (z+1)*9;
+
+              update_bound_recv[cnt] = true;
+              
+              //get neigbhour proc coordincate.
+              neighbour_procs[cnt][0] = coord[0] + x;
+              neighbour_procs[cnt][1] = coord[1] + y;
+              neighbour_procs[cnt][2] = coord[2] + z;
+
+              //center block, not edge, does not need to update
+              if (x == 0 && y == 0 && z == 0) {
+                update_bound_recv[cnt] = false;
+                continue;
+              }
+
+              //if STENCIL_STAR, does not update corner blocks    
+              int stencil_flag = abs(x) + abs(y) + abs(z);
+              if (st == STENCIL_STAR && stencil_flag != 1) {
+                update_bound_recv[cnt] = false;
+                continue;
+              }
+
+              // 
+              if (xs == 0 && x == -1) {
+                if (bx == BOUNDARY_PERIODIC) {
+                  neighbour_procs[cnt][0] = px - 1;
+                } else {
+                  update_bound_recv[cnt] = false;
+                  continue;
+                }
+              }
+              
+              if (xe == gx && x == 1) {
+                if (bx == BOUNDARY_PERIODIC) {
+                  neighbour_procs[cnt][0] = 0;
+                } else {
+                  update_bound_recv[cnt] = false;
+                  continue;
+                }
+              }
+
+              if (ys == 0 && y == -1) {
+                if (by == BOUNDARY_PERIODIC) {
+                  neighbour_procs[cnt][1] = py - 1;
+                } else {
+                  update_bound_recv[cnt] = false;
+                  continue;
+                }
+              }
+
+              if (ye == gy && y == 1) {
+                if (by == BOUNDARY_PERIODIC) {
+                  neighbour_procs[cnt][1] = 0;
+                } else {
+                  update_bound_recv[cnt] = false;
+                  continue;
+                }
+              }
+              
+              if (zs == 0 && z == -1) {
+                if (bz == BOUNDARY_PERIODIC) {
+                  neighbour_procs[cnt][2] = pz - 1;
+                } else {
+                  update_bound_recv[cnt] = false;
+                  continue;
+                }
+              }
+
+              if (ze == gz && z == 1) {
+                if (bz == BOUNDARY_PERIODIC) {
+                  neighbour_procs[cnt][2] = 0;
+                } else {
+                  update_bound_recv[cnt] = false;
+                  continue;
+                }
+              }
+
+              // define the inside send box [starts, counts] of array_buffer
+              int i_starts[3] = {i_cx[x + 1] + s, i_cy[y + 1] + s, i_cz[z + 1] + s};
+              int i_counts[3] = {i_dx[x + 1], i_dy[y + 1], i_dz[z + 1]};
+              i_box[cnt] = Box(i_starts, i_counts);
+
+              // define the outside recieve box [starts, counts] of array_buffer
+              int o_starts[3] = {o_cx[x + 1], o_cy[y + 1], o_cz[z + 1]};
+              int o_counts[3] = {o_dx[x + 1], o_dy[y + 1], o_dz[z + 1]};
+              o_box[cnt] = Box(o_starts, o_counts);
+
+
+              update_cnt++;
+            }
+          }
+        }
+      }
+
       // receive should be reversed
       for (int i = 26; i >= 0; i--) {
       
-        if (!update_bound[i]) continue;
+        if (!update_bound_recv[i]) continue;
         
         int xs1, ys1, zs1, xe1, ye1, ze1;
         o_box[i].get_corners(xs1, xe1, ys1, ye1, zs1, ze1);
