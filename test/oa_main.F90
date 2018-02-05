@@ -24,7 +24,7 @@ program main
 
   call test_init(4, 3, 2, MPI_COMM_WORLD)
   
-  do i = 1, 100000000
+  do i = 1, 1
      print*, "i = ", i
      !initialize the test module  
 
