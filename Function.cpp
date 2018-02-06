@@ -333,7 +333,7 @@ namespace oa {
 
     void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction, int3 lb, int3 rb) {
       // set ghost to zeros, then eval's answer equal to eval_with_op      
-      set_ghost_zeros(ap); 
+      //set_ghost_zeros(ap); 
       
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();
