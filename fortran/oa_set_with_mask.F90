@@ -8,7 +8,8 @@
 module oa_set_with_mask
   use iso_c_binding
   use oa_type
-
+  use oa_utils
+  
   interface set
      ///:for type1 in types
      module procedure set_with_mask_array_const_${type1[0]}$_array
@@ -46,7 +47,9 @@ contains
     call c_set_with_mask_array_const_${type1[0]}$_array(A%ptr, &
          val, mask%ptr)
 
+    call try_destroy(mask)
   end subroutine
+  
   subroutine set_with_mask_array_const_${type1[0]}$_node(A, &
        val, mask)
     implicit none
@@ -64,14 +67,18 @@ contains
        end subroutine
     end interface
 
-    type(array), intent(inout) :: A
+    type(array), intent(in) :: A
     ${type1[1]}$, intent(in) :: val
     type(node), intent(in) :: mask
-    type(array) :: mask_array
-    mask_array = mask
+    type(array) :: mask_array, mask1
+
+    call eval(mask_array, mask)
+    
     call c_set_with_mask_array_const_${type1[0]}$_array(A%ptr, &
          val, mask_array%ptr)
 
+    call try_destroy(mask)
+    call destroy(mask_array)
   end subroutine
 
   ///:endfor
@@ -95,7 +102,9 @@ contains
     type(array), intent(in) :: mask
     
     call c_set_with_mask_array_array_array(A%ptr, B%ptr, mask%ptr)
-    
+
+    call try_destroy(B)
+    call try_destroy(mask)
   end subroutine
   
   subroutine set_with_mask_array_node_array(A, B, mask)
@@ -115,11 +124,14 @@ contains
     type(array) :: B_array
     type(array), intent(in) :: mask
 
-    B_array = B
+    call eval(B_array, B)
 
     call c_set_with_mask_array_array_array(A%ptr, B_array%ptr, &
          mask%ptr)
-             
+
+    call try_destroy(B)
+    call try_destroy(mask)
+    call destroy(B_array)
   end subroutine
 
  
@@ -141,10 +153,16 @@ contains
     type(node), intent(in) :: mask
     
     type(array) :: mask_array
-    mask_array = mask
+
+    call eval(mask_array, mask)
+
     call c_set_with_mask_array_array_array(A%ptr, B%ptr, &
          mask_array%ptr)
-    
+
+    call try_destroy(B)
+    call try_destroy(mask)
+    call destroy(mask_array)
+
   end subroutine
 
   subroutine set_with_mask_array_node_node(A, B, mask)
@@ -166,10 +184,17 @@ contains
     
     type(array) :: mask_array
     type(array) :: B_array
-    mask_array = mask
-    B_array = B
+
+    call eval(mask_array, mask)
+    call eval(B_array, B)
+
     call c_set_with_mask_array_array_array(A%ptr, B_array%ptr, &
          mask_array%ptr)
+
+    call try_destroy(B)
+    call try_destroy(mask)
+    call destroy(mask_array)
+    call destroy(B_array)
     
   end subroutine
 end module oa_set_with_mask
