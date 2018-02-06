@@ -545,7 +545,7 @@ namespace oa {
           if (sb) {
             for (int i = 0; i < sz; i++) 
               oa::funcs::update_ghost_start(update_list[i], reqs_list, 4, lb_list[i], rb_list[i]);
-            OA_MPI_Wait_Begin(&reqs_list, &tid);
+            oa::funcs::OA_MPI_Wait_Begin(&reqs_list, &tid);
           }
 
           ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
@@ -564,7 +564,7 @@ namespace oa {
           if (sb) {
             // step 3:  end of update boundary
               //oa::funcs::update_ghost_end(reqs_list);
-            OA_MPI_Wait_End(&tid);
+            oa::funcs::OA_MPI_Wait_End(&tid);
 
             // step 4:  calc_outside
             // use A->hash() + 1 to get outside fusion kernel
