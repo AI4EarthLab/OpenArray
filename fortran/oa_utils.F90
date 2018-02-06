@@ -11,6 +11,24 @@ module oa_utils
 
 contains
 
+  subroutine print_c_ptr(arg)
+    use iso_c_binding
+    implicit none
+    type(c_ptr), intent(in) :: arg
+    interface
+       subroutine c_print_c_ptr(arg) &
+            bind(C, name="c_print_c_ptr")
+         use iso_c_binding
+         implicit none
+         type(c_ptr) :: arg
+       end subroutine
+    end interface
+
+    call c_print_c_ptr(arg)
+    
+  end subroutine
+
+  
   !> convert a fortran string to C string
   function string_f2c(f_string) result(c_string)
     use iso_c_binding

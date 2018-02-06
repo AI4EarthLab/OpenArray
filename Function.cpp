@@ -1314,6 +1314,9 @@ namespace oa {
     void set_with_mask(ArrayPtr& A, 
                        const ArrayPtr& B, 
                        const ArrayPtr& M) {
+      // A->display("A");
+      // B->display("B");
+      // M->display("M");      
       // need reset pseudo_3d
       A->reset_pseudo_3d();
 
@@ -1352,7 +1355,9 @@ namespace oa {
       if (A->get_data_type() == ${i[0]}$
           && B1->get_data_type() == ${j[0]}$ 
           && M1->get_data_type() == ${k[0]}$ ) {
-        oa::internal::copy_buffer_with_mask<${i[1]}$, ${j[1]}$, ${k[1]}$>(
+        oa::internal::copy_buffer_with_mask<${i[1]}$,
+                                            ${j[1]}$,
+                                            ${k[1]}$>(
           (${i[1]}$*) A->get_buffer(),
           A->buffer_shape(),
           A->local_data_win(),

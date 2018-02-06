@@ -296,9 +296,9 @@
            type(c_ptr), intent(in) :: A
          end subroutine
       end interface
-      
-      call c_destroy_node(A%ptr)
 
+      call c_destroy_node(A%ptr)
+      
     end subroutine
 
     !> destroy the object if it is 'rvalue'
@@ -865,6 +865,15 @@
       call c_node_assign_array(A%ptr, B%ptr)
 
       call try_destroy(B)
+    end subroutine
+
+    subroutine eval(A, B)
+      implicit none
+      type(array), intent(inout) :: A
+      type(node), intent(in) :: B
+
+      call c_node_assign_array(A%ptr, B%ptr)
+
     end subroutine
 
     subroutine set_stencil(st, sw)

@@ -272,5 +272,9 @@ extern "C" {
   void c_format_short(int flag){
     oa::utils::set_disp_format(flag);
   }
+
+  void c_print_c_ptr(void*& d){
+    printf("pointer is %p\n", d);
+  }
 }
 

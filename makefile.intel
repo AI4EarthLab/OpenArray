@@ -20,9 +20,9 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 oplevel0 = -O0 -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK
 oplevel3 = -O3 -Ofast -xHost -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK
 
-FC = mpiifort ${oplevel0} 
-CC = mpiicc   ${oplevel0} 
-CXX = mpiicpc ${oplevel0} 
+FC = mpiifort ${oplevel3}
+CC = mpiicc   ${oplevel3}
+CXX = mpiicpc ${oplevel3}
 
 FCFLAGS  = 
 
@@ -30,11 +30,10 @@ CXXFLAGS =
 
 CFLAGS   = 
 
-LIBS =  -lstdc++ ${EXT_LIB} ${EXT_LIB_LINK} 
+LIBS =  -lstdc++ ${EXT_LIB} ${EXT_LIB_LINK}
 
-
-OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) \
-	$(addsuffix .o, $(basename $(wildcard utils/*.cpp))) \
+OBJS = $(addsuffix .o,  $(basename $(wildcard *.cpp))) 	\
+	$(addsuffix .o, $(basename $(wildcard utils/*.cpp))) 	\
 	$(addsuffix .o, $(basename $(wildcard c-interface/*.cpp))) \
 	$(addsuffix .o, $(basename $(wildcard modules/*/*.cpp)))
 
