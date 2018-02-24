@@ -41,10 +41,11 @@ namespace oa {
     ArrayPtr t_kernel_${name}$_${grid}$(vector<ArrayPtr> &ops_ap) {
       ArrayPtr u = ops_ap[0];
       ArrayPtr ap;
-      
+
       // use pseudo
       if (u->is_pseudo()) {
-        if (u->has_pseudo_3d() == false) u->set_pseudo_3d(oa::funcs::make_psudo3d(u));
+        if (u->has_pseudo_3d() == false)
+          u->set_pseudo_3d(oa::funcs::make_psudo3d(u));
         u = u->get_pseudo_3d();
       }
 
@@ -96,7 +97,7 @@ namespace oa {
       int grid_dt = DATA_FLOAT;
       void* grid_buffer = NULL;
       Shape SG = {0, 0, 0};
-      
+
       // cout<<"${grid}$"<<endl; 
       if (gridptr != NULL) {
         // gridptr->display("gridptr = ");
@@ -105,7 +106,7 @@ namespace oa {
         grid_dt = gridptr->get_data_type();
         grid_buffer = gridptr->get_buffer();
         SG = gridptr->buffer_shape();
-      } 
+      }
 
       vector<MPI_Request> reqs;
       ///:mute

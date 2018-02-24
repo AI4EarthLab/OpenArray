@@ -333,9 +333,6 @@ namespace oa {
     }
 
     ArrayPtr make_psudo3d(const ArrayPtr& B);
-    void *OA_MPI_Wait_Func(void *arg);
-    void OA_MPI_Wait_Begin(vector<MPI_Request>  *mra, pthread_t * tid);
-    void OA_MPI_Wait_End(pthread_t * tid);
 
   }
 }

@@ -747,6 +747,27 @@ contains
 
   end subroutine
 
+  subroutine test_grid1()
+    implicit none
+    type(array) :: dx, dy, dz, dt, res
+
+    dx = load("dx.nc", "data")
+    dy = load("dy.nc", "data")
+    dz = load("dz.nc", "data")
+    dt = load("dt.nc", "data")
+    
+    call grid_init('C', dx, dy, dz)
+    call grid_bind(dt, 3)
+
+    call disp(dx, "dx = ")
+    call disp(dy, "dy = ")
+    call disp(dz, "dz = ")
+    call disp(dt, "dt = ")
+    
+    res = DXB(dt)
+    call disp(res, "res = ")
+  end subroutine
+  
   subroutine test_grid()
     implicit none
     type(array) :: A, B, C, dx, dy, dz

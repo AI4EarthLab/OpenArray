@@ -76,4 +76,25 @@ namespace oa{
       MPI_Barrier(m_comm);
   }
 
+
+  void *MPI::wait_func(void *arg)
+  {
+    int i,j;
+    vector<MPI_Request>  *mra = (vector<MPI_Request>  *)arg;
+    for(i=0;i<(*mra).size();i++)
+      {
+        MPI_Wait(&(*mra)[i], MPI_STATUSES_IGNORE);
+      }
+    return NULL;
+  }
+  void MPI::wait_begin(vector<MPI_Request>  *mra, pthread_t * tid)
+  {
+    pthread_create(tid, NULL, wait_func, (void *)(mra));
+  }
+  void MPI::wait_end(pthread_t * tid)
+  {
+    pthread_join(*tid,NULL);
+  }
+
+
 }

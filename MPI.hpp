@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "mpi.h"
+#include <vector>
 
 namespace oa{
   class MPI{
@@ -35,6 +36,14 @@ namespace oa{
 
     void order_start();
     void order_end();
+
+    // void *OA_MPI_Wait_Func(void *arg);
+    // void OA_MPI_Wait_Begin(vector<MPI_Request>  *mra, pthread_t * tid);
+    // void OA_MPI_Wait_End(pthread_t * tid);
+    static void *wait_func(void *arg);
+    static void wait_begin(std::vector<MPI_Request>  *mra, pthread_t * tid);
+    static void wait_end(pthread_t * tid);
+
   };
 }
 #endif

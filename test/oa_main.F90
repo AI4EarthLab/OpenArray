@@ -28,8 +28,10 @@ program main
      print*, "i = ", i
      !initialize the test module  
 
-     call test_wave()
+     ! call test_wave()
 
+     call test_grid1()
+     
      ! call test_create_array()
 
      ! call test_create_node()
