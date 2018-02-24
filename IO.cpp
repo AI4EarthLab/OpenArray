@@ -4,6 +4,7 @@
 #include "armadillo"
 #include <boost/filesystem.hpp>
 #include "Function.hpp"
+#include "Partition.hpp"
 
 #define CHECK_ERR(status)                               \
   if (status != NC_NOERR) {                             \
@@ -149,7 +150,7 @@ namespace oa {
       status = ncmpi_inq_dimlen(ncid, var_dimids[2], &gx);
       CHECK_ERR(status);
 
-      int sw = 1;
+      int sw = Partition::get_default_stencil_width();
       
       ArrayPtr A;
 

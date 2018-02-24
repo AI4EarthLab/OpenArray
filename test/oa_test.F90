@@ -847,6 +847,15 @@ contains
     B = load("A.nc", "data")
 
     call display(B, "B = ")
+
+    A = zeros(500, 10000, dt=OA_DOUBLE, sw=2)
+
+    call save(A, "A1.nc", "data")
+
+    ! B = load("A1.nc", "data")
+
+    ! call display(B, "B1 = ")
+    
   end subroutine
 
   subroutine test_get_ptr()
@@ -1766,7 +1775,38 @@ print * , "~~~~~~~~~~~~~"
 
 !  call oa_finalize()
 
-  end 
+  end subroutine
 
+
+  subroutine test_wave()
+    implicit none
+    type(array) :: u0, ut, res, tmp, u1, u2, x
+    integer :: i, steps, nx
+    double precision :: dt, dx
+
+    dt = 0.01
+    dx = 0.01
+    nx = 500
+    steps = 10000
+    x = seqs(nx) * dx;
+    u0 = cos(x*10) * exp(-(x-2.5)**4);
+    u1 = shift(u0, 1)
+
+    res = zeros(nx, steps, 1, dt=OA_DOUBLE)
+    
+    do i = 1, 10000
+       print*, "i = ", i
+       
+       u2 = 2 * u1 - u0 + DXB(DXF(u1)) / (dx*dx) * (dt*dt)
+       
+       call set(sub(u2, 1),  0)
+       call set(sub(u2, nx), 0)
+       call set(sub(res, ':', i, 1), u2)
+       
+       u0 = u1
+       u1 = u2
+    end do
+    call save(res, "result.nc", "data")
+  end subroutine
 
 end module

@@ -22,7 +22,7 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
   m_comm(comm), m_global_shape(gs), m_stencil_width(sw) {
   BOOST_ASSERT_MSG(gs[0] > 0 && gs[1] > 0 && gs[2] > 0 && size > 0,
                    "incorrect parameter.");
-  double tot = pow(gs[0] * gs[1] * gs[2] * 1.0, 1.0 / 3);
+  double tot = gs[0] * gs[1] * gs[2];
   double fx = gs[0] / tot;
   double fy = gs[1] / tot;
   double fz = gs[2] / tot;
@@ -48,8 +48,8 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
     z_fixed = true;
   }
 
-  double factor = INT_MAX;
-  double tsz = pow(size * 1.0, 1.0 / 3);
+  double factor = 3.0;
+  double tsz = size;
 
   for (int i = x_fixed?x:1; i <= (x_fixed?x:size); i++)
     if (size % i == 0) {
@@ -58,18 +58,24 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
         if (ed % j == 0) {
           int k = z_fixed?z:(ed / j);
           if(i * j * k != size) continue;
-          double dfx = fx - i * 1.0 / tsz;
-          double dfy = fy - j * 1.0 / tsz;
-          double dfz = fz - k * 1.0 / tsz;
+          double dfx = fx - i * double(1.0) / tsz;
+          double dfy = fy - j * double(1.0) / tsz;
+          double dfz = fz - k * double(1.0) / tsz;
           double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
-          //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
+          // cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
           if (factor >= new_factor) {
             m_procs_shape = {{i, j, k}};
             factor = new_factor;
           }
         }
     }
-
+  
+  printf("(%d, %d, %d) %d, %d, %d\n",
+          gs[0], gs[1], gs[2],
+          m_procs_shape[0],
+          m_procs_shape[1],
+          m_procs_shape[2]);
+    
   BOOST_ASSERT_MSG(m_procs_shape[0] > 0,
           "can not find proper procs shape.");
 
@@ -299,7 +305,9 @@ void Partition::split_box_procs(const Box& b,
   
   int xs, ys, zs, xe, ye, ze;
   b.get_corners(xs, xe, ys, ye, zs, ze);
-
+  // printf("(xs=%d, xe=%d, ys=%d, ye=%d, zs=%d, ze=%d\n",
+  //         xs, xe, ys, ye, zs, ze);
+  // b.display("b = ");
   BOOST_ASSERT_MSG((xs >= 0 && ys >= 0 && zs >=0
                   && xe <= m_global_shape[0]
                   && ye <= m_global_shape[1]
