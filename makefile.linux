@@ -16,8 +16,8 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_system -lboost_log -lboost_log_setup -lboost_thread -ldl -llapack -lblas -lgtest -ljit \
 		-Wl,-rpath=${JIT_LIB}
 
-oplevel0 = -O0 -g  -DBOOST_LOG_DYN_LINK
-oplevel3 = -O3 -ffast-math -DBOOST_LOG_DYN_LINK
+oplevel0 = -O0 -g  -DBOOST_LOG_DYN_LINK -fopenmp
+oplevel3 = -O3 -ffast-math -DBOOST_LOG_DYN_LINK -fopenmp
 
 FC = mpif90 ${oplevel3}
 CC = mpicc  ${oplevel3}

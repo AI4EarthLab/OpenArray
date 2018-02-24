@@ -10,6 +10,25 @@ using namespace std;
 namespace oa {
   namespace funcs {
 
+    void *OA_MPI_Wait_Func(void *arg)
+    {
+      int i,j;
+      vector<MPI_Request>  *mra = (vector<MPI_Request>  *)arg;
+      for(i=0;i<(*mra).size();i++)
+      {
+        MPI_Wait(&(*mra)[i], MPI_STATUSES_IGNORE);
+      }
+      
+    }
+    void OA_MPI_Wait_Begin(vector<MPI_Request>  *mra, pthread_t * tid)
+    {
+      pthread_create(tid, NULL, OA_MPI_Wait_Func, (void *)(mra));
+    }
+    void OA_MPI_Wait_End(pthread_t * tid)
+    {
+      pthread_join(*tid,NULL);
+    }
+
     // create a ones array
     ArrayPtr ones(MPI_Comm comm, const Shape& s, 
                   int stencil_width, int data_type) {
@@ -333,7 +352,7 @@ namespace oa {
 
     void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction, int3 lb, int3 rb) {
       // set ghost to zeros, then eval's answer equal to eval_with_op      
-      set_ghost_zeros(ap); 
+      //set_ghost_zeros(ap); 
       
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();

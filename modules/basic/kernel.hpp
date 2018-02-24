@@ -74,6 +74,17 @@ namespace oa{
           
           ap = ArrayPool::global()->get(pp, dt);
 
+          // use pseudo
+          if (u->is_pseudo()) {
+            if (u->has_pseudo_3d() == false) u->set_pseudo_3d(oa::funcs::make_psudo3d(u));
+            u = u->get_pseudo_3d();
+          }
+
+          if (v->is_pseudo()) {
+            if (v->has_pseudo_3d() == false) v->set_pseudo_3d(oa::funcs::make_psudo3d(v));
+            v = v->get_pseudo_3d();
+          }
+
           oa::internal::pseudo_buffer_${name}$_buffer(
               (T1*) ap->get_buffer(),
               (T2*) u->get_buffer(),
