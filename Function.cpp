@@ -18,7 +18,7 @@ namespace oa {
       {
         MPI_Wait(&(*mra)[i], MPI_STATUSES_IGNORE);
       }
-      
+      return NULL;
     }
     void OA_MPI_Wait_Begin(vector<MPI_Request>  *mra, pthread_t * tid)
     {
