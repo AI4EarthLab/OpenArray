@@ -273,8 +273,8 @@ extern "C" {
     oa::utils::set_disp_format(flag);
   }
 
-  void c_print_c_ptr(void*& d){
-    printf("pointer is %p\n", d);
+  void c_print_c_ptr(ArrayPtr*& d){
+    printf("pointer is %p\n", d->get());
   }
 }
 

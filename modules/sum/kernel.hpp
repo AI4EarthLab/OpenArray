@@ -196,6 +196,7 @@ namespace oa {
 
       PartitionPtr upar = u->get_partition();
       ap = ArrayPool::global()->get(upar, u_dt);
+      ap ->set_zeros();
       Shape sp = upar->procs_shape();
 
       vector<int> vi = upar->get_procs_3d(rankID);

@@ -932,4 +932,37 @@
 
       call try_destroy(A)
     end function
+
+    function has_nan_or_inf(A, d) result(res)
+      implicit none
+      real :: name
+      type(array), intent(in) :: A
+      integer, optional :: d
+      logical :: res
+      integer :: i
+      interface
+         subroutine c_has_nan_or_inf(i, A, d) &
+              bind(C, name = 'c_has_nan_or_inf')
+           use iso_c_binding
+           implicit none
+           type(c_ptr), intent(in) :: A
+           integer, value :: d
+           integer :: i
+         end subroutine
+      end interface
+
+      if(present(d)) then
+         call c_has_nan_or_inf(i, A%ptr, d)
+      else
+         call c_has_nan_or_inf(i, A%ptr, 1)
+      end if
+
+      if(i == 0) then
+         res = .false.
+      else
+         res = .true.
+      endif
+      
+    end function
+
   end module
