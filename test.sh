@@ -11,6 +11,7 @@ if [ ! -d "$build_dir" ]; then
 fi
 
 cp makefile*  ${build_dir}/ 2>/dev/null
+sed -i "s/##===##//g" ${build_dir}/makefile*
 
 for d in `find . -maxdepth 2 -type d`
 do

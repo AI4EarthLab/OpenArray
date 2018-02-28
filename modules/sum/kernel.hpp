@@ -45,7 +45,229 @@ namespace oa {
       return ap;
     }
 
+//////
+
     //sum to x 
+    template <typename T>
+    ArrayPtr t_kernel_sum_x(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr ap;
+      ArrayPtr u = ops_ap[0];
+      int u_dt = u->get_data_type();
+      int sw = u->get_partition()->get_stencil_width();
+
+      MPI_Comm comm = u->get_partition()->get_comm();
+
+      const int rankID = MPI::global()->rank(comm);
+      const int mpisize = MPI::global()->size(comm);
+
+      MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
+
+      PartitionPtr upar = u->get_partition();
+      ap = ArrayPool::global()->get(upar, u_dt);
+      Shape sp = upar->procs_shape();
+
+      vector<int> vi = upar->get_procs_3d(rankID);
+
+      int xs, xe, ys, ye, zs, ze;
+      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      int buffersize = (ye-ys-2*sw)*(ze-zs-2*sw);
+      T * buffer = new T[buffersize];
+      T * recv = new T[buffersize];
+      int type= -1;
+      oa::internal::buffer_sum_x_const(
+          (T*) ap->get_buffer(),
+          (T*) u->get_buffer(),
+          u->get_local_box(),
+          sw,
+          u->buffer_size(),
+          buffer,
+          type);
+
+      for(int i = 0; i < sp[0] - 1; i++)
+      {
+        for(int j = 0; j < sp[1]; j++)
+          for(int k = 0; k < sp[2]; k++){
+            int receid = upar->get_procs_rank(sp[0] - 1, j, k);
+            int sendid = upar->get_procs_rank(i, j, k);
+
+            if(rankID == sendid)
+              MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
+
+            if(rankID == receid)
+            {
+              MPI_Recv(recv, buffersize, mpidt, sendid, 0, comm, MPI_STATUS_IGNORE);
+              for(int l = 0; l < buffersize; l++)
+                buffer[l] += recv[l];
+              if(i == sp[0] - 2){
+                oa::internal::buffer_sum_x_const(
+                    (T*) ap->get_buffer(),
+                    (T*) u->get_buffer(),
+                    u->get_local_box(),
+                    sw,
+                    u->buffer_size(),
+                    buffer,
+                    4);
+              }
+            }
+
+          }
+        MPI_Barrier(comm);
+      }
+
+      delete []buffer;
+      delete []recv;
+      return ap;
+    }
+
+    //sum to y
+    template <typename T>
+    ArrayPtr t_kernel_sum_y(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr ap;
+      ArrayPtr u = ops_ap[0];
+      int u_dt = u->get_data_type();
+      int sw = u->get_partition()->get_stencil_width();
+
+      MPI_Comm comm = u->get_partition()->get_comm();
+      const int rankID = MPI::global()->rank(comm);
+      const int mpisize = MPI::global()->size(comm);
+
+      MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
+
+      PartitionPtr upar = u->get_partition();
+      ap = ArrayPool::global()->get(upar, u_dt);
+      Shape sp = upar->procs_shape();
+
+      vector<int> vi = upar->get_procs_3d(rankID);
+
+      int xs, xe, ys, ye, zs, ze;
+      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      int buffersize = (xe-xs-2*sw)*(ze-zs-2*sw);
+      T * buffer = new T[buffersize];
+      T * recv = new T[buffersize];
+      int type= -1;
+      oa::internal::buffer_sum_y_const(
+          (T*) ap->get_buffer(),
+          (T*) u->get_buffer(),
+          u->get_local_box(),
+          sw,
+          u->buffer_size(),
+          buffer,
+          type);
+
+
+      for(int j = 0; j < sp[1] - 1; j++)
+      {
+        for(int i = 0; i < sp[0]; i++)
+          for(int k = 0; k < sp[2]; k++){
+            int receid = upar->get_procs_rank(i, sp[1] - 1, k);
+            int sendid = upar->get_procs_rank(i, j, k);
+
+            if(rankID == sendid)
+              MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
+
+            if(rankID == receid)
+            {
+              MPI_Recv(recv, buffersize, mpidt, sendid, 0, comm, MPI_STATUS_IGNORE);
+              for(int l = 0; l < buffersize; l++)
+                buffer[l] += recv[l];
+              if(j == sp[1] - 2){
+                oa::internal::buffer_sum_y_const(
+                    (T*) ap->get_buffer(),
+                    (T*) u->get_buffer(),
+                    u->get_local_box(),
+                    sw,
+                    u->buffer_size(),
+                    buffer,
+                    4);
+              }
+            }
+
+          }
+        MPI_Barrier(comm);
+      }
+
+      delete []buffer;
+      delete []recv;
+      return ap;
+    }
+
+
+    //sum to z
+    template <typename T>
+    ArrayPtr t_kernel_sum_z(vector<ArrayPtr> &ops_ap) {
+      ArrayPtr ap;
+      ArrayPtr u = ops_ap[0];
+      int u_dt = u->get_data_type();
+      int sw = u->get_partition()->get_stencil_width();
+
+      MPI_Comm comm = u->get_partition()->get_comm();
+
+      const int rankID = MPI::global()->rank(comm);
+      const int mpisize = MPI::global()->size(comm);
+
+      MPI_Datatype mpidt = oa::utils::mpi_datatype(u_dt);
+
+      PartitionPtr upar = u->get_partition();
+      ap = ArrayPool::global()->get(upar, u_dt);
+      Shape sp = upar->procs_shape();
+
+      vector<int> vi = upar->get_procs_3d(rankID);
+
+      int xs, xe, ys, ye, zs, ze;
+      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      int buffersize = (xe-xs-2*sw)*(ye-ys-2*sw);
+      T * buffer = new T[buffersize];
+      T * recv = new T[buffersize];
+      int type = -1;
+      oa::internal::buffer_sum_z_const(
+          (T*) ap->get_buffer(),
+          (T*) u->get_buffer(),
+          u->get_local_box(),
+          sw,
+          u->buffer_size(),
+          buffer,
+          type);
+
+      for(int k = 0; k < sp[2] - 1; k++)
+      {
+        for(int i = 0; i < sp[0]; i++)
+          for(int j = 0; j < sp[1]; j++){
+            int receid = upar->get_procs_rank(i, j, sp[2] - 1);
+            int sendid = upar->get_procs_rank(i, j, k);
+
+            if(rankID == sendid)
+              MPI_Send(buffer, buffersize, mpidt, receid, 0, comm);
+
+            if(rankID == receid)
+            {
+              MPI_Recv(recv, buffersize, mpidt, sendid, 0, comm, MPI_STATUS_IGNORE);
+              for(int l = 0; l < buffersize; l++)
+                buffer[l] += recv[l];
+              if(k == sp[2] - 2){
+                oa::internal::buffer_sum_z_const(
+                    (T*) ap->get_buffer(),
+                    (T*) u->get_buffer(),
+                    u->get_local_box(),
+                    sw,
+                    u->buffer_size(),
+                    buffer,
+                    4);
+              }
+            }
+
+          }
+        MPI_Barrier(comm);
+      }
+
+      delete [] buffer;
+      delete []recv;
+      return ap;
+    }
+
+
+
+////
+    //csum to x 
     template <typename T>
     ArrayPtr t_kernel_csum_x(vector<ArrayPtr> &ops_ap) {
       ArrayPtr ap;

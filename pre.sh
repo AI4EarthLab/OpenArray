@@ -11,6 +11,7 @@ fi
 cp makefile  ${build_dir}/makefile
 cp makefile.intel  ${build_dir}/makefile.intel
 cp -rf makefile* ${build_dir}/
+sed -i "s/##===##//g" ${build_dir}/makefile*
 
 for d in `find . -maxdepth 2 -type d`
 do
