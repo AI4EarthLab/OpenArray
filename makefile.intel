@@ -67,20 +67,14 @@ debug:
 	$(FC) ${FCFLAGS} -c $< -o $@
 
 %.d: %.cpp
-	@set -e; rm -f $@; $(CXX) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $*.o -MMD
 
 %.d: %.c
-	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(CXX) ${EXT_INCLUDE} -c $(CFLAGS) $< -o $*.o -MMD
 
 
 %.d: %.F90 
-	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>/dev/null; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(FC) ${FCFLAGS} -c $< -o $*.o -gen-dep=$*.d
 
 
 
