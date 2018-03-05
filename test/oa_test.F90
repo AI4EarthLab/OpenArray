@@ -15,6 +15,38 @@ module oa_test
 
 contains
 
+  subroutine test_diag()
+    implicit none
+    type(array) :: A, B, C, dx, dy, dz, rho, rmean
+    integer :: i, N
+
+    ! N = 10000000
+
+    dx = load("dx.nc", "data")
+    dy = load("dy.nc", "data")
+    dz = load("dz.nc", "data")
+    rho = load("rho.nc", "data")
+    rmean = load("rmean.nc", "data")
+
+    call grid_init('C', dx, dy, dz)
+    call grid_bind(rho, 3)
+    call grid_bind(rmean, 3)
+
+    call disp(rho, "rho = ")
+    call disp(rmean, "rmean = ")    
+    call disp(dz, "dz = ")
+    call open_debug()
+    A = DZB(rho - rmean)
+    call close_debug()
+    call disp(A, "A = ")
+    ! A = load("el.nc", "data")
+    ! call disp(A, "A = ")
+    
+    ! print*, has_nan_or_inf(A)
+    ! call disp(C, "C = ")
+  end subroutine
+
+
   subroutine test_memleak()
     implicit none
     type(array) :: A, B, C

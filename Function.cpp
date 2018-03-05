@@ -1307,7 +1307,7 @@ namespace oa {
       ArrayPtr ap =
         oa::kernel::kernel_rep_with_partition(apl, true);
       
-      ap->set_bitset(bs);
+      ap->set_bitset(B->get_bitset());
       ap->set_pseudo(true);
       ap->set_pos(B->get_pos());
       return ap;

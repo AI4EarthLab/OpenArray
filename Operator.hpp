@@ -27,7 +27,7 @@ namespace oa {
 
     ArrayPtr eval(NodePtr A);
 
-    ArrayPtr eval_with_op(NodePtr A);
+    // ArrayPtr eval_with_op(NodePtr A);
 
     ArrayPtr force_eval(NodePtr A);
 
@@ -50,8 +50,8 @@ namespace oa {
 
     void gen_kernels(NodePtr A, bool is_root = true);
 
-    void gen_kernels_JIT(NodePtr A, 
-        bool is_root = true);
+    // void gen_kernels_JIT(NodePtr A, 
+    //     bool is_root = true);
 
     void gen_kernels_JIT_with_op(NodePtr A, 
         bool is_root = true);

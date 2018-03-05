@@ -14,7 +14,7 @@ program main
   integer :: step
   integer :: i
   !no split in z-direction
-  call oa_init(MPI_COMM_WORLD, [-1, 1, 1])
+  call oa_init(MPI_COMM_WORLD, [-1, -1, 1])
   !call oa_init(MPI_COMM_WORLD, [2, 2, 2])
 
   call oa_get_option(step, "step", -1)
@@ -28,9 +28,11 @@ program main
      print*, "i = ", i
      !initialize the test module  
 
+     call test_diag()
+     
      ! call test_wave()
 
-     call test_grid1()
+     ! call test_grid1()
      
      ! call test_create_array()
 
@@ -66,7 +68,7 @@ program main
 
      ! call test_set_with_mask()
 
-     call test_io()
+     ! call test_io()
 
      ! call test_get_ptr()
 

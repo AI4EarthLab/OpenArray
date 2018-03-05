@@ -59,7 +59,7 @@ extern "C"{
     } else {
       ArrayPtr& p1 = (*A)->input(0)->get_data();
       oa::ops::gen_kernels_JIT_with_op(*B);
-      ArrayPtr p2 = oa::ops::eval_with_op(*B);
+      ArrayPtr p2 = oa::ops::eval(*B);
 
       oa::funcs::set(p1, (*A)->get_ref(), p2);
     }

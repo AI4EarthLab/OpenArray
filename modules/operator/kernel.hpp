@@ -53,6 +53,7 @@ namespace oa {
       int dt = oa::utils::to_type<T1>();
 
       ap = ArrayPool::global()->get(u->get_partition(), dt);
+      ap->set_bitset(u->get_bitset());
 
       int sw = u->get_partition()->get_stencil_width();
       Shape sp = u->local_shape();

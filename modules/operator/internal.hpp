@@ -23,6 +23,7 @@ namespace oa{
     void ${name}$_${grid}$_calc_inside(T1* ans, T2* b, T3* g, int3 lbound, int3 rbound, 
             int sw, Shape sp, Shape S, Shape SG) {
       int o = sw;
+
       ///:if name[0] == 'a'
       ///:set g = 1
       ///:endif

@@ -8,9 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include "Diagnosis.hpp"
 
 using namespace oa::kernel;
 
+// void c_has_nan_or_inf(int* res, ArrayPtr** ap, int skip_sw);
+
+  
 namespace oa {
   namespace ops{
 
@@ -43,7 +47,7 @@ namespace oa {
                                      u->get_data_type(),
                                      v->get_data_type());
       }
-
+ 
       if (nd.ew) {
         np->set_depth(u->get_depth(), v->get_depth());
         // U and V must have same shape
@@ -406,7 +410,7 @@ namespace oa {
         // need change need_update's state
         bool flag = A->need_update();
         A->set_update(false);
-        ArrayPtr ap = eval_with_op(A);
+        ArrayPtr ap = eval(A);
         A->set_update(flag);
 
         // ap is a pseudo 3d, need to make_pseudo_3d
@@ -457,64 +461,8 @@ namespace oa {
       }
     }
 
-
-    //
-    ArrayPtr eval(NodePtr A) {
-      // fusion kernel
-      if (A->hash()) {
-        FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
-        if (fkptr != NULL) {
-          vector<void*> list;
-          PartitionPtr par_ptr;
-          get_kernel_parameter(A, list, par_ptr);
-          ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
-
-          list.push_back(ap->get_buffer());
-          void** list_pointer = list.data();
-          fkptr(list_pointer, ap->buffer_size());
-
-          //cout<<"fusion-kernel called"<<endl;
-          
-          //A->set_data(ap);
-          ap->set_pseudo(A->is_pseudo());
-          ap->set_bitset(A->get_bitset());
-          ap->set_pos(A->get_pos());
-
-          return ap;
-        }
-      }
-
-      
-      // data
-      if (A->has_data()) return A->get_data();
-
-      // tree
-      vector<ArrayPtr> ops_ap;
-
-      for (int i = 0; i < A->input_size(); i++) {
-        ops_ap.push_back(eval(A->input(i)));
-      }
-
-      //printf("ATYPE=%d\n",A->type());
-      ArrayPtr ap;
-      if(A->type() == TYPE_REF){
-        ap = oa::funcs::subarray(ops_ap[0], A->get_ref());
-      }else{
-        const NodeDesc& nd = get_node_desc(A->type());
-        KernelPtr kernel_addr = nd.func;
-        ap = kernel_addr(ops_ap);
-        //A->set_data(ap);
-        ap->set_pseudo(A->is_pseudo());
-        ap->set_bitset(A->get_bitset());
-        ap->set_pos(A->get_pos());
-      }
-      // ap->display();
-
-      return ap;
-    }
-
     // treat operator as element wise
-    ArrayPtr eval_with_op(NodePtr A) {
+    ArrayPtr eval(NodePtr A) {
       // fusion kernel
       if (A->hash()) {
         // A->display();
@@ -572,7 +520,6 @@ namespace oa {
             if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
           }
 
-
           //cout<<"fusion-kernel called"<<endl;
           
           //A->set_data(ap);
@@ -593,7 +540,7 @@ namespace oa {
       vector<ArrayPtr> ops_ap;
 
       for (int i = 0; i < A->input_size(); i++) {
-        ops_ap.push_back(eval_with_op(A->input(i)));
+        ops_ap.push_back(eval(A->input(i)));
       }
 
       //printf("ATYPE=%d\n",A->type());
@@ -708,48 +655,6 @@ namespace oa {
 
       for (int i = 0; i < A->input_size(); i++) {
         gen_kernels(A->input(i), false);
-      }
-    }
-
-    void gen_kernels_JIT(NodePtr A, bool is_root) {
-      if (A->has_data()) return ;
-      
-      const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew || A->need_update()) {
-        for (int i = 0; i < A->input_size(); i++) {
-          gen_kernels_JIT(A->input(i), true);
-        }
-        return ;
-      }
-
-      if (is_root && A->get_depth() >= 2) {
-        stringstream ss1;
-        stringstream code;
-        stringstream __code;
-        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
-        int id = 0;
-        vector<int> int_id, float_id, double_id;
-        tree_to_code(A, __code, id, int_id, float_id, double_id);
-        tree_to_string_stack(A, ss1);
-        std::hash<string> str_hash;
-        size_t hash = str_hash(ss1.str());
-        
-        // JIT source code add function signature
-        code_add_function_signature(code, hash);
-        // JIT source code add const parameters
-        code_add_const(code, int_id, float_id, double_id);
-        // JIT source code add calc_inside
-        code_add_function(code, __code, A->get_data_type(), id);
-
-        // cout<<code.str()<<endl;
-        // Add fusion kernel into JIT map
-        Jit_Driver::global()->insert(hash, code);
-
-        A->set_hash(hash);
-      }
-
-      for (int i = 0; i < A->input_size(); i++) {
-        gen_kernels_JIT(A->input(i), false);
       }
     }
 
@@ -1133,7 +1038,6 @@ namespace oa {
             char pos_i[3] = "oi";
             char pos_j[3] = "oj";
             char pos_k[3] = "ok";
-            
             bitset<3> bit = grid_ptr->get_bitset();
             ss<<"[calc_id("<<pos_i[bit[2]]<<",";
             ss<<pos_j[bit[1]]<<",";
@@ -1283,8 +1187,10 @@ namespace oa {
 
       // code<<"#include <array>\n\n";
       // code<<"typedef std::array<int, 3> int3;\n\n";
-      code<<"#include \"math.h\"\n\n";
-            
+      code<<"#include \"math.h\"\n";
+      code<<"#include \"stdlib.h\"\n";
+      code<<"#include \"stdio.h\"\n";
+      
       code<<"typedef int int3[3];\n\n";
 
       code<<"extern \"C\" {\n";
@@ -1441,7 +1347,7 @@ namespace oa {
 
     void code_add_calc_inside(stringstream& code, 
       stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
-      
+
       code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
       for (int i = 0; i <= S_id; i++) {
         code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
@@ -1450,7 +1356,7 @@ namespace oa {
       code<<"  const int3 &lbound = int3_p["<<S_id + 1<<"];\n";
       code<<"  const int3 &rbound = int3_p["<<S_id + 2<<"];\n";
       code<<"  const int3 &sp = int3_p["<<S_id + 3<<"];\n\n";
-
+ 
       /*
         start debug
       */
@@ -1488,8 +1394,9 @@ namespace oa {
           break;    
       }
 
-      code<<__code.str()<<";\n      }\n    }\n  }\n  return ;\n}}";
+      // code<<__code.str()<<";\n   printf(\"##:%d %d %d\\n\", o, o + lbound[2], o + sp[2] - rbound[2]);  \n  }\n    }\n  }\n  return ;\n}}";
 
+      code<<__code.str()<<";\n  }\n    }\n  }\n  return ;\n}}";      
     }
     
 
