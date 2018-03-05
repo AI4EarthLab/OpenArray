@@ -37,9 +37,11 @@ private:
     FusionKernelPtr fk_ptr = get(hash);
     if (fk_ptr != NULL) return -1;
     stringstream filename;
-    filename<<"/GPFS/cess/wangdong/temp/tmp/"<<"kernel_"<<hash<<".cpp";
+    //filename<<"/GPFS/cess/wangdong/temp/tmp/"<<"kernel_"<<hash<<".cpp";
+    filename<<"/home/siofive/tmp/"<<"kernel_"<<hash<<".cpp";
     stringstream objname;
-    objname<<"/GPFS/cess/wangdong/temp/tmp/"<<"kernel_"<<hash<<".so";
+    //objname<<"/GPFS/cess/wangdong/temp/tmp/"<<"kernel_"<<hash<<".so";
+    objname<<"/home/siofive/tmp/"<<"kernel_"<<hash<<".so";
     ofstream sourcefile;
     stringstream cmd;
     cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -qopenmp -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
