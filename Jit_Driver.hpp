@@ -14,6 +14,10 @@
 #include <vector>
 #include <dlfcn.h>  
 #include <unistd.h>  
+#include <sys/stat.h>
+#include<stdio.h>
+#include<time.h>
+#include<sys/types.h>
 
 typedef std::shared_ptr<Jit> JitPtr;
 
@@ -27,161 +31,188 @@ typedef unordered_map<size_t, FusionKernelPtr> FKPtrMap;
 typedef unordered_map<size_t, JitPtr> JitPoolMap;
 
 class Jit_Driver{
-private:
-  int haveicc = -1;
-  FKPtrMap kernel_dict;
-  JitPoolMap m_jit_pool;
+  private:
+    int inited = -1;
+    int haveicc = -1;
+    stringstream pwd ;
+    int myrank = -1;
 
-  int insert_icc(size_t hash, const stringstream& code){
-    //std::cout<<"icc"<<std::endl;
-    FusionKernelPtr fk_ptr = get(hash);
-    if (fk_ptr != NULL) return -1;
-    stringstream filename;
-    filename<<"/tmp/"<<"kernel_"<<hash<<".cpp";
-    stringstream objname;
-    objname<<"/tmp/"<<"kernel_"<<hash<<".so";
-    ofstream sourcefile;
-    stringstream cmd;
-    cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -qopenmp -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
-    //cmd<<"pwd";
+    FKPtrMap kernel_dict;
+    JitPoolMap m_jit_pool;
 
-    //cout<<objname.str().c_str()<<endl;
+    int insert_icc(size_t hash, const stringstream& code){
+      //std::cout<<"icc"<<std::endl;
+      FusionKernelPtr fk_ptr = get(hash);
+      if (fk_ptr != NULL) return -1;
+      stringstream filename;
+      filename<<pwd.str().c_str()<<"kernel_"<<hash<<".cpp";
+      stringstream objname;
+      objname<<pwd.str().c_str()<<"kernel_"<<hash<<".so";
+      ofstream sourcefile;
+      stringstream cmd;
+      cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -qopenmp -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
 
-    if(access(filename.str().c_str(), F_OK) == -1)
-    {  
+      //cout<<objname.str().c_str()<<endl;
+
+      if(access(filename.str().c_str(), F_OK) == -1)
+      {  
+        sourcefile.open(filename.str());
+        sourcefile<<code.str();
+        sourcefile.close();
+      }   
+      if(access(objname.str().c_str(), F_OK) == -1)
+      {  
+        if(system(cmd.str().c_str()) != 0)
+        {
+          std::cout<<"icc compile err"<<std::endl;
+          haveicc = 0;
+          return -1;
+        }
+      }   
+      uint64_t Entry ;
+      void *dlHandle = NULL;  
+
+      stringstream funcname;
+      funcname<<"kernel_"<<hash;
+      dlHandle = dlopen(objname.str().c_str(), RTLD_LAZY);  
+      int dltime = 0;
+      while(dlHandle == NULL)  
+      {  
+        dltime++;
+        dlHandle = dlopen(objname.str().c_str(), RTLD_LAZY);  
+        std::cout<<"dlopen again "<<dltime<<std::endl;
+      }  
+      char *error = NULL;
+      Entry = (uint64_t)dlsym(dlHandle, funcname.str().c_str());  
+      if((error = dlerror()) != NULL)  
+      {  
+        printf("dlsym error(%s).\n", error);  
+        return -1;  
+      }  
+
+
+      fk_ptr = (kernel_func)Entry;
+      kernel_dict[hash] = fk_ptr;
+
+      return 1;
+
+    }
+
+    void init()
+    {
+      inited = 1;
+      if(haveicc == -1) 
+        testicc();
+      time_t t;
+      printf ( "time: %ld\n",t);
+      MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+      //if(world_rank == 0) 
+      time (&t);
+      //MPI_Bcast( &t, 1, MPI_LONG_LONG, 0, MPI_COMM_WORLD );
+      pwd<<"/tmp/kernel_folder_"<<t<<"_"<<myrank<<"/";
+      cout<<pwd.str().c_str()<<endl;
+      if(access(pwd.str().c_str(),0)==-1)
+      {
+        if (mkdir(pwd.str().c_str(),0777))
+        {
+          printf("creat folder failed!!!");
+        }
+      }
+
+    }
+
+  public:
+    FusionKernelPtr get(size_t hash) {
+      if (kernel_dict.find(hash) == kernel_dict.end()) return NULL;
+      return kernel_dict[hash];
+    }
+
+    void testicc(){
+      if(system("icc -v 2> /dev/null") == 0)
+      {
+        haveicc = 1;
+        std::cout<<"use icc."<<std::endl;
+      }
+      else
+      {
+        haveicc = 0;
+        std::cout<<"use llvm."<<std::endl;
+      }
+    }
+
+    void insert(size_t hash, const stringstream& code) {
+      if(inited == -1)
+        init();
+      if(haveicc){
+        if(insert_icc(hash,code) == 1)
+          return;
+      }
+      //std::cout<<"llvm"<<std::endl;
+
+      stringstream filename;
+      filename<<"/home/siofive/GOMO/tmp/"<<"kernel_"<<hash<<".cpp";
+      ofstream sourcefile;
       sourcefile.open(filename.str());
       sourcefile<<code.str();
       sourcefile.close();
-    }   
-    if(access(objname.str().c_str(), F_OK) == -1)
-    {  
-      if(system(cmd.str().c_str()) != 0)
-      {
-        std::cout<<"icc compile err"<<std::endl;
-        haveicc = 0;
-        return -1;
-      }
-    }   
-    uint64_t Entry ;
-    void *dlHandle = NULL;  
 
-    stringstream funcname;
-    funcname<<"kernel_"<<hash;
-    dlHandle = dlopen(objname.str().c_str(), RTLD_LAZY);  
-    int dltime = 0;
-    while(dlHandle == NULL)  
-    {  
-      dltime++;
-      dlHandle = dlopen(objname.str().c_str(), RTLD_LAZY);  
-      std::cout<<"dlopen again "<<dltime<<std::endl;
-    }  
-    char *error = NULL;
-    Entry = (uint64_t)dlsym(dlHandle, funcname.str().c_str());  
-    if((error = dlerror()) != NULL)  
-    {  
-      printf("dlsym error(%s).\n", error);  
-      return -1;  
-    }  
+      FusionKernelPtr fk_ptr = get(hash);
+      if (fk_ptr != NULL) return ;
 
+      std::vector<string> opvs;
 
-    fk_ptr = (kernel_func)Entry;
-    kernel_dict[hash] = fk_ptr;
+      opvs.push_back("-O3");
+      opvs.push_back("-Ofast");
+      opvs.push_back("-ffast-math");
+      opvs.push_back("-march=core-avx2");
+      opvs.push_back("-m64");
+      opvs.push_back("--std=c++0x");
+      //opvs.push_back("-Rpass-missed=loop-vectorize");
+      //opvs.push_back("-Rpass=loop-vectorize");
+      //opvs.push_back("-Rpass=inline");
+      //opvs.push_back("-Rpass-missed=inline");
+      //opvs.push_back("-m64");
 
-    return 1;
+      char **fake_argv = new char*[opvs.size()];
 
-  }
-public:
-  FusionKernelPtr get(size_t hash) {
-    if (kernel_dict.find(hash) == kernel_dict.end()) return NULL;
-    return kernel_dict[hash];
-  }
-
-  void testicc(){
-    if(system("icc -v 2> /dev/null") == 0)
-    {
-      haveicc = 1;
-      std::cout<<"use icc."<<std::endl;
-    }
-    else
-    {
-      haveicc = 0;
-      std::cout<<"use llvm."<<std::endl;
-    }
-  }
-
-  void insert(size_t hash, const stringstream& code) {
-    if(haveicc == -1) 
-      testicc();
-    if(haveicc){
-      if(insert_icc(hash,code) == 1)
-        return;
-    }
-    //std::cout<<"llvm"<<std::endl;
-
-    stringstream filename;
-    filename<<"/home/siofive/GOMO/tmp/"<<"kernel_"<<hash<<".cpp";
-    ofstream sourcefile;
-    sourcefile.open(filename.str());
-    sourcefile<<code.str();
-    sourcefile.close();
-
-    FusionKernelPtr fk_ptr = get(hash);
-    if (fk_ptr != NULL) return ;
-
-    std::vector<string> opvs;
-
-    opvs.push_back("-O3");
-    opvs.push_back("-Ofast");
-    opvs.push_back("-ffast-math");
-    opvs.push_back("-march=core-avx2");
-    opvs.push_back("-m64");
-    opvs.push_back("--std=c++0x");
-    //opvs.push_back("-Rpass-missed=loop-vectorize");
-    //opvs.push_back("-Rpass=loop-vectorize");
-    //opvs.push_back("-Rpass=inline");
-    //opvs.push_back("-Rpass-missed=inline");
-    //opvs.push_back("-m64");
-
-    char **fake_argv = new char*[opvs.size()];
-
-    for (int i = 0; i < opvs.size(); i++) {
+      for (int i = 0; i < opvs.size(); i++) {
         fake_argv[i] = new char[256];
         strcpy(fake_argv[i], opvs[i].c_str());
+      }
+
+      stringstream ss;
+      ss<<"kernel_"<<hash;
+
+      const string& scode = code.str();  
+      const char* cccode = scode.c_str(); 
+      const string& sname = ss.str();  
+      const char* ccname = sname.c_str(); 
+
+      char *ccode = new char[strlen(cccode)+1];
+      char *cname = new char[strlen(ccname)+1];
+      strcpy(ccode, cccode);
+      strcpy(cname, ccname);
+
+      JitPtr jit_ptr = JitPtr(new Jit(opvs.size(), fake_argv, cname, ccode));
+      m_jit_pool[hash] = jit_ptr;
+
+      uint64_t Entry = jit_ptr->compile();
+
+      fk_ptr = (kernel_func)Entry;
+      kernel_dict[hash] = fk_ptr;
+
+      delete []ccode;
+      delete []cname;
+      for (int i = 0; i < opvs.size(); i++) delete[] fake_argv[i];
+      delete[] fake_argv;
+
+      return ;
     }
-    
-    stringstream ss;
-    ss<<"kernel_"<<hash;
-    
-    const string& scode = code.str();  
-    const char* cccode = scode.c_str(); 
-    const string& sname = ss.str();  
-    const char* ccname = sname.c_str(); 
-    
-    char *ccode = new char[strlen(cccode)+1];
-    char *cname = new char[strlen(ccname)+1];
-    strcpy(ccode, cccode);
-    strcpy(cname, ccname);
 
-    JitPtr jit_ptr = JitPtr(new Jit(opvs.size(), fake_argv, cname, ccode));
-    m_jit_pool[hash] = jit_ptr;
-
-    uint64_t Entry = jit_ptr->compile();
-    
-    fk_ptr = (kernel_func)Entry;
-    kernel_dict[hash] = fk_ptr;
-
-    delete []ccode;
-    delete []cname;
-    for (int i = 0; i < opvs.size(); i++) delete[] fake_argv[i];
-    delete[] fake_argv;
-
-    return ;
-  }
-
-  static Jit_Driver* global() {
-    static Jit_Driver jit;
-    return &jit;
-  }
+    static Jit_Driver* global() {
+      static Jit_Driver jit;
+      return &jit;
+    }
 };
 
 #endif

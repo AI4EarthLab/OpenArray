@@ -17,12 +17,12 @@ EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_thread  -ldl -llapack -lblas -lgtest -ljit \
 		-Wl,-rpath=${JIT_LIB}
 
-oplevel0 = -O0 -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK
-oplevel3 = -O3 -Ofast -xHost -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK
+oplevel0 = -O0 -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK -qopenmp
+oplevel3 = -O3 -Ofast -xHost -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK -qopenmp
 
-FC = mpiifort ${oplevel3}
-CC = mpiicc   ${oplevel3}
-CXX = mpiicpc ${oplevel3}
+FC = mpiifort ${oplevel0}
+CC = mpiicc   ${oplevel0}
+CXX = mpiicpc ${oplevel0}
 
 FCFLAGS  = 
 
@@ -67,20 +67,14 @@ debug:
 	$(FC) ${FCFLAGS} -c $< -o $@
 
 %.d: %.cpp
-	@set -e; rm -f $@; $(CXX) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $*.o -MMD
 
 %.d: %.c
-	@set -e; rm -f $@; $(CC) ${EXT_INCLUDE} -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(CXX) ${EXT_INCLUDE} -c $(CFLAGS) $< -o $*.o -MMD
 
 
 %.d: %.F90 
-	@set -e; rm -f $@; $(FC) ${FCFLAGS} -MM $< $(INCLUDEFLAGS) > $@.$$$$ 2>/dev/null; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(FC) ${FCFLAGS} -c $< -o $*.o -gen-dep=$*.d
 
 
 
