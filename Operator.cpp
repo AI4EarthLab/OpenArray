@@ -523,7 +523,7 @@ namespace oa {
           //cout<<"fusion-kernel called"<<endl;
           
           //A->set_data(ap);
-          ap->set_pseudo(A->is_pseudo());
+          //ap->set_pseudo(A->is_pseudo());
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
 
@@ -555,7 +555,7 @@ namespace oa {
         // ops_ap[1]->display("right = ");        
         ap = kernel_addr(ops_ap);
         //A->set_data(ap);
-        ap->set_pseudo(A->is_pseudo());
+        //ap->set_pseudo(A->is_pseudo());
         ap->set_bitset(A->get_bitset());
         ap->set_pos(A->get_pos());
       }

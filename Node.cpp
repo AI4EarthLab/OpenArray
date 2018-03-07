@@ -252,7 +252,6 @@ void Node::set_bitset() {
     if (m_global_shape[i] != 1) m_bs[2 - i] = 1;
     else {
       m_bs[2 - i] = 0;
-      m_is_pseudo = true;
     }
   }
 }

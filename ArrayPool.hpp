@@ -89,6 +89,7 @@ public:
 
     // set bitset based on array global shape [m, n, k]
     ap->set_bitset();
+    ap->set_pseudo();
 
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
@@ -126,6 +127,7 @@ public:
 
     // set bitset based on array global shape [m, n, k]
     ap->set_bitset();
+    ap->set_pseudo();
 
     // ArrayPtr constructor with (Array pointer, Del del)
     return ArrayPtr(ap, 
@@ -157,6 +159,7 @@ public:
 
     // set bitset based on array global shape [m, n, k]
     ap->set_bitset();
+    ap->set_pseudo();
 
     return ArrayPtr(ap, [](Array* arr_p) {
                       ArrayPool::global()->dispose(arr_p);

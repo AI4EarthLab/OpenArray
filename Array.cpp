@@ -263,6 +263,14 @@ void Array::set_pseudo(bool ps) {
   m_is_pseudo = ps;
 }
 
+void Array::set_pseudo() {
+  for (int i = 0; i < 3; i++) {
+    if (m_par_ptr->shape()[i] == 1 && m_par_ptr->procs_shape()[i] != 1) {
+      m_is_pseudo = true;
+    }
+  }
+}
+
 bool Array::is_pseudo() {
   return m_is_pseudo;
 }
@@ -281,7 +289,6 @@ void Array::set_bitset() {
     if (m_par_ptr->shape()[i] != 1) m_bs[2 - i] = 1;
     else {
       m_bs[2 - i] = 0;
-      m_is_pseudo = true;
     }
   }
 }

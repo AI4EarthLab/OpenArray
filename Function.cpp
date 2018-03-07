@@ -1282,13 +1282,9 @@ namespace oa {
       Shape ps = B->get_partition()->procs_shape();
       Shape as = B->shape();
 
-      std::bitset<3> bs;
-      for(int i = 0; i < 3; ++i){
-        if(as[i] != 1) {
+      for (int i = 0; i < 3; i++) {
+        if (as[i] != 1) {
           ps[i] = 1;
-          bs[2-i] = 1;
-        }else{
-          bs[2-i] = 0;
         }
       }
       
@@ -1308,7 +1304,7 @@ namespace oa {
         oa::kernel::kernel_rep_with_partition(apl, true);
       
       ap->set_bitset(B->get_bitset());
-      ap->set_pseudo(true);
+      ap->set_pseudo(false);
       ap->set_pos(B->get_pos());
       return ap;
     }

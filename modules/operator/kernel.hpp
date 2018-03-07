@@ -42,12 +42,12 @@ namespace oa {
       ArrayPtr u = ops_ap[0];
       ArrayPtr ap;
 
-      // use pseudo
-      if (u->is_pseudo()) {
-        if (u->has_pseudo_3d() == false)
-          u->set_pseudo_3d(oa::funcs::make_psudo3d(u));
-        u = u->get_pseudo_3d();
-      }
+      // // use pseudo
+      // if (u->is_pseudo()) {
+      //   if (u->has_pseudo_3d() == false)
+      //     u->set_pseudo_3d(oa::funcs::make_psudo3d(u));
+      //   u = u->get_pseudo_3d();
+      // }
 
       // printf("calling kernel ${name}$...\n");
       int dt = oa::utils::to_type<T1>();
