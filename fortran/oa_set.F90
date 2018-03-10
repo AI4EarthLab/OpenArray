@@ -103,7 +103,7 @@ contains
 
     type(array), intent(inout) :: A
     ${type1[1]}$, intent(in) :: val
-    print*, "set array const..."
+    !print*, "set array const..."
     call c_set_array_const_${type1[0]}$(A%ptr, val)
 
     call try_destroy(A)

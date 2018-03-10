@@ -334,7 +334,7 @@ namespace oa {
 
     void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction, int3 lb, int3 rb) {
       // set ghost to zeros, then eval's answer equal to eval_with_op      
-      //set_ghost_zeros(ap); 
+      // set_ghost_zeros(ap); 
       
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();
@@ -741,6 +741,35 @@ namespace oa {
           break;
         case DATA_DOUBLE:
           oa::internal::set_ghost_consts((double*)buffer, ls, (double)0, sw);
+          break;
+      }
+    }
+
+    // set boundary to zeros, especially when use operator
+    void set_boundary_zeros(ArrayPtr &ap, int3 lb, int3 rb) {
+      Shape s = ap->shape();
+
+      if (lb[0]) set_boundary_zeros(ap, Box(0, lb[0], 0, s[1], 0, s[2]));
+      if (lb[1]) set_boundary_zeros(ap, Box(0, s[0], 0, lb[1], 0, s[2]));
+      if (lb[2]) set_boundary_zeros(ap, Box(0, s[0], 0, s[1], 0, lb[2]));
+      
+      if (rb[0]) set_boundary_zeros(ap, Box(s[0] - rb[0], s[0], 0, s[1], 0, s[2]));
+      if (rb[1]) set_boundary_zeros(ap, Box(0, s[0], s[1] - rb[1], s[1], 0, s[2]));
+      if (rb[2]) set_boundary_zeros(ap, Box(0, s[0], 0, s[1], s[2] - rb[2], s[2]));
+    }
+    
+    // set boundary to zeros, especially when use operator
+    void set_boundary_zeros(ArrayPtr &ap, Box sub_box) {
+      Shape s = ap->shape();
+      switch(ap->get_data_type()) {
+        case DATA_INT:
+          set_ref_const(ap, sub_box, (int)0);
+          break;
+        case DATA_FLOAT:
+          set_ref_const(ap, sub_box, (float)0);
+          break;
+        case DATA_DOUBLE:
+          set_ref_const(ap, sub_box, (double)0);
           break;
       }
     }

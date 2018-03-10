@@ -493,7 +493,7 @@ namespace oa {
           if (sb) {
             for (int i = 0; i < sz; i++) 
               oa::funcs::update_ghost_start(update_list[i], reqs_list, 4, lb_list[i], rb_list[i]);
-            oa::MPI::wait_begin(&reqs_list, &tid);
+            //oa::MPI::wait_begin(&reqs_list, &tid);
           }
 
           ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
@@ -511,13 +511,15 @@ namespace oa {
           
           if (sb) {
             // step 3:  end of update boundary
-              //oa::funcs::update_ghost_end(reqs_list);
-            oa::MPI::wait_end(&tid);
+              oa::funcs::update_ghost_end(reqs_list);
+            //oa::MPI::wait_end(&tid);
 
             // step 4:  calc_outside
             // use A->hash() + 1 to get outside fusion kernel
             FusionKernelPtr out_fkptr = Jit_Driver::global()->get(A->hash() + 1);
             if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
+
+            //oa::funcs::set_boundary_zeros(ap, lb, rb);
           }
 
           //cout<<"fusion-kernel called"<<endl;

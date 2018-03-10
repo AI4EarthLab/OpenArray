@@ -75,6 +75,10 @@ namespace oa {
 
     void set_ghost_zeros(ArrayPtr ap);
 
+    void set_boundary_zeros(ArrayPtr &ap, int3 lb, int3 rb);
+    
+    void set_boundary_zeros(ArrayPtr &ap, Box sub_box); 
+
     inline int calc_id(int i, int j, int k, int3 S);
 
     void calc_inside(ArrayPtr &ap, ArrayPtr &A, int3 lbound, int3 rbound);
@@ -333,6 +337,7 @@ namespace oa {
     }
 
     ArrayPtr make_psudo3d(const ArrayPtr& B);
+
 
   }
 }
