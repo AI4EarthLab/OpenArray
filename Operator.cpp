@@ -519,7 +519,7 @@ namespace oa {
             FusionKernelPtr out_fkptr = Jit_Driver::global()->get(A->hash() + 1);
             if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
 
-            //oa::funcs::set_boundary_zeros(ap, lb, rb);
+            oa::funcs::set_boundary_zeros(ap, lb, rb);
           }
 
           //cout<<"fusion-kernel called"<<endl;

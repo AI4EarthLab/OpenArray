@@ -1339,7 +1339,7 @@ namespace oa {
       ap->set_bitset(B->get_bitset());
       ap->set_pseudo(false);
       ap->set_pos(B->get_pos());
-      oa::utils::tic(str.c_str());
+      oa::utils::toc(str.c_str());
       return ap;
     }
 
