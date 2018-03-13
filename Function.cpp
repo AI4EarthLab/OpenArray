@@ -1,6 +1,7 @@
 #include "Function.hpp"
 #include "common.hpp"
 #include "utils/utils.hpp"
+#include "utils/calcTime.hpp"
 #include <fstream>
 #include <mpi.h>
 #include "Kernel.hpp"
@@ -1316,6 +1317,9 @@ namespace oa {
           ps[i] = 1;
         }
       }
+
+      string str = "pseudo_3d-" + to_string(ps[0]) + "-" + to_string(ps[1]) + "-" + to_string(ps[2]);
+      oa::utils::tic(str.c_str());
       
       // if(ps[0] == 1 && ps[1] == 1 && ps[2] == 1){
       //   THROW_LOGIC_EXCEPTION(
@@ -1335,6 +1339,7 @@ namespace oa {
       ap->set_bitset(B->get_bitset());
       ap->set_pseudo(false);
       ap->set_pos(B->get_pos());
+      oa::utils::tic(str.c_str());
       return ap;
     }
 
