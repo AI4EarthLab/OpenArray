@@ -329,13 +329,44 @@ namespace oa {
 
       MPI_Waitall(isreqs_cnt, &isreqs[0], MPI_STATUSES_IGNORE);
       MPI_Waitall(irreqs_cnt, &irreqs[0], MPI_STATUSES_IGNORE);
-
       return ap;
     }
+    
+    int3 get_update_ghost(int3 bound, bool x, bool y, bool z) {
+      if (x == true) bound[0] = 0;
+      if (y == true) bound[1] = 0;
+      if (z == true) bound[2] = 0;
+      return bound;
+    }
 
-    void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction, int3 lb, int3 rb) {
+    void update_ghost_start(ArrayPtr ap, vector<MPI_Request> &reqs, int direction, int3 lbound, int3 rbound) {
       // set ghost to zeros, then eval's answer equal to eval_with_op      
       // set_ghost_zeros(ap); 
+
+
+int cta=0,ctb=0;
+if(lbound[0]) cta++;
+if(lbound[1]) cta++;
+if(lbound[2]) cta++;
+if(rbound[0]) cta++;
+if(rbound[1]) cta++;
+if(rbound[2]) cta++;
+
+
+      int3 lb = lbound;
+      int3 rb = rbound;
+      //int3 lb = get_update_ghost(lbound, ap->get_lb_ghost_updated(0), ap->get_lb_ghost_updated(1), ap->get_lb_ghost_updated(2));
+      //int3 rb = get_update_ghost(rbound, ap->get_rb_ghost_updated(0), ap->get_rb_ghost_updated(1), ap->get_rb_ghost_updated(2));
+
+if(lb[0]) ctb++;
+if(lb[1]) ctb++;
+if(lb[2]) ctb++;
+if(rb[0]) ctb++;
+if(rb[1]) ctb++;
+if(rb[2]) ctb++;
+//if(cta != ctb) printf("===: %d ,%d \n",cta,ctb);
+      ap->update_lb_ghost_updated(lbound);
+      ap->update_rb_ghost_updated(rbound);
       
       PartitionPtr pp = ap->get_partition();
       Shape arr_shape = ap->shape();
@@ -519,6 +550,7 @@ namespace oa {
 
       int sw = s;
 
+int c27=0;
       for (int i = 0; i < 27; ++i) {
         if (!update_bound_send[i]) continue;
         
@@ -563,8 +595,9 @@ namespace oa {
                   pp->get_comm(), &req);
         reqs.push_back(req);
         MPI_Type_free(&target_sub_array);
+        c27++;
       }
-
+        //printf("c27= %d \n",c27);
       // update_bound_recv
       if (direction != 4) {
         for (int i = 0; i < 27; i++) update_bound_recv[i] = update_bound_send[i];
@@ -725,6 +758,7 @@ namespace oa {
       if (reqs.size() > 0) {
         MPI_Waitall(reqs.size(), reqs.data(), MPI_STATUSES_IGNORE);
       }
+      reqs.clear();
     }
 
     // set ghost to zeros, in order to check correctness
@@ -775,13 +809,15 @@ namespace oa {
       }
     }
 
+#define calc_id(i,j,k,S) ((k)*(S[0])*(S[1])+(j)*(S[0])+(i))
+/*
     inline int calc_id(int i, int j, int k, int3 S) {
       int M = S[0];
       int N = S[1];
       int P = S[2];
       return k * M * N + j * M + i;
     }
-
+*/
     // ap = Operator(A), only calc inside
     // lbound = [-xs_sw, -ys_sw, -zs_sw]
     // rbound = [xe_sw, ye_sw, ze_sw]
@@ -1318,8 +1354,8 @@ namespace oa {
         }
       }
 
-      string str = "pseudo_3d-" + to_string(ps[0]) + "-" + to_string(ps[1]) + "-" + to_string(ps[2]);
-      oa::utils::tic(str.c_str());
+      if (ps[0] == 1 && ps[1] == 1 && ps[2] == 1) return B;
+
       
       // if(ps[0] == 1 && ps[1] == 1 && ps[2] == 1){
       //   THROW_LOGIC_EXCEPTION(
@@ -1339,7 +1375,6 @@ namespace oa {
       ap->set_bitset(B->get_bitset());
       ap->set_pseudo(false);
       ap->set_pos(B->get_pos());
-      oa::utils::toc(str.c_str());
       return ap;
     }
 

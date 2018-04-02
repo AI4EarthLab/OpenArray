@@ -51,9 +51,11 @@ extern "C"{
   }
 
   void clear_cache() {
+/*
     for (auto it = _cached_nodes.begin(); it != _cached_nodes.end(); it++) {
       cout<<it->first<<" "<<it->second<<endl;
     }
+*/
     _cached_nodes.clear();
   }
 

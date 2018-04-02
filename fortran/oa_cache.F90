@@ -17,8 +17,8 @@ contains
     !character(len=len(file)+8) :: buf
     !character(kind=c_char) :: res(*)
     
-    write(tmp_node_key__, "(A, A, I0)") &
-         file,":",line
+    !write(tmp_node_key__, "(A, A, I0)") &
+    !     file,":",line
     
     !res = string_f2c(buf)
   end subroutine

@@ -33,6 +33,8 @@ class Array {
   bool m_has_pseudo_3d = false;
   std::bitset<3> m_bs = std::bitset<3>(7);
   ArrayPtr m_pseudo_3d;
+  bool m_lb_ghost_updated[3] = {false, false, false};
+  bool m_rb_ghost_updated[3] = {false, false, false};
 
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
@@ -75,6 +77,11 @@ class Array {
   ArrayPtr get_pseudo_3d();
   void set_pseudo_3d(ArrayPtr ap);
   void reset();
+  void update_lb_ghost_updated(int3 lb);
+  void update_rb_ghost_updated(int3 rb);
+  bool get_lb_ghost_updated(int dimension);
+  bool get_rb_ghost_updated(int dimension);
+  void reset_ghost_updated();
 
   static void copy(ArrayPtr& dst, const ArrayPtr& src);
 };

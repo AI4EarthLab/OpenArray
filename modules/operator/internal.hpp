@@ -5,6 +5,7 @@
 #include "../../Function.hpp"
 namespace oa{
   namespace internal{
+#define calc_id(i,j,k,S) ((k)*(S[0])*(S[1])+(j)*(S[0])+(i))
     ///:mute
     ///:include "kernel_type.fypp"
     ///:endmute

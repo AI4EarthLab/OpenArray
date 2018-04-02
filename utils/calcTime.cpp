@@ -64,13 +64,13 @@ namespace oa {
       string str(s);
       printf("\n");
 
-      printf("%-15s %-15s %-15s %-15s %-15s %-15s\n",
+      printf("%-30s %-15s %-15s %-15s %-15s %-15s\n",
              "function", "min", "max", "call", 
              "total", "average");
       
       printf(HLINE);
 
-      printf("%-15s %-15.6f %-15.6f %-15d %-15.6f %-15.6f\n",
+      printf("%-30s %-15.6f %-15.6f %-15d %-15.6f %-15.6f\n",
              str.c_str(), minTime[str] / 1e6, 
              maxTime[str] / 1e6, cnt[str],
              totTime[str] / 1e6, totTime[str] / 1e6 / cnt[str]);
@@ -82,7 +82,7 @@ namespace oa {
     void show_all() {
       printf("\n");
       printf(HLINE);
-      printf("%-15s %-15s %-15s %-15s %-15s %-15s %-15s%%\n",
+      printf("%-30s %-15s %-15s %-15s %-15s %-15s %-15s%%\n",
              "function", "min", "max", "call", 
              "total", "average", "per");
 
@@ -90,7 +90,7 @@ namespace oa {
       
       for (map<string, int>::iterator it = cnt.begin(); it != cnt.end(); it++) {
         string str = it->first;
-        printf("%-15s %-15.6f %-15.6f %-15d %-15.6f %-15.6f %-15.6f%%\n",
+        printf("%-30s %-15.6f %-15.6f %-15d %-15.6f %-15.6f %-15.6f%%\n",
                str.c_str(), minTime[str] / 1e6, 
                maxTime[str] / 1e6, cnt[str],
                totTime[str] / 1e6, totTime[str] / 1e6 / cnt[str],

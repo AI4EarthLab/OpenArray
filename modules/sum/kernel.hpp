@@ -6,6 +6,7 @@
 #include "../../Function.hpp"
 #include "../../MPI.hpp"
 #include "internal.hpp"
+#include "../../utils/calcTime.hpp"
 #include <vector>
 using namespace std;
 
@@ -105,7 +106,7 @@ namespace oa {
                       mpidt, sendid, 0, comm, MPI_STATUS_IGNORE);
 
           }
-        MPI_Barrier(comm);
+        //MPI_Barrier(comm);
       }
 
       delete []buffer;
@@ -171,7 +172,7 @@ namespace oa {
                       sendid, 0, comm, MPI_STATUS_IGNORE);
 
           }
-        MPI_Barrier(comm);
+        //MPI_Barrier(comm);
       }
 
       delete []buffer;
@@ -240,7 +241,7 @@ namespace oa {
                       mpidt, sendid, 0, comm, MPI_STATUS_IGNORE);
 
           }
-        MPI_Barrier(comm);
+        //MPI_Barrier(comm);
       }
 
       delete [] buffer;

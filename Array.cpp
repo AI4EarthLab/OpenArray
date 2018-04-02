@@ -329,6 +329,7 @@ void Array::reset() {
   //m_hash = 0;
   pos = -1;
   reset_pseudo_3d();
+  reset_ghost_updated();
 }
 
 void Array::reset_pseudo_3d() {
@@ -381,4 +382,31 @@ void Array::copy(ArrayPtr& dst, const ArrayPtr& src){
     dst = dst1;
   }
 }
+  void Array::update_lb_ghost_updated(int3 lb) {
+    m_lb_ghost_updated[0] = m_lb_ghost_updated[0] || lb[0];
+    m_lb_ghost_updated[1] = m_lb_ghost_updated[1] || lb[1];
+    m_lb_ghost_updated[2] = m_lb_ghost_updated[2] || lb[2];
+  }
+
+  void Array::update_rb_ghost_updated(int3 rb) {
+    m_rb_ghost_updated[0] = m_rb_ghost_updated[0] || rb[0];
+    m_rb_ghost_updated[1] = m_rb_ghost_updated[1] || rb[1];
+    m_rb_ghost_updated[2] = m_rb_ghost_updated[2] || rb[2];
+  }
+
+  bool Array::get_lb_ghost_updated(int dimension) {
+    return m_lb_ghost_updated[dimension];
+  }
+  bool Array::get_rb_ghost_updated(int dimension) {
+    return m_rb_ghost_updated[dimension];
+  }
+
+  void Array::reset_ghost_updated() {
+    m_lb_ghost_updated[0] = false;
+    m_lb_ghost_updated[1] = false;
+    m_lb_ghost_updated[2] = false;
+    m_rb_ghost_updated[0] = false;
+    m_rb_ghost_updated[1] = false;
+    m_rb_ghost_updated[2] = false;
+  }
 

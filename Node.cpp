@@ -281,3 +281,11 @@ ArrayPtr& Node::get_ref_data(){
   assert(is_ref_data());
   return m_input.at(0)->get_data();
 }
+
+void Node::set_slice(int k) {
+  m_slice = k;
+}
+
+int Node::get_slice() {
+  return m_slice;
+}

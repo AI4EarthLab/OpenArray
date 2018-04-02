@@ -10,14 +10,14 @@ namespace oa {
         buffer[i] = r;
       }
     }
-
+/*
     int calc_id(int i, int j, int k, int3 S) {
       int M = S[0];
       int N = S[1];
       int P = S[2];
       return k * M * N + j * M + i;
     }
-
+*/
     int3 calc_step(Box box, int d, int sw) {
       int xs, xe, ys, ye, zs, ze;
       int st, ed, step;
