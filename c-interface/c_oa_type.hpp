@@ -59,6 +59,15 @@ extern "C" {
           const ArrayPtr*& B, const ArrayPtr*& C);
   
   void c_grid_bind(ArrayPtr*& A, int pos);
+
+  void c_local_sub(ArrayPtr*& A, int* x, int* y, int* z, double* ans); 
+
+  void c_set_local(ArrayPtr*& A, int* x, int* y, int* z, double* val);
+
+  void c_get_box_corners(ArrayPtr*& A, int* s);
+
+  void c_update_ghost(ArrayPtr*& A);
+
 }
 
 #endif

@@ -59,8 +59,14 @@ namespace oa {
     // A = transfer(src, pp)
     ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp);
 
+    double local_sub(const ArrayPtr &ap, int x, int y, int z); 
+
+    void set_local(const ArrayPtr &ap, int x, int y, int z, double val); 
+
     // get a sub Array based on Box b
     ArrayPtr subarray(const ArrayPtr &ap, const Box &box);
+
+    void update_ghost(ArrayPtr ap);
 
     /*
      * update boundary, direction = -1, all dimension

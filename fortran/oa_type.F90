@@ -654,6 +654,90 @@
 
     end function
 
+    function get_box_corners(A) result(res)
+      implicit none
+      interface
+        subroutine c_get_box_corners(a, s) &
+          bind(C, name = "c_get_box_corners")
+        use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           integer, intent(out) :: s(6)
+         end subroutine
+      end interface
+
+      type(array) :: A
+      integer :: res(6)
+
+      call c_get_box_corners(A%ptr, res)
+
+    end function
+
+    subroutine update_ghost(A)
+      implicit none
+      interface
+        subroutine c_update_ghost(a) &
+          bind(C, name = "c_update_ghost")
+        use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+         end subroutine
+      end interface
+
+      type(array) :: A
+      call c_update_ghost(A%ptr)
+    end subroutine 
+
+    function local_sub(A, x, y, z) result(res)
+      implicit none
+      interface
+        subroutine c_local_sub(a, x, y, z, s) &
+          bind(C, name = "c_local_sub")
+        use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           integer :: x, y, z
+           real(8), intent(out) :: s
+         end subroutine
+      end interface
+
+      type(array) :: A
+      integer :: x, y, z
+      integer :: rx, ry, rz
+      real(8) :: res
+      rx = x - 1
+      ry = y - 1
+      rz = z - 1
+
+      call c_local_sub(A%ptr, rx, ry, rz, res)
+
+    end function
+
+    subroutine set_local(A, x, y, z, val)
+      implicit none
+      interface
+        subroutine c_set_local(a, x, y, z, val) &
+          bind(C, name = "c_set_local")
+        use iso_c_binding
+           implicit none
+           type(c_ptr) :: a
+           integer :: x, y, z
+           real(8) :: val
+         end subroutine
+      end interface
+
+      type(array) :: A
+      integer :: x, y, z
+      integer :: rx, ry, rz
+      real(8) :: val
+      rx = x - 1
+      ry = y - 1
+      rz = z - 1
+
+      call c_set_local(A%ptr, rx, ry, rz, val)
+
+    end subroutine 
+
     function shape_node(A) result(res)
       implicit none
       interface

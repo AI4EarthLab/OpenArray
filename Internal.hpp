@@ -25,6 +25,28 @@ namespace oa {
     void set_buffer_consts(T *buffer, int size, T val) {
       for (int i = 0; i < size; i++) buffer[i] = val;
     }
+    
+    template <typename T>
+    void set_buffer_local(T* sub_buffer, const Box& box, int x, int y, int z, T val, int sw) {
+      Shape sp = box.shape(sw);
+      int M = sp[0];
+      int N = sp[1];
+      int P = sp[2];
+
+      int cnt = (z + sw) * M * N + (y + sw) * M + x + sw;
+      sub_buffer[cnt] = val;
+    }
+
+    template <typename T>
+    T get_buffer_local_sub(T* sub_buffer, const Box& box, int x, int y, int z, int sw) {
+      Shape sp = box.shape(sw);
+      int M = sp[0];
+      int N = sp[1];
+      int P = sp[2];
+
+      int cnt = (z + sw) * M * N + (y + sw) * M + x + sw;
+      return sub_buffer[cnt];
+    }
 
     //sub_A = sub(A, box)
     template <typename T>

@@ -274,5 +274,25 @@ extern "C" {
   void c_print_c_ptr(ArrayPtr*& d){
     printf("pointer is %p\n", d->get());
   }
+
+  void c_get_box_corners(ArrayPtr*& A, int* s){
+    ENSURE_VALID_PTR(A);
+    (*A)->get_local_box().get_corners(
+        s[0], s[1], s[2], s[3], s[4], s[5]
+    );
+  }
+  
+  void c_local_sub(ArrayPtr*& A, int* x, int* y, int* z, double* ans) {
+    *ans = oa::funcs::local_sub(*A, *x, *y, *z);
+  }
+  
+  void c_set_local(ArrayPtr*& A, int* x, int* y, int* z, double* val) {
+    oa::funcs::set_local(*A, *x, *y, *z, *val);
+  }
+  
+  void c_update_ghost(ArrayPtr*& A) {
+    oa::funcs::update_ghost(*A);
+  }
+
 }
 
