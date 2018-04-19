@@ -53,7 +53,7 @@ namespace oa {
                   int stencil_width, int data_type) {
       ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, data_type);
       Box box = ap->get_local_box();
-      int size = box.size(stencil_width);
+      int size = box.size_with_stencil(stencil_width);
       switch(data_type) {
       case DATA_INT:
         oa::internal::set_buffer_rand((int*)ap->get_buffer(), size);

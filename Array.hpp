@@ -1,3 +1,8 @@
+/*
+ * Array:
+ *
+=======================================================*/
+
 #ifndef __ARRAY_HPP__
 #define __ARRAY_HPP__
 
@@ -5,47 +10,51 @@
 #include <memory>
 #include <bitset>
 #include <string>
-#include "Partition.hpp"
 #include "Internal.hpp"
-/*
- * Array:
- *  buffer:   data
- *  PartitionPtr:   partition information
- *  BoxPtr:   Array can be a reference one 
- */
-class Array;
-typedef shared_ptr<Array> ArrayPtr;
+#include "Partition.hpp"
+
 class Grid;
+class Array;
 typedef shared_ptr<Grid> GridPtr;
+typedef shared_ptr<Array> ArrayPtr;
 
 class Array {
   private:
-  void *m_buffer;
-  int m_data_type = 2;
-  PartitionPtr m_par_ptr;
-  BoxPtr m_ref_box_ptr;
-  Box m_corners;
-  bool m_is_scalar = false;
-  bool m_is_seqs = false;
-  size_t m_hash;
-  int pos = -1;
-  bool m_is_pseudo = false;
-  bool m_has_pseudo_3d = false;
-  std::bitset<3> m_bs = std::bitset<3>(7);
-  ArrayPtr m_pseudo_3d;
+  bool m_is_seqs = false;       // is sequence or not 
+  bool m_is_scalar = false;     // is scalar or not
+  bool m_is_pseudo = false;     // is pseudo array or not
+  bool m_has_pseudo_3d = false; // has pseudo_3d array or not
   bool m_lb_ghost_updated[3] = {false, false, false};
   bool m_rb_ghost_updated[3] = {false, false, false};
 
+  int pos = -1;         // default grid pos is -1
+  int m_data_type = 2;  // default data type is double(2)
+  
+  size_t m_hash;        // hash value for array, used in Array Pool
+  void *m_buffer;       // array's data
+
+  Box m_corners;            // array's local box
+  BoxPtr m_ref_box_ptr;     // array's reference box
+  ArrayPtr m_pseudo_3d;     // array's pseudo_3d
+  PartitionPtr m_par_ptr;   // array's partition pointer
+
+  // array's bitset, 110 means the size of z dimension is 1, default bitset is 111
+  std::bitset<3> m_bs = std::bitset<3>(7);
+
   public:
+  // Constructor, default data type is DATA_DOUBLE
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
+  // Destructor
   ~Array();
+
+  void set_local_box();
+  Box get_local_box() const;
+
   int get_data_type() const;
   void* get_buffer();
   void set_buffer(void *buffer, int size);
   PartitionPtr get_partition() const;
   void display(const char *prefix = "");
-  void set_local_box();
-  Box get_local_box() const;
   Shape buffer_shape() const;
   int buffer_size() const;
   Shape local_shape();

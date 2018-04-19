@@ -1,12 +1,11 @@
-#include "Array.hpp"
 #include "mpi.h"
+#include "Array.hpp"
 #include "common.hpp"
-#include "utils/utils.hpp"
-#include "ArrayPool.hpp"
 #include "Function.hpp"
+#include "ArrayPool.hpp"
+#include "utils/utils.hpp"
 
 using namespace std;
-
 
 Array::Array(const PartitionPtr &ptr, int data_type) : 
   m_data_type(data_type), m_par_ptr(ptr) {
@@ -14,7 +13,7 @@ Array::Array(const PartitionPtr &ptr, int data_type) :
   Box box = get_local_box();
   int sw = ptr->get_stencil_width();
   int size_in = box.size();
-  int size = box.size(sw);
+  int size = box.size_with_stencil(sw);
 
   // if box.size() == 0, there is no need to contain stencil
   // if (size_in == 0) size = 0;
@@ -179,12 +178,12 @@ Box Array::get_local_box() const{
 
 Shape Array::buffer_shape() const{
   int sw = m_par_ptr->get_stencil_width();
-  return m_corners.shape(sw);
+  return m_corners.shape_with_stencil(sw);
 }
 
 int Array::buffer_size() const {
   int sw = m_par_ptr->get_stencil_width();
-  return m_corners.size(sw);
+  return m_corners.size_with_stencil(sw);
 }
 
 // return box shape in each process

@@ -28,7 +28,7 @@ namespace oa {
     
     template <typename T>
     void set_buffer_local(T* sub_buffer, const Box& box, int x, int y, int z, T val, int sw) {
-      Shape sp = box.shape(sw);
+      Shape sp = box.shape_with_stencil(sw);
       int M = sp[0];
       int N = sp[1];
       int P = sp[2];
@@ -39,7 +39,7 @@ namespace oa {
 
     template <typename T>
     T get_buffer_local_sub(T* sub_buffer, const Box& box, int x, int y, int z, int sw) {
-      Shape sp = box.shape(sw);
+      Shape sp = box.shape_with_stencil(sw);
       int M = sp[0];
       int N = sp[1];
       int P = sp[2];
@@ -53,7 +53,7 @@ namespace oa {
     void get_buffer_subarray(T *sub_buffer, T *buffer, const Box &sub_box,
       const Box &box, int sw) {
       
-      Shape sp = box.shape(sw);
+      Shape sp = box.shape_with_stencil(sw);
       int M = sp[0];
       int N = sp[1];
       int P = sp[2];
@@ -61,7 +61,7 @@ namespace oa {
       Box bd_box = box.boundary_box(sw);
       Box ref_box = sub_box.ref_box(bd_box);
       int xs, xe, ys, ye, zs, ze;
-      ref_box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+      ref_box.get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
       
       //ref_box.display("ref_box");
 
@@ -189,7 +189,7 @@ namespace oa {
     void set_buffer_subarray_const(T1* buffer, T2 val, const Box &box, 
       const Box &sub_box, int sw) {
 
-      Shape sp = box.shape(sw);
+      Shape sp = box.shape_with_stencil(sw);
       int M = sp[0];
       int N = sp[1];
       int P = sp[2];
@@ -197,7 +197,7 @@ namespace oa {
       Box bd_box = box.boundary_box(sw);
       Box ref_box = sub_box.ref_box(bd_box);
       int xs, xe, ys, ye, zs, ze;
-      ref_box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+      ref_box.get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
       
       //ref_box.display("ref_box");
 
@@ -236,7 +236,7 @@ namespace oa {
       int N = s[1];
       int P = s[2];
       //cout<<M<<" "<<N<<" "<<P<<endl;
-      box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+      box.get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
       //printf("%d %d %d %d %d %d\n", xs, xe, ys, ye, zs, ze);
       for (int k = zs; k < ze; k++) {
         for (int j = ys; j < ye; j++) {

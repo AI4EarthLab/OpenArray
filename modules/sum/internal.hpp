@@ -9,7 +9,7 @@ namespace oa{
       void buffer_sum_scalar_const(T *val, T *A, Box box, int sw, int size) {
         int x = 0, y = 0, z = 0;
         int xs, xe, ys, ye, zs, ze;
-        box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+        box.get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
 
         int M = xe - xs;
         int N = ye - ys;
@@ -36,7 +36,7 @@ namespace oa{
         //type:   top 2  mid 1  bottom 0
         int x = 0, y = 0, z = 0;
         int xs, xe, ys, ye, zs, ze;
-        box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+        box.get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
 
         int M = xe - xs;
         int N = ye - ys;
@@ -92,7 +92,7 @@ namespace oa{
         //type:   top 2  mid 1  bottom 0
         int x = 0, y = 0, z = 0;
         int xs, xe, ys, ye, zs, ze;
-        box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+        box.get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
 
         int M = xe - xs;
         int N = ye - ys;
@@ -146,7 +146,7 @@ namespace oa{
         //type:   top 2  mid 1  bottom 0
         int x = 0, y = 0, z = 0;
         int xs, xe, ys, ye, zs, ze;
-        box.get_corners(xs, xe, ys, ye, zs, ze, sw);
+        box.get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
 
         int M = xe - xs;
         int N = ye - ys;
