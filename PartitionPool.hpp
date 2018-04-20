@@ -1,35 +1,39 @@
+/*
+ * PartitionPool.hpp
+ * if two array have the same partition, they share the same partition pointer
+ * each partition has it's own hash value
+ *
+=======================================================*/
 
 #ifndef __PARTITIONPOOL_HPP__
 #define __PARTITIONPOOL_HPP__
 
+#include <vector>
 #include "Partition.hpp"
 #include <unordered_map>
-#include <vector>
 
 using namespace std;
 
 typedef unordered_map<size_t, PartitionPtr> PartitionPoolMap;
 
-/*
- * Partition Pool:
- *  m_pool:     use [comm, procs_size, (gx, gy, gz), stencil_width] as identicial key
- *    m_pool_xyz:   use [comm, lx, ly, lz, stencil_width] as identical key
- */
+    
 class PartitionPool {
   private:
+    // use [comm, procs_size, (gx, gy, gz), stencil_width] as identicial key
     PartitionPoolMap m_pool;
+    // use [comm, lx, ly, lz, stencil_width] as identical key
     PartitionPoolMap m_pool_xyz;
-    int global_count = 0;
+    int global_count = 0;   // the total number of different partition
 
   public:
     // get a PartitionPtr from m_pool based on hash created by key:
-  // [comm, process_size, (gx, gy, gz), stencil_width] 
-  PartitionPtr get(MPI_Comm comm, int size, const Shape& gs,
+    // [comm, process_size, (gx, gy, gz), stencil_width] 
+    PartitionPtr get(MPI_Comm comm, int size, const Shape& gs,
           int stencil_width = 1, size_t par_hash = 0) {
-    PartitionPtr par_ptr;
-      // par_hash == 0: should gen hash
+      PartitionPtr par_ptr;
+
+      // par_hash == 0: should generate hash
       // par_hash != 0: means arraypool has already gen hash, just use it
-      
       if (par_hash == 0)
         par_hash = Partition::gen_hash(comm, gs, stencil_width);
       
@@ -69,16 +73,17 @@ class PartitionPool {
     }
 
     // only need one Partition Pool in each process, so make it static
-    // static variable in .hpp
     static PartitionPool* global() {
       static PartitionPool par_pool;
       return &par_pool;
     }
 
+    // return the total number of different partition
     int count() {
       return global_count;
     }
 
+    // add the number of different partition
     void add_count() {
       global_count += 1;
     }
