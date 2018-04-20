@@ -1,3 +1,8 @@
+/*
+ * not used currently
+ *
+=======================================================*/
+
 #ifndef __BOUNDARYPOOL_HPP__
 #define __BOUNDARYPOOL_HPP__
 

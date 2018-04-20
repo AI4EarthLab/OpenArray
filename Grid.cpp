@@ -1,10 +1,15 @@
-#include "Operator.hpp"
-#include "Grid.hpp"
-#include "op_define.hpp"
-#include <boost/throw_exception.hpp>
-#include "common.hpp"
-#include "utils/utils.hpp"
+/*
+ * Grid.cpp
+ *
+=======================================================*/
+
 #include "MPI.hpp"
+#include "Grid.hpp"
+#include "common.hpp"
+#include "Operator.hpp"
+#include "op_define.hpp"
+#include "utils/utils.hpp"
+#include <boost/throw_exception.hpp>
 
 #define PSU3D(x) oa::funcs::make_psudo3d(x)
 
@@ -16,6 +21,7 @@ void Grid::init_grid(char type,
   NodePtr ndz = oa::ops::new_node(dz);
 
   switch(type){
+  // init C grid
   case 'C':
     x_d[0] = PSU3D(EVAL(AYB(AXB(ndx))));
     y_d[0] = PSU3D(EVAL(AYB(AXB(ndy))));
@@ -48,13 +54,6 @@ void Grid::init_grid(char type,
     x_d[7] = PSU3D(dx);
     y_d[7] = PSU3D(dy);
     z_d[7] = PSU3D(EVAL(AZB(ndz)));
-
-    // z_d[7]->display("z_d[7] = ");
-    // x_d[1]->display("x_d[0] = ");
-    // y_d[1]->display("y_d[0] = ");
-    // z_d[1]->display("z_d[0] = ");
-
-    
 
     // need update ghost of dx, dy, dz
     for (int i = 0; i < 8; i++) {
@@ -90,18 +89,6 @@ void Grid::init_grid(char type,
     BOOST_THROW_EXCEPTION(std::logic_error("unsupported grid type"));
     break;
   }
-
-  // int rk = x_d[1]->rank();
-  // Shape sp = x_d[1]->local_shape();
-  // sp[0] += 2;
-  // sp[1] += 2;
-  // sp[2] += 2;
-
-  // MPI_ORDER_START
-  // printf("=====%d======\n", rk);
-  // oa::utils::print_data(x_d[1]->get_buffer(), sp, DATA_DOUBLE);
-  // MPI_ORDER_END
-
 }
 
 ArrayPtr Grid::get_grid_dx(int pos){
@@ -118,7 +105,9 @@ ArrayPtr Grid::get_grid_dz(int pos){
 
 ArrayPtr Grid::get_grid(int pos, NodeType t) {
   ArrayPtr np;
+  // if pos is -1, not in C grid, return null
   if (pos == -1) return np;
+
   switch (t) {
   case TYPE_AXB:
   case TYPE_DXB:
