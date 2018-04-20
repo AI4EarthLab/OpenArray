@@ -1,6 +1,11 @@
-#include "ArrayPool.hpp"
-#include "MPI.hpp"
+/*
+ * Diagnosis.cpp:
+ *
+=======================================================*/
+
 #include "mpi.h"
+#include "MPI.hpp"
+#include "ArrayPool.hpp"
 
 namespace oa{
   namespace diag{

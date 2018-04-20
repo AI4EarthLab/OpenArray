@@ -1,3 +1,8 @@
+/*
+ * Init.hpp:
+ *  initialize & finalize the OpenArray
+ *
+=======================================================*/
 
 #ifndef __INIT_HPP__
 #define __INIT_HPP__
