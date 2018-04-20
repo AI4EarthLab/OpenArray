@@ -40,7 +40,7 @@ namespace oa {
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
       vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, 
       bitset<3> &bt, vector<int3> &lb_list, vector<int3> &rb_list,
-      int3 lb_now, int3 rb_now); 
+      int3 lb_now, int3 rb_now, vector<ArrayPtr> &data_list); 
     
     const KernelPtr get_kernel_dict(size_t hash, 
                                     const char *filename = "fusion-kernels");
@@ -63,7 +63,7 @@ namespace oa {
     void tree_to_code(NodePtr A, stringstream &ss, int &id,
       vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
 
-    void tree_to_code_with_op(NodePtr A, stringstream &ss, int &id, int &S_id,
+    void tree_to_code_with_op(NodePtr A, stringstream &ss, stringstream &__point, int &id, int &S_id,
       vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
 
     void change_string_with_op(stringstream& ss, string in, const NodeDesc &nd);
@@ -83,10 +83,10 @@ namespace oa {
       stringstream& __code, DATA_TYPE dt, int& id);
 
     void code_add_calc_outside(stringstream& code, 
-      stringstream& __code, DATA_TYPE dt, int& id, int& S_id);
+      stringstream& __code, stringstream& __point, DATA_TYPE dt, int& id, int& S_id);
 
     void code_add_calc_inside(stringstream& code, 
-      stringstream& __code, DATA_TYPE dt, int& id, int& S_id);    
+      stringstream& __code, stringstream& __point, DATA_TYPE dt, int& id, int& S_id);    
   }
 }
 

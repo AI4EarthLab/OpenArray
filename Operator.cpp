@@ -377,12 +377,28 @@ namespace oa {
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
       vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, 
       bitset<3> &bt, vector<int3> &lb_list, vector<int3> &rb_list,
-      int3 lb_now, int3 rb_now) {
+      int3 lb_now, int3 rb_now, vector<ArrayPtr> &data_list) {
+      bool find_in_data_list;
       ArrayPtr ap;
       // data
       if (A->has_data()) {
         ap = A->get_data();
-        
+
+        if(!ap->is_scalar())
+        {
+          find_in_data_list = false;
+          for(int i = 0; i < data_list.size(); i++){
+            if(ap->shape() == data_list[i]->shape()){
+              PartitionPtr pp = ap->get_partition();
+              if(!(pp->equal(data_list[i]->get_partition()))){
+                ap = oa::funcs::transfer(ap, data_list[i]->get_partition());
+              }
+              find_in_data_list  = true;
+              break;
+            }
+          }
+          if(!find_in_data_list) data_list.push_back(ap);
+        }
         // ap is a pseudo 3d, need to make_pseudo_3d
         if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
           if (ap->has_pseudo_3d() == false) {
@@ -414,6 +430,21 @@ namespace oa {
         ArrayPtr ap = eval(A);
         A->set_update(flag);
 
+        if(!ap->is_scalar())
+        {
+          find_in_data_list = false;
+          for(int i = 0; i < data_list.size(); i++){
+            if(ap->shape() == data_list[i]->shape()){
+              PartitionPtr pp = ap->get_partition();
+              if(!(pp->equal(data_list[i]->get_partition()))){
+                ap = oa::funcs::transfer(ap, data_list[i]->get_partition());
+              }
+              find_in_data_list  = true;
+              break;
+            }
+          }
+          if(!find_in_data_list) data_list.push_back(ap);
+        }
         // ap is a pseudo 3d, need to make_pseudo_3d
         if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
           if (ap->has_pseudo_3d() == false) {
@@ -438,7 +469,7 @@ namespace oa {
       // tree
       for (int i = 0; i < A->input_size(); i++) {
         get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr, bt,
-            lb_list, rb_list, change_lbound(nd.type, lb_now), change_rbound(nd.type, rb_now));
+            lb_list, rb_list, change_lbound(nd.type, lb_now), change_rbound(nd.type, rb_now), data_list);
       }
 
       // bind grid if A.pos != -1
@@ -479,9 +510,10 @@ namespace oa {
           vector<int3> rb_list;
           int3 lb_now = {{0,0,0}};
           int3 rb_now = {{0,0,0}};
+          vector<ArrayPtr> data_list;
           get_kernel_parameter_with_op(A, 
             list, update_list, S, par_ptr, bt,
-            lb_list, rb_list, lb_now, rb_now);
+            lb_list, rb_list, lb_now, rb_now,data_list);
 
           int3 lb = A->get_lbound();
           int3 rb = A->get_rbound();
@@ -690,6 +722,7 @@ namespace oa {
         stringstream ss1;
         stringstream code;
         stringstream __code;
+        stringstream __point;
         
         // generate hash code for tree
         tree_to_string_stack(A, ss1);
@@ -709,14 +742,14 @@ namespace oa {
           int id = 0;
           int S_id = 0;
           vector<int> int_id, float_id, double_id;
-          tree_to_code_with_op(A, __code, id, S_id, int_id, float_id, double_id);
+          tree_to_code_with_op(A, __code, __point, id, S_id, int_id, float_id, double_id);
           
           // JIT source code add function signature
           code_add_function_signature_with_op(code, hash);
           // JIT source code add const parameters
           code_add_const(code, int_id, float_id, double_id);
           // JIT source code add calc_inside
-          code_add_calc_inside(code, __code, A->get_data_type(), id, S_id);
+          code_add_calc_inside(code, __code, __point, A->get_data_type(), id, S_id);
 
           // for debug
           if (g_debug) cout<<code.str()<<endl;
@@ -946,7 +979,7 @@ namespace oa {
       return;
     }
 
-    void tree_to_code_with_op(NodePtr A, stringstream &ss, int &id, int& S_id,
+    void tree_to_code_with_op(NodePtr A, stringstream &ss, stringstream &__point, int &id, int& S_id,
       vector<int>& int_id, vector<int>& float_id, vector<int>& double_id) {
       const NodeDesc &nd = get_node_desc(A->type());
 
@@ -973,6 +1006,17 @@ namespace oa {
           }
         // [i][j][k] based on node bitset
         } else {
+          switch(A->get_data_type()) {
+            case DATA_INT:
+                __point<<"  int *list_"<<id<<";  list_"<<id<<" = (int *) list["<<id<<"];\n";
+              break;
+            case DATA_FLOAT:
+                __point<<"  float *list_"<<id<<";  list_"<<id<<" = (float *) list["<<id<<"];\n";
+              break;
+            case DATA_DOUBLE:
+                __point<<"  double *list_"<<id<<";  list_"<<id<<" = (double *) list["<<id<<"];\n";
+              break;    
+          }
         /*
           ss<<"(";
           switch(A->get_data_type()) {
@@ -1005,7 +1049,7 @@ namespace oa {
 
       stringstream child[2];
       for (int i = 0; i < A->input_size(); i++) {
-        tree_to_code_with_op(A->input(i), child[i], id, S_id, 
+        tree_to_code_with_op(A->input(i), child[i], __point, id, S_id, 
           int_id, float_id, double_id);
         //child[i] = tree_to_string(A->input(i));
       }
@@ -1035,6 +1079,17 @@ namespace oa {
             ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);
 
             ss<<"/";
+            switch(A->get_data_type()) {
+              case DATA_INT:
+                __point<<"  int *list_"<<id<<";  list_"<<id<<" = (int *) list["<<id<<"];\n";
+                break;
+              case DATA_FLOAT:
+                __point<<"  float *list_"<<id<<";  list_"<<id<<" = (float *) list["<<id<<"];\n";
+                break;
+              case DATA_DOUBLE:
+                __point<<"  double *list_"<<id<<";  list_"<<id<<" = (double *) list["<<id<<"];\n";
+                break;    
+            }
             /*
             switch(grid_ptr->get_data_type()) {
               case DATA_INT:
@@ -1249,121 +1304,11 @@ namespace oa {
       code<<__code.str()<<";\n  }\n  return ;\n}}";
     }
 /*
-    void code_add_calc_outside(stringstream& code, 
-      stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
-      
-      code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
-      for (int i = 0; i <= S_id; i++) {
-        code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
-        code<<"  const int S"<<i<<"_0 = int3_p["<<i<<"][0];\n";
-        code<<"  const int S"<<i<<"_1 = int3_p["<<i<<"][1];\n";
-      }
-      code<<"\n";
-      code<<"  const int3 &lbound = int3_p["<<S_id + 1<<"];\n";
-      code<<"  const int3 &rbound = int3_p["<<S_id + 2<<"];\n";
-      code<<"  const int3 &sp = int3_p["<<S_id + 3<<"];\n\n";
 
-      string ans_type[3];
-      ans_type[DATA_INT] = "(int*)";
-      ans_type[DATA_FLOAT] = "(float*)";
-      ans_type[DATA_DOUBLE] = "(double*)";
-
-      // lbound[2]
-      code<<"  if (lbound[2]) {\n";
-      code<<"    for (int k = o; k < o + lbound[2]; k++) {\n";
-      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
-      code<<"      #pragma simd\n";
-      code<<"      #pragma clang loop vectorize(assume_safety)\n";
-      code<<"      #pragma clang loop interleave(enable)\n";
-      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
-      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
-                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
-      code<<"        }\n";
-      code<<"      }\n";
-      code<<"    }\n";
-      code<<"  }\n\n";
-      
-      // rbound[2]
-      code<<"  if (rbound[2]) {\n";
-      code<<"    for (int k = o + sp[2] - rbound[2]; k < o + sp[2]; k++) {\n";
-      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
-      code<<"      #pragma simd\n";
-      code<<"      #pragma clang loop vectorize(assume_safety)\n";
-      code<<"      #pragma clang loop interleave(enable)\n";
-      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
-      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
-                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
-      code<<"        }\n";
-      code<<"      }\n";
-      code<<"    }\n";
-      code<<"  }\n\n";
-
-
-      // lbound[1]
-      code<<"  if (lbound[1]) {\n";
-      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
-      code<<"      for (int j = o; j < o + lbound[1]; j++) {\n";
-      code<<"      #pragma simd\n";
-      code<<"      #pragma clang loop vectorize(assume_safety)\n";
-      code<<"      #pragma clang loop interleave(enable)\n";
-      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
-      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
-                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
-      code<<"        }\n";
-      code<<"      }\n";
-      code<<"    }\n";
-      code<<"  }\n\n";
-      
-      // rbound[1]
-      code<<"  if (rbound[1]) {\n";
-      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
-      code<<"      for (int j = o + sp[1] - rbound[1]; j < o + sp[1]; j++) {\n";
-      code<<"      #pragma simd\n";
-      code<<"      #pragma clang loop vectorize(assume_safety)\n";
-      code<<"      #pragma clang loop interleave(enable)\n";
-      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
-      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
-                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
-      code<<"        }\n";
-      code<<"      }\n";
-      code<<"    }\n";
-      code<<"  }\n\n";
-
-      // lbound[0]
-      code<<"  if (lbound[0]) {\n";
-      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
-      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
-      code<<"        for (int i = o; i < o + lbound[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
-                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
-      code<<"        }\n";
-      code<<"      }\n";
-      code<<"    }\n";
-      code<<"  }\n\n";
-      
-      // rbound[0]
-      code<<"  if (rbound[0]) {\n";
-      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
-      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
-      code<<"        for (int i = o + sp[0] - rbound[0]; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
-                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
-      code<<"        }\n";
-      code<<"      }\n";
-      code<<"    }\n";
-      code<<"  }\n\n";
-
-      code<<"  return ;\n}}";
-
-    }
     */
 
     void code_add_calc_inside(stringstream& code, 
-      stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
+      stringstream& __code, stringstream& __point, DATA_TYPE dt, int& id, int& S_id) {
       code<<"  o = 1;//temp wangdong\n";
       code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
       for (int i = 0; i <= S_id; i++) {
@@ -1376,21 +1321,16 @@ namespace oa {
       code<<"  const int3 &rbound = int3_p["<<S_id + 2<<"];\n";
       code<<"  const int3 &sp = int3_p["<<S_id + 3<<"];\n\n";
 
+      code<<__point.str();
       switch(dt) {
         case DATA_INT:
-          for (int i = 0; i <= id; i++){
-            code<<"  int *list_"<<i<<";  list_"<<i<<" = (int *) list["<<i<<"];\n";
-          }
+            code<<"  int *list_"<<id<<";  list_"<<id<<" = (int *) list["<<id<<"];\n";
           break;
         case DATA_FLOAT:
-          for (int i = 0; i <= id; i++){
-            code<<"  float *list_"<<i<<";  list_"<<i<<" = (double *) list["<<i<<"];\n";
-          }
+            code<<"  float *list_"<<id<<";  list_"<<id<<" = (float *) list["<<id<<"];\n";
           break;
         case DATA_DOUBLE:
-          for (int i = 0; i <= id; i++){
-            code<<"  double *list_"<<i<<";  list_"<<i<<" = (double *) list["<<i<<"];\n";
-          }
+            code<<"  double *list_"<<id<<";  list_"<<id<<" = (double *) list["<<id<<"];\n";
           break;    
       }
 
