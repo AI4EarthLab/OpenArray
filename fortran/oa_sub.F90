@@ -23,6 +23,16 @@ module oa_sub
      end subroutine
   end interface
 
+  interface
+     subroutine c_new_node_slice_node(A, B, k) &
+          bind(C, name="c_new_node_slice_node")
+       use iso_c_binding       
+       implicit none
+       type(c_ptr) :: A, B
+       integer :: k
+     end subroutine
+  end interface
+
   ///:mute
   ///:set ptype = [['int2', 'integer, dimension(2)'], &
        ['int', 'integer'], &
@@ -211,5 +221,22 @@ contains
   ///:endfor
   ///:endfor
   ///:endfor
+
+  function slice(A, k) result(B)
+    implicit none
+    type(array), intent(in) :: A
+    type(node) :: B, NA
+    integer :: k
+    integer :: rk
+    rk = k - 1
+
+    call c_new_node_array(NA%ptr, A%ptr)
+    call c_new_node_slice_node(B%ptr, NA%ptr, k)
+
+    call set_rvalue(B)
+    call try_destroy(A)
+    call destroy(NA)
+  end function
+
 
 end module oa_sub

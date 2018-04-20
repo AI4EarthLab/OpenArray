@@ -252,7 +252,6 @@ void Node::set_bitset() {
     if (m_global_shape[i] != 1) m_bs[2 - i] = 1;
     else {
       m_bs[2 - i] = 0;
-      m_is_pseudo = true;
     }
   }
 }
@@ -281,4 +280,12 @@ bool Node::is_ref_data() const{
 ArrayPtr& Node::get_ref_data(){
   assert(is_ref_data());
   return m_input.at(0)->get_data();
+}
+
+void Node::set_slice(int k) {
+  m_slice = k;
+}
+
+int Node::get_slice() {
+  return m_slice;
 }

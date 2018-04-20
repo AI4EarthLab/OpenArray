@@ -49,6 +49,7 @@ void Grid::init_grid(char type,
     y_d[7] = PSU3D(dy);
     z_d[7] = PSU3D(EVAL(AZB(ndz)));
 
+    // z_d[7]->display("z_d[7] = ");
     // x_d[1]->display("x_d[0] = ");
     // y_d[1]->display("y_d[0] = ");
     // z_d[1]->display("z_d[0] = ");

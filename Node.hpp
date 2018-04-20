@@ -34,6 +34,7 @@ private:
   std::bitset<3> m_bs = std::bitset<3>(7);
 
   Box m_ref;
+  int m_slice;
 
 public:
   Node();
@@ -146,6 +147,10 @@ public:
   bool is_ref() const;
 
   bool is_ref_data() const;
+
+  void set_slice(int k);
+
+  int get_slice();
 
   ArrayPtr& get_ref_data();
 };

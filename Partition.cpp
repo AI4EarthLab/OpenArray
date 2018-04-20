@@ -70,11 +70,11 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
         }
     }
   
-  printf("(%d, %d, %d) %d, %d, %d\n",
-          gs[0], gs[1], gs[2],
-          m_procs_shape[0],
-          m_procs_shape[1],
-          m_procs_shape[2]);
+  // printf("(%d, %d, %d) %d, %d, %d\n",
+  //         gs[0], gs[1], gs[2],
+  //         m_procs_shape[0],
+  //         m_procs_shape[1],
+  //         m_procs_shape[2]);
     
   BOOST_ASSERT_MSG(m_procs_shape[0] > 0,
           "can not find proper procs shape.");

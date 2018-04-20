@@ -5,6 +5,7 @@
 #include "../../Function.hpp"
 namespace oa{
   namespace internal{
+#define calc_id(i,j,k,S) ((k)*(S[0])*(S[1])+(j)*(S[0])+(i))
     ///:mute
     ///:include "kernel_type.fypp"
     ///:endmute
@@ -23,6 +24,7 @@ namespace oa{
     void ${name}$_${grid}$_calc_inside(T1* ans, T2* b, T3* g, int3 lbound, int3 rbound, 
             int sw, Shape sp, Shape S, Shape SG) {
       int o = sw;
+
       ///:if name[0] == 'a'
       ///:set g = 1
       ///:endif

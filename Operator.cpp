@@ -1,5 +1,6 @@
 #include "Operator.hpp"
 #include "utils/utils.hpp"
+#include "utils/calcTime.hpp"
 #include "Kernel.hpp"
 #include "Jit_Driver.hpp"
 #include "Grid.hpp"
@@ -8,9 +9,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include "Diagnosis.hpp"
 
 using namespace oa::kernel;
 
+// void c_has_nan_or_inf(int* res, ArrayPtr** ap, int skip_sw);
+
+  
 namespace oa {
   namespace ops{
 
@@ -43,7 +48,7 @@ namespace oa {
                                      u->get_data_type(),
                                      v->get_data_type());
       }
-
+ 
       if (nd.ew) {
         np->set_depth(u->get_depth(), v->get_depth());
         // U and V must have same shape
@@ -218,7 +223,7 @@ namespace oa {
         
         
         ///!:if (('A' <= i[3] and i[3] <= 'F') or name == 'pow' or name == 'not')
-        ///:if i[2] == ''
+        ///:if (i[1] == 'unknown' or i[2] == '')
         s[${type}$].func = NULL;
         ///:else
         s[${type}$].func = ${kernel_name}$;
@@ -252,11 +257,11 @@ namespace oa {
       const NodeDesc & nd = get_node_desc(root->type());
 
       ofs<<boost::format("[label=\"[%s]\\n id=%d \n (ref:%d) "
-			 "\n (lb:%d %d %d) \n (rb: %d %d %d) \n (up: %d)\"];") 
+			 "\n (lb:%d %d %d) \n (rb: %d %d %d) \n (pseudo: %d) \n (up: %d)\"];") 
 	% nd.name % id % root.use_count()
 	% root->get_lbound()[0] % root->get_lbound()[1] % root->get_lbound()[2]
 	% root->get_rbound()[0] % root->get_rbound()[1] % root->get_rbound()[2] 
-	% root->need_update() <<endl;
+	% root->is_pseudo() % root->need_update() <<endl;
 
       for (int i = 0; i < root->input_size(); i++) {
         write_graph(root->input(i), false, filename);
@@ -406,7 +411,7 @@ namespace oa {
         // need change need_update's state
         bool flag = A->need_update();
         A->set_update(false);
-        ArrayPtr ap = eval_with_op(A);
+        ArrayPtr ap = eval(A);
         A->set_update(flag);
 
         // ap is a pseudo 3d, need to make_pseudo_3d
@@ -457,64 +462,8 @@ namespace oa {
       }
     }
 
-
-    //
-    ArrayPtr eval(NodePtr A) {
-      // fusion kernel
-      if (A->hash()) {
-        FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
-        if (fkptr != NULL) {
-          vector<void*> list;
-          PartitionPtr par_ptr;
-          get_kernel_parameter(A, list, par_ptr);
-          ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
-
-          list.push_back(ap->get_buffer());
-          void** list_pointer = list.data();
-          fkptr(list_pointer, ap->buffer_size());
-
-          //cout<<"fusion-kernel called"<<endl;
-          
-          //A->set_data(ap);
-          ap->set_pseudo(A->is_pseudo());
-          ap->set_bitset(A->get_bitset());
-          ap->set_pos(A->get_pos());
-
-          return ap;
-        }
-      }
-
-      
-      // data
-      if (A->has_data()) return A->get_data();
-
-      // tree
-      vector<ArrayPtr> ops_ap;
-
-      for (int i = 0; i < A->input_size(); i++) {
-        ops_ap.push_back(eval(A->input(i)));
-      }
-
-      //printf("ATYPE=%d\n",A->type());
-      ArrayPtr ap;
-      if(A->type() == TYPE_REF){
-        ap = oa::funcs::subarray(ops_ap[0], A->get_ref());
-      }else{
-        const NodeDesc& nd = get_node_desc(A->type());
-        KernelPtr kernel_addr = nd.func;
-        ap = kernel_addr(ops_ap);
-        //A->set_data(ap);
-        ap->set_pseudo(A->is_pseudo());
-        ap->set_bitset(A->get_bitset());
-        ap->set_pos(A->get_pos());
-      }
-      // ap->display();
-
-      return ap;
-    }
-
     // treat operator as element wise
-    ArrayPtr eval_with_op(NodePtr A) {
+    ArrayPtr eval(NodePtr A) {
       // fusion kernel
       if (A->hash()) {
         // A->display();
@@ -543,9 +492,10 @@ namespace oa {
           pthread_t tid;
           // step 1:  start of update boundary
           if (sb) {
-            for (int i = 0; i < sz; i++) 
+            for (int i = 0; i < sz; i++){
               oa::funcs::update_ghost_start(update_list[i], reqs_list, 4, lb_list[i], rb_list[i]);
-            oa::MPI::wait_begin(&reqs_list, &tid);
+            }
+            oa::funcs::update_ghost_end(reqs_list);
           }
 
           ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
@@ -564,21 +514,23 @@ namespace oa {
           if (sb) {
             // step 3:  end of update boundary
               //oa::funcs::update_ghost_end(reqs_list);
-            oa::MPI::wait_end(&tid);
+            //oa::MPI::wait_end(&tid);
 
             // step 4:  calc_outside
             // use A->hash() + 1 to get outside fusion kernel
-            FusionKernelPtr out_fkptr = Jit_Driver::global()->get(A->hash() + 1);
-            if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
-          }
+            //FusionKernelPtr out_fkptr = Jit_Driver::global()->get(A->hash() + 1);
+            //if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
 
+            oa::funcs::set_boundary_zeros(ap, lb, rb);
+          }
 
           //cout<<"fusion-kernel called"<<endl;
           
           //A->set_data(ap);
-          ap->set_pseudo(A->is_pseudo());
+          //ap->set_pseudo(A->is_pseudo());
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
+          ap->reset_ghost_updated();
 
           // oa::funcs::set_ghost_zeros(ap); // add by 57
           return ap;
@@ -593,7 +545,7 @@ namespace oa {
       vector<ArrayPtr> ops_ap;
 
       for (int i = 0; i < A->input_size(); i++) {
-        ops_ap.push_back(eval_with_op(A->input(i)));
+        ops_ap.push_back(eval(A->input(i)));
       }
 
       //printf("ATYPE=%d\n",A->type());
@@ -608,11 +560,12 @@ namespace oa {
         // ops_ap[1]->display("right = ");        
         ap = kernel_addr(ops_ap);
         //A->set_data(ap);
-        ap->set_pseudo(A->is_pseudo());
+        //ap->set_pseudo(A->is_pseudo());
         ap->set_bitset(A->get_bitset());
         ap->set_pos(A->get_pos());
       }
 
+      ap->reset_ghost_updated();
       // oa::funcs::set_ghost_zeros(ap); // add by 57
       return ap;
     }
@@ -711,48 +664,6 @@ namespace oa {
       }
     }
 
-    void gen_kernels_JIT(NodePtr A, bool is_root) {
-      if (A->has_data()) return ;
-      
-      const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew || A->need_update()) {
-        for (int i = 0; i < A->input_size(); i++) {
-          gen_kernels_JIT(A->input(i), true);
-        }
-        return ;
-      }
-
-      if (is_root && A->get_depth() >= 2) {
-        stringstream ss1;
-        stringstream code;
-        stringstream __code;
-        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
-        int id = 0;
-        vector<int> int_id, float_id, double_id;
-        tree_to_code(A, __code, id, int_id, float_id, double_id);
-        tree_to_string_stack(A, ss1);
-        std::hash<string> str_hash;
-        size_t hash = str_hash(ss1.str());
-        
-        // JIT source code add function signature
-        code_add_function_signature(code, hash);
-        // JIT source code add const parameters
-        code_add_const(code, int_id, float_id, double_id);
-        // JIT source code add calc_inside
-        code_add_function(code, __code, A->get_data_type(), id);
-
-        // cout<<code.str()<<endl;
-        // Add fusion kernel into JIT map
-        Jit_Driver::global()->insert(hash, code);
-
-        A->set_hash(hash);
-      }
-
-      for (int i = 0; i < A->input_size(); i++) {
-        gen_kernels_JIT(A->input(i), false);
-      }
-    }
-
     void gen_kernels_JIT_with_op(NodePtr A, bool is_root) {
       if (A->has_data()) return ;
       
@@ -821,13 +732,13 @@ namespace oa {
 
           // Add calc_outside
           if (sb) {
-            stringstream code_out;
-            size_t hash_out = hash + 1;
-            code_add_function_signature_with_op(code_out, hash_out);
-            code_add_const(code_out, int_id, float_id, double_id);
-            code_add_calc_outside(code_out, __code, A->get_data_type(), id, S_id);
-            // cout<<code_out.str()<<endl;
-            Jit_Driver::global()->insert(hash_out, code_out);
+            //stringstream code_out;
+            //size_t hash_out = hash + 1;
+            //code_add_function_signature_with_op(code_out, hash_out);
+            //code_add_const(code_out, int_id, float_id, double_id);
+            //code_add_calc_outside(code_out, __code, A->get_data_type(), id, S_id);
+            //// cout<<code_out.str()<<endl;
+            //Jit_Driver::global()->insert(hash_out, code_out);
           }
         }
       }
@@ -1062,6 +973,7 @@ namespace oa {
           }
         // [i][j][k] based on node bitset
         } else {
+        /*
           ss<<"(";
           switch(A->get_data_type()) {
             case DATA_INT:
@@ -1074,16 +986,17 @@ namespace oa {
               ss<<"(double*)";
               break;
           }
-          ss<<"(list["<<id<<"]))";
+          */
+          ss<<"list_"<<id;
           
           char pos_i[3] = "oi";
           char pos_j[3] = "oj";
           char pos_k[3] = "ok";
           
           bitset<3> bit = A->get_bitset();
-          ss<<"[calc_id("<<pos_i[bit[2]]<<",";
+          ss<<"[calc_id2("<<pos_i[bit[2]]<<",";
           ss<<pos_j[bit[1]]<<",";
-          ss<<pos_k[bit[0]]<<",S"<<S_id<<")]";
+          ss<<pos_k[bit[0]]<<",S"<<S_id<<"_0,S"<<S_id<<"_1)]";
           S_id++;
         }
         id++;
@@ -1099,7 +1012,13 @@ namespace oa {
 
       switch(A->input_size()) {
       case 1:
-        change_string_with_op(ss, child[0].str(), nd);
+        if (nd.type == TYPE_UNKNOWN) {
+          string in = child[0].str();
+          // printf("in Operator, k = %d\n", A->get_slice());
+          string out  = replace_string(in, "k", to_string(A->get_slice()));
+          ss<<out;
+        }
+        else change_string_with_op(ss, child[0].str(), nd);
         // bind grid if A.pos != -1
         if (A->get_pos() != -1) {
           if (nd.type == TYPE_DXC ||
@@ -1115,7 +1034,8 @@ namespace oa {
             // get grid ptr
             ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);
 
-            ss<<"/(";
+            ss<<"/";
+            /*
             switch(grid_ptr->get_data_type()) {
               case DATA_INT:
                 ss<<"(int*)";
@@ -1126,18 +1046,17 @@ namespace oa {
               case DATA_DOUBLE:
                 ss<<"(double*)";
                 break;
-            }
-            ss<<"(list["<<id<<"]))";
+            }*/
+            ss<<"list_"<<id;
             id++;
             
             char pos_i[3] = "oi";
             char pos_j[3] = "oj";
             char pos_k[3] = "ok";
-            
             bitset<3> bit = grid_ptr->get_bitset();
-            ss<<"[calc_id("<<pos_i[bit[2]]<<",";
+            ss<<"[calc_id2("<<pos_i[bit[2]]<<",";
             ss<<pos_j[bit[1]]<<",";
-            ss<<pos_k[bit[0]]<<",S"<<S_id<<")]";
+            ss<<pos_k[bit[0]]<<",S"<<S_id<<"_0,S"<<S_id<<"_1)]";
             S_id++;
           }
         }
@@ -1283,15 +1202,16 @@ namespace oa {
 
       // code<<"#include <array>\n\n";
       // code<<"typedef std::array<int, 3> int3;\n\n";
-      code<<"#include \"math.h\"\n\n";
-            
+      code<<"#include \"math.h\"\n";
+      code<<"#include \"stdlib.h\"\n";
+      code<<"#include \"stdio.h\"\n";
+      
       code<<"typedef int int3[3];\n\n";
+      code<<"#define min(a,b) ((a)<(b))?(a):(b)\n";
+      code<<"#define BLOCK_NUM 32\n";
 
       code<<"extern \"C\" {\n";
-      code<<"inline int calc_id(const int &i, const int &j, const int &k, const int3 &S) {\n";
-      code<<"  const int M = S[0];\n";
-      code<<"  const int N = S[1];\n";
-      code<<"  return k * M * N + j * M + i;\n}\n\n";
+      code<<"#define calc_id2(i,j,k,S0,S1) ((k)*(S0)*(S1)+(j)*(S0)+(i))\n";
       code<<"void kernel_"<<hash;
       code<<"(void** &list, int o) {\n";
     }
@@ -1328,13 +1248,15 @@ namespace oa {
       }
       code<<__code.str()<<";\n  }\n  return ;\n}}";
     }
-
+/*
     void code_add_calc_outside(stringstream& code, 
       stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
       
       code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
       for (int i = 0; i <= S_id; i++) {
         code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
+        code<<"  const int S"<<i<<"_0 = int3_p["<<i<<"][0];\n";
+        code<<"  const int S"<<i<<"_1 = int3_p["<<i<<"][1];\n";
       }
       code<<"\n";
       code<<"  const int3 &lbound = int3_p["<<S_id + 1<<"];\n";
@@ -1355,8 +1277,8 @@ namespace oa {
       code<<"      #pragma clang loop interleave(enable)\n";
       code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
-                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
       code<<"        }\n";
       code<<"      }\n";
       code<<"    }\n";
@@ -1371,8 +1293,8 @@ namespace oa {
       code<<"      #pragma clang loop interleave(enable)\n";
       code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
-                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
       code<<"        }\n";
       code<<"      }\n";
       code<<"    }\n";
@@ -1388,8 +1310,8 @@ namespace oa {
       code<<"      #pragma clang loop interleave(enable)\n";
       code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
-                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
       code<<"        }\n";
       code<<"      }\n";
       code<<"    }\n";
@@ -1404,8 +1326,8 @@ namespace oa {
       code<<"      #pragma clang loop interleave(enable)\n";
       code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
       code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
-                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
       code<<"        }\n";
       code<<"      }\n";
       code<<"    }\n";
@@ -1416,8 +1338,8 @@ namespace oa {
       code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
       code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
       code<<"        for (int i = o; i < o + lbound[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
-                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
       code<<"        }\n";
       code<<"      }\n";
       code<<"    }\n";
@@ -1428,8 +1350,8 @@ namespace oa {
       code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
       code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
       code<<"        for (int i = o + sp[0] - rbound[0]; i < o + sp[0]; i++) {\n";
-      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id(i,j,k,S"
-                       <<S_id<<")] = "<<__code.str()<<";\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
       code<<"        }\n";
       code<<"      }\n";
       code<<"    }\n";
@@ -1438,18 +1360,41 @@ namespace oa {
       code<<"  return ;\n}}";
 
     }
+    */
 
     void code_add_calc_inside(stringstream& code, 
       stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
-      
+      code<<"  o = 1;//temp wangdong\n";
       code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
       for (int i = 0; i <= S_id; i++) {
-        code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
+        //code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
+        code<<"  const int S"<<i<<"_0 = int3_p["<<i<<"][0];  ";
+        code<<"  const int S"<<i<<"_1 = int3_p["<<i<<"][1];\n";
       }
       code<<"\n";
       code<<"  const int3 &lbound = int3_p["<<S_id + 1<<"];\n";
       code<<"  const int3 &rbound = int3_p["<<S_id + 2<<"];\n";
       code<<"  const int3 &sp = int3_p["<<S_id + 3<<"];\n\n";
+
+      switch(dt) {
+        case DATA_INT:
+          for (int i = 0; i <= id; i++){
+            code<<"  int *list_"<<i<<";  list_"<<i<<" = (int *) list["<<i<<"];\n";
+          }
+          break;
+        case DATA_FLOAT:
+          for (int i = 0; i <= id; i++){
+            code<<"  float *list_"<<i<<";  list_"<<i<<" = (double *) list["<<i<<"];\n";
+          }
+          break;
+        case DATA_DOUBLE:
+          for (int i = 0; i <= id; i++){
+            code<<"  double *list_"<<i<<";  list_"<<i<<" = (double *) list["<<i<<"];\n";
+          }
+          break;    
+      }
+
+
 
       /*
         start debug
@@ -1467,29 +1412,32 @@ namespace oa {
         end debug
       */
       
+      code<<"  int ist=o ; ";
+      code<<"  int ied=o + sp[0] ;\n";
+      code<<"  int jst=o ; ";
+      code<<"  int jed=o + sp[1] ;\n";
+      code<<"  int kst=o ; ";
+      code<<"  int ked=o + sp[2] ;\n";
 
-      code<<"  for (int k = o + lbound[2]; k < o + sp[2] - rbound[2]; k++) {\n";
-      code<<"    for (int j = o + lbound[1]; j < o + sp[1] - rbound[1]; j++) {\n";
-      code<<"      #pragma simd\n";
-      code<<"      #pragma clang loop vectorize(assume_safety)\n";
-      code<<"      #pragma clang loop interleave(enable)\n";
-      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
-      code<<"      for (int i = o + lbound[0]; i < o + sp[0] - rbound[0]; i++) {\n";
+      code<<"  /*for (int kk = kst; kk< ked+BLOCK_NUM; kk += BLOCK_NUM)*/{\n";
+      code<<"    //int kend=min(kk+BLOCK_NUM,ked);\n";
+      code<<"    /*for (int jj = jst; jj< jed+BLOCK_NUM; jj += BLOCK_NUM)*/{\n";
+      code<<"      //int jend=min(jj+BLOCK_NUM,jed);\n";
+      code<<"      /*for (int ii = ist; ii< ied+BLOCK_NUM; ii += BLOCK_NUM)*/{\n";
+      code<<"        //int iend=min(ii+BLOCK_NUM,ied);\n";
+      code<<"        for (int k = kst; k < ked; k++) {\n";
+      code<<"          for (int j = jst; j < jed; j++) {\n";
+      code<<"            #pragma simd\n";
+      code<<"            #pragma clang loop vectorize(assume_safety)\n";
+      code<<"            #pragma clang loop interleave(enable)\n";
+      code<<"            #pragma clang loop vectorize_width(8) interleave_count(1)\n";
+      code<<"            for (int i = ist; i < ied ;i++){\n";
 
-      switch(dt) {
-        case DATA_INT:
-          code<<"        ((int*)(list["<<id<<"]))[calc_id(i,j,k,S"<<S_id<<")] = ";
-          break;
-        case DATA_FLOAT:
-          code<<"        ((float*)(list["<<id<<"]))[calc_id(i,j,k,S"<<S_id<<")] = ";
-          break;
-        case DATA_DOUBLE:
-          code<<"        ((double*)(list["<<id<<"]))[calc_id(i,j,k,S"<<S_id<<")] = ";
-          break;    
-      }
+      code<<"              list_"<<id<<"[calc_id2(i,j,k,S"<<S_id<<"_0,S"<<S_id<<"_1)] = ";
 
-      code<<__code.str()<<";\n      }\n    }\n  }\n  return ;\n}}";
+      // code<<__code.str()<<";\n   printf(\"##:%d %d %d\\n\", o, o + lbound[2], o + sp[2] - rbound[2]);  \n  }\n    }\n  }\n  return ;\n}}";
 
+      code<<__code.str()<<";\n            }\n          }\n        }\n      }\n    }\n  }\n  return ;\n}}";      
     }
     
 

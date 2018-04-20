@@ -6,6 +6,7 @@
 #include "../MPI.hpp"
 
 bool g_debug = false;
+bool transticbegin = false;
 
 extern "C" {
   // void c_get_rank(int* rank, MPI_Fint fcomm) {
@@ -38,6 +39,7 @@ extern "C" {
   }
 
   void c_open_debug() {
+    transticbegin = true;
     g_debug = true;
   }
 

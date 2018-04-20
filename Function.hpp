@@ -59,8 +59,14 @@ namespace oa {
     // A = transfer(src, pp)
     ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp);
 
+    double local_sub(const ArrayPtr &ap, int x, int y, int z); 
+
+    void set_local(const ArrayPtr &ap, int x, int y, int z, double val); 
+
     // get a sub Array based on Box b
     ArrayPtr subarray(const ArrayPtr &ap, const Box &box);
+
+    void update_ghost(ArrayPtr ap);
 
     /*
      * update boundary, direction = -1, all dimension
@@ -75,14 +81,17 @@ namespace oa {
 
     void set_ghost_zeros(ArrayPtr ap);
 
-    inline int calc_id(int i, int j, int k, int3 S);
+    void set_boundary_zeros(ArrayPtr &ap, int3 lb, int3 rb);
+    
+    void set_boundary_zeros(ArrayPtr &ap, Box sub_box); 
+
+    //inline int calc_id(int i, int j, int k, int3 S);
 
     void calc_inside(ArrayPtr &ap, ArrayPtr &A, int3 lbound, int3 rbound);
 
     void calc_outside(ArrayPtr &ap, ArrayPtr &B, int3 lbound, int3 rbound);
 
     // convert a mpi array to sequential array
-    ArrayPtr to_rank0(ArrayPtr A);
 
     template<class T>
     bool is_equal(const ArrayPtr& A, const arma::Cube<T>& B){
@@ -333,6 +342,7 @@ namespace oa {
     }
 
     ArrayPtr make_psudo3d(const ArrayPtr& B);
+
 
   }
 }

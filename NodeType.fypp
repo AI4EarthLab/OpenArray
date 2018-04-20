@@ -12,7 +12,7 @@
   
 #! [   TN,              NA,        SY,           LT,    ET,  EW,  CL,  EF,            RT]      
   ///:set L = &   
-       [["TYPE_UNKNOWN", "unknown", "",    "",    "",  "T", "F",  "",           "0"],&
+       [["TYPE_UNKNOWN", "unknown", "slice",    "",    "",  "T", "F",  "",           "0"],&
        ["TYPE_DATA",    "data",    "",       "",    "",  "T", "F",  "",           "0"],&    
        ["TYPE_REF",     "ref",     "",        "",    "",  "F", "F",  "",           "0"],&
        ["TYPE_PLUS",    "plus",    "+",          "A",   "2", "T", "F",  "A+B",        "0"],&

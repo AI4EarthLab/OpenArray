@@ -19,11 +19,33 @@ using namespace std;
 namespace oa {
   namespace internal {
 
-    int calc_id(int i, int j, int k, int3 S);
+    //int calc_id(int i, int j, int k, int3 S);
 
     template <typename T>
     void set_buffer_consts(T *buffer, int size, T val) {
       for (int i = 0; i < size; i++) buffer[i] = val;
+    }
+    
+    template <typename T>
+    void set_buffer_local(T* sub_buffer, const Box& box, int x, int y, int z, T val, int sw) {
+      Shape sp = box.shape(sw);
+      int M = sp[0];
+      int N = sp[1];
+      int P = sp[2];
+
+      int cnt = (z + sw) * M * N + (y + sw) * M + x + sw;
+      sub_buffer[cnt] = val;
+    }
+
+    template <typename T>
+    T get_buffer_local_sub(T* sub_buffer, const Box& box, int x, int y, int z, int sw) {
+      Shape sp = box.shape(sw);
+      int M = sp[0];
+      int N = sp[1];
+      int P = sp[2];
+
+      int cnt = (z + sw) * M * N + (y + sw) * M + x + sw;
+      return sub_buffer[cnt];
     }
 
     //sub_A = sub(A, box)
@@ -46,8 +68,9 @@ namespace oa {
       int cnt = 0;
       for (int k = zs; k < ze; k++) {
         for (int j = ys; j < ye; j++) {
+#pragma simd
           for (int i = xs; i < xe; i++) {
-            sub_buffer[cnt++] = buffer[k * M * N + j * M + i];
+            sub_buffer[(k-zs)*(ye-ys)*(xe-xs)+(j-ys)*(xe-xs)+(i-xs)] = buffer[k * M * N + j * M + i];
             //cout<<buffer[cnt-1]<<" ";
           }
           //cout<<endl;
@@ -88,6 +111,7 @@ namespace oa {
       int cnt = 0;
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
+#pragma simd
           for (int i = 0; i < M; i++) {
             A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] =
               B_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2];
@@ -135,6 +159,7 @@ namespace oa {
         int cnt = 0;
         for (int k = 0; k < P; k++) {
           for (int j = 0; j < N; j++) {
+#pragma simd
             for (int i = 0; i < M; i++) {
               if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)// >0
                 A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] =
@@ -147,6 +172,7 @@ namespace oa {
         int cnt = 0;
         for (int k = 0; k < P; k++) {
           for (int j = 0; j < N; j++) {
+#pragma simd
             for (int i = 0; i < M; i++) {
               if(C_buf[(k+zs2)*M2*N2 + (j+ys2)*M2 + i+xs2] > 0)// >0
                 A_buf[(k+zs1)*M1*N1 + (j+ys1)*M1 + i + xs1] = B_buf[0];
@@ -177,6 +203,7 @@ namespace oa {
 
       for (int k = zs+sw; k < ze-sw; k++) {
         for (int j = ys+sw; j < ye-sw; j++) {
+#pragma simd
           for (int i = xs+sw; i < xe-sw; i++) {
             buffer[k * M * N + j * M + i] = val;
             //cout<<buffer[cnt-1]<<" ";
@@ -213,8 +240,9 @@ namespace oa {
       //printf("%d %d %d %d %d %d\n", xs, xe, ys, ye, zs, ze);
       for (int k = zs; k < ze; k++) {
         for (int j = ys; j < ye; j++) {
+#pragma simd
           for (int i = xs; i < xe; i++) {
-            buffer[cnt++] = k * M * N + j * M + i;
+            buffer[(k-zs)*(ye-ys)*(xe-xs)+(j-ys)*(xe-xs)+(i-xs)] = k * M * N + j * M + i;
             //cout<<buffer[cnt-1]<<" ";
           }
           //cout<<endl;
@@ -232,6 +260,7 @@ namespace oa {
       int cnt = 0;
       for (int k = 0; k < P; k++) {
         for (int j = 0; j < N; j++) {
+#pragma simd
           for (int i = 0; i < M; i++) {
             if ((sw <= k && k < P - sw) &&
                 (sw <= j && j < N - sw) &&
@@ -250,6 +279,7 @@ namespace oa {
     // A = B
     template<typename T>
     void copy_buffer(T *A, T *B, int size) {
+#pragma simd
       for (int i = 0; i < size; i++) {
         A[i] = B[i];
       }

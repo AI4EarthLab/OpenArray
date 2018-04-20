@@ -30,7 +30,7 @@ extern "C"{
       std::cout<<"Error: found a same key already cached. Maybe hash conflicted?";
     }else{
       _cached_nodes[key] = p;
-      oa::ops::gen_kernels_JIT(p);
+      oa::ops::gen_kernels_JIT_with_op(p);
     }
   }
   
@@ -51,9 +51,11 @@ extern "C"{
   }
 
   void clear_cache() {
+/*
     for (auto it = _cached_nodes.begin(); it != _cached_nodes.end(); it++) {
       cout<<it->first<<" "<<it->second<<endl;
     }
+*/
     _cached_nodes.clear();
   }
 

@@ -21,8 +21,6 @@ typedef shared_ptr<Grid> GridPtr;
 class Array {
   private:
   void *m_buffer;
-  // bool m_is_field = false;
-  // int m_grid_pos = -1;
   int m_data_type = 2;
   PartitionPtr m_par_ptr;
   BoxPtr m_ref_box_ptr;
@@ -31,11 +29,12 @@ class Array {
   bool m_is_seqs = false;
   size_t m_hash;
   int pos = -1;
-  //GridPtr grid;
   bool m_is_pseudo = false;
   bool m_has_pseudo_3d = false;
-  std::bitset<3> m_bs = std::bitset<3>(std::string("111"));
+  std::bitset<3> m_bs = std::bitset<3>(7);
   ArrayPtr m_pseudo_3d;
+  bool m_lb_ghost_updated[3] = {false, false, false};
+  bool m_rb_ghost_updated[3] = {false, false, false};
 
   public:
   Array(const PartitionPtr &ptr, int data_type = DATA_DOUBLE); 
@@ -57,14 +56,13 @@ class Array {
   bool is_scalar();
   bool is_seqs();
   bool is_seqs_scalar();
-  // void set_scalar();
-  // void set_seqs();
   bool has_local_data() const;
   void set_hash(const size_t &hash);
   size_t get_hash() const;
   void set_pos(int p);
   int get_pos();
   void set_pseudo(bool ps);
+  void set_pseudo();
   bool is_pseudo();
   void set_bitset(std::string);
   bitset<3> get_bitset();
@@ -79,6 +77,11 @@ class Array {
   ArrayPtr get_pseudo_3d();
   void set_pseudo_3d(ArrayPtr ap);
   void reset();
+  void update_lb_ghost_updated(int3 lb);
+  void update_rb_ghost_updated(int3 rb);
+  bool get_lb_ghost_updated(int dimension);
+  bool get_rb_ghost_updated(int dimension);
+  void reset_ghost_updated();
 
   static void copy(ArrayPtr& dst, const ArrayPtr& src);
 };

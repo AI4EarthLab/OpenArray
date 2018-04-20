@@ -8,6 +8,7 @@
 
 namespace oa{
   namespace internal{
+#define calc_id(i,j,k,S) ((k)*(S[0])*(S[1])+(j)*(S[0])+(i))
 
     ///:for k in [i for i in L if (i[3] == 'A' or i[3] == 'B' or i[3] == 'F')]
     ///:set name = k[1]
@@ -114,20 +115,6 @@ namespace oa{
       int3 v_z = calc_step(vb, 2, sw);
 
       
-      // printf("a\n");
-      // printf("%d %d %d\n", a_x[0], a_x[1], a_x[2]);
-      // printf("%d %d %d\n", a_y[0], a_y[1], a_y[2]);
-      // printf("%d %d %d\n", a_z[0], a_z[1], a_z[2]);
-
-      // printf("u\n");
-      // printf("%d %d %d\n", u_x[0], u_x[1], u_x[2]);
-      // printf("%d %d %d\n", u_y[0], u_y[1], u_y[2]);
-      // printf("%d %d %d\n", u_z[0], u_z[1], u_z[2]);
-
-      // printf("v\n");
-      // printf("%d %d %d\n", v_x[0], v_x[1], v_x[2]);
-      // printf("%d %d %d\n", v_y[0], v_y[1], v_y[2]);
-      // printf("%d %d %d\n", v_z[0], v_z[1], v_z[2]);
       
       for (int ka = a_z[0], ku = u_z[0], kv = v_z[0]; 
            ka < a_z[2] && ku < u_z[2] && kv < v_z[2];
