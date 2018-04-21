@@ -1309,7 +1309,7 @@ namespace oa {
 
     void code_add_calc_inside(stringstream& code, 
       stringstream& __code, stringstream& __point, DATA_TYPE dt, int& id, int& S_id) {
-      code<<"  o = 1;//temp wangdong\n";
+      code<<"  //o = 1;//temp wangdong\n";
       code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
       for (int i = 0; i <= S_id; i++) {
         //code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";

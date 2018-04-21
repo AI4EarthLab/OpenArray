@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <linux/limits.h>  
 #include <errno.h>
 #include <sys/wait.h>
 #include <iostream>
@@ -14,6 +15,7 @@
 #include <vector>
 #include <dlfcn.h>  
 #include <unistd.h>  
+#include <sys/stat.h>
 
 typedef std::shared_ptr<Jit> JitPtr;
 
@@ -33,15 +35,41 @@ class Jit_Driver{
     JitPoolMap m_jit_pool;
 
     int insert_icc(size_t hash, const stringstream& code){
+      int myrank;
       //std::cout<<"icc"<<std::endl;
       FusionKernelPtr fk_ptr = get(hash);
       if (fk_ptr != NULL) return -1;
+      stringstream pathname;
+      char current_absolute_path[PATH_MAX];
+      int cnt = readlink("/proc/self/exe", current_absolute_path, PATH_MAX);
+      if (cnt < 0 || cnt >= PATH_MAX)
+      {
+        printf("***Error***\n");
+      }
+      int i;
+      for (i = cnt; i >=0; --i)
+      {
+        if (current_absolute_path[i] == '/')
+        {
+          current_absolute_path[i+1] = '\0';
+          break;
+        }
+      }
+      pathname<<current_absolute_path;
+      MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+      pathname<<"kernel_folder_"<<myrank;
+      if(access(pathname.str().c_str(),0)==-1)
+      {
+        if (mkdir(pathname.str().c_str(),0777))
+        {
+          printf("creat folder failed!!!");
+        }
+      }
+
       stringstream filename;
-      //filename<<"/GPFS/cess/wangdong/temp/tmp/"<<"kernel_"<<hash<<".cpp";
-      filename<<"/home/wangdong/siofive/tmp/"<<"kernel_"<<hash<<".cpp";
+      filename<<pathname.str()<<"/kernel_"<<hash<<".cpp";
       stringstream objname;
-      //objname<<"/GPFS/cess/wangdong/temp/tmp/"<<"kernel_"<<hash<<".so";
-      objname<<"/home/wangdong/siofive/tmp/"<<"kernel_"<<hash<<".so";
+      objname<<pathname.str()<<"/kernel_"<<hash<<".so";
       ofstream sourcefile;
       stringstream cmd;
       cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -qopenmp -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
