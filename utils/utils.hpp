@@ -9,6 +9,7 @@
 #include <boost/format.hpp>
 #include "../common.hpp"
 #include <armadillo>
+#include <iomanip>
 
 extern "C" {
   void tic(const char* s);
@@ -81,6 +82,7 @@ namespace oa {
       for(int k = 0; k < P; ++k) {
         std::cout<<"[k = " << k << "]" << std::endl;
         for(int i = 0; i < M; ++i) {
+          std::cout<<"x = "<<std::setw(1+(int)log10(M))<<i;
           for(int j = 0; j < N; ++j) {
             std::cout<<boost::format(frt_str) % (buf[i + j * M + k * M * N] * val);
           }

@@ -46,8 +46,9 @@ class Jit_Driver{
       {
         printf("***Error***\n");
       }
+      current_absolute_path[cnt]='\0';
       int i;
-      for (i = cnt; i >=0; --i)
+      for (i = cnt-1; i >=0; --i)
       {
         if (current_absolute_path[i] == '/')
         {
@@ -72,7 +73,8 @@ class Jit_Driver{
       objname<<pathname.str()<<"/kernel_"<<hash<<".so";
       ofstream sourcefile;
       stringstream cmd;
-      cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -qopenmp -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
+      //cmd<<"icc -shared -fPIC -nostartfiles -O0 -finline -inline-level=2 -finline-functions -no-inline-factor -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
+      cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
       //cmd<<"pwd";
 
       //cout<<objname.str().c_str()<<endl;
@@ -121,6 +123,13 @@ class Jit_Driver{
       int dltime = 0;
       while(dlHandle == NULL)  
       {  
+        if(system(cmd.str().c_str()) != 0)
+        {
+          std::cout<<"icc compile err"<<std::endl;
+          haveicc = 0;
+          return -1;
+        }
+
         dltime++;
         dlHandle = dlopen(objname.str().c_str(), RTLD_LAZY);  
         std::cout<<"dlopen again "<<dltime<<std::endl;
