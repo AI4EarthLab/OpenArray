@@ -1,3 +1,9 @@
+/*
+ * Array.cpp
+ * 
+ *
+=======================================================*/
+
 #include "mpi.h"
 #include "Array.hpp"
 #include "common.hpp"
@@ -9,15 +15,13 @@ using namespace std;
 
 Array::Array(const PartitionPtr &ptr, int data_type) : 
   m_data_type(data_type), m_par_ptr(ptr) {
+
   set_local_box();
   Box box = get_local_box();
   int sw = ptr->get_stencil_width();
-  int size_in = box.size();
   int size = box.size_with_stencil(sw);
-
-  // if box.size() == 0, there is no need to contain stencil
-  // if (size_in == 0) size = 0;
   
+  // malloc data buffer
   switch (m_data_type) {
   case DATA_INT:
     m_buffer = (void*) new int[size];
@@ -34,7 +38,9 @@ Array::Array(const PartitionPtr &ptr, int data_type) :
 }
 
 Array::~Array(){
-  //std::cout<<"Array destructor called!"<<std::endl;
+  // std::cout<<"Array destructor called!"<<std::endl;
+  // delete data buffer
+  
   switch (m_data_type) {
   case DATA_INT:
     delete((int*) m_buffer);
@@ -79,7 +85,7 @@ void Array::display(const char *prefix) {
   
   MPI_Request reqs[num_procs];
   int reqs_cnt = 0;
-  //printf("gs:%d, %d, %d\n", gs[0], gs[1], gs[2]);
+
   // rank 0 recv & others send
   if (my_rank == 0) {
     global_buf = new char[gs[0] * gs[1] * gs[2] * 
@@ -166,12 +172,10 @@ void Array::display(const char *prefix) {
   }
 }
 
-// set local box in each process
 void Array::set_local_box() {
   m_corners = m_par_ptr->get_local_box();
 }
 
-// get local box in each process
 Box Array::get_local_box() const{
   return m_corners;
 }
@@ -186,7 +190,6 @@ int Array::buffer_size() const {
   return m_corners.size_with_stencil(sw);
 }
 
-// return box shape in each process
 Shape Array::local_shape() {
   Box box = get_local_box();
   return box.shape();
@@ -203,7 +206,6 @@ Box Array::local_data_win() const{
   return Box(sw, bs[0]-sw, sw, bs[1]-sw, sw, bs[2]-sw);
 }
 
-// return global shape of Array
 Shape Array::shape() {
   return m_par_ptr->shape();
 }
@@ -228,24 +230,14 @@ bool Array::is_seqs_scalar() {
   return is_scalar() && is_seqs();
 }
 
-// void Array::set_seqs() {
-//   m_is_seqs = true;
-// }
-
-// void Array::set_scalar() {
-//   m_is_scalar = true;
-// }
-
 bool Array::has_local_data() const {
   return local_size() > 0;
 }
 
-// set partition hash
 void Array::set_hash(const size_t &hash) {
   m_hash = hash;  
 }
 
-// get partition hash
 size_t Array::get_hash() const{
   return m_hash;
 }
@@ -262,8 +254,11 @@ void Array::set_pseudo(bool ps) {
   m_is_pseudo = ps;
 }
 
+// set pseudo automatically based on array's shape and procs_shape
 void Array::set_pseudo() {
   for (int i = 0; i < 3; i++) {
+    // array's shape [m,n,1], process's shape [px,py,1]  pseudo = false
+    // array's shape [m,n,1], process's shape [px,py,pz(>1)], pseudo = true
     if (m_par_ptr->shape()[i] == 1 && m_par_ptr->procs_shape()[i] != 1) {
       m_is_pseudo = true;
     }
@@ -282,7 +277,7 @@ void Array::set_bitset(bitset<3> bs) {
   m_bs = bs;
 }
 
-// set_bitset based on global shape
+// set_bitset automatically based on global shape
 void Array::set_bitset() {
   for (int i = 0; i < 3; i++) {
     if (m_par_ptr->shape()[i] != 1) m_bs[2 - i] = 1;
@@ -324,13 +319,6 @@ bool Array::has_pseudo_3d() {
   return m_has_pseudo_3d;
 }
 
-void Array::reset() {
-  //m_hash = 0;
-  pos = -1;
-  reset_pseudo_3d();
-  reset_ghost_updated();
-}
-
 void Array::reset_pseudo_3d() {
   m_has_pseudo_3d = false;
   m_pseudo_3d = NULL;
@@ -345,14 +333,20 @@ void Array::set_pseudo_3d(ArrayPtr ap) {
   m_has_pseudo_3d = true;
 }
 
-void Array::copy(ArrayPtr& dst, const ArrayPtr& src){
+void Array::reset() {
+  pos = -1;
+  reset_pseudo_3d();
+  // reset_ghost_updated(); // not used yet
+}
 
+void Array::copy(ArrayPtr& dst, const ArrayPtr& src){
   //same datatype, same stencil width
   if(dst->get_hash() == src->get_hash()){
 
     dst->set_pos(src->get_pos());
     dst->set_pseudo(src->is_pseudo());
     dst->set_bitset(src->get_bitset());
+    dst->reset_pseudo_3d();
     
     DataType dt = src->get_data_type();
 
@@ -377,35 +371,38 @@ void Array::copy(ArrayPtr& dst, const ArrayPtr& src){
       break;
     }
   }else{
+    // the partition is not same, need to transfer
     ArrayPtr dst1 = oa::funcs::transfer(src, dst->get_partition());
     dst = dst1;
   }
 }
-  void Array::update_lb_ghost_updated(int3 lb) {
-    m_lb_ghost_updated[0] = m_lb_ghost_updated[0] || lb[0];
-    m_lb_ghost_updated[1] = m_lb_ghost_updated[1] || lb[1];
-    m_lb_ghost_updated[2] = m_lb_ghost_updated[2] || lb[2];
-  }
 
-  void Array::update_rb_ghost_updated(int3 rb) {
-    m_rb_ghost_updated[0] = m_rb_ghost_updated[0] || rb[0];
-    m_rb_ghost_updated[1] = m_rb_ghost_updated[1] || rb[1];
-    m_rb_ghost_updated[2] = m_rb_ghost_updated[2] || rb[2];
-  }
+void Array::update_lb_ghost_updated(int3 lb) {
+  m_lb_ghost_updated[0] = m_lb_ghost_updated[0] || lb[0];
+  m_lb_ghost_updated[1] = m_lb_ghost_updated[1] || lb[1];
+  m_lb_ghost_updated[2] = m_lb_ghost_updated[2] || lb[2];
+}
 
-  bool Array::get_lb_ghost_updated(int dimension) {
-    return m_lb_ghost_updated[dimension];
-  }
-  bool Array::get_rb_ghost_updated(int dimension) {
-    return m_rb_ghost_updated[dimension];
-  }
+void Array::update_rb_ghost_updated(int3 rb) {
+  m_rb_ghost_updated[0] = m_rb_ghost_updated[0] || rb[0];
+  m_rb_ghost_updated[1] = m_rb_ghost_updated[1] || rb[1];
+  m_rb_ghost_updated[2] = m_rb_ghost_updated[2] || rb[2];
+}
 
-  void Array::reset_ghost_updated() {
-    m_lb_ghost_updated[0] = false;
-    m_lb_ghost_updated[1] = false;
-    m_lb_ghost_updated[2] = false;
-    m_rb_ghost_updated[0] = false;
-    m_rb_ghost_updated[1] = false;
-    m_rb_ghost_updated[2] = false;
-  }
+bool Array::get_lb_ghost_updated(int dimension) {
+  return m_lb_ghost_updated[dimension];
+}
+
+bool Array::get_rb_ghost_updated(int dimension) {
+  return m_rb_ghost_updated[dimension];
+}
+
+void Array::reset_ghost_updated() {
+  m_lb_ghost_updated[0] = false;
+  m_lb_ghost_updated[1] = false;
+  m_lb_ghost_updated[2] = false;
+  m_rb_ghost_updated[0] = false;
+  m_rb_ghost_updated[1] = false;
+  m_rb_ghost_updated[2] = false;
+}
 
