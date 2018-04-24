@@ -15,19 +15,19 @@ namespace oa {
     }
     
     //! display array for a buffer. 
-    void print_data(void* buf, const Shape& shape, DATA_TYPE dt) {
+    void print_data(void* buf, const Shape& shape, DATA_TYPE dt, int is, int ie, int js, int je, int ks, int ke) {
       switch(dt){
       case DATA_BOOL:
-        print_data_t((bool*)buf, shape);
+        print_data_t((bool*)buf, shape, is, ie, js, je, ks, ke);
         break;
       case DATA_INT:
-        print_data_t((int*)buf, shape);
+        print_data_t((int*)buf, shape, is, ie, js, je, ks, ke);
         break;
       case DATA_FLOAT:
-        print_data_t((float*)buf, shape);
+        print_data_t((float*)buf, shape, is, ie, js, je, ks, ke);
         break;
       case DATA_DOUBLE:
-        print_data_t((double*)buf, shape);
+        print_data_t((double*)buf, shape, is, ie, js, je, ks, ke);
         break;
       }
     }

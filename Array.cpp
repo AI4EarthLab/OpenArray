@@ -64,7 +64,7 @@ PartitionPtr Array::get_partition() const{
   return m_par_ptr;
 }
 
-void Array::display(const char *prefix) {
+void Array::display(const char *prefix, int is, int ie, int js, int je, int ks, int ke) {
 
   Shape ps = m_par_ptr->procs_shape();
 
@@ -161,7 +161,7 @@ void Array::display(const char *prefix) {
     m_par_ptr->display(NULL, true);
     
     MPI_Waitall(reqs_cnt, &reqs[0], MPI_STATUSES_IGNORE);
-    oa::utils::print_data((void*)global_buf, gs, m_data_type);
+    oa::utils::print_data((void*)global_buf, gs, m_data_type, is, ie, js, je, ks, ke);
     delete(global_buf);
     printf("\n");
   }

@@ -43,7 +43,8 @@ class Array {
   void* get_buffer();
   void set_buffer(void *buffer, int size);
   PartitionPtr get_partition() const;
-  void display(const char *prefix = "");
+  void display(const char *prefix = "", int is = -1, int ie = -1, int js = -1, int je = -1, int ks = -1, int ke = -1);
+  void display_for_gdb();
   void set_local_box();
   Box get_local_box() const;
   Shape buffer_shape() const;
