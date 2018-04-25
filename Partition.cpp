@@ -13,7 +13,6 @@
 #include <sstream>
 #include <algorithm>
 #include "utils/utils.hpp"
-#include "boost/assert.hpp"
 #include "MPI.hpp"
 
 using namespace std;
