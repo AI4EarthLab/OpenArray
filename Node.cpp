@@ -1,3 +1,9 @@
+/*
+ * Node.cpp
+ * 
+ *
+=======================================================*/
+
 #include "Node.hpp"
 #include "NodeDesc.hpp"
 #include "Operator.hpp"
@@ -9,7 +15,6 @@ Node::Node() {}
 
 Node::Node(NodePtr u) {}
 
-//Node(ArrayPtr array);
 Node::~Node() {}
 
 void Node::display(char const *prefix) {
@@ -21,7 +26,6 @@ void Node::display(char const *prefix) {
     const NodeDesc& nd = oa::ops::get_node_desc(m_type);    
     printf("    type : %s\n", nd.name.c_str());
     std::cout<<"    hash : "<<m_hash<<endl; 
-    //printf("    hash : %d\n", m_hash);
     printf("   shape : [%d %d %d]\n",
             shape()[0], shape()[1], shape()[2]);
     printf("  lbound : [%d %d %d]\n", m_lbound[0], m_lbound[1], m_lbound[2]);
@@ -80,8 +84,8 @@ void Node::set_type(NodeType type) {
   m_type = type;
 }
 
-void Node::set_data(const ArrayPtr& ptr) {
-  m_data = ptr;
+NodeType Node::type() {
+  return m_type;
 }
 
 void Node::set_id(int _id) {
@@ -100,8 +104,8 @@ void Node::set_hash(size_t hash) {
   m_hash = hash;
 }
 
-NodeType Node::type() {
-  return m_type;
+void Node::set_data(const ArrayPtr& ptr) {
+  m_data = ptr;
 }
 
 ArrayPtr& Node::get_data() {
@@ -140,18 +144,16 @@ bool Node::is_scalar() const {
   return m_is_scalar;
 }
 
+void Node::set_scalar(bool value) {
+  m_is_scalar = value;
+}
+
 bool Node::is_seqs() const {
   return m_is_seqs;
 }
 
-void Node::set_scalar(bool value) {
-  m_is_scalar = value;
-  //m_data->set_scalar();
-}
-
 void Node::set_seqs(bool value) {
   m_is_seqs = value;
-  //m_data->set_seqs();
 }
 
 bool Node::is_seqs_scalar() const {
@@ -159,7 +161,7 @@ bool Node::is_seqs_scalar() const {
 }
 
 void Node::set_depth(int child_depth) {
-  m_depth = child_depth + 1;
+  m_depth = child_depth + 1;  // depth is from botom to top
 }
 
 void Node::set_depth(int l, int r) {
