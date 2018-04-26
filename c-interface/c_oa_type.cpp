@@ -282,13 +282,19 @@ extern "C" {
     );
   }
   
-  void c_local_sub(ArrayPtr*& A, int* x, int* y, int* z, double* ans) {
-    *ans = oa::funcs::local_sub(*A, *x, *y, *z);
+  ///:for t in TYPE 
+  void c_local_sub_${t[0]}$(ArrayPtr*& A, int* x, int* y, int* z, ${t[0]}$* ans) {
+    oa::funcs::local_sub(*A, *x, *y, *z, ans);
   }
+
+  ///:endfor
   
-  void c_set_local(ArrayPtr*& A, int* x, int* y, int* z, double* val) {
+  ///:for t in TYPE
+  void c_set_local_${t[0]}$(ArrayPtr*& A, int* x, int* y, int* z, ${t[0]}$* val) {
     oa::funcs::set_local(*A, *x, *y, *z, *val);
   }
+
+  ///:endfor
   
   void c_update_ghost(ArrayPtr*& A) {
     oa::funcs::update_ghost(*A);

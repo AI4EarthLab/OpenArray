@@ -1,11 +1,17 @@
-#include "Function.hpp"
+/*
+ * Function.cpp
+ *
+=======================================================*/
+
+#include "MPI.hpp"
+#include "Kernel.hpp"
 #include "common.hpp"
+#include "Function.hpp"
 #include "utils/utils.hpp"
 #include "utils/calcTime.hpp"
-#include <fstream>
+
 #include <mpi.h>
-#include "Kernel.hpp"
-#include "MPI.hpp"
+#include <fstream>
 
 using namespace std;
 namespace oa {
@@ -108,56 +114,6 @@ namespace oa {
       return ap;
     }
 
-    void set_local(const ArrayPtr &ap, int x, int y, int z, double val) {
-      Box b(x, x+1, y, y+1, z, z+1);
-      Box local_box = ap->get_local_box();
-      //b.display("b = ");
-      //local_box.display("local_box = ");
-      //assert(b.is_inside(local_box));
-      int sw = ap->get_stencil_width();
-      x -= local_box.xs();
-      y -= local_box.ys();
-      z -= local_box.zs();
-      switch(ap->get_data_type()) {
-      case DATA_INT:
-        oa::internal::set_buffer_local((int*)ap->get_buffer(), local_box, x, y, z, (int)val, sw);
-        break;
-      case DATA_FLOAT:
-        oa::internal::set_buffer_local((float*)ap->get_buffer(), local_box, x, y, z, (float)val, sw);
-        break;
-      case DATA_DOUBLE:
-        oa::internal::set_buffer_local((double*)ap->get_buffer(), local_box, x, y, z, (double)val, sw);
-        break;
-      }
-      
-    }
-   
-    double local_sub(const ArrayPtr &ap, int x, int y, int z) {
-      Box b(x, x+1, y, y+1, z, z+1);
-      Box local_box = ap->get_local_box();
-      //b.display("b = ");
-      //local_box.display("local_box = ");
-      //assert(b.is_inside(local_box));
-      int sw = ap->get_stencil_width();
-      x -= local_box.xs();
-      y -= local_box.ys();
-      z -= local_box.zs();
-      double ans;
-      switch(ap->get_data_type()) {
-      case DATA_INT:
-        ans = oa::internal::get_buffer_local_sub((int*)ap->get_buffer(), local_box, x, y, z, sw);
-        break;
-      case DATA_FLOAT:
-        ans = oa::internal::get_buffer_local_sub((float*)ap->get_buffer(), local_box, x, y, z, sw);
-        break;
-      case DATA_DOUBLE:
-        ans = oa::internal::get_buffer_local_sub((double*)ap->get_buffer(), local_box, x, y, z, sw);
-        break;
-      }
-      return ans;
-      
-    }
-   
     //transfer(ArrayPtr &A, ArrayPtr &B);
     ArrayPtr subarray(const ArrayPtr &ap, const Box &b) {
       vector<int> rsx, rsy, rsz;
