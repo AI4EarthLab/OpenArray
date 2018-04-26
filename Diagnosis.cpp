@@ -38,7 +38,8 @@ namespace oa{
       }
       ///:endfor
       default:
-        THROW_LOGIC_EXCEPTION("unsupported datatype.");
+        printf("unsupported datatype.\n");
+        exit(0);
         break;
       }
 

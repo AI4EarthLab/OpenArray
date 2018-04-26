@@ -116,15 +116,14 @@ extern "C"{
     arr_sh[0] = s[0]; arr_sh[1] = s[1]; arr_sh[2] = s[2];
 
     if(arr_sh != (*p)->shape()){
-      THROW_LOGIC_EXCEPTION(
-          (boost::format("src shape(%1%,%2%,%3%) "
-                  "and dst shape(%4%,%5%,%6%) does not match.") %
-                  (*p)->shape()[0] %
-                  (*p)->shape()[1] %
-                  (*p)->shape()[2] %
-                  arr_sh[0] %
-                  arr_sh[1] %
-                  arr_sh[2]).str());
+      printf("src shape(%d,%d,%d) and dst shape(%d,%d,%d) does not match\n",
+                  (*p)->shape()[0],
+                  (*p)->shape()[1],
+                  (*p)->shape()[2],
+                  arr_sh[0],
+                  arr_sh[1],
+                  arr_sh[2]);
+      exit(0);
     }
     
     const Box arr_box(0, arr_sh[0], 0, arr_sh[1], 0, arr_sh[2]);
@@ -184,12 +183,10 @@ extern "C"{
   void c_set_${type}$_array(${type}$& val,ArrayPtr*& ap){
     ENSURE_VALID_PTR(ap);
     if((*ap)->shape() != SCALAR_SHAPE){
-      std::cout<<(boost::format("can not covert input "
-              "array of shape (%1%,%2%,%3%) to a scalar.")
-              % (*ap)->shape()[0]
-              % (*ap)->shape()[1]
-              % (*ap)->shape()[2]).str()
-               << std::endl;
+      printf("can not covert input array of shape (%d,%d,%d) to a scalar.\n",
+              (*ap)->shape()[0],
+              (*ap)->shape()[1],
+              (*ap)->shape()[2]);
       exit(0);
     }
 
@@ -219,12 +216,10 @@ extern "C"{
   void c_set_${type}$_node(${type}$& val, NodePtr*& np){
     ENSURE_VALID_PTR(np);
     if((*np)->shape() != SCALAR_SHAPE){
-      std::cout<<(boost::format("can not covert input "
-                      "node of shape (%1%,%2%,%3%) to a scalar.")
-              % (*np)->shape()[0]
-              % (*np)->shape()[1]
-              % (*np)->shape()[2]).str()
-               << std::endl;
+      printf("can not covert intpu node of shape (%d,%d,%d) to a scalar.\n",
+              (*np)->shape()[0],
+              (*np)->shape()[1],
+              (*np)->shape()[2]);
       exit(0);
     }
     

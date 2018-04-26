@@ -9,7 +9,6 @@
 #include "Operator.hpp"
 #include "op_define.hpp"
 #include "utils/utils.hpp"
-#include <boost/throw_exception.hpp>
 
 #define PSU3D(x) oa::funcs::make_psudo3d(x)
 
@@ -86,7 +85,8 @@ void Grid::init_grid(char type,
     
     break;
   default:
-    BOOST_THROW_EXCEPTION(std::logic_error("unsupported grid type"));
+    std::cout<<"unsupported grid type"<<std::endl;
+    exit(0);
     break;
   }
 }
