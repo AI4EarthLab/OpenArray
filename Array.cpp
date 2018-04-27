@@ -69,6 +69,31 @@ PartitionPtr Array::get_partition() const{
   return m_par_ptr;
 }
 
+void Array::display_info(const char *prefix) {
+  if (rank() == 0){
+    printf("\n%s\n", prefix);
+    std::cout<<"\tdata type = "
+             << oa::utils::get_type_string(m_data_type)
+             << std::endl;
+
+    std::cout<<"\tpos = "
+             << pos
+             << std::endl;
+
+    std::cout<<"\tis_pseudo = "
+             << m_is_pseudo
+             << std::endl;
+    
+    std::cout<<"\tbitset = "
+             << m_bs
+             << std::endl;
+
+    m_par_ptr->display(NULL, true);
+    
+    printf("\n");
+  }
+}
+
 void Array::display(const char *prefix) {
 
   Shape ps = m_par_ptr->procs_shape();

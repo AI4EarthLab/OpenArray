@@ -60,6 +60,9 @@ class Array {
   // get array's partition shared pointer
   PartitionPtr get_partition() const;
 
+  // display array information without data
+  void display_info(const char *prefix = "");
+
   // display array
   void display(const char *prefix = "");
 

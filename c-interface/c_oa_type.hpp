@@ -21,6 +21,8 @@ extern "C" {
 
   void c_destroy_node(void*& A);
 
+  void c_display_array_info(ArrayPtr* A, char* prefix);
+
   void c_display_array(ArrayPtr* A, char* prefix);
 
   void c_display_node(NodePtr* A, char* prefix);

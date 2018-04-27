@@ -123,6 +123,13 @@ extern "C" {
     }
   }
 
+  void c_display_array_info(ArrayPtr* A, char* prefix) {
+    //printf("prefix = %s\n", (char*)prefix);
+    if(A != NULL){
+      (*(ArrayPtr*) A)->display_info((char*)prefix);      
+    }
+  }
+
   void c_display_array(ArrayPtr* A, char* prefix) {
     //printf("prefix = %s\n", (char*)prefix);
     if(A != NULL){

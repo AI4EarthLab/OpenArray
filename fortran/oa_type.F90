@@ -333,6 +333,23 @@
       
     end subroutine
     
+    subroutine display_info(A, prefix)
+      use iso_c_binding
+      type(array), intent(in) :: A
+      character(len=*):: prefix
+      interface
+         subroutine c_display_array_info(A, prefix) &
+              bind(C, name = 'c_display_array_info')
+           use iso_c_binding
+           type(c_ptr), intent(in), VALUE :: A
+           character(kind=c_char),  intent(in)  :: prefix(*)
+         end subroutine
+      end interface
+
+      !ASSERT_LVALUE(A)      
+      call c_display_array_info(A%ptr, string_f2c(prefix))
+    end subroutine
+    
     subroutine display_array(A, prefix)
       use iso_c_binding
       type(array), intent(in) :: A
