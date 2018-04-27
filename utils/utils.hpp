@@ -9,6 +9,7 @@
 #include <boost/format.hpp>
 #include "../common.hpp"
 #include <armadillo>
+#include <iomanip>
 
 extern "C" {
   void tic(const char* s);
@@ -25,11 +26,13 @@ namespace oa {
     int& get_disp_format();
 
     template<class T>
-    void print_data_t(T* buf, const Shape& shape) {
+    void print_data_t(T* buf, const Shape& shape, int is, int ie, int js, int je, int ks, int ke) {
       const int M = shape[0];
       const int N = shape[1];
       const int P = shape[2];
       const int buf_size = M * N * P;
+      bool printlocal = false;
+      if(is!=-1&&ie!=-1&&js!=-1&&je!=-1&&ks!=-1&&ke!=-1) printlocal = true;
 
       std::string frt_str;
       if (std::is_same<T, int>::value) {
@@ -79,9 +82,19 @@ namespace oa {
       //for (int i = 0; i < 24; i++) std::cout<<buf[i]<<" "<<std::endl;
 
       for(int k = 0; k < P; ++k) {
+        if(printlocal && (k < ks || k > ke)) continue;
         std::cout<<"[k = " << k << "]" << std::endl;
+        std::cout<<"      "<<std::setw(1+(int)log10(M))<<"";
+        for(int j = 0; j < N; ++j) {
+          if(printlocal && (j < js || j > je)) continue;
+          std::cout<<"j = "<<std::setiosflags(std::ios::left)<<std::setw(16)<<j;
+        }
+        std::cout<<std::endl;
         for(int i = 0; i < M; ++i) {
+          if(printlocal && (i < is || i > ie)) continue;
+          std::cout<<"i = "<<std::setw(1+(int)log10(M))<<i;
           for(int j = 0; j < N; ++j) {
+            if(printlocal && (j < js || j > je)) continue;
             std::cout<<boost::format(frt_str) % (buf[i + j * M + k * M * N] * val);
           }
           std::cout<<std::endl;
@@ -158,7 +171,7 @@ namespace oa {
     DataType cast_data_type(DataType t1, DataType t2);
 
     //! display array for a buffer. 
-    void print_data(void* buf, const Shape& shape, DATA_TYPE dt);
+    void print_data(void* buf, const Shape& shape, DATA_TYPE dt, int is = -1, int ie = -1, int js = -1, int je = -1, int ks = -1, int ke = -1);
 
     int data_size(int data_type);
     

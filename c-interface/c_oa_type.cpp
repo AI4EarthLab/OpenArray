@@ -137,6 +137,24 @@ extern "C" {
     }
   }
 
+  void gdb_display_range(ArrayPtr* A, int is, int ie, int js, int je, int ks, int ke) {
+    int a = is;
+    int b = ie;
+    int c = js;
+    int d = je;
+    int e = ks;
+    int f = ke;
+    if(A != NULL){
+      (*(ArrayPtr*) A)->display(NULL,a,b,c,d,e,f);      
+    }
+  }
+
+  void gdb_display(ArrayPtr* A) {
+    if(A != NULL){
+      (*(ArrayPtr*) A)->display(NULL);      
+    }
+  }
+
   void c_display_node(NodePtr* A, char* prefix) {
     (*(NodePtr*) A)->display((char*) prefix);
   }

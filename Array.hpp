@@ -64,7 +64,10 @@ class Array {
   void display_info(const char *prefix = "");
 
   // display array
-  void display(const char *prefix = "");
+  void display(const char *prefix = "", int is = -1, int ie = -1, int js = -1, int je = -1, int ks = -1, int ke = -1);
+
+  // display for gdb
+  void display_for_gdb();
 
   // set & get local box in each process
   void set_local_box();

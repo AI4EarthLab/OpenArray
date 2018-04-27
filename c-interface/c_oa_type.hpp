@@ -25,6 +25,10 @@ extern "C" {
 
   void c_display_array(ArrayPtr* A, char* prefix);
 
+  void gdb_display_range(ArrayPtr* A, int is, int ie, int js, int je, int ks, int ke);
+
+  void gdb_display(ArrayPtr* A);
+
   void c_display_node(NodePtr* A, char* prefix);
 
   ///:for f in ['ones', 'zeros', 'rands', 'seqs']
