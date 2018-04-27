@@ -75,6 +75,14 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
           }
         }
     }
+
+  if (Partition::get_default_auto_3d_procs_shape() == false && 
+      gs[0] > 1 && gs[1] > 1 && gs[2] > 1) {
+
+    Partition::set_default_procs_shape(m_procs_shape);
+    Partition::set_default_auto_3d_procs_shape(true);
+
+    }
   
   // for debug
   // printf("(%d, %d, %d) %d, %d, %d\n",
@@ -490,4 +498,17 @@ void Partition::set_default_stencil_type(int st){
 int Partition::get_default_stencil_type(){
   return m_default_stencil_type;
 }
+
+bool Partition::m_auto_3d_procs_shape = false;  // default as false
+
+bool Partition::get_default_auto_3d_procs_shape() {
+  return m_auto_3d_procs_shape; 
+}
+
+void Partition::set_default_auto_3d_procs_shape(bool val) {
+  m_auto_3d_procs_shape = val;
+}
+
+
+
 
