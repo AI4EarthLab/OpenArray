@@ -1,3 +1,7 @@
+/*
+ * MPI.cpp
+ *
+=======================================================*/
 
 #include "MPI.hpp"
 #include "c-interface/c_oa_cache.hpp"
@@ -22,11 +26,12 @@ namespace oa{
     }else{
       MPI_Init(NULL, NULL);
     }
+    // comm is a fortran MPI_Comm, use f2c to change into c MPI_Comm
     m_comm = MPI_Comm_f2c(comm);
   }
 
   void MPI::finalize(){
-    c_clear_cache();
+    c_clear_cache();  // clear cache used in FSET(CSET)
     MPI_Finalize();
   }
   
@@ -77,8 +82,7 @@ namespace oa{
   }
 
 
-  void *MPI::wait_func(void *arg)
-  {
+  void *MPI::wait_func(void *arg) {
     int i,j;
     vector<MPI_Request>  *mra = (vector<MPI_Request>  *)arg;
     for(i=0;i<(*mra).size();i++)
@@ -87,14 +91,13 @@ namespace oa{
       }
     return NULL;
   }
-  void MPI::wait_begin(vector<MPI_Request>  *mra, pthread_t * tid)
-  {
+
+  void MPI::wait_begin(vector<MPI_Request>  *mra, pthread_t * tid) {
     pthread_create(tid, NULL, wait_func, (void *)(mra));
   }
-  void MPI::wait_end(pthread_t * tid)
-  {
+
+  void MPI::wait_end(pthread_t * tid) {
     pthread_join(*tid,NULL);
   }
-
 
 }

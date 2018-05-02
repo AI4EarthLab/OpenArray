@@ -1,3 +1,9 @@
+/*
+ * NodePool.hpp
+ * use a node pool to maintain node
+ * get node from the pool, and dispose unused node to the pool
+ *
+=======================================================*/
 
 #ifndef __NODEPOOL_HPP__
 #define __NODEPOOL_HPP__
@@ -9,8 +15,8 @@
 
 class NodePool {
   typedef std::list<Node*> NodeList;
-  NodeList m_list;
-  int global_count = 0;
+  NodeList m_list;    // use list to contain node 
+  int global_count = 0;  // total number of node
 
 public:
 
@@ -19,20 +25,24 @@ public:
     
     Node *p = NULL;
     if(m_list.size() > 0) {
+    // get node from the pool if list.size() > 0
       p = m_list.back();
       m_list.pop_back();
     }else{
+    // create new node
       p = new Node();
       add_count();
       if (g_debug) cout<<"NodePool.size() = "<<count()<<endl;
     }
     p->set_id(NodePool::global_id());
 
+    // create node shared pointer by node* & dispose method
     return NodePtr(p, [](Node* np) {
         NodePool::global()->dispose(np);
       });
   }
 
+  // get a sequences node from node pool
   template<class T>
   NodePtr get_seqs_scalar(T val) {
     NodePtr p = NodePool::global()->get();
@@ -50,6 +60,7 @@ public:
     return p;
   }
 
+  // get a sequences 1d node from node pool
   template<class T, int size>
   NodePtr get_local_1d(T* val) {
     NodePtr p = NodePool::global()->get();
@@ -74,21 +85,25 @@ public:
     m_list.push_back(n);
   }
 
+  // static method, only keep one static node pool
   static NodePool* global() {
     static NodePool np;
     return &np;
   }
 
+  // each node has it's global id
   static int global_id() {
     static int m_global_id = 0;
     m_global_id += 1;
     return m_global_id;
   }
 
+  // total number of node created
   int count() {
     return global_count;
   }
 
+  // increase number of node
   void add_count() {
     global_count += 1;
   }

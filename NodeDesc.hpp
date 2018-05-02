@@ -1,3 +1,8 @@
+/*
+ * NodeDesc.hpp
+ * information of each Node
+ *
+=======================================================*/
 
 #ifndef __OP_DESC_HPP__
 #define __OP_DESC_HPP__
@@ -7,40 +12,29 @@
 #include <functional>
 #include <vector>
 
+// define kernel raw pointer
 typedef ArrayPtr kernel_rawptr (std::vector<ArrayPtr>&);
 
+// define kernel function pointer
 typedef std::function<kernel_rawptr> KernelPtr;
 
 //typedef std::function<ArrayPtr(std::vector<ArrayPtr>&)> KernelPtr;
 
 struct NodeDesc{
-  NodeType type;         // operator type
+  NodeType type;    // operator type
   std::string name; // operator name
   std::string sy;   // operator symbol
-  bool ew;          // if element-wise operation
-  bool cl;          // if change data layout
+  bool ew;          // is element-wise operation or not
+  bool cl;          // change data layout or not
   std::string expr; // expression form
   KernelPtr func;   // operator function address
   int rt;           // result type
 
   NodeDesc(){}
   
-  // NodeDesc(NodeType _type,
-  //          const char* _name,
-  //          const char* _sy,
-  //          bool _ew, bool _cl,
-  //          const char* _expr,
-  //          kernel_rawptr* _func,
-  //          int _rt) : type(_type), name(_name),
-  //                     sy(_sy), ew(_ew), cl(_cl), func(_func), rt(_rt){
-    
-  // }
 };
 
-
-
 typedef std::vector<NodeDesc> OpDescList;
-
 
 #endif
 

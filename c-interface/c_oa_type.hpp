@@ -21,6 +21,8 @@ extern "C" {
 
   void c_destroy_node(void*& A);
 
+  void c_display_array_info(ArrayPtr* A, char* prefix);
+
   void c_display_array(ArrayPtr* A, char* prefix);
 
   void gdb_display_range(ArrayPtr* A, int is, int ie, int js, int je, int ks, int ke);
@@ -64,9 +66,13 @@ extern "C" {
   
   void c_grid_bind(ArrayPtr*& A, int pos);
 
-  void c_local_sub(ArrayPtr*& A, int* x, int* y, int* z, double* ans); 
+  ///:for t in TYPE
+  void c_local_sub_${t[0]}$(ArrayPtr*& A, int* x, int* y, int* z, ${t[0]}$* ans); 
+  ///:endfor
 
-  void c_set_local(ArrayPtr*& A, int* x, int* y, int* z, double* val);
+  ///:for t in TYPE
+  void c_set_local_${t[0]}$(ArrayPtr*& A, int* x, int* y, int* z, ${t[0]}$* val);
+  ///:endfor
 
   void c_get_box_corners(ArrayPtr*& A, int* s);
 

@@ -64,6 +64,18 @@
        ///:endfor
     end interface consts
 
+    interface local_sub
+      ///:for t in TYPE
+      module procedure local_sub_${t[0]}$
+      ///:endfor
+    end interface local_sub
+
+    interface set_local
+      ///:for t in TYPE
+      module procedure set_local_${t[0]}$
+      ///:endfor
+    end interface set_local
+
     ///:for t in TYPE
     interface
        subroutine c_new_seqs_scalar_node_${t[0]}$ &
@@ -319,6 +331,23 @@
 
       if(is_rvalue(A)) call destroy(A)
       
+    end subroutine
+    
+    subroutine display_info(A, prefix)
+      use iso_c_binding
+      type(array), intent(in) :: A
+      character(len=*):: prefix
+      interface
+         subroutine c_display_array_info(A, prefix) &
+              bind(C, name = 'c_display_array_info')
+           use iso_c_binding
+           type(c_ptr), intent(in), VALUE :: A
+           character(kind=c_char),  intent(in)  :: prefix(*)
+         end subroutine
+      end interface
+
+      !ASSERT_LVALUE(A)      
+      call c_display_array_info(A%ptr, string_f2c(prefix))
     end subroutine
     
     subroutine display_array(A, prefix)
@@ -688,55 +717,61 @@
       call c_update_ghost(A%ptr)
     end subroutine 
 
-    function local_sub(A, x, y, z) result(res)
+    ///:for t in TYPE
+    subroutine local_sub_${t[0]}$(A, x, y, z, val)
       implicit none
       interface
-        subroutine c_local_sub(a, x, y, z, s) &
-          bind(C, name = "c_local_sub")
+        subroutine c_local_sub_${t[0]}$(a, x, y, z, s) &
+          bind(C, name = "c_local_sub_${t[0]}$")
         use iso_c_binding
            implicit none
            type(c_ptr) :: a
            integer :: x, y, z
-           real(8), intent(out) :: s
+           ${t[1]}$, intent(out) :: s
          end subroutine
       end interface
 
       type(array) :: A
       integer :: x, y, z
       integer :: rx, ry, rz
-      real(8) :: res
+      ${t[1]}$ :: val
       rx = x - 1
       ry = y - 1
       rz = z - 1
 
-      call c_local_sub(A%ptr, rx, ry, rz, res)
+      call c_local_sub_${t[0]}$(A%ptr, rx, ry, rz, val)
 
-    end function
+    end subroutine
 
-    subroutine set_local(A, x, y, z, val)
+    ///:endfor
+
+    ///:for t in TYPE
+    subroutine set_local_${t[0]}$(A, x, y, z, val)
       implicit none
       interface
-        subroutine c_set_local(a, x, y, z, val) &
-          bind(C, name = "c_set_local")
-        use iso_c_binding
+        subroutine c_set_local_${t[0]}$(a, x, y, z, val) &
+          bind(C, name = "c_set_local_${t[0]}$") 
+        use iso_c_binding 
            implicit none
            type(c_ptr) :: a
            integer :: x, y, z
-           real(8) :: val
+           ${t[1]}$ :: val
          end subroutine
       end interface
 
       type(array) :: A
       integer :: x, y, z
       integer :: rx, ry, rz
-      real(8) :: val
-      rx = x - 1
+      ${t[1]}$ :: val
+      rx = x - 1 
       ry = y - 1
       rz = z - 1
 
-      call c_set_local(A%ptr, rx, ry, rz, val)
+      call c_set_local_${t[0]}$(A%ptr, rx, ry, rz, val)
 
     end subroutine 
+    
+    ///:endfor
 
     function shape_node(A) result(res)
       implicit none

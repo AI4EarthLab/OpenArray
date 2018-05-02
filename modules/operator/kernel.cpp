@@ -71,17 +71,17 @@ namespace oa {
       Shape us = u->shape();
 
       std::string err_msg =
-        (boost::format("unable to perform \"%1%\" "
-                "on array of shape (%2%,%3%,%4%)")
-                % "${name.upper()}$"
-                % us[0] % us[1] % us[2]).str();
+        "unable to perform ${name.upper()}$ on array of shape (" +
+        to_string(us[0]) + "," + 
+        to_string(us[1]) + "," + 
+        to_string(us[2]) + ")";
         
       ///:if name[1].lower()   == 'x'
-      if(us[0] < 2) THROW_LOGIC_EXCEPTION(err_msg);
+      if(us[0] < 2) assert(false && err_msg.c_str());
       ///:elif name[1].lower() == 'y'
-      if(us[1] < 2) THROW_LOGIC_EXCEPTION(err_msg);
+      if(us[1] < 2) assert(false && err_msg.c_str());
       ///:elif name[1].lower() == 'z'
-      if(us[2] < 2) THROW_LOGIC_EXCEPTION(err_msg);
+      if(us[2] < 2) assert(false && err_msg.c_str());
       ///:endif
       
 

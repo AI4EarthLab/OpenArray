@@ -68,7 +68,7 @@ namespace oa {
       vector<int> vi = upar->get_procs_3d(rankID);
 
       int xs, xe, ys, ye, zs, ze;
-      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      u->get_local_box().get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
       int buffersize = (ye-ys-2*sw)*(ze-zs-2*sw);
       T * buffer = new T[buffersize];
 
@@ -134,7 +134,7 @@ namespace oa {
       vector<int> vi = upar->get_procs_3d(rankID);
 
       int xs, xe, ys, ye, zs, ze;
-      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      u->get_local_box().get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
       int buffersize = (xe-xs-2*sw)*(ze-zs-2*sw);
       T * buffer = new T[buffersize];
 
@@ -203,7 +203,7 @@ namespace oa {
       vector<int> vi = upar->get_procs_3d(rankID);
 
       int xs, xe, ys, ye, zs, ze;
-      u->get_local_box().get_corners(xs, xe, ys, ye, zs, ze, sw);
+      u->get_local_box().get_corners_with_stencil(xs, xe, ys, ye, zs, ze, sw);
       int buffersize = (xe-xs-2*sw)*(ye-ys-2*sw);
       T * buffer = new T[buffersize];
 

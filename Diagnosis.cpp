@@ -1,6 +1,11 @@
-#include "ArrayPool.hpp"
-#include "MPI.hpp"
+/*
+ * Diagnosis.cpp:
+ *
+=======================================================*/
+
 #include "mpi.h"
+#include "MPI.hpp"
+#include "ArrayPool.hpp"
 
 namespace oa{
   namespace diag{
@@ -33,7 +38,8 @@ namespace oa{
       }
       ///:endfor
       default:
-        THROW_LOGIC_EXCEPTION("unsupported datatype.");
+        printf("unsupported datatype.\n");
+        exit(0);
         break;
       }
 

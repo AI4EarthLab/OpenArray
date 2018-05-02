@@ -1304,7 +1304,117 @@ namespace oa {
       code<<__code.str()<<";\n  }\n  return ;\n}}";
     }
 /*
+    void code_add_calc_outside(stringstream& code, 
+      stringstream& __code, DATA_TYPE dt, int& id, int& S_id) {
+      
+      code<<"  int3* int3_p = (int3*)(list["<<id + 1<<"]);\n";
+      for (int i = 0; i <= S_id; i++) {
+        code<<"  const int3 &S"<<i<<" = int3_p["<<i<<"];\n";
+        code<<"  const int S"<<i<<"_0 = int3_p["<<i<<"][0];\n";
+        code<<"  const int S"<<i<<"_1 = int3_p["<<i<<"][1];\n";
+      }
+      code<<"\n";
+      code<<"  const int3 &lbound = int3_p["<<S_id + 1<<"];\n";
+      code<<"  const int3 &rbound = int3_p["<<S_id + 2<<"];\n";
+      code<<"  const int3 &sp = int3_p["<<S_id + 3<<"];\n\n";
 
+      string ans_type[3];
+      ans_type[DATA_INT] = "(int*)";
+      ans_type[DATA_FLOAT] = "(float*)";
+      ans_type[DATA_DOUBLE] = "(double*)";
+
+      // lbound[2]
+      code<<"  if (lbound[2]) {\n";
+      code<<"    for (int k = o; k < o + lbound[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+      
+      // rbound[2]
+      code<<"  if (rbound[2]) {\n";
+      code<<"    for (int k = o + sp[2] - rbound[2]; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+
+
+      // lbound[1]
+      code<<"  if (lbound[1]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + lbound[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+      
+      // rbound[1]
+      code<<"  if (rbound[1]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o + sp[1] - rbound[1]; j < o + sp[1]; j++) {\n";
+      code<<"      #pragma simd\n";
+      code<<"      #pragma clang loop vectorize(assume_safety)\n";
+      code<<"      #pragma clang loop interleave(enable)\n";
+      code<<"      #pragma clang loop vectorize_width(8) interleave_count(1)\n";
+      code<<"        for (int i = o; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+
+      // lbound[0]
+      code<<"  if (lbound[0]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"        for (int i = o; i < o + lbound[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+      
+      // rbound[0]
+      code<<"  if (rbound[0]) {\n";
+      code<<"    for (int k = o; k < o + sp[2]; k++) {\n";
+      code<<"      for (int j = o; j < o + sp[1]; j++) {\n";
+      code<<"        for (int i = o + sp[0] - rbound[0]; i < o + sp[0]; i++) {\n";
+      code<<"          ("<<ans_type[dt]<<"(list["<<id<<"]))[calc_id2(i,j,k,S"
+                       <<S_id<<"_0,S"<<S_id<<"_1)] = "<<__code.str()<<";\n";
+      code<<"        }\n";
+      code<<"      }\n";
+      code<<"    }\n";
+      code<<"  }\n\n";
+
+      code<<"  return ;\n}}";
+
+    }
     */
 
     void code_add_calc_inside(stringstream& code, 

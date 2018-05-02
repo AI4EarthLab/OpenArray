@@ -1,10 +1,16 @@
+/*
+ * Function.hpp
+ * some basic functions in OpenArray
+ *
+=======================================================*/
+
 #ifndef __FUNCTION_HPP__
 #define __FUNCTION_HPP__
 
 #include "common.hpp"
-#include "utils/utils.hpp"
 #include "Internal.hpp"
 #include "ArrayPool.hpp"
+#include "utils/utils.hpp"
 
 namespace oa {
   namespace funcs {
@@ -15,10 +21,8 @@ namespace oa {
       int data_type = oa::utils::to_type<T>();
       ArrayPtr ap = ArrayPool::global()->get(comm, s, stencil_width, data_type);
       Box box = ap->get_local_box();
-      int size = box.size(stencil_width);
+      int size = box.size_with_stencil(stencil_width);
       oa::internal::set_buffer_consts((T*)ap->get_buffer(), size, val);
-      // if(comm == MPI_COMM_SELF) ap->set_seqs();
-      // if(ap->shape() == SCALAR_SHAPE) ap->set_scalar();
       return ap;
     }
 
@@ -29,10 +33,8 @@ namespace oa {
       int data_type = oa::utils::to_type<T>();
       ArrayPtr ap = ArrayPool::global()->get(comm, x, y, z, stencil_width, data_type);
       Box box = ap->get_local_box();
-      int size = box.size(stencil_width);
+      int size = box.size_with_stencil(stencil_width);
       oa::internal::set_buffer_consts((T*)ap->get_buffer(), size, val);
-      // if(comm == MPI_COMM_SELF) ap->set_seqs();
-      // if(ap->shape() == SCALAR_SHAPE) ap->set_scalar();
       return ap;
     }
 
@@ -59,9 +61,53 @@ namespace oa {
     // A = transfer(src, pp)
     ArrayPtr transfer(const ArrayPtr &src, const PartitionPtr &pp);
 
-    double local_sub(const ArrayPtr &ap, int x, int y, int z); 
+    template <typename T>
+    void local_sub(const ArrayPtr &ap, int x, int y, int z, T* val)  {
+      Box b(x, x+1, y, y+1, z, z+1);
+      Box local_box = ap->get_local_box();
+      int sw = ap->get_stencil_width();
+      x -= local_box.xs();
+      y -= local_box.ys();
+      z -= local_box.zs();
+      switch(ap->get_data_type()) {
+      case DATA_INT:
+        *val = oa::internal::get_buffer_local_sub((int*)ap->get_buffer(), 
+            local_box, x, y, z, sw);
+        break;
+      case DATA_FLOAT:
+        *val = oa::internal::get_buffer_local_sub((float*)ap->get_buffer(), 
+            local_box, x, y, z, sw);
+        break;
+      case DATA_DOUBLE:
+        *val = oa::internal::get_buffer_local_sub((double*)ap->get_buffer(), 
+            local_box, x, y, z, sw);
+        break;
+      }
+    }
 
-    void set_local(const ArrayPtr &ap, int x, int y, int z, double val); 
+    template <typename T>
+    void set_local(const ArrayPtr &ap, int x, int y, int z, T val) {
+      Box b(x, x+1, y, y+1, z, z+1);
+      Box local_box = ap->get_local_box();
+      int sw = ap->get_stencil_width();
+      x -= local_box.xs();
+      y -= local_box.ys();
+      z -= local_box.zs();
+      switch(ap->get_data_type()) {
+      case DATA_INT:
+        oa::internal::set_buffer_local((int*)ap->get_buffer(), 
+            local_box, x, y, z, (int)val, sw);
+        break;
+      case DATA_FLOAT:
+        oa::internal::set_buffer_local((float*)ap->get_buffer(), 
+            local_box, x, y, z, (float)val, sw);
+        break;
+      case DATA_DOUBLE:
+        oa::internal::set_buffer_local((double*)ap->get_buffer(), 
+            local_box, x, y, z, (double)val, sw);
+        break;
+      }
+    }
 
     // get a sub Array based on Box b
     ArrayPtr subarray(const ArrayPtr &ap, const Box &box);

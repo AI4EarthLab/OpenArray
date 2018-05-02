@@ -17,7 +17,7 @@ namespace oa{
       np->set_pos(u->get_pos());
 
       np->set_depth(u->get_depth());
-      np->set_shape(b.shape(0));
+      np->set_shape(b.shape());
 
       np->set_data_type(u->get_data_type());
       np->set_lbound(u->get_lbound());
@@ -38,7 +38,7 @@ namespace oa{
       np->set_pos(u->get_pos());
 
       np->set_depth(0);
-      np->set_shape(b.shape(0));
+      np->set_shape(b.shape());
 
       np->set_data_type(u->get_data_type());
 
