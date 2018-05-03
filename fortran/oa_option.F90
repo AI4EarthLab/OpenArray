@@ -1,4 +1,4 @@
-
+#ifndef SUNWAY
 module oa_option
   use oa_type
   ///:mute
@@ -42,3 +42,4 @@ contains
   ///:endfor
   ///:endfor
 end module
+#endif

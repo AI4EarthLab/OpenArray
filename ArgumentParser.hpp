@@ -1,4 +1,4 @@
-
+#ifndef SUNWAY
 #ifndef __ARGUMENTPARSER_HPP__
 #define __ARGUMENTPARSER_HPP__
 
@@ -57,4 +57,5 @@ public:
   }
 };
 
+#endif
 #endif

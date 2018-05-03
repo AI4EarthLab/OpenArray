@@ -1,4 +1,5 @@
 
+#ifndef SUNWAY
 #include "../ArgumentParser.hpp"
 #include <iostream>
 
@@ -33,3 +34,4 @@ extern "C"{
   ///:endfor
   ///:endfor
 }
+#endif
