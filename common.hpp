@@ -2,6 +2,7 @@
 #define __COMMON_H__
 
 #include <array>
+#include <assert.h>
 
 #include "otype.hpp"
 

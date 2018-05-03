@@ -6,7 +6,6 @@
 #include <mpi.h>
 #include <algorithm>
 #include <type_traits>
-#include <boost/format.hpp>
 #include "../common.hpp"
 #include <armadillo>
 #include <iomanip>
@@ -95,7 +94,7 @@ namespace oa {
           std::cout<<"i = "<<std::setw(1+(int)log10(M))<<i;
           for(int j = 0; j < N; ++j) {
             if(printlocal && (j < js || j > je)) continue;
-            std::cout<<boost::format(frt_str) % (buf[i + j * M + k * M * N] * val);
+            printf(frt_str.c_str(), buf[i + j * M + k * M * N] * val);
           }
           std::cout<<std::endl;
         }

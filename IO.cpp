@@ -11,6 +11,8 @@
 #include "Function.hpp"
 #include "Partition.hpp"
 
+#include <assert.h>
+
 #define CHECK_ERR(status)                               \
   if (status != NC_NOERR) {                             \
     fprintf(stderr, "error found line:%d, msg : %s\n",  \

@@ -9,6 +9,8 @@
 #include "Operator.hpp"
 #include "MPI.hpp"
 
+#include <assert.h>
+
 using namespace std;
 
 Node::Node() {}
