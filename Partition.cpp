@@ -25,75 +25,78 @@ Partition::Partition(MPI_Comm comm, int size, const Shape& gs, int sw) :
 
   assert(gs[0] > 0 && gs[1] > 0 && gs[2] > 0 && size > 0 &&
           "incorrect parameter.");
+  if(comm != MPI_COMM_SELF){
+    double tot = gs[0] + gs[1] + gs[2];
+    double fx = gs[0] / tot;
+    double fy = gs[1] / tot;
+    double fz = gs[2] / tot;
 
-  double tot = gs[0] + gs[1] + gs[2];
-  double fx = gs[0] / tot;
-  double fy = gs[1] / tot;
-  double fz = gs[2] / tot;
+    m_procs_shape = Partition::get_default_procs_shape();
 
-  m_procs_shape = Partition::get_default_procs_shape();
+    int x; bool x_fixed = false;
+    int y; bool y_fixed = false;
+    int z; bool z_fixed = false;
 
-  int x; bool x_fixed = false;
-  int y; bool y_fixed = false;
-  int z; bool z_fixed = false;
-  
-  if(m_procs_shape[0] > 0){
-    x = m_procs_shape[0];
-    x_fixed = true;
-  }
-  
-  if(m_procs_shape[1] > 0){
-    y = m_procs_shape[1];
-    y_fixed = true;
-  }
-  
-  if(m_procs_shape[2] > 0){
-    z = m_procs_shape[2];
-    z_fixed = true;
-  }
+    if(m_procs_shape[0] > 0){
+      x = m_procs_shape[0];
+      x_fixed = true;
+    }
 
-  double factor = 3.0;
-  double tsz = size;
+    if(m_procs_shape[1] > 0){
+      y = m_procs_shape[1];
+      y_fixed = true;
+    }
 
-  // find the approriate process shape by given total mpi size & array global shape
-  for (int i = x_fixed?x:1; i <= (x_fixed?x:size); i++)
-    if (size % i == 0) {
-      int ed = size / i;
-      for (int j = y_fixed?y:1; j <= (y_fixed?y:ed); j++)
-        if (ed % j == 0) {
-          int k = z_fixed?z:(ed / j);
-          if(i * j * k != size) continue;
-          tsz = i + j + k;
-          double dfx = fx - i * double(1.0) / tsz;
-          double dfy = fy - j * double(1.0) / tsz;
-          double dfz = fz - k * double(1.0) / tsz;
-          double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
-          //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
-          if (factor >= new_factor) {
-            m_procs_shape = {{i, j, k}};
-            factor = new_factor;
+    if(m_procs_shape[2] > 0){
+      z = m_procs_shape[2];
+      z_fixed = true;
+    }
+
+    double factor = 3.0;
+    double tsz = size;
+
+    // find the approriate process shape by given total mpi size & array global shape
+    for (int i = x_fixed?x:1; i <= (x_fixed?x:size); i++)
+      if (size % i == 0) {
+        int ed = size / i;
+        for (int j = y_fixed?y:1; j <= (y_fixed?y:ed); j++)
+          if (ed % j == 0) {
+            int k = z_fixed?z:(ed / j);
+            if(i * j * k != size) continue;
+            tsz = i + j + k;
+            double dfx = fx - i * double(1.0) / tsz;
+            double dfy = fy - j * double(1.0) / tsz;
+            double dfz = fz - k * double(1.0) / tsz;
+            double new_factor = dfx * dfx + dfy * dfy + dfz * dfz;
+            //cout<<factor<<" "<<new_factor<<" "<<i<<" "<<j<<" "<<k<<endl;
+            if (factor >= new_factor) {
+              m_procs_shape = {{i, j, k}};
+              factor = new_factor;
+            }
           }
-        }
+      }
+
+    if (Partition::get_default_auto_3d_procs_shape() == false && 
+        gs[0] > 1 && gs[1] > 1 && gs[2] > 1) {
+
+      Partition::set_default_procs_shape(m_procs_shape);
+      Partition::set_default_auto_3d_procs_shape(true);
+
     }
 
-  if (Partition::get_default_auto_3d_procs_shape() == false && 
-      gs[0] > 1 && gs[1] > 1 && gs[2] > 1) {
+    // for debug
+    // printf("(%d, %d, %d) %d, %d, %d\n",
+    //         gs[0], gs[1], gs[2],
+    //         m_procs_shape[0],
+    //         m_procs_shape[1],
+    //         m_procs_shape[2]);
 
-    Partition::set_default_procs_shape(m_procs_shape);
-    Partition::set_default_auto_3d_procs_shape(true);
-
-    }
-  
-  // for debug
-  // printf("(%d, %d, %d) %d, %d, %d\n",
-  //         gs[0], gs[1], gs[2],
-  //         m_procs_shape[0],
-  //         m_procs_shape[1],
-  //         m_procs_shape[2]);
-    
-  assert(m_procs_shape[0] > 0 &&
-          "can not find proper procs shape.");
-
+    assert(m_procs_shape[0] > 0 &&
+        "can not find proper procs shape.");
+  }
+  else{
+    m_procs_shape = {{1,1,1}};
+  }
   m_lx = vector<int> (m_procs_shape[0], gs[0] / m_procs_shape[0]);
   m_ly = vector<int> (m_procs_shape[1], gs[1] / m_procs_shape[1]);
   m_lz = vector<int> (m_procs_shape[2], gs[2] / m_procs_shape[2]);
