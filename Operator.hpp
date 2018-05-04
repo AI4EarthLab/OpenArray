@@ -1,3 +1,9 @@
+/*
+ * Operator.hpp
+ * evaluate the expression graph
+ *
+=======================================================*/
+
 #ifndef __OPERATOR_HPP__
 #define __OPERATOR_HPP__ 
 
@@ -17,8 +23,6 @@ namespace oa {
     NodePtr new_node(const ArrayPtr &ap);
 
     NodePtr new_node(NodeType type, NodePtr u, NodePtr v);
-
-    NodePtr new_node(NodeType type, NodePtr u);
 
     const NodeDesc& get_node_desc(NodeType type);
 

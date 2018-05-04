@@ -1,3 +1,9 @@
+/*
+ * Operator.cpp
+ * evaluate the expression graph
+ *
+=======================================================*/
+
 #include "Operator.hpp"
 #include "utils/utils.hpp"
 #include "utils/calcTime.hpp"
@@ -13,13 +19,12 @@
 
 using namespace oa::kernel;
 
-// void c_has_nan_or_inf(int* res, ArrayPtr** ap, int skip_sw);
-
-  
 namespace oa {
   namespace ops{
 
     NodePtr new_node(const ArrayPtr &ap) {
+
+      // cout<<"why in new_node array ????"<<endl;
       NodePtr np = NodePool::global()->get();
       np->set_type(TYPE_DATA);
       np->set_data(ap);
@@ -35,12 +40,14 @@ namespace oa {
     }
 
     NodePtr new_node(NodeType type, NodePtr u, NodePtr v){
+      cout<<"why in new_node (type, u, v) ????"<<endl;
       NodePtr np = NodePool::global()->get();
       np->set_type(type);
       np->add_input(0, u);
       np->add_input(1, v);
       
       const NodeDesc &nd = get_node_desc(type);
+      cout<<"nd.name is "<<nd.name<<endl;
       // set dt for ans, ans = u type v
       int dt = nd.rt;
       if (TYPE_PLUS <= type && type <= TYPE_DIVD) {
@@ -80,102 +87,6 @@ namespace oa {
      
       return np;
     }
-
-    NodePtr new_node(NodeType type, NodePtr u){
-      NodePtr np = NodePool::global()->get();
-      np->set_type(type);
-      np->add_input(0, u);
-      
-      const NodeDesc &nd = get_node_desc(type);
-      int dt = u->get_data_type();
-      if (TYPE_EXP <= type && type <= TYPE_DZF) dt = nd.rt;
-      if (type == TYPE_UPLUS or type == TYPE_UMINUS) dt = u->get_data_type();
-      if (type == TYPE_NOT) dt = nd.rt;
-
-      // only OP will change grid pos
-      np->set_pos(u->get_pos());
-
-      if (nd.ew) {
-        np->set_depth(u->get_depth());
-        np->set_shape(u->shape());
-
-        np->set_data_type(dt);
-        np->set_lbound(u->get_lbound());
-        np->set_rbound(u->get_rbound());
-        
-
-        if (TYPE_AXB <= type && type <= TYPE_DZF) {
-          int3 lb, rb;
-          switch (type) {
-            case TYPE_AXB:
-            case TYPE_DXB:
-              lb = {{1, 0, 0}};
-              rb = {{0, 0, 0}};
-              break;
-            case TYPE_AXF:
-            case TYPE_DXF:
-              lb = {{0, 0, 0}};
-              rb = {{1, 0, 0}}; 
-              break;
-            case TYPE_AYB:
-            case TYPE_DYB:
-              lb = {{0, 1, 0}};
-              rb = {{0, 0, 0}}; 
-              break;
-            case TYPE_AYF:
-            case TYPE_DYF:
-              lb = {{0, 0, 0}};
-              rb = {{0, 1, 0}}; 
-              break;
-            case TYPE_AZB:
-            case TYPE_DZB:
-              lb = {{0, 0, 1}};
-              rb = {{0, 0, 0}}; 
-              break;
-            case TYPE_AZF:
-            case TYPE_DZF:
-              lb = {{0, 0, 0}};
-              rb = {{0, 0, 1}}; 
-              break;
-          }
-
-          int3 new_lb = u->get_lbound();
-          int3 new_rb = u->get_rbound();
-          
-          int mx = 0;
-          for (int i = 0; i < 3; i++) {
-            new_lb[i] += lb[i];
-            mx = max(new_lb[i], mx);
-            new_rb[i] += rb[i];
-            mx = max(new_rb[i], mx);
-          }
-
-          // set default max stencil as two
-          if (mx > 1) {
-            np->set_lbound(lb);
-            np->set_rbound(rb);
-            u->set_update();
-          } else {
-            np->set_lbound(new_lb);
-            np->set_rbound(new_rb);
-          }
-        }
-
-        if(u->get_pos() != -1){
-          np->set_pos(Grid::global()->get_pos(u->get_pos(), type));
-        }
-
-      } else {
-        // to do set data_type && shape
-        np->set_lbound({{0, 0, 0}});
-        np->set_rbound({{0, 0, 0}});
-        np->set_update();
-        np->set_data_type(dt);
-      }
-      return np;
-    }
-
-
 
     //! get description of an operator for a given type
     const NodeDesc& get_node_desc(NodeType type){

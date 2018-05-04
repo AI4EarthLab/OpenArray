@@ -552,7 +552,6 @@
 
       ///:if t == 'array'
       call c_new_node_array(NA%ptr, A%ptr)
-      !call c_new_node_op1(B%ptr, ${n[0]}$,NA%ptr)
       
       call c_new_node_${name}$(B%ptr, NA%ptr)
       ///:else
