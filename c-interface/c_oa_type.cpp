@@ -214,12 +214,6 @@ extern "C" {
     *ptr = oa::ops::new_node((NodeType)nodetype, *u, *v);
   }
 
-  void c_new_node_op1(NodePtr* &ptr, int nodetype, NodePtr* &u) {
-    if (ptr == NULL) ptr = new NodePtr();
-    
-    *ptr = oa::ops::new_node((NodeType)nodetype, *u);
-  }
-
   void c_new_local_int3(NodePtr* &ptr, int* val){
     if (ptr == NULL) ptr = new NodePtr();
 

@@ -57,8 +57,6 @@ extern "C" {
   void c_new_node_op2(NodePtr* &ptr, int nodetype,
           NodePtr* &u, NodePtr* &v);
 
-  void c_new_node_op1(NodePtr* &ptr, int nodetype, NodePtr* &u);
-
   void c_new_local_int3(NodePtr* &B, int* val);
 
   void c_grid_init (char* ch, const ArrayPtr*& A,

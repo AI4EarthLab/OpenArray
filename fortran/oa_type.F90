@@ -108,16 +108,6 @@
     end interface
 
     interface
-       subroutine c_new_node_op1(A, nodetype, U) &
-            bind(C, name='c_new_node_op1')
-         use iso_c_binding
-         type(c_ptr), intent(inout) :: A
-         type(c_ptr), intent(in) :: U 
-         integer(c_int), intent(in), VALUE :: nodetype
-       end subroutine
-    end interface
-
-    interface
        subroutine c_new_node_csum(A, U, V) &
             bind(C, name='c_new_node_csum')
          use iso_c_binding
