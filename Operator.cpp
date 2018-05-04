@@ -22,9 +22,8 @@ using namespace oa::kernel;
 namespace oa {
   namespace ops{
 
+    // needs to set all attributes to the new node
     NodePtr new_node(const ArrayPtr &ap) {
-
-      // cout<<"why in new_node array ????"<<endl;
       NodePtr np = NodePool::global()->get();
       np->set_type(TYPE_DATA);
       np->set_data(ap);
@@ -39,47 +38,18 @@ namespace oa {
       return np;
     }
 
+    // only operator min_max & rep will call this function
+    // other binary operator will call new_node_type in modules
     NodePtr new_node(NodeType type, NodePtr u, NodePtr v){
-      cout<<"why in new_node (type, u, v) ????"<<endl;
       NodePtr np = NodePool::global()->get();
       np->set_type(type);
       np->add_input(0, u);
       np->add_input(1, v);
+      np->set_lbound({{0, 0, 0}});
+      np->set_rbound({{0, 0, 0}});
+      np->set_update();
+      np->set_data_type(u->get_data_type());
       
-      const NodeDesc &nd = get_node_desc(type);
-      cout<<"nd.name is "<<nd.name<<endl;
-      // set dt for ans, ans = u type v
-      int dt = nd.rt;
-      if (TYPE_PLUS <= type && type <= TYPE_DIVD) {
-        dt = oa::utils::cast_data_type(
-                                     u->get_data_type(),
-                                     v->get_data_type());
-      }
- 
-      if (nd.ew) {
-        np->set_depth(u->get_depth(), v->get_depth());
-        // U and V must have same shape
-        if (u->is_seqs_scalar()) np->set_shape(v->shape());
-        else if (v->is_seqs_scalar()) np->set_shape(u->shape());
-        else {
-          /*
-          pseudo 3d, so don't have to assert
-          assert(oa::utils::is_equal_shape(u->shape(), v->shape()));
-          */
-          np->set_shape(u->shape());
-        }
-        np->set_data_type(dt);
-        np->set_lbound(u->get_lbound(), v->get_lbound());
-        np->set_rbound(u->get_rbound(), v->get_rbound());
-      } else {
-        np->set_lbound({{0, 0, 0}});
-        np->set_rbound({{0, 0, 0}});
-        np->set_update();
-        np->set_data_type(dt);
-      }
-      
-      // u & v must in the same grid pos
-      //assert(u->get_pos() == v->get_pos());
       if(u->get_pos() != -1)
         np->set_pos(u->get_pos());
       else if(v->get_pos() != -1)
@@ -88,7 +58,6 @@ namespace oa {
       return np;
     }
 
-    //! get description of an operator for a given type
     const NodeDesc& get_node_desc(NodeType type){
 
       static bool has_init = false;                                            
@@ -189,7 +158,6 @@ namespace oa {
       }
     }
 
-    // eval without kernel fusion
     ArrayPtr force_eval(NodePtr A) {
       if (A->has_data()) return A->get_data();
 
@@ -200,46 +168,12 @@ namespace oa {
 
       const NodeDesc& nd = get_node_desc(A->type());
       KernelPtr kernel_addr = nd.func;
-      //printf("kernel : %p\n", kernel_addr.target< kernel_rawptr* >());
       ArrayPtr ap = kernel_addr(ops_ap);
-      //A->set_data(ap);
       ap->set_pseudo(A->is_pseudo());
       ap->set_bitset(A->get_bitset());
       ap->set_pos(A->get_pos());
 
       return ap;
-    }
-
-
-    // prepare kernel fusion parameters
-    void get_kernel_parameter(NodePtr A, vector<void*> &list, 
-      PartitionPtr &ptr) {
-      ArrayPtr ap;
-      // data
-      if (A->has_data()) {
-        ap = A->get_data();
-        list.push_back(ap->get_buffer());
-        if (ptr == NULL && !(ap->is_seqs_scalar())) {
-          ptr = ap->get_partition();
-        }
-        return ;
-      }
-
-      // not element wise, need eval
-      const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew || A->need_update()) {
-        ArrayPtr ap = eval(A);
-        list.push_back(ap->get_buffer());
-        if (ptr == NULL && !(ap->is_seqs_scalar())) {
-          ptr = ap->get_partition();
-        }
-        return ;
-      }
-
-      // tree
-      for (int i = 0; i < A->input_size(); i++) {
-        get_kernel_parameter(A->input(i), list, ptr);
-      }
     }
 
     int3 change_lbound(NodeType type, int3 lb) {

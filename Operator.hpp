@@ -15,28 +15,30 @@
 namespace oa {
   namespace ops {
 
+    // create a new sequences scalar node
     template<class T>
     NodePtr new_seqs_scalar_node(T val){
       return(NodePool::global()->get_seqs_scalar(val));
     }
     
+    // create a new node based on ArrayPtr ap
     NodePtr new_node(const ArrayPtr &ap);
 
+    // create a new node on binaray operator 
+    // which NodeType is type & input is u and v
     NodePtr new_node(NodeType type, NodePtr u, NodePtr v);
 
+    //! get description of an operator for a given type
     const NodeDesc& get_node_desc(NodeType type);
 
+    // write the expression graph into graph.dot
     void write_graph(const NodePtr& root, bool is_root = true,
                      const char *filename = "graph.dot");
 
-    ArrayPtr eval(NodePtr A);
-
-    // ArrayPtr eval_with_op(NodePtr A);
-
+    // force eval expression graph, eval without fusion kernels
     ArrayPtr force_eval(NodePtr A);
 
-    void get_kernel_parameter(NodePtr A, vector<void*> &list, 
-      PartitionPtr &ptr);
+    ArrayPtr eval(NodePtr A);
 
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
       vector<int3> &S, PartitionPtr &ptr);
