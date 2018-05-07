@@ -63,6 +63,7 @@ namespace oa {
       static bool has_init = false;                                            
       static OpDescList s;
       
+      // use NodeType.fypp to initialize the NodeDesc
       if (!has_init) {
         s.resize(NUM_NODE_TYPES);
         ///:mute
@@ -123,6 +124,7 @@ namespace oa {
       return s.at(type);
     }
 
+    // write the expression graph into filename.dot
     void write_graph(const NodePtr& root, bool is_root,
             const char *filename) {
       if (MPI_RANK > 0) return ;
@@ -158,6 +160,7 @@ namespace oa {
       }
     }
 
+    // force eval the expression graph, only use basic kernels
     ArrayPtr force_eval(NodePtr A) {
       if (A->has_data()) return A->get_data();
 
@@ -176,6 +179,7 @@ namespace oa {
       return ap;
     }
 
+    // based on specific NodeType to change the lbound
     int3 change_lbound(NodeType type, int3 lb) {
       switch (type) {
         case TYPE_AXB:
@@ -199,6 +203,7 @@ namespace oa {
       return lb;
     }
 
+    // based on specific NodeType to change the rbound
     int3 change_rbound(NodeType type, int3 rb) {
       switch (type) {
         case TYPE_AXF:
@@ -222,17 +227,37 @@ namespace oa {
       return rb;
     }
 
-    // prepare kernel fusion parameters with operator
+    //
+    // =======================================================
+    // to evaluate expression like A = B + C + D
+    // we need to pass parameters to the fusion kernel
+    // like: the data pointer to ans A, parameters B, C & D
+    //       the shape of ans A, parameters B, C & D etc.
+    // =======================================================
+    //
+    // NodePtr A :  the root of (sub)expression graph
+    // list:        the data list which used in fusion kernel
+    // update_list: the array list which needs to update boundary 
+    // S:           the shape of array in data list which used in fusion kernel
+    // ptr:         the final Partition pointer of ans
+    // bt:          the final bitset of ans
+    // lb_list:     the lbound list of array in data list which used in fusion kernel
+    // rb_list:     the rbound list of array in data list which used in fusion kernel
+    // lb_now:      the 
+    // rb_now:
+    // data_list:   the data list of different shape, to check whether data has to transfer or not
+    //
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
       vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, 
       bitset<3> &bt, vector<int3> &lb_list, vector<int3> &rb_list,
       int3 lb_now, int3 rb_now, vector<ArrayPtr> &data_list) {
       bool find_in_data_list;
       ArrayPtr ap;
-      // data
+      // 1. the Node is a data node, put data into list
       if (A->has_data()) {
         ap = A->get_data();
 
+        // 1.1 to check whether the ap needs to transfer or not
         if(!ap->is_scalar())
         {
           find_in_data_list = false;
@@ -240,14 +265,17 @@ namespace oa {
             if(ap->shape() == data_list[i]->shape()){
               PartitionPtr pp = ap->get_partition();
               if(!(pp->equal(data_list[i]->get_partition()))){
+                // ap has the same shape with data_list[i], but the partition is not the same
                 ap = oa::funcs::transfer(ap, data_list[i]->get_partition());
               }
               find_in_data_list  = true;
               break;
             }
           }
+          // it's the first time the shape appears
           if(!find_in_data_list) data_list.push_back(ap);
         }
+
         // ap is a pseudo 3d, need to make_pseudo_3d
         if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
           if (ap->has_pseudo_3d() == false) {
@@ -344,12 +372,12 @@ namespace oa {
 
     // treat operator as element wise
     ArrayPtr eval(NodePtr A) {
-      // fusion kernel
+      // 1. Node has hash value, means may have an fusion kernel
       if (A->hash()) {
-        // A->display();
         // use A->hash() to get inside fusion kernel
         FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());
         if (fkptr != NULL) {
+          // prepare parameters used in fusion kernel
           vector<void*> list;
           vector<int3> S;
           vector<ArrayPtr> update_list;
@@ -370,7 +398,7 @@ namespace oa {
           int sb = lb[0] + lb[1] + lb[2] + rb[0] + rb[1] + rb[2];
           int sz = update_list.size();
           vector<MPI_Request>  reqs_list;
-          pthread_t tid;
+          // pthread_t tid;
           // step 1:  start of update boundary
           if (sb) {
             for (int i = 0; i < sz; i++){
@@ -402,52 +430,41 @@ namespace oa {
             //FusionKernelPtr out_fkptr = Jit_Driver::global()->get(A->hash() + 1);
             //if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
 
+            // set the boundary to zeros based on lb & rb becased it used illegal data
             oa::funcs::set_boundary_zeros(ap, lb, rb);
           }
 
           //cout<<"fusion-kernel called"<<endl;
           
-          //A->set_data(ap);
-          //ap->set_pseudo(A->is_pseudo());
           ap->set_bitset(A->get_bitset());
           ap->set_pos(A->get_pos());
-          ap->reset_ghost_updated();
-
-          // oa::funcs::set_ghost_zeros(ap); // add by 57
           return ap;
         }
       }
 
       
-      // data
+      // 2. Node is a data node, just return the data
       if (A->has_data()) return A->get_data();
 
-      // tree
+      // 3. Node is an operator node, and doesn't have fusion kernel
+      // first, evaluate it's child node recursively
       vector<ArrayPtr> ops_ap;
-
       for (int i = 0; i < A->input_size(); i++) {
         ops_ap.push_back(eval(A->input(i)));
       }
 
-      //printf("ATYPE=%d\n",A->type());
+      // 4. second, evaluate the node
       ArrayPtr ap;
-      if(A->type() == TYPE_REF){
+      if(A->type() == TYPE_REF) {
         ap = oa::funcs::subarray(ops_ap[0], A->get_ref());
-      }else{
+      } else {
         const NodeDesc& nd = get_node_desc(A->type());
         KernelPtr kernel_addr = nd.func;
 
-        // ops_ap[0]->display("left = ");
-        // ops_ap[1]->display("right = ");        
         ap = kernel_addr(ops_ap);
-        //A->set_data(ap);
-        //ap->set_pseudo(A->is_pseudo());
         ap->set_bitset(A->get_bitset());
         ap->set_pos(A->get_pos());
       }
-
-      ap->reset_ghost_updated();
-      // oa::funcs::set_ghost_zeros(ap); // add by 57
       return ap;
     }
 

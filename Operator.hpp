@@ -38,15 +38,14 @@ namespace oa {
     // force eval expression graph, eval without fusion kernels
     ArrayPtr force_eval(NodePtr A);
 
-    ArrayPtr eval(NodePtr A);
-
-    void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
-      vector<int3> &S, PartitionPtr &ptr);
-
+    // prepare kernel fusion parameters with operator
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
       vector<ArrayPtr> &update_list, vector<int3> &S, PartitionPtr &ptr, 
       bitset<3> &bt, vector<int3> &lb_list, vector<int3> &rb_list,
       int3 lb_now, int3 rb_now, vector<ArrayPtr> &data_list); 
+
+    // eval the expression graph by using fusion kernels
+    ArrayPtr eval(NodePtr A);
     
     const KernelPtr get_kernel_dict(size_t hash, 
                                     const char *filename = "fusion-kernels");
@@ -55,9 +54,6 @@ namespace oa {
                             const char *filename = "fusion-kernels");
 
     void gen_kernels(NodePtr A, bool is_root = true);
-
-    // void gen_kernels_JIT(NodePtr A, 
-    //     bool is_root = true);
 
     void gen_kernels_JIT_with_op(NodePtr A, 
         bool is_root = true);
