@@ -1,5 +1,5 @@
-
 module oa_option
+#ifndef SUNWAY
   use oa_type
   ///:mute
   ///:set TYPE = [['int','integer','integer(c_int)'], &
@@ -41,4 +41,5 @@ contains
   end subroutine
   ///:endfor
   ///:endfor
+#endif
 end module

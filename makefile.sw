@@ -14,15 +14,15 @@ JIT_LIB = ${EXT_PATH}/lib64/
 
 EXT_LIB_LINK = 	-lpnetcdf -lboost_program_options -lboost_filesystem \
 		-lboost_system -lboost_log -lboost_log_setup       \
-		-lboost_thread  -ldl -llapack -lblas -lgtest -ljit \
+		-lboost_thread  -ldl -ljit -larmadillo \
 		-Wl,-rpath=${JIT_LIB}
 
-oplevel0 = -O0 -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK -qopenmp
-oplevel3 = -O3 -Ofast -xHost -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK -qopenmp
+oplevel0 = -O0 -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK -qopenmp -DSUNWAY
+oplevel3 = -O3 -Ofast -xHost -w -g  -std=c++0x -DBOOST_LOG_DYN_LINK -qopenmp -DSUNWAY
 
-FC = mpiifort ${oplevel3}
-CC = mpiicc   ${oplevel3}
-CXX = mpiicpc ${oplevel3}
+FC = mpiifort ${oplevel0}
+CC = mpiicc   ${oplevel0}
+CXX = mpiicpc ${oplevel0}
 
 FCFLAGS  = 
 

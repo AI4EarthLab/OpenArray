@@ -1,4 +1,4 @@
-
+#ifndef SUNWAY
 #include "ArgumentParser.hpp"
 #include "boost/bind.hpp"
 #include<boost/algorithm/string/split.hpp>
@@ -39,4 +39,4 @@ void ArgumentParser::parse_file(char* file){
 void ArgumentParser::show(){
   std::cout<<m_ops_desc;
 }
-
+#endif

@@ -1,7 +1,9 @@
 
 #include "../Array.hpp"
 #include "../Init.hpp"
+#ifndef SUNWAY
 #include "../ArgumentParser.hpp"
+#endif
 #include "../log.hpp"
 
 extern "C"{
@@ -12,7 +14,9 @@ extern "C"{
     ps[2] = procs_shape[2];
     oa::init(fcomm, ps);
 
+#ifndef SUNWAY
     ArgumentParser::global()->set_cmdline(cmdline);
+#endif
     //oa::logging::logging_start(1);
   }
 }
