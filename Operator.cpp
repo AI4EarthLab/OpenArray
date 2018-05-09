@@ -243,8 +243,8 @@ namespace oa {
     // bt:          the final bitset of ans
     // lb_list:     the lbound list of array in data list which used in fusion kernel
     // rb_list:     the rbound list of array in data list which used in fusion kernel
-    // lb_now:      the 
-    // rb_now:
+    // lb_now:      the lbound from the root to the current node
+    // rb_now:      the rbound from the root to the current node
     // data_list:   the data list of different shape, to check whether data has to transfer or not
     //
     void get_kernel_parameter_with_op(NodePtr A, vector<void*> &list, 
@@ -276,19 +276,24 @@ namespace oa {
           if(!find_in_data_list) data_list.push_back(ap);
         }
 
-        // ap is a pseudo 3d, need to make_pseudo_3d
-        if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
+        // 1.2 ap is a pseudo 3d, need to make_pseudo_3d
+        if (ap->get_bitset() != bt && !ap->is_seqs_scalar() && ap->is_pseudo()) {
           if (ap->has_pseudo_3d() == false) {
             ap->set_pseudo_3d(oa::funcs::make_psudo3d(ap));
           }
           ap = ap->get_pseudo_3d();
         }
 
-        if (g_debug) ap->display("test");
+        // 1.3 put the array's data into list
         list.push_back(ap->get_buffer());
+
+        // 1.4 determine the answer's partition
         if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
         }
+
+        // 1.5 put the buffer shape into S which needs in fusion kernel
+        // put the lb_now & rb_now into lb_list & rb_list which needs in update boundary
         if (!A->is_seqs_scalar()) {
           S.push_back(ap->buffer_shape());
           update_list.push_back(ap);
@@ -298,15 +303,16 @@ namespace oa {
         return ;
       }
 
-      // not element wise, need eval
+      // 2. Operator node is not element wise, or need update 
       const NodeDesc &nd = get_node_desc(A->type());
       if (!nd.ew || A->need_update()) {
-        // need change need_update's state
+        // need change need_update's state in order to evaluate recursively
         bool flag = A->need_update();
         A->set_update(false);
         ArrayPtr ap = eval(A);
         A->set_update(flag);
 
+        // 2.1 to check whether the ap needs to transfer or not
         if(!ap->is_scalar())
         {
           find_in_data_list = false;
@@ -322,18 +328,24 @@ namespace oa {
           }
           if(!find_in_data_list) data_list.push_back(ap);
         }
-        // ap is a pseudo 3d, need to make_pseudo_3d
-        if (ap->get_bitset() != bt && !ap->is_seqs_scalar()) {
+        // 2.2 ap is a pseudo 3d, need to make_pseudo_3d
+        if (ap->get_bitset() != bt && !ap->is_seqs_scalar() && ap->is_pseudo()) {
           if (ap->has_pseudo_3d() == false) {
             ap->set_pseudo_3d(oa::funcs::make_psudo3d(ap));
           }
           ap = ap->get_pseudo_3d();
         }
 
+        // 2.3 put the array's data into list
         list.push_back(ap->get_buffer());
+
+        // 2.4 determine the answer's partition
         if (ptr == NULL && ap->get_bitset() == bt) {
           ptr = ap->get_partition();
         }
+
+        // 2.5 put the buffer shape into S which needs in fusion kernel
+        // put the lb_now & rb_now into lb_list & rb_list which needs in update boundary
         if (!A->is_seqs_scalar()) {
           S.push_back(ap->buffer_shape());
           update_list.push_back(ap);
@@ -343,13 +355,13 @@ namespace oa {
         return ;
       }
 
-      // tree
+      // 3. it's an operator node, get kernel parameters from it's child node 
       for (int i = 0; i < A->input_size(); i++) {
         get_kernel_parameter_with_op(A->input(i), list, update_list, S, ptr, bt,
             lb_list, rb_list, change_lbound(nd.type, lb_now), change_rbound(nd.type, rb_now), data_list);
       }
 
-      // bind grid if A.pos != -1
+      // 4. if A is OPERATOR, need to bind grid if A.pos != -1
       if (A->input_size() == 1 && A->get_pos() != -1) {
         if (nd.type == TYPE_DXC ||
             nd.type == TYPE_DYC ||
@@ -361,18 +373,20 @@ namespace oa {
             nd.type == TYPE_DZB ||
             nd.type == TYPE_DZF) {
 
-          // get grid ptr
+          // 4.1 get grid ptr
           ArrayPtr grid_ptr = Grid::global()->get_grid(A->get_pos(), nd.type);          
-          S.push_back(grid_ptr->buffer_shape());
+          // 4.2 get the grid's data into list
           list.push_back(grid_ptr->get_buffer());
-          if (g_debug) grid_ptr->display("test grid");
+          // 4.3 put the buffer shape into S
+          S.push_back(grid_ptr->buffer_shape());
+          //if (g_debug) grid_ptr->display("test grid");
         }
       }
     }
 
     // treat operator as element wise
     ArrayPtr eval(NodePtr A) {
-      // 1. Node has hash value, means may have an fusion kernel
+      // 1. Node has hash value, means may have a fusion kernel
       if (A->hash()) {
         // use A->hash() to get inside fusion kernel
         FusionKernelPtr fkptr = Jit_Driver::global()->get(A->hash());

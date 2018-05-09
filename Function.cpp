@@ -1366,8 +1366,10 @@ int c27=0;
         }
       }
 
-      if (ps[0] == 1 && ps[1] == 1 && ps[2] == 1) return B;
-
+      if (ps[0] == 1 && ps[1] == 1 && ps[2] == 1) {
+        // printf("why????????\n");
+        // return B;
+      }
       
       // if(ps[0] == 1 && ps[1] == 1 && ps[2] == 1){
       //   THROW_LOGIC_EXCEPTION(
