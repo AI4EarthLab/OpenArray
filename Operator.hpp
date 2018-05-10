@@ -47,15 +47,11 @@ namespace oa {
     // eval the expression graph by using fusion kernels
     ArrayPtr eval(NodePtr A);
 
+    // generate fusion kernels
     void gen_kernels_JIT_with_op(NodePtr A, 
         bool is_root = true);
 
     void tree_to_string(NodePtr A, stringstream &ss);
-
-    void tree_to_code(NodePtr A, stringstream &ss, int &id);
-
-    void tree_to_code(NodePtr A, stringstream &ss, int &id,
-      vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
 
     void tree_to_code_with_op(NodePtr A, stringstream &ss, stringstream &__point, int &id, int &S_id,
       vector<int>& int_id, vector<int>& float_id, vector<int>& double_id);
