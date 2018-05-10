@@ -328,6 +328,7 @@ namespace oa {
           }
           if(!find_in_data_list) data_list.push_back(ap);
         }
+
         // 2.2 ap is a pseudo 3d, need to make_pseudo_3d
         if (ap->get_bitset() != bt && !ap->is_seqs_scalar() && ap->is_pseudo()) {
           if (ap->has_pseudo_3d() == false) {
@@ -421,6 +422,7 @@ namespace oa {
             oa::funcs::update_ghost_end(reqs_list);
           }
 
+          // put the answer array's data and shape into list
           ArrayPtr ap = ArrayPool::global()->get(par_ptr, A->get_data_type());
           S.push_back(ap->buffer_shape());
           S.push_back(A->get_lbound());
@@ -480,100 +482,6 @@ namespace oa {
         ap->set_pos(A->get_pos());
       }
       return ap;
-    }
-
-    const KernelPtr get_kernel_dict(size_t hash, const char *filename) {
-      static bool has_init = false;
-      static unordered_map<size_t, KernelPtr> kernel_dict;
-      if (!has_init) {
-        has_init = true;
-
-        void *handle;
-        char *error;
-
-        // open dynamic library
-        handle = dlopen(LIB_KERNEL_PATH, RTLD_LAZY);
-        if (!handle) {
-          fprintf(stderr, "%s\n", error);
-          exit(EXIT_FAILURE);
-        }
-
-        // clean up the error before
-        dlerror();
-
-        // open kernel_dict and get kernel name as function signature
-        std::ifstream ifs;
-        ifs.open(filename);
-        size_t key;
-        string value;
-        typedef ArrayPtr (*FUNC)(vector<ArrayPtr>&);
-        KernelPtr func;
-
-        while(ifs>>key) {
-          ifs>>value;
-          stringstream ss;
-          ss<<"kernel_"<<key;
-          func = (FUNC)(dlsym(handle, ss.str().c_str()));
-          if ((error = dlerror()) != NULL) {
-            fprintf(stderr, "%s\n", error);
-            func = NULL;
-          }
-          kernel_dict[key] = func;
-        }
-
-        ifs.close();
-        dlclose(handle);
-      }
-      if (kernel_dict.find(hash) == kernel_dict.end()) return NULL;
-      return kernel_dict[hash];
-    }
-
-    void insert_kernel_dict(size_t hash, const stringstream &s,
-                            const char *filename) {
-      std::ofstream ofs;
-      ofs.open(filename, std::ofstream::out | std::ofstream::app);
-      ofs<<hash<<" "<<s.str()<<endl;
-      ofs.close();
-    }
-
-    void gen_kernels(NodePtr A, bool is_root) {
-      if (MPI_RANK != 0) return;
-      if (A->has_data()) return ;
-      //A->display();
-      
-      const NodeDesc &nd = get_node_desc(A->type());
-      if (!nd.ew || A->need_update()) {
-        for (int i = 0; i < A->input_size(); i++) {
-          gen_kernels(A->input(i), true);
-        }
-        return ;
-      }
-
-      if (is_root && A->get_depth() >= 2) {
-        // fusion kernel
-        //stringstream ss = tree_to_string(A);
-        // fusion kernel hash
-        stringstream ss;
-        stringstream ss1;
-        stringstream code;
-        //code<<"for (int i = 0; i < size; i++) {\n  ans[i] = ";
-        int id = 0;
-        tree_to_code(A, code, id);
-        //cout<<code.str()<<endl;
-        tree_to_string(A, ss);
-        tree_to_string_stack(A, ss1);
-        std::hash<string> str_hash;
-        size_t hash = str_hash(ss1.str());
-        
-        const KernelPtr func = get_kernel_dict(hash);
-        if (func == NULL) {
-          insert_kernel_dict(hash, ss);
-        }
-      }
-
-      for (int i = 0; i < A->input_size(); i++) {
-        gen_kernels(A->input(i), false);
-      }
     }
 
     void gen_kernels_JIT_with_op(NodePtr A, bool is_root) {

@@ -46,14 +46,6 @@ namespace oa {
 
     // eval the expression graph by using fusion kernels
     ArrayPtr eval(NodePtr A);
-    
-    const KernelPtr get_kernel_dict(size_t hash, 
-                                    const char *filename = "fusion-kernels");
-
-    void insert_kernel_dict(size_t hash, const stringstream &s,
-                            const char *filename = "fusion-kernels");
-
-    void gen_kernels(NodePtr A, bool is_root = true);
 
     void gen_kernels_JIT_with_op(NodePtr A, 
         bool is_root = true);
