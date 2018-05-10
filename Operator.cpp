@@ -385,7 +385,16 @@ namespace oa {
       }
     }
 
+    // =======================================================
+    // evaluate the expression graph, which the root node is A
     // treat operator as element wise
+    //
+    //    case 1: if A has fusion kernel, use it to evaluate and return
+    //    case 2: if A is a data node, just return it's data 
+    //    case 3: if A is not an element wise operator node 
+    //            or need to update, evaluate it's child first,
+    //            after that, evaluate the A
+    // =======================================================
     ArrayPtr eval(NodePtr A) {
       // 1. Node has hash value, means may have a fusion kernel
       if (A->hash()) {
@@ -462,14 +471,14 @@ namespace oa {
       // 2. Node is a data node, just return the data
       if (A->has_data()) return A->get_data();
 
-      // 3. Node is an operator node, and doesn't have fusion kernel
+      // 3.1 Node is an operator node, and doesn't have fusion kernel
       // first, evaluate it's child node recursively
       vector<ArrayPtr> ops_ap;
       for (int i = 0; i < A->input_size(); i++) {
         ops_ap.push_back(eval(A->input(i)));
       }
 
-      // 4. second, evaluate the node
+      // 3.2 second, evaluate the node
       ArrayPtr ap;
       if(A->type() == TYPE_REF) {
         ap = oa::funcs::subarray(ops_ap[0], A->get_ref());
@@ -484,12 +493,26 @@ namespace oa {
       return ap;
     }
 
+
+    // =======================================================
+    // Before evaluate the expression graph, we need to analyze the graph
+    // Here's how we generate the fusion kernel for each sub expression graph
+    // 
+    // exp: A = AXF(A) + sub(A+B+C) 
+    // there is two fusion kernels becasue of the sub operator
+    //      kernel 1: ans = AXF(A) + tmp
+    //      kernel 2: ans = A+B+C
+    // =======================================================
+    // NodePtr A :  the root of (sub)expression graph
+    // is_root:     we only have to generate fusion kernels of the root node
     void gen_kernels_JIT_with_op(NodePtr A, bool is_root) {
+      // 1. if A is a data node, doesn't have to generate fusion kernel
       if (A->has_data()) return ;
       
       const NodeDesc &nd = get_node_desc(A->type());
       
-      // not element wise
+      // 2. if A is not element wise (like sum, rep, etc)
+      //    need to generate it's children's fusion kernels recursively
       if (!nd.ew) {
         for (int i = 0; i < A->input_size(); i++) {
           gen_kernels_JIT_with_op(A->input(i), true);
@@ -497,7 +520,7 @@ namespace oa {
         return ;
       }
 
-      // need update
+      // 3. if A's need update state is true, should generate fusion kernel 
       if (A->need_update()) {
         // should set update to false in order to generate kernels
         A->set_update(false);
@@ -506,6 +529,7 @@ namespace oa {
         return ;
       }
 
+      // 4. is root && A->depth >= 2, generate fusion kernel
       if (is_root && A->get_depth() >= 2) {
         stringstream ss1;
         stringstream code;
@@ -564,13 +588,13 @@ namespace oa {
         }
       }
 
+      // 5. generate fusion kernels recursively 
       for (int i = 0; i < A->input_size(); i++) {
         gen_kernels_JIT_with_op(A->input(i), false);
       }
     }
 
     // example: (A1+S2)*A3
-    
     void tree_to_string(NodePtr A, stringstream &ss) {
       const NodeDesc &nd = get_node_desc(A->type());
       
