@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include "Diagnosis.hpp"
+#include <boost/format.hpp>
 
 using namespace oa::kernel;
 
@@ -138,16 +139,23 @@ namespace oa {
 
       const NodeDesc & nd = get_node_desc(root->type());
 
-      char buffer[500];
+      //char buffer[500];
 
-      sprintf(buffer, "[label=\"[%s]\\n id=%d \n (ref:%d) "
-			 "\n (lb:%d %d %d) \n (rb: %d %d %d) \n (pseudo: %d) \n (up: %d)\"];",  
-	    nd.name, id, root.use_count(),
-	    root->get_lbound()[0], root->get_lbound()[1], root->get_lbound()[2],
-	    root->get_rbound()[0], root->get_rbound()[1], root->get_rbound()[2],
-	    root->is_pseudo(), root->need_update());
+      //sprintf(buffer, "[label=\"[%s]\\n id=%d \n (ref:%d) "
+			// "\n (lb:%d %d %d) \n (rb: %d %d %d) \n (pseudo: %d) \n (up: %d)\"];",  
+	    //nd.name, id, root.use_count(),
+	    //root->get_lbound()[0], root->get_lbound()[1], root->get_lbound()[2],
+	    //root->get_rbound()[0], root->get_rbound()[1], root->get_rbound()[2],
+	    //root->is_pseudo(), root->need_update());
 
-      ofs<<buffer<<endl;
+      //ofs<<buffer<<endl;
+
+      ofs<<boost::format("[label=\"[%s]\\n id=%d \n (ref:%d) "
+                          "\n (lb:%d %d %d) \n (rb: %d %d %d) \n (up: %d)\"];") 
+        % nd.name % id % root.use_count()
+        % root->get_lbound()[0] % root->get_lbound()[1] % root->get_lbound()[2]
+        % root->get_rbound()[0] % root->get_rbound()[1] % root->get_rbound()[2] 
+        % root->need_update() <<endl;
 
       for (int i = 0; i < root->input_size(); i++) {
         write_graph(root->input(i), false, filename);
