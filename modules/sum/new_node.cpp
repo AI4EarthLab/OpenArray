@@ -26,6 +26,8 @@ namespace oa {
 
       np->set_bitset();
 
+      np->set_data_list_size(1);
+
       return np;
     }
 
@@ -45,6 +47,8 @@ namespace oa {
       np->set_pos(u->get_pos());
       np->set_shape(u->shape());
       np->set_bitset();
+
+      np->set_data_list_size(1);
 
       return np;
     }

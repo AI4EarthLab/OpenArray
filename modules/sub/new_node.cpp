@@ -24,6 +24,9 @@ namespace oa{
       np->set_rbound(u->get_rbound());
       
       np->set_bitset();
+
+      np->set_data_list_size(1);
+      
       return np;
     }
 
@@ -43,6 +46,8 @@ namespace oa{
       np->set_data_type(u->get_data_type());
 
       np->set_bitset();
+
+      np->set_data_list_size(1);
 
       return np;
     }

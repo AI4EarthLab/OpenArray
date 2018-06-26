@@ -35,6 +35,7 @@ namespace oa {
       np->set_pos(ap->get_pos());
       np->set_bitset(ap->get_bitset());
       np->set_pseudo(ap->is_pseudo());
+      np->set_data_list_size(1);
 
       return np;
     }
@@ -464,8 +465,9 @@ namespace oa {
             //if (out_fkptr) out_fkptr(list_pointer, ap->get_stencil_width());
 
             // set the boundary to zeros based on lb & rb becased it used illegal data
-            oa::funcs::set_boundary_zeros(ap, lb, rb);
+            //oa::funcs::set_boundary_zeros(ap, lb, rb);
           }
+            oa::funcs::set_boundary_zeros(ap, lb, rb);
 
           //cout<<"fusion-kernel called"<<endl;
           

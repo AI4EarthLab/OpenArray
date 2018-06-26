@@ -58,6 +58,12 @@ namespace oa{
       lb = {{0, 0, 1}};
       rb = {{0, 0, 1}};  
       ///:endif
+      
+      int grid_data_size = 0;
+      ///:if name[0] == 'd'
+      grid_data_size = 1;
+      ///:endif
+
 
       int3 new_lb = u->get_lbound();
       int3 new_rb = u->get_rbound();
@@ -70,18 +76,25 @@ namespace oa{
         mx = max(new_rb[i], mx);
       }
 
+      if(u->get_pos() != -1) {
+        np->set_pos(Grid::global()->get_pos(u->get_pos(), ${type}$));
+      } else {
+        grid_data_size = 0;
+      }
+
+      int data_list_size = 2 * u->get_data_list_size() + grid_data_size;
+
       // set default max stencil as two
-      if (mx > 1) {
+      // split into two fusion kernel when the size of data list is too large
+      if (mx > 1 || data_list_size > 10) {
         np->set_lbound(lb);
         np->set_rbound(rb);
         u->set_update();
+        np->set_data_list_size(2 + grid_data_size);
       } else {
         np->set_lbound(new_lb);
         np->set_rbound(new_rb);
-      }
-
-      if(u->get_pos() != -1){
-        np->set_pos(Grid::global()->get_pos(u->get_pos(), ${type}$));
+        np->set_data_list_size(data_list_size);
       }
 
       np->set_pseudo(u->is_pseudo());

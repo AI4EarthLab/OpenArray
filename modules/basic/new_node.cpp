@@ -48,6 +48,19 @@ namespace oa{
 
       np->set_bitset(u->get_bitset() | v->get_bitset());
 
+      // split into two fusion kernel when the size of data list is too large
+      int data_list_size = u->get_data_list_size() + v->get_data_list_size();
+
+      if (data_list_size > 10) {
+        np->set_lbound({{0,0,0}});
+        np->set_rbound({{0,0,0}});
+        u->set_update();
+        v->set_update();
+        np->set_data_list_size(1 + 1);
+      } else {
+        np->set_data_list_size(data_list_size);
+      }
+
       // np->display();
       return np;
     }
@@ -91,6 +104,19 @@ namespace oa{
 
       np->set_bitset(u->get_bitset() | v->get_bitset());
 
+      // split into two fusion kernel when the size of data list is too large
+      int data_list_size = u->get_data_list_size() + v->get_data_list_size();
+      
+      if (data_list_size > 10) {
+        np->set_lbound({{0,0,0}});
+        np->set_rbound({{0,0,0}});
+        u->set_update();
+        v->set_update();
+        np->set_data_list_size(1 + 1);
+      } else {
+        np->set_data_list_size(data_list_size);
+      }
+
       return np;
     }
     ///:endfor
@@ -122,6 +148,9 @@ namespace oa{
       np->set_pseudo(u->is_pseudo());
 
       np->set_bitset(u->get_bitset());
+
+      np->set_data_list_size(u->get_data_list_size());
+
       return np;
     }
     ///:endfor

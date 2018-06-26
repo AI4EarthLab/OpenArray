@@ -19,6 +19,8 @@ NodePtr new_node_${name}$ (const NodePtr& p)
   ///:else
   np->set_shape(SCALAR_SHAPE);
   ///:endif
+
+  np->set_data_list_size(1);
   
   return np;
 }

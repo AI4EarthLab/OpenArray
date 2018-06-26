@@ -48,6 +48,8 @@ private:
 
   Box m_ref;    // if it's reference data, should have a reference box
   int m_slice;
+  
+  int m_data_list_size = 0;   // the size of data list in the fusion kernel
 
 public:
   // Constructor
@@ -162,6 +164,10 @@ public:
   void set_slice(int k);
 
   int get_slice();
+
+  int get_data_list_size();
+
+  void set_data_list_size(int x);
 
 };
 

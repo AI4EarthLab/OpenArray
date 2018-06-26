@@ -140,6 +140,7 @@ void Node::reset() {
   m_is_scalar = false;
   pos = -1;
   m_bs = std::bitset<3>(7);
+  m_data_list_size = 0;
 }
 
 bool Node::is_scalar() const {
@@ -292,4 +293,12 @@ void Node::set_slice(int k) {
 
 int Node::get_slice() {
   return m_slice;
+}
+
+int Node::get_data_list_size() {
+  return m_data_list_size;
+}
+
+void Node::set_data_list_size(int x) {
+  m_data_list_size = x;
 }
