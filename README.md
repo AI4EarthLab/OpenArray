@@ -2,7 +2,7 @@
 OpenArray is a simple computing library to decouple the work of ocean modelling from the work of parallel computing. The library provides twelve basic operators that feature user-friendly interfaces, effective programming and automatic parallelization.
 The main purpose of OpenArray is to make complex parallel programming transparent to the modellers. We use a computation graph as an intermediate representation, meaning that the operator expression forms written in Fortran will be translated into a computation graph with a particular data structure. In addition, OpenArray will use the intermediate computation graph to analyse the dependency of the distributed data and automatically produce the underlying parallel code. Additionally, we use stable and mature compilers, such as the GNU Compiler Collection (GCC), Intel compiler (ICC), and Sunway compiler (SWACC), to generate the executable program according to different backend platforms. These four steps and some related techniques are described in detail in our paper
 
-# Compile Openarray
+# Compile OpenArray
 Before attempting to compile OpenArray, the following dependent libraries are required:
 1.	Fortran 90 or Fortran 95 compiler.
 2.	gcc/g++ compiler version 6.1.0 or higher.
