@@ -15,7 +15,7 @@ Before attempting to compile OpenArray, the following dependent libraries are re
 9.	LLVM compiler version 6.0.0 or higher.
 
 
-First type “./test.sh in” the home directory of OpenArray, the source code will be generated in the build folder. Second, change the directory into build, type “make -f makefile.intel oalib_obj”, then libopenarray.a and openarray.mod will be generated if there is no other question.
+First checkout to branch dev and type “./test.sh" in the home directory of OpenArray, the source code will be generated in the build folder. Second, change the directory into build, type “make -f makefile.intel oalib_obj”, then libopenarray.a and openarray.mod will be generated if there is no other question.
 
 
 
