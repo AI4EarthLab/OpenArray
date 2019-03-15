@@ -8,7 +8,7 @@ Before attempting to compile OpenArray, the following dependent libraries are re
 2.	gcc/g++ compiler version 6.1.0 or higher.
 3.	Intel icc/icpc compiler version 2017 or higher.
 4.	GNU make version 3.81 or higher.
-5.	Parallel NetCDF library.
+5.	Parallel NetCDF library version 1.7.0 or higher.
 6.	Message Passing Interface (MPI) library.
 7.	Armadillo, a C++ library for linear algebra & scientific computing, version 8.200.2 or higher.
 8.	Boost C++ Libraries,version 1_65_1 or higher.
