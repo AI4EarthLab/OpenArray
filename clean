@@ -1,1 +1,0 @@
-find . -name "fortran_main*" -or -name "libopenarray.a" -or -name "*.o" -or -name "*.d*" -or -name "*.mod" -or -name "main" -or -name "fortran_main" -or -name "testall_main" | xargs rm -f &>/dev/null
