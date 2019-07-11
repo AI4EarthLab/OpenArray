@@ -1,8 +1,11 @@
 # Build
 build/*
 
+# kernel_folder
+kernel_folder/*
+
 # Prerequisites
-*.d
+#*.d
 
 # Compiled Object files
 *.slo
@@ -54,3 +57,8 @@ test.cpp
 
 # nc files
 *.nc
+
+#manual_main
+manual_main
+#clean
+clean

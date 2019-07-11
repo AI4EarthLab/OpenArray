@@ -30,13 +30,13 @@ typedef unordered_map<size_t, JitPtr> JitPoolMap;
 
 class Jit_Driver{
   private:
-    int haveicc = -1;
+    int havegcc = -1;
     FKPtrMap kernel_dict;
     JitPoolMap m_jit_pool;
 
-    int insert_icc(size_t hash, const stringstream& code){
+    int insert_gcc(size_t hash, const stringstream& code){
       int myrank;
-      //std::cout<<"icc"<<std::endl;
+      //std::cout<<"gcc"<<std::endl;
       FusionKernelPtr fk_ptr = get(hash);
       if (fk_ptr != NULL) return -1;
       stringstream pathname;
@@ -74,8 +74,8 @@ class Jit_Driver{
       objname<<pathname.str()<<"/kernel_"<<hash<<".so";
       ofstream sourcefile;
       stringstream cmd;
-      //cmd<<"icc -shared -fPIC -nostartfiles -O0 -finline -inline-level=2 -finline-functions -no-inline-factor -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
-      cmd<<"icc -shared -fPIC -nostartfiles -xHost -O3 -Ofast -finline -inline-level=2 -finline-functions -no-inline-factor -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
+      //cmd<<"gcc -shared -fPIC -nostartfiles -O0 -finline -inline-level=2 -finline-functions -no-inline-factor -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
+      cmd<<"gcc -shared -fPIC -nostartfiles -O3 -g -w -o "<<objname.str().c_str()<<" "<<filename.str().c_str();
       //cmd<<"pwd";
 
       //cout<<objname.str().c_str()<<endl;
@@ -109,8 +109,8 @@ class Jit_Driver{
           {  
             if(system(cmd.str().c_str()) != 0)
             {
-              std::cout<<"icc compile err"<<std::endl;
-              haveicc = 0;
+              std::cout<<"gcc compile err"<<std::endl;
+              havegcc = 0;
               return -1;
             }
           }   
@@ -128,8 +128,8 @@ class Jit_Driver{
       {  
         if(system(cmd.str().c_str()) != 0)
         {
-          std::cout<<"icc compile err"<<std::endl;
-          haveicc = 0;
+          std::cout<<"gcc compile err"<<std::endl;
+          havegcc = 0;
           return -1;
         }
 
@@ -158,24 +158,24 @@ class Jit_Driver{
       return kernel_dict[hash];
     }
 
-    void testicc(){
-      if(system("icc -v 2> /dev/null") == 0)
+    void testgcc(){
+      if(system("gcc -v 2> /dev/null") == 0)
       {
-        haveicc = 1;
-        // std::cout<<"use icc."<<std::endl;
+        havegcc = 1;
+        // std::cout<<"use gcc."<<std::endl;
       }
       else
       {
-        haveicc = 0;
+        havegcc = 0;
         //std::cout<<"use llvm."<<std::endl;
       }
     }
 
     void insert(size_t hash, const stringstream& code) {
-      if(haveicc == -1) 
-        testicc();
-      if(haveicc){
-        if(insert_icc(hash,code) == 1)
+      if(havegcc == -1) 
+        testgcc();
+      if(havegcc){
+        if(insert_gcc(hash,code) == 1)
           return;
       }
 #ifndef _WITHOUT_LLVM_

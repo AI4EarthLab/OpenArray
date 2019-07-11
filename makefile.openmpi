@@ -12,11 +12,11 @@ EXT_LIB_LINK = 	-lpnetcdf   -ldl  \
 		-lgfortran 
 
 oplevel0 = -O0 -w -g  -std=c++0x   -D_WITHOUT_LLVM_ -DSUNWAY
-oplevel3 = -O3 -Ofast -xHost -w -g  -std=c++0x  -D_WITHOUT_LLVM_ -DSUNWAY
+oplevel3 = -O3 -O3 -w -g  -std=c++0x  -D_WITHOUT_LLVM_ -DSUNWAY
 
-FC = mpiifort ${oplevel0}
-CC = mpiicc   ${oplevel0}
-CXX = mpiicpc ${oplevel0}
+FC = mpif90 ${oplevel0}
+CC = mpicc   ${oplevel0}
+CXX = mpicxx ${oplevel0}
 
 FCFLAGS  = 
 
@@ -63,13 +63,13 @@ debug:
 #	$(CXX) ${EXT_INCLUDE} -c $(CXXFLAGS) $< -o $*.o -MMD
 #
 #%.d: %.c
-	$(CXX) ${EXT_INCLUDE} -c $(CFLAGS) $< -o $*.o -MMD
+#	$(CXX) ${EXT_INCLUDE} -c $(CFLAGS) $< -o $*.o -MMD
 
 
 #%.d: %.F90 
 #	$(FC) ${FCFLAGS} -c $< -o $*.o -gen-dep=$*.d
 
-#-include $(OBJ_FORTRAN_LIB:.o=.d)
+-include $(OBJ_FORTRAN_LIB:.o=.d)
 #-include $(OBJ_FORTRAN:.o=.d) 
 #-include $(OBJ_MAIN:.o=.d) 
 #-include $(OBJ_TEST:.o=.d) 

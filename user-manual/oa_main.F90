@@ -361,9 +361,10 @@ call toc("heat")
 end module
 
 program main
-  use mpi
+  !use mpi
   use oa_test
   implicit none
+include "mpif.h"
   integer :: step
   integer :: i, nt, nx, ny, nz
   ! initialize OpenArray, no split in z-direction
@@ -378,17 +379,21 @@ program main
 !  call oa_get_option(nt, "nt", -1)
 !  print*, "nt = ", nt
 !
-!  call array_creation()
-!  call arithmetic_operation()
-!  call array_operation()
-!  call stencil_operation()
-!  call io_operation()
-!  call util_operation()
-!
-!  call continuity(nt, nx, ny, nz)
-!  call heat_diffusion(nt, nx, ny, nz)
-!  call hotspot2D(nt, nx, ny, nz)
-!  call hotspot3D(nt, nx, ny, nz)
+  nx = 10
+  ny = 10
+  nz = 5
+  nt = 5
+  call array_creation()
+  call arithmetic_operation()
+  call array_operation()
+  call stencil_operation()
+  call io_operation()
+  call util_operation()
+
+  call continuity(nt, nx, ny, nz)
+  call heat_diffusion(nt, nx, ny, nz)
+  call hotspot2D(nt, nx, ny, nz)
+  call hotspot3D(nt, nx, ny, nz)
   call heat_3d()
   if(get_rank() .eq. 0)call show_timer()
   call oa_finalize()
