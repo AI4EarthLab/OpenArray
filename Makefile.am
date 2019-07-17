@@ -111,4 +111,4 @@ libopenarray_a_AR = $(AR) rcs
 my_execbin_PROGRAMS =  manual_main
 manual_main_SOURCES = user-manual/oa_main.F90
 manual_main_DEPENDENCIES = libopenarray.a
-manual_main_LDADD = -L. -lopenarray -lstdc++ -lpnetcdf -lgfortran -L/usr/lib/x86_64-linux-gnu/openmpi/lib -lmpi_cxx  -lm -ldl ${AM_LDFLAGS}
+manual_main_LDADD = -L. -lopenarray -lstdc++ -lgfortran -lm -ldl -lpthread ${AM_LDFLAGS}
