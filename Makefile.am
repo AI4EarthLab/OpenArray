@@ -6,10 +6,7 @@ FCFLAGS = $(oplevel0)
 CFLAGS = $(oplevel0)
 CXXFLAGS = $(oplevel0)
 
-my_execbindir = $(pkglibdir)
-my_doclibdir  = $(docdir)
-
-my_doclib_LIBRARIES = libopenarray.a
+lib_LIBRARIES = libopenarray.a
 libopenarray_a_SOURCES = ./Init.cpp
 libopenarray_a_SOURCES += ./Operator.cpp
 libopenarray_a_SOURCES += ./ArgumentParser.cpp
@@ -104,11 +101,15 @@ libopenarray_a_SOURCES += fortran/oa_sub.F90
 libopenarray_a_SOURCES += fortran/oa_sum.F90
 libopenarray_a_SOURCES += fortran/oa_mod.F90
 
+include_HEADERS = openarray.mod
+
 # libopenarray_a_SOURCES += test/oa_test.F90
 # libopenarray_a_SOURCES += test/oa_main.F90
 libopenarray_a_AR = $(AR) rcs
 
-my_execbin_PROGRAMS =  manual_main
+noinst_PROGRAMS =  manual_main
 manual_main_SOURCES = user-manual/oa_main.F90
 manual_main_DEPENDENCIES = libopenarray.a
 manual_main_LDADD = -L. -lopenarray -lstdc++ -lgfortran -lm -ldl -lpthread ${AM_LDFLAGS}
+
+user-manual/oa_main.o: fortran/oa_mod.o
