@@ -128,10 +128,13 @@ fortran/oa_sub.o: fortran/oa_type.o
 fortran/oa_mod.o: fortran/oa_mpi.o fortran/oa_type.o fortran/oa_sub.o fortran/oa_partition.o
 openarray.mod: libopenarray.a
 
-.PHONY: src bin
+.PHONY: src bin test
 
 src:
 	git archive --format=tar.gz --prefix=${PACKAGE_NAME}-${PACKAGE_VERSION}/ v${PACKAGE_VERSION} > ${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz
 
 bin: libopenarray.a openarray.mod
 	zip ${PACKAGE_NAME}-bin-release-${PACKAGE_VERSION}.zip $^
+
+test: manual_main
+	time mpirun -n $(nproc) ./manual_main
