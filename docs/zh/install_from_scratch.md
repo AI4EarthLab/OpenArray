@@ -147,3 +147,30 @@ make manual_main
 # 执行测试
 time mpirun -n 2 ./manual_main
 ```
+
+## FAQ
+
+### 下载 openmpi-4.0.1.tar.bz2 错误
+
+执行下载命令：
+
+```bash
+wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.bz2
+```
+
+出现错误：
+
+```text
+--2019-07-21 10:52:45--  https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.1.tar.bz2
+Resolving download.open-mpi.org... failed: nodename nor servname provided, or not known.
+wget: unable to resolve host address ‘download.open-mpi.org’
+```
+
+通常是网络问题（国内较为常见，不同地区表现时间也不尽相同），建议方法有：
+
+1. 换下 DNS Nameserver 。更新下 `/etc/resolv.conf` 文件中的 nameserver 配置。
+2. 通过其他途径，下载好 `openmpi-4.0.1.tar.bz2` 软件包，拷贝到这里。
+3. 去 [https://github.com/open-mpi/ompi](https://github.com/open-mpi/ompi) 看下其他下载方式。
+4. 通过搜索引擎，寻找其他镜像站点 (mirror site) 下载。
+5. 等待一段时间，这种问题通常过段时间就好。
+6. 联系我们。
