@@ -113,3 +113,28 @@ manual_main_DEPENDENCIES = libopenarray.a
 manual_main_LDADD = -L. -lopenarray -lstdc++ -lgfortran -lm -ldl -lpthread ${AM_LDFLAGS}
 
 user-manual/oa_main.o: fortran/oa_mod.o
+
+fortran/oa_type.o: fortran/oa_utils.o
+fortran/oa_cache.o: fortran/oa_type.o
+fortran/oa_io.o: fortran/oa_type.o
+fortran/oa_init.o: fortran/oa_type.o
+fortran/oa_min_max.o: fortran/oa_type.o
+fortran/oa_rep.o: fortran/oa_type.o
+fortran/oa_sum.o: fortran/oa_type.o
+fortran/oa_set_with_mask.o: fortran/oa_type.o
+fortran/oa_shift.o: fortran/oa_type.o
+fortran/oa_set.o: fortran/oa_type.o
+fortran/oa_sub.o: fortran/oa_type.o
+fortran/oa_mod.o: fortran/oa_mpi.o fortran/oa_type.o fortran/oa_sub.o fortran/oa_partition.o
+openarray.mod: libopenarray.a
+
+.PHONY: src bin test
+
+src:
+	git archive --format=tar.gz --prefix=${PACKAGE_NAME}-${PACKAGE_VERSION}/ v${PACKAGE_VERSION} > ${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz
+
+bin: libopenarray.a openarray.mod
+	zip ${PACKAGE_NAME}-bin-release-${PACKAGE_VERSION}.zip $^
+
+test: manual_main
+	time mpirun -n $(nproc) ./manual_main

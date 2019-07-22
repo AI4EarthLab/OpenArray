@@ -108,5 +108,6 @@ echo "\
    optional <target> can be:
               manual_main - build a test programs (build only, no run)
               install     - install OpenArray library in ${prefix}
+              test        - build manual_main and run
 
 ------------------------------------------------------------------------------"
