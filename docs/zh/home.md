@@ -4,6 +4,7 @@
 
 - [手动编译](./build_openarray.md)
 - [容器编译](./build_by_docker.md)
+- [编译二进制发行包](./build_binaries.md)
 
 ## 相关文档
 

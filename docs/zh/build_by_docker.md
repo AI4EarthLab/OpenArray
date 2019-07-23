@@ -2,7 +2,7 @@
 
 本文以 `centos` image 环境为例，介绍通过 Docker 编译步骤。
 
-创建 `basic.Dockerfile` 文件如下：
+创建 [builder.Dockerfile](https://github.com/hxmhuang/OpenArray_CXX/blob/master/scripts/docker-build/centos7/builder.Dockerfile) 文件如下：
 
 ```Dockerfile
 FROM centos:7 AS builder
@@ -65,7 +65,7 @@ COPY --from=builder ${INSTALL_PREFIX} ${INSTALL_PREFIX}
 编译基本的 image :
 
 ```shell
-docker build -t openarray-builder:v0.0.1 . -f basic.Dockerfile
+docker build -t openarray-builder:v0.0.1 . -f builder.Dockerfile
 ```
 
 启动编译容器：
