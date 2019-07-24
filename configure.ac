@@ -1,5 +1,5 @@
 AC_PREREQ(2.50)
-AC_INIT([OpenArray], [0.0])
+AC_INIT([OpenArray], [1.0])
 config_flags="$*"
 AM_INIT_AUTOMAKE([subdir-objects no-define no-dependencies foreign])
 
