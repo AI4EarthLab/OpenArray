@@ -3,12 +3,32 @@ AC_INIT([OpenArray], [1.0])
 config_flags="$*"
 AM_INIT_AUTOMAKE([subdir-objects no-define no-dependencies foreign])
 
-AS_UNSET([CC])
-AS_UNSET([CXX])
-AS_UNSET([FC])
-AC_PROG_CC([mpicc mpiicc])
-AC_PROG_CXX([mpicxx mpiicpc])
-AC_PROG_FC([mpif90 mpiifort])
+AC_ARG_WITH([cc],
+            [AS_HELP_STRING([--with-cc],
+              [spacify c file compiler from command line @<:@default=no@:>@])],
+            [],
+            [with_cc=no])
+
+AS_IF([test "x$with_cc" = xno],
+            [AC_PROG_CC([mpicc mpiicc])])
+
+AC_ARG_WITH([cxx],
+            [AS_HELP_STRING([--with-cxx],
+              [spacify cpp compile command from command line @<:@default=no@:>@])],
+            [],
+            [with_cxx=no])
+
+AS_IF([test "x$with_cxx" = xno],
+            [AC_PROG_CXX([mpicxx mpiicpc])])
+
+AC_ARG_WITH([fc],
+            [AS_HELP_STRING([--with-fc],
+              [spacify fortrain command from command line @<:@default=no@:>@])],
+            [],
+            [with_fc=no])
+
+AS_IF([test "x$with_fc" = xno],
+            [AC_PROG_FC([mpif90 mpiifort])])
 
 # Append installition path to LDFLAGS and CFLAGS
 AC_DEFUN([APPEND_SEARCH_PATH],
