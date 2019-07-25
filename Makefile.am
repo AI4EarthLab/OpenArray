@@ -9,7 +9,7 @@ CXXFLAGS = $(oplevel0)
 lib_LIBRARIES = libopenarray.a
 libopenarray_a_SOURCES = src/Init.cpp
 libopenarray_a_SOURCES += src/Operator.cpp
-libopenarray_a_SOURCES += srd/ArgumentParser.cpp
+libopenarray_a_SOURCES += src/ArgumentParser.cpp
 libopenarray_a_SOURCES += src/Range.cpp
 libopenarray_a_SOURCES += src/MPI.cpp
 libopenarray_a_SOURCES += src/log.cpp
@@ -114,7 +114,7 @@ manual_main_LDADD = -L. -lopenarray -lstdc++ -lgfortran -lm -ldl -lpthread ${AM_
 
 user-manual/oa_main.o: src/fortran/oa_mod.o
 
-src/fortran/oa_type.o: src/fortran/oa_utils.o
+src/fortran/oa_type.o: src/fortran/oa_utils.o src/fortran/oa_mod.o
 src/fortran/oa_cache.o: src/fortran/oa_type.o
 src/fortran/oa_io.o: src/fortran/oa_type.o
 src/fortran/oa_init.o: src/fortran/oa_type.o
