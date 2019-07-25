@@ -1136,9 +1136,9 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLIBRARIES
 .PRECIOUS: Makefile
 
 
-user-manual/oa_main.o: src/fortran/oa_mod.o
+user-manual/oa_main.o: src/fortran/oa_mod.o src/fortran/oa_test.o
 
-src/fortran/oa_type.o: src/fortran/oa_utils.o
+src/fortran/oa_type.o: src/fortran/oa_utils.o src/fortran/oa_mod.o
 src/fortran/oa_cache.o: src/fortran/oa_type.o
 src/fortran/oa_io.o: src/fortran/oa_type.o
 src/fortran/oa_init.o: src/fortran/oa_type.o
