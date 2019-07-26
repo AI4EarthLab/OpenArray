@@ -109,23 +109,36 @@ libopenarray_a_AR = $(AR) rcs
 
 noinst_PROGRAMS =  manual_main
 manual_main_SOURCES = src/test/oa_main.F90
+manual_main_SOURCES += src/test/oa_test.F90
 manual_main_DEPENDENCIES = libopenarray.a
 manual_main_LDADD = -L. -lopenarray -lstdc++ -lgfortran -lm -ldl -lpthread ${AM_LDFLAGS}
 
-user-manual/oa_main.o: src/fortran/oa_mod.o src/fortran/oa_test.o
+src/test/oa_main.o: src/fortran/oa_mod.o src/test/oa_test.o
 
-src/fortran/oa_type.o: src/fortran/oa_utils.o src/fortran/oa_mod.o
-src/fortran/oa_cache.o: src/fortran/oa_type.o
-src/fortran/oa_io.o: src/fortran/oa_type.o
-src/fortran/oa_init.o: src/fortran/oa_type.o
-src/fortran/oa_min_max.o: src/fortran/oa_type.o
-src/fortran/oa_rep.o: src/fortran/oa_type.o
-src/fortran/oa_sum.o: src/fortran/oa_type.o
-src/fortran/oa_set_with_mask.o: src/fortran/oa_type.o
-src/fortran/oa_shift.o: src/fortran/oa_type.o
-src/fortran/oa_set.o: src/fortran/oa_type.o
-src/fortran/oa_sub.o: src/fortran/oa_type.o
-src/fortran/oa_mod.o: src/fortran/oa_mpi.o src/fortran/oa_type.o src/fortran/oa_sub.o src/fortran/oa_partition.o
+oa_init_fnl.mod :   src/fortran/oa_init.F90
+src/fortran/oa_cache.o :   src/fortran/oa_cache.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_init.o :   src/fortran/oa_init.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_interpolation.o: src/fortran/config.h src/fortran/oa_interpolation.F90
+src/fortran/oa_io.o :   src/fortran/oa_io.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_mat_mult.o: src/fortran/config.h src/fortran/oa_mat_mult.F90
+src/fortran/oa_min_max.o: src/fortran/config.h src/fortran/oa_min_max.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_mod.o :   src/fortran/oa_mod.F90 oa_interpolation.mod oa_option.mod oa_init_fnl.mod oa_io.mod oa_cache.mod   oa_rep.mod oa_shift.mod oa_min_max.mod oa_sum.mod oa_set_with_mask.mod   oa_set.mod oa_sub.mod oa_partition.mod oa_utils.mod oa_type.mod oa_mpi.mod   oa_interpolation.mod oa_option.mod oa_init_fnl.mod oa_io.mod oa_cache.mod   oa_rep.mod oa_shift.mod oa_min_max.mod oa_sum.mod oa_set_with_mask.mod   oa_set.mod oa_sub.mod oa_partition.mod oa_utils.mod oa_type.mod oa_mpi.mod
+src/fortran/oa_mpi.o :   src/fortran/oa_mpi.F90
+src/fortran/oa_option.o :   src/fortran/oa_option.F90
+src/fortran/oa_partition.o :   src/fortran/oa_partition.F90
+src/fortran/oa_rep.o: src/fortran/config.h src/fortran/oa_rep.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_set.o :   src/fortran/oa_set.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_set_with_mask.o :   src/fortran/oa_set_with_mask.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_shift.o: src/fortran/config.h src/fortran/oa_shift.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_sub.o :   src/fortran/oa_sub.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_sum.o: src/fortran/config.h src/fortran/oa_sum.F90 oa_utils.mod oa_type.mod
+src/fortran/oa_type.o: src/fortran/config.h src/fortran/oa_type.F90 oa_utils.mod
+src/fortran/oa_utils.o :   src/fortran/oa_utils.F90
+src/test/oa_test.o : src/test/oa_test.F90 oa_mod.mod
+
+%.mod: src/fortran/%.o
+	@true
+
 src/openarray.mod: libopenarray.a
 
 .PHONY: src bin test
