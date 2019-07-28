@@ -6,6 +6,11 @@ FCFLAGS = $(oplevel0)
 CFLAGS = $(oplevel0)
 CXXFLAGS = $(oplevel0)
 
+
+CC=$(MPICC)
+CXX=$(MPICXX)
+FC=$(MPIF90)
+
 lib_LIBRARIES = libopenarray.a
 libopenarray_a_SOURCES = src/Init.cpp
 libopenarray_a_SOURCES += src/Operator.cpp
