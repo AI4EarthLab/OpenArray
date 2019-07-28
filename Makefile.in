@@ -88,10 +88,13 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = @build@
+host_triplet = @host@
 noinst_PROGRAMS = manual_main$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -130,7 +133,6 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LIBRARIES = $(lib_LIBRARIES)
-AR = ar
 ARFLAGS = cru
 AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
@@ -295,7 +297,8 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 AM_RECURSIVE_TARGETS = cscope
-am__DIST_COMMON = $(srcdir)/Makefile.in compile install-sh missing
+am__DIST_COMMON = $(srcdir)/Makefile.in ar-lib compile config.guess \
+	config.sub install-sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -316,6 +319,7 @@ distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
+AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -333,8 +337,21 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+F77 = @F77@
 FC = @FC@
 FCFLAGS = $(oplevel0)
+FCFLAGS_F = @FCFLAGS_F@
+FCFLAGS_F90 = @FCFLAGS_F90@
+FCFLAGS_f = @FCFLAGS_f@
+FCFLAGS_f90 = @FCFLAGS_f90@
+FCLIBS = @FCLIBS@
+FC_DEFINE = @FC_DEFINE@
+FC_MODEXT = @FC_MODEXT@
+FC_MODINC = @FC_MODINC@
+FFIXEDFORMFLAG = @FFIXEDFORMFLAG@
+FFLAGS = @FFLAGS@
+FFREEFORMFLAG = @FFREEFORMFLAG@
+FLIBS = @FLIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -347,6 +364,10 @@ LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
+MPICC = @MPICC@
+MPICXX = @MPICXX@
+MPIF77 = @MPIF77@
+MPIF90 = @MPIF90@
 MPI_DIR = @MPI_DIR@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -358,30 +379,57 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PNETCDF_DIR = @PNETCDF_DIR@
+PNF_FILL_INT64 = @PNF_FILL_INT64@
+PNF_FILL_UINT = @PNF_FILL_UINT@
+PNF_FILL_UINT64 = @PNF_FILL_UINT64@
+PNF_INT8_MODIFIER = @PNF_INT8_MODIFIER@
+PNF_X_INT8_MAX = @PNF_X_INT8_MAX@
+PNF_X_INT8_MIN = @PNF_X_INT8_MIN@
+PNF_X_UINT8_MAX = @PNF_X_UINT8_MAX@
+PNF_X_UINT_MAX = @PNF_X_UINT_MAX@
 RANLIB = @RANLIB@
+RM = @RM@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+USE_MPIF_HEADER = @USE_MPIF_HEADER@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
+ac_ct_F77 = @ac_ct_F77@
 ac_ct_FC = @ac_ct_FC@
+ac_empty = @ac_empty@
+ac_mpi_prog_MPICC = @ac_mpi_prog_MPICC@
+ac_mpi_prog_MPICXX = @ac_mpi_prog_MPICXX@
+ac_mpi_prog_MPIF77 = @ac_mpi_prog_MPIF77@
+ac_mpi_prog_MPIF90 = @ac_mpi_prog_MPIF90@
 am__leading_dot = @am__leading_dot@
 am__tar = @am__tar@
 am__untar = @am__untar@
 bindir = @bindir@
+build = @build@
 build_alias = @build_alias@
+build_cpu = @build_cpu@
+build_os = @build_os@
+build_vendor = @build_vendor@
 builddir = @builddir@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
+has_fortran = @has_fortran@
+has_mpicxx = @has_mpicxx@
+host = @host@
 host_alias = @host_alias@
+host_cpu = @host_cpu@
+host_os = @host_os@
+host_vendor = @host_vendor@
 htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
@@ -463,7 +511,7 @@ libopenarray_a_SOURCES = src/Init.cpp src/Operator.cpp \
 	src/fortran/oa_set.F90 src/fortran/oa_set_with_mask.F90 \
 	src/fortran/oa_shift.F90 src/fortran/oa_sub.F90 \
 	src/fortran/oa_sum.F90 src/fortran/oa_mod.F90
-include_HEADERS = src/openarray.mod
+include_HEADERS = openarray.mod
 
 # libopenarray_a_SOURCES += src/test/oa_test.F90
 # libopenarray_a_SOURCES += src/test/oa_main.F90
@@ -1046,8 +1094,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLIBRARIES clean-noinstPROGRAMS \
-	mostlyclean-am
+clean-am: clean-generic clean-libLIBRARIES clean-local \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -1118,7 +1166,7 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLIBRARIES
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--refresh check check-am clean \
-	clean-cscope clean-generic clean-libLIBRARIES \
+	clean-cscope clean-generic clean-libLIBRARIES clean-local \
 	clean-noinstPROGRAMS cscope cscopelist-am ctags ctags-am dist \
 	dist-all dist-bzip2 dist-gzip dist-lzip dist-shar dist-tarZ \
 	dist-xz dist-zip distcheck distclean distclean-compile \
@@ -1163,7 +1211,7 @@ src/test/oa_test.o : src/test/oa_test.F90 oa_mod.mod
 %.mod: src/fortran/%.o
 	@true
 
-src/openarray.mod: libopenarray.a
+openarray.mod: libopenarray.a
 
 .PHONY: src bin test
 
@@ -1175,6 +1223,9 @@ bin: libopenarray.a src/openarray.mod
 
 test: manual_main
 	time mpirun -n $(nproc) ./manual_main
+
+clean-local:
+	rm -f *.mod
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -101,7 +101,7 @@ libopenarray_a_SOURCES += src/fortran/oa_sub.F90
 libopenarray_a_SOURCES += src/fortran/oa_sum.F90
 libopenarray_a_SOURCES += src/fortran/oa_mod.F90
 
-include_HEADERS = src/openarray.mod
+include_HEADERS = openarray.mod
 
 # libopenarray_a_SOURCES += src/test/oa_test.F90
 # libopenarray_a_SOURCES += src/test/oa_main.F90
@@ -139,7 +139,7 @@ src/test/oa_test.o : src/test/oa_test.F90 oa_mod.mod
 %.mod: src/fortran/%.o
 	@true
 
-src/openarray.mod: libopenarray.a
+openarray.mod: libopenarray.a
 
 .PHONY: src bin test
 
@@ -151,3 +151,6 @@ bin: libopenarray.a src/openarray.mod
 
 test: manual_main
 	time mpirun -n $(nproc) ./manual_main
+
+clean-local:
+	rm -f *.mod
