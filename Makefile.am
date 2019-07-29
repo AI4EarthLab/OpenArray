@@ -113,12 +113,11 @@ include_HEADERS = openarray.mod
 libopenarray_a_AR = $(AR) rcs
 
 noinst_PROGRAMS =  manual_main
-manual_main_SOURCES = src/test/oa_main.F90
-manual_main_SOURCES += src/test/oa_test.F90
+manual_main_SOURCES = examples/oa_main.F90
 manual_main_DEPENDENCIES = libopenarray.a
 manual_main_LDADD = -L. -lopenarray -lstdc++ -lgfortran -lm -ldl -lpthread ${AM_LDFLAGS}
 
-src/test/oa_main.o: src/fortran/oa_mod.o src/test/oa_test.o
+src/test/oa_main.o: src/fortran/oa_mod.o 
 
 oa_init_fnl.mod :   src/fortran/oa_init.F90
 src/fortran/oa_cache.o :   src/fortran/oa_cache.F90 oa_utils.mod oa_type.mod
@@ -139,7 +138,6 @@ src/fortran/oa_sub.o :   src/fortran/oa_sub.F90 oa_utils.mod oa_type.mod
 src/fortran/oa_sum.o: src/fortran/config.h src/fortran/oa_sum.F90 oa_utils.mod oa_type.mod
 src/fortran/oa_type.o: src/fortran/config.h src/fortran/oa_type.F90 oa_utils.mod
 src/fortran/oa_utils.o :   src/fortran/oa_utils.F90
-src/test/oa_test.o : src/test/oa_test.F90 oa_mod.mod
 
 %.mod: src/fortran/%.o
 	@true

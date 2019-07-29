@@ -1,4 +1,4 @@
-#include "../fortran/config.h"
+#include "../src/fortran/config.h"
 module oa_test
   use iso_c_binding
   use oa_mod
