@@ -624,6 +624,8 @@ LTLIBOBJS
 LIBOBJS
 RANLIB
 MPI_DIR
+HAS_NPROC_FALSE
+HAS_NPROC_TRUE
 CPP
 PNETCDF_DIR
 HAVE_MPI_MOD_FALSE
@@ -675,6 +677,8 @@ CPPFLAGS
 FCFLAGS
 CFLAGS
 LDFLAGS
+NPROC_PROG
+TIME
 RM
 EGREP
 GREP
@@ -3140,13 +3144,13 @@ fi
 
 # Some tools Automake needs.
 
-ACLOCAL=${ACLOCAL-"${am_missing_run}aclocal-${am__api_version}"}
+ACLOCAL=${ACLOCAL-"${am_missing_run}aclocal"}
 
 
 AUTOCONF=${AUTOCONF-"${am_missing_run}autoconf"}
 
 
-AUTOMAKE=${AUTOMAKE-"${am_missing_run}automake-${am__api_version}"}
+AUTOMAKE=${AUTOMAKE-"${am_missing_run}automake"}
 
 
 AUTOHEADER=${AUTOHEADER-"${am_missing_run}autoheader"}
@@ -3392,6 +3396,89 @@ fi
   test -n "$RM" && break
 done
 
+for ac_prog in time
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_TIME+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$TIME"; then
+  ac_cv_prog_TIME="$TIME" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_TIME="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+TIME=$ac_cv_prog_TIME
+if test -n "$TIME"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $TIME" >&5
+$as_echo "$TIME" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$TIME" && break
+done
+
+for ac_prog in nproc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_NPROC_PROG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$NPROC_PROG"; then
+  ac_cv_prog_NPROC_PROG="$NPROC_PROG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_NPROC_PROG="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+NPROC_PROG=$ac_cv_prog_NPROC_PROG
+if test -n "$NPROC_PROG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NPROC_PROG" >&5
+$as_echo "$NPROC_PROG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$NPROC_PROG" && break
+done
 
 # Append installition path to LDFLAGS and CFLAGS
 
@@ -3456,10 +3543,15 @@ if test "x$MPIF77" = x -a "x$FC"  != x ; then ac_user_MPIF77=$FC  ; fi
 if test "x$MPIF90" = x -a "x$F90" != x ; then ac_user_MPIF90=$F90 ; fi
 if test "x$MPIF90" = x -a "x$FC"  != x ; then ac_user_MPIF90=$FC  ; fi
 
-CANDIDATE_MPICC="   mpicc mpicc_r"
-CANDIDATE_MPICXX=" mpicxx mpic++ mpiCC mpcxx mpc++ mpicxx_r mpiCC_r mpcxx_r mpic++_r mpc++_r"
-CANDIDATE_MPIF77=" mpif77 mpif77_r mpf77 mpf77_r"
-CANDIDATE_MPIF90=" mpif90 mpif90_r mpf90 mpf90_r mpif95 mpif95_r mpf95 mpf95_r"
+CANDIDATE_MPICC=" mpiicc icc"
+CANDIDATE_MPICXX=" mpiicpc mpiicxx mpiic++ mpiiCC icpc"
+CANDIDATE_MPIF77=" mpiifort mpiifc mpiif77 ifort"
+CANDIDATE_MPIF90=" mpiifort mpiifc mpiif95 mpiif90 ifort"
+
+CANDIDATE_MPICC+="   mpicc mpicc_r"
+CANDIDATE_MPICXX+=" mpicxx mpic++ mpiCC mpcxx mpc++ mpicxx_r mpiCC_r mpcxx_r mpic++_r mpc++_r"
+CANDIDATE_MPIF77+=" mpif77 mpif77_r mpf77 mpf77_r"
+CANDIDATE_MPIF90+=" mpif90 mpif90_r mpf90 mpf90_r mpif95 mpif95_r mpf95 mpf95_r"
 
 CANDIDATE_MPICC+=" mpigcc mpgcc mpigcc_r mpgcc_r"
 CANDIDATE_MPICXX+=" mpig++ mpg++ mpig++_r mpg++_r"
@@ -3485,11 +3577,6 @@ CANDIDATE_MPICC+=" cc"
 CANDIDATE_MPICXX+=" CC"
 CANDIDATE_MPIF77+=" ftn"
 CANDIDATE_MPIF90+=" ftn"
-
-CANDIDATE_MPICC+=" mpiicc icc"
-CANDIDATE_MPICXX+=" mpiicpc mpiicxx mpiic++ mpiiCC icpc"
-CANDIDATE_MPIF77+=" mpiifort mpiifc mpiif77 ifort"
-CANDIDATE_MPIF90+=" mpiifort mpiifc mpiif95 mpiif90 ifort"
 
 CANDIDATE_MPICC+=" mpipgcc mppgcc ${MPICC} "
 CANDIDATE_MPICXX+=" mpipgCC mppgCC ${MPICXX}"
@@ -7958,7 +8045,7 @@ else
   as_fn_error $? "
                             -----------------------------------------------------------------------
                                 Invalid MPI compiler specified or detected
-                                A working pdfcdf lib is required. Please specify the location
+                                A working pnetcdf lib is required. Please specify the location
                                 in the PNETCDF_DIR environment variable. Abort.
                             -----------------------------------------------------------------------" "$LINENO" 5
 
@@ -7994,6 +8081,30 @@ if test "x$PNETCDF_DIR" != x; then :
 
 
 fi
+
+
+case "${host_os}" in
+    darwin*)
+         CFLAGS+=" -D_OSX_ "
+
+         FCFLAGS+=" -D_OSX_ "
+
+         CPPFLAGS+=" -D_OSX_ "
+
+         CXXFLAGS+=" -D_OSX_ "
+
+        ;;
+    *)
+        ;;
+esac
+ if test "x$NPROC_PROG" != x; then
+  HAS_NPROC_TRUE=
+  HAS_NPROC_FALSE='#'
+else
+  HAS_NPROC_TRUE='#'
+  HAS_NPROC_FALSE=
+fi
+
 
 
 
@@ -8279,6 +8390,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_MPI_MOD_TRUE}" && test -z "${HAVE_MPI_MOD_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_MPI_MOD\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAS_NPROC_TRUE}" && test -z "${HAS_NPROC_FALSE}"; then
+  as_fn_error $? "conditional \"HAS_NPROC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -9341,7 +9456,6 @@ if test "${has_mpicxx}" = yes ; then
 fi
 if test "${has_fortran}" = yes ; then
    echo "\
-              FFLAGS   = ${FFLAGS}
               FCFLAGS  = ${FCFLAGS}"
 fi
 if test "x${LDFLAGS}" != x ; then

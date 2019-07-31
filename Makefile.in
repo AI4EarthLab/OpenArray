@@ -212,8 +212,7 @@ am_libopenarray_a_OBJECTS = src/Init.$(OBJEXT) src/Operator.$(OBJEXT) \
 	src/fortran/oa_sum.$(OBJEXT) src/fortran/oa_mod.$(OBJEXT)
 libopenarray_a_OBJECTS = $(am_libopenarray_a_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
-am_manual_main_OBJECTS = src/test/oa_main.$(OBJEXT) \
-	src/test/oa_test.$(OBJEXT)
+am_manual_main_OBJECTS = examples/oa_main.$(OBJEXT)
 manual_main_OBJECTS = $(am_manual_main_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -357,6 +356,7 @@ MPICXX = @MPICXX@
 MPIF77 = @MPIF77@
 MPIF90 = @MPIF90@
 MPI_DIR = @MPI_DIR@
+NPROC_PROG = @NPROC_PROG@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -372,6 +372,7 @@ RM = @RM@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+TIME = @TIME@
 USE_MPIF_HEADER = @USE_MPIF_HEADER@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
@@ -434,6 +435,8 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 oplevel0 = -O0 -w -g  -std=c++0x   -D_WITHOUT_LLVM_ -DSUNWAY
 oplevel3 = -O3 -O3 -w -g  -std=c++0x  -D_WITHOUT_LLVM_ -DSUNWAY
+@HAS_NPROC_FALSE@NPROC = 2
+@HAS_NPROC_TRUE@NPROC := $(shell ${NPROC_PROG})
 lib_LIBRARIES = libopenarray.a
 libopenarray_a_SOURCES = src/Init.cpp src/Operator.cpp \
 	src/ArgumentParser.cpp src/Range.cpp src/MPI.cpp src/log.cpp \
@@ -494,7 +497,7 @@ include_HEADERS = openarray.mod
 # libopenarray_a_SOURCES += src/test/oa_test.F90
 # libopenarray_a_SOURCES += src/test/oa_main.F90
 libopenarray_a_AR = $(AR) rcs
-manual_main_SOURCES = src/test/oa_main.F90 src/test/oa_test.F90
+manual_main_SOURCES = examples/oa_main.F90
 manual_main_DEPENDENCIES = libopenarray.a
 manual_main_LDADD = -L. -lopenarray -lstdc++ -lgfortran -lm -ldl -lpthread ${AM_LDFLAGS}
 all: all-am
@@ -730,11 +733,10 @@ libopenarray.a: $(libopenarray_a_OBJECTS) $(libopenarray_a_DEPENDENCIES) $(EXTRA
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-src/test/$(am__dirstamp):
-	@$(MKDIR_P) src/test
-	@: > src/test/$(am__dirstamp)
-src/test/oa_main.$(OBJEXT): src/test/$(am__dirstamp)
-src/test/oa_test.$(OBJEXT): src/test/$(am__dirstamp)
+examples/$(am__dirstamp):
+	@$(MKDIR_P) examples
+	@: > examples/$(am__dirstamp)
+examples/oa_main.$(OBJEXT): examples/$(am__dirstamp)
 
 manual_main$(EXEEXT): $(manual_main_OBJECTS) $(manual_main_DEPENDENCIES) $(EXTRA_manual_main_DEPENDENCIES) 
 	@rm -f manual_main$(EXEEXT)
@@ -742,6 +744,7 @@ manual_main$(EXEEXT): $(manual_main_OBJECTS) $(manual_main_DEPENDENCIES) $(EXTRA
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f examples/*.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
 	-rm -f src/c-interface/*.$(OBJEXT)
 	-rm -f src/fortran/*.$(OBJEXT)
@@ -756,7 +759,6 @@ mostlyclean-compile:
 	-rm -f src/modules/sub/*.$(OBJEXT)
 	-rm -f src/modules/sum/*.$(OBJEXT)
 	-rm -f src/modules/tree_tool/*.$(OBJEXT)
-	-rm -f src/test/*.$(OBJEXT)
 	-rm -f src/utils/*.$(OBJEXT)
 
 distclean-compile:
@@ -1050,6 +1052,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f examples/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
 	-rm -f src/c-interface/$(am__dirstamp)
 	-rm -f src/fortran/$(am__dirstamp)
@@ -1064,7 +1067,6 @@ distclean-generic:
 	-rm -f src/modules/sub/$(am__dirstamp)
 	-rm -f src/modules/sum/$(am__dirstamp)
 	-rm -f src/modules/tree_tool/$(am__dirstamp)
-	-rm -f src/test/$(am__dirstamp)
 	-rm -f src/utils/$(am__dirstamp)
 
 maintainer-clean-generic:
@@ -1163,7 +1165,7 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLIBRARIES
 .PRECIOUS: Makefile
 
 
-src/test/oa_main.o: src/fortran/oa_mod.o src/test/oa_test.o
+examples/oa_main.o: src/fortran/oa_mod.o
 
 oa_init_fnl.mod :   src/fortran/oa_init.F90
 src/fortran/oa_cache.o :   src/fortran/oa_cache.F90 oa_utils.mod oa_type.mod
@@ -1184,7 +1186,8 @@ src/fortran/oa_sub.o :   src/fortran/oa_sub.F90 oa_utils.mod oa_type.mod
 src/fortran/oa_sum.o: src/fortran/config.h src/fortran/oa_sum.F90 oa_utils.mod oa_type.mod
 src/fortran/oa_type.o: src/fortran/config.h src/fortran/oa_type.F90 oa_utils.mod
 src/fortran/oa_utils.o :   src/fortran/oa_utils.F90
-src/test/oa_test.o : src/test/oa_test.F90 oa_mod.mod
+
+oa_init_fnl.mod: src/fortran/oa_init.o
 
 %.mod: src/fortran/%.o
 	@true
@@ -1200,10 +1203,10 @@ bin: libopenarray.a src/openarray.mod
 	zip ${PACKAGE_NAME}-bin-release-${PACKAGE_VERSION}.zip $^
 
 test: manual_main
-	time mpirun -n $(nproc) ./manual_main
+	$(TIME) mpirun -n $(NPROC) ./manual_main
 
 clean-local:
-	rm -f *.mod
+	${RM} -f *.mod
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

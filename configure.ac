@@ -6,7 +6,8 @@ AM_INIT_AUTOMAKE([subdir-objects no-define no-dependencies foreign])
 AC_PROG_GREP
 AC_PROG_EGREP
 AC_CHECK_PROGS(RM, [rm])
-
+AC_CHECK_PROGS(TIME, [time])
+AC_CHECK_PROGS(NPROC_PROG, [nproc])
 # Append installition path to LDFLAGS and CFLAGS
 AC_DEFUN([APPEND_SEARCH_PATH],
         [
@@ -71,10 +72,16 @@ if test "x$MPIF77" = x -a "x$FC"  != x ; then ac_user_MPIF77=$FC  ; fi
 if test "x$MPIF90" = x -a "x$F90" != x ; then ac_user_MPIF90=$F90 ; fi
 if test "x$MPIF90" = x -a "x$FC"  != x ; then ac_user_MPIF90=$FC  ; fi
 
-CANDIDATE_MPICC="   mpicc mpicc_r"
-CANDIDATE_MPICXX=" mpicxx mpic++ mpiCC mpcxx mpc++ mpicxx_r mpiCC_r mpcxx_r mpic++_r mpc++_r"
-CANDIDATE_MPIF77=" mpif77 mpif77_r mpf77 mpf77_r"
-CANDIDATE_MPIF90=" mpif90 mpif90_r mpf90 mpf90_r mpif95 mpif95_r mpf95 mpf95_r"
+dnl add Intel MPI compiler wrappers
+CANDIDATE_MPICC=" mpiicc icc"
+CANDIDATE_MPICXX=" mpiicpc mpiicxx mpiic++ mpiiCC icpc"
+CANDIDATE_MPIF77=" mpiifort mpiifc mpiif77 ifort"
+CANDIDATE_MPIF90=" mpiifort mpiifc mpiif95 mpiif90 ifort"
+
+CANDIDATE_MPICC+="   mpicc mpicc_r"
+CANDIDATE_MPICXX+=" mpicxx mpic++ mpiCC mpcxx mpc++ mpicxx_r mpiCC_r mpcxx_r mpic++_r mpc++_r"
+CANDIDATE_MPIF77+=" mpif77 mpif77_r mpf77 mpf77_r"
+CANDIDATE_MPIF90+=" mpif90 mpif90_r mpf90 mpf90_r mpif95 mpif95_r mpf95 mpf95_r"
 
 dnl add GNU MPI compilers
 CANDIDATE_MPICC+=" mpigcc mpgcc mpigcc_r mpgcc_r"
@@ -105,12 +112,6 @@ CANDIDATE_MPICC+=" cc"
 CANDIDATE_MPICXX+=" CC"
 CANDIDATE_MPIF77+=" ftn"
 CANDIDATE_MPIF90+=" ftn"
-
-dnl add Intel MPI compiler wrappers
-CANDIDATE_MPICC+=" mpiicc icc"
-CANDIDATE_MPICXX+=" mpiicpc mpiicxx mpiic++ mpiiCC icpc"
-CANDIDATE_MPIF77+=" mpiifort mpiifc mpiif77 ifort"
-CANDIDATE_MPIF90+=" mpiifort mpiifc mpiif95 mpiif90 ifort"
 
 dnl add PGI MPI compiler wrappers
 CANDIDATE_MPICC+=" mpipgcc mppgcc ${MPICC} "
@@ -479,7 +480,7 @@ AC_CHECK_HEADER(pnetcdf.h, [AC_CHECK_FUNC([ncmpi_open], [],
                                      [AC_MSG_ERROR([
                             -----------------------------------------------------------------------
                                 Invalid MPI compiler specified or detected
-                                A working pdfcdf lib is required. Please specify the location 
+                                A working pnetcdf lib is required. Please specify the location 
                                 in the PNETCDF_DIR environment variable. Abort.
                             -----------------------------------------------------------------------])
                         ])])],
@@ -495,6 +496,23 @@ CFLAGS=${old_CFLAGS}
 LDFLAGS=${old_LDFLAGS}
 AS_IF([test "x$PNETCDF_DIR" != x], [APPEND_SEARCH_PATH([$PNETCDF_DIR])],
       [])
+
+AC_CANONICAL_HOST
+case "${host_os}" in
+    darwin*)
+         CFLAGS+=" -D_OSX_ "
+         AC_SUBST(CFLAGS)
+         FCFLAGS+=" -D_OSX_ "
+         AC_SUBST(FCFLAGS)
+         CPPFLAGS+=" -D_OSX_ "
+         AC_SUBST(CPPFLAGS)
+         CXXFLAGS+=" -D_OSX_ "
+         AC_SUBST(CXXFLAGS)
+        ;;
+    *)
+        ;;
+esac
+AM_CONDITIONAL([HAS_NPROC], [test "x$NPROC_PROG" != x])
 
 AC_SUBST(MPI_DIR)
 AC_SUBST(PNETCDF_DIR)
@@ -538,7 +556,6 @@ if test "${has_mpicxx}" = yes ; then
 fi
 if test "${has_fortran}" = yes ; then
    echo "\
-              FFLAGS   = ${FFLAGS}
               FCFLAGS  = ${FCFLAGS}"
 fi
 if test "x${LDFLAGS}" != x ; then
