@@ -1096,7 +1096,8 @@ info: info-am
 info-am:
 
 install-data-am: install-includeHEADERS
-
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 install-dvi: install-dvi-am
 
 install-dvi-am:
@@ -1143,7 +1144,7 @@ ps-am:
 
 uninstall-am: uninstall-includeHEADERS uninstall-libLIBRARIES
 
-.MAKE: install-am install-strip
+.MAKE: install-am install-data-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--refresh check check-am clean \
 	clean-cscope clean-generic clean-libLIBRARIES clean-local \
@@ -1152,12 +1153,13 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLIBRARIES
 	dist-xz dist-zip distcheck distclean distclean-compile \
 	distclean-generic distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-includeHEADERS install-info \
-	install-info-am install-libLIBRARIES install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	install install-am install-data install-data-am \
+	install-data-hook install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am \
+	install-includeHEADERS install-info install-info-am \
+	install-libLIBRARIES install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
 	uninstall-am uninstall-includeHEADERS uninstall-libLIBRARIES
@@ -1207,6 +1209,14 @@ test: manual_main
 
 clean-local:
 	${RM} -f *.mod
+
+install-data-hook:
+	@echo '+----------------------------------------------------------------------------+'
+	@echo '|'
+	@echo '|  OpenArray has been successfully installed under'
+	@echo '|          $(DESTDIR)$(prefix)'
+	@echo '|'
+	@echo '+----------------------------------------------------------------------------+'
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

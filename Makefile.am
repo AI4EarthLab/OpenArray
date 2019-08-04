@@ -164,3 +164,11 @@ test: manual_main
 
 clean-local:
 	${RM} -f *.mod
+
+install-data-hook:
+	@echo '+----------------------------------------------------------------------------+'
+	@echo '|'
+	@echo '|  OpenArray has been successfully installed under'
+	@echo '|          $(DESTDIR)$(prefix)'
+	@echo '|'
+	@echo '+----------------------------------------------------------------------------+'

@@ -73,10 +73,10 @@ if test "x$MPIF90" = x -a "x$F90" != x ; then ac_user_MPIF90=$F90 ; fi
 if test "x$MPIF90" = x -a "x$FC"  != x ; then ac_user_MPIF90=$FC  ; fi
 
 dnl add Intel MPI compiler wrappers
-CANDIDATE_MPICC=" mpiicc icc"
-CANDIDATE_MPICXX=" mpiicpc mpiicxx mpiic++ mpiiCC icpc"
-CANDIDATE_MPIF77=" mpiifort mpiifc mpiif77 ifort"
-CANDIDATE_MPIF90=" mpiifort mpiifc mpiif95 mpiif90 ifort"
+CANDIDATE_MPICC="  ${MPICC} mpiicc icc"
+CANDIDATE_MPICXX=" ${MPICXX} mpiicpc mpiicxx mpiic++ mpiiCC icpc"
+CANDIDATE_MPIF77=" ${MPIF77} mpiifort mpiifc mpiif77 ifort"
+CANDIDATE_MPIF90=" ${MPIF90} mpiifort mpiifc mpiif95 mpiif90 ifort"
 
 CANDIDATE_MPICC+="   mpicc mpicc_r"
 CANDIDATE_MPICXX+=" mpicxx mpic++ mpiCC mpcxx mpc++ mpicxx_r mpiCC_r mpcxx_r mpic++_r mpc++_r"
@@ -114,10 +114,10 @@ CANDIDATE_MPIF77+=" ftn"
 CANDIDATE_MPIF90+=" ftn"
 
 dnl add PGI MPI compiler wrappers
-CANDIDATE_MPICC+=" mpipgcc mppgcc ${MPICC} "
-CANDIDATE_MPICXX+=" mpipgCC mppgCC ${MPICXX}"
-CANDIDATE_MPIF77+=" mpipgf77 mppgf77 ${MPIF77}"
-CANDIDATE_MPIF90+=" mpipgf90 mpipgf95 mppgf90 mppgf95  ${MPIF90}"
+CANDIDATE_MPICC+=" mpipgcc mppgcc"
+CANDIDATE_MPICXX+=" mpipgCC mppgCC"
+CANDIDATE_MPIF77+=" mpipgf77 mppgf77"
+CANDIDATE_MPIF90+=" mpipgf90 mpipgf95 mppgf90 mppgf95 "
 
 dnl find the full path of MPICC from CANDIDATE_MPICC and MPI_INSTALL
 if test "x${ac_user_MPICC}" = x ; then
