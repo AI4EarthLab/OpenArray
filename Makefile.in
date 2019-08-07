@@ -492,7 +492,11 @@ libopenarray_a_SOURCES = src/Init.cpp src/Operator.cpp \
 	src/fortran/oa_set.F90 src/fortran/oa_set_with_mask.F90 \
 	src/fortran/oa_shift.F90 src/fortran/oa_sub.F90 \
 	src/fortran/oa_sum.F90 src/fortran/oa_mod.F90
-include_HEADERS = openarray.mod
+include_HEADERS = oa_init_fnl.mod oa_min_max.mod oa_option.mod \
+	oa_set.mod oa_mat_mult.mod oa_mod.mod oa_io.mod oa_utils.mod \
+	oa_sub.mod oa_rep.mod oa_interpolation.mod oa_mpi.mod \
+	oa_type.mod oa_set_with_mask.mod oa_sum.mod oa_partition.mod \
+	oa_cache.mod oa_shift.mod openarray.mod
 
 # libopenarray_a_SOURCES += src/test/oa_test.F90
 # libopenarray_a_SOURCES += src/test/oa_main.F90

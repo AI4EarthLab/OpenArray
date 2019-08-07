@@ -111,7 +111,25 @@ libopenarray_a_SOURCES += src/fortran/oa_sub.F90
 libopenarray_a_SOURCES += src/fortran/oa_sum.F90
 libopenarray_a_SOURCES += src/fortran/oa_mod.F90
 
-include_HEADERS = openarray.mod
+include_HEADERS = oa_init_fnl.mod
+include_HEADERS += oa_min_max.mod
+include_HEADERS += oa_option.mod
+include_HEADERS += oa_set.mod
+include_HEADERS += oa_mat_mult.mod
+include_HEADERS += oa_mod.mod
+include_HEADERS += oa_io.mod
+include_HEADERS += oa_utils.mod
+include_HEADERS += oa_sub.mod
+include_HEADERS += oa_rep.mod
+include_HEADERS += oa_interpolation.mod
+include_HEADERS += oa_mpi.mod
+include_HEADERS += oa_type.mod
+include_HEADERS += oa_set_with_mask.mod
+include_HEADERS += oa_sum.mod
+include_HEADERS += oa_partition.mod
+include_HEADERS += oa_cache.mod
+include_HEADERS += oa_shift.mod
+include_HEADERS += openarray.mod
 
 # libopenarray_a_SOURCES += src/test/oa_test.F90
 # libopenarray_a_SOURCES += src/test/oa_main.F90
