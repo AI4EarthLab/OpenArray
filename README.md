@@ -1,0 +1,2 @@
+# OpenArray V1.0.0
+OpenArray is a simple operator library for the decoupling of ocean modelling and parallel computing. It has been in development for the past three years with close collaboration between oceanographers and computer scientists. The library is promoted as a development tool for the future numerical models to make complex parallel programming transparent. For more details, please refer to our paper (https://www.geosci-model-dev-discuss.net/gmd-2019-28/).
