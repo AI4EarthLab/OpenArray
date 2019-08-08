@@ -12,31 +12,31 @@ OpenArray has been successfully installed on multiple operating systems, includi
 
 ### openSUSE
 
-- [x] [openmpi](./doc/opensuse-openmpi.md)
-- [x] [mpich](./doc/opensuse-mpich.md)
+- [x] [openmpi](./doc/en/opensuse-openmpi.md)
+- [x] [mpich](./doc/en/opensuse-mpich.md)
 
 ### Fedora
 
-- [x] [openmpi](./doc/fedora-openmpi.md)
-- [x] [mpich](./doc/fedora-mpich.md)
+- [x] [openmpi](./doc/en/fedora-openmpi.md)
+- [x] [mpich](./doc/en/fedora-mpich.md)
 
 ### MacOS
 
-- [x] [openmpi](./doc/macos-openmpi.md)
-- [x] [mpich](./doc/macos-mpich.md)
+- [x] [openmpi](./doc/en/macos-openmpi.md)
+- [x] [mpich](./doc/en/macos-mpich.md)
 
 ### Ubuntu
 
-- [x] [openmpi](./doc/ubuntu-openmpi.md)
-- [x] [mpich](./doc/ubuntu-mpich.md)
+- [x] [openmpi](./doc/en/ubuntu-openmpi.md)
+- [x] [mpich](./doc/en/ubuntu-mpich.md)
 
 ### Debian
 
-- [x] [openmpi](./doc/debian-openmpi.md)
-- [x] [mpich](./doc/debian-mpich.md)
+- [x] [openmpi](./doc/en/debian-openmpi.md)
+- [x] [mpich](./doc/en/debian-mpich.md)
 
 ### CentOS
 
-- [x] [openmpi](./doc/centos-openmpi.md)
-- [x] [mpich](./doc/centos-mpich.md)
+- [x] [openmpi](./doc/en/centos-openmpi.md)
+- [x] [mpich](./doc/en/centos-mpich.md)
 
