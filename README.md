@@ -15,16 +15,17 @@ The following instructions take you through a sequence of steps to get the defau
 
 (a) You will need the following prerequisites.
 
-    - REQUIRED: This installation package
+```shell
+    * The gcc/g++/gfortran compiler, version 6.1.0 or latter
 
-    - REQUIRED: The gcc/g++/gfortran compiler, version 4.9.0 or latter
+    * An MPI C/C++/Fortran compiler 
+      (mpich 3.2.1 or latter, or openmpi v3.0.4 or latter, or Parallel Studio XE 2017 or latter)
 
-    - REQUIRED: An MPI C/C++/Fortran compiler
+    * Parallel netCDF (http://cucis.ece.northwestern.edu/projects/PnetCDF/)
 
-    - REQUIRED: Parallel netCDF (http://cucis.ece.northwestern.edu/projects/PnetCDF/)
-
-    - REQUIRED: Some other development tools, including gzip, make, m4, automake.
-                These are usually part of your operating system's development tools.
+    * Some basic development tools, including gzip, make, m4, automake. 
+      These are usually part of your operating system's development tools.
+```
 
 (b) Unzip the package and go to the top level directory:
 
