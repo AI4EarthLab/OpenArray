@@ -9,12 +9,9 @@ OpenArray is a simple operator library for the decoupling of ocean modelling and
 4.  Reporting Installation or Usage Problems
 
 
--------------------------------------------------------------------------
+## 1. Getting Started
 
-1. Getting Started
-
-The following instructions take you through a sequence of steps to get the
-default configuration of OpenArray up and running.
+The following instructions take you through a sequence of steps to get the default configuration of OpenArray up and running.
 
 (a) You will need the following prerequisites.
 
@@ -29,60 +26,40 @@ default configuration of OpenArray up and running.
     - REQUIRED: Some other development tools, including gzip, make, m4, automake.
                 These are usually part of your operating system's development tools.
 
-    Also, you need to know what shell you are using since different shell has
-    different command syntax. Command "echo $SHELL" prints out the current
-    shell used by your terminal program.
+(b) Unzip the package and go to the top level directory:
 
-(b) Unpack the tar file and go to the top level directory:
+      wget https://github.com/hxmhuang/OpenArray/archive/master.zip -O OpenArray-master.zip
+      unzip OpenArray-master.zip
+      cd OpenArray-master
 
-      tar zxvf OpenArray.tar.gz or unzip OpenArray.zip
-      cd OpenArray
+(c) Configure OpenArray specifying the installation directory, e.g. ${HOME}/install 
 
-(c) Choose an installation directory, say $HOME/OpenArray
-
-(d) Configure OpenArray specifying the installation directory:
-
-      ./configure --prefix=$HOME/OpenArray
+      ./configure --prefix=${HOME}/install
 
    If the Parallel netCDF or MPI compilers are not configured in the default
    environment variables, you may specify these configurations, for example:
 
-      MPICC=mpicc MPICXX=mpicxx MPIF90=mpif90 PNETCDF_DIR=${where you install
-      pnetcdf} ./configure --prefix=$HOME/OpenArray
+      MPICC=mpicc MPICXX=mpicxx MPIF90=mpif90 PNETCDF_DIR=${where you install pnetcdf} ./configure --prefix=${HOME}/install
 
-(e) Build OpenArray:
+(d) Build OpenArray:
 
       make
 
-   Or if "make" runs slow, try parallel make, e.g. (using 8 simultaneous jobs)
+   Or try parallel make, e.g. (using 8 simultaneous jobs)
 
       make -j8
 
-(f) Install OpenArray
+(e) Install OpenArray and test
 
       make install
+      ./manual_main
 
-(g) Add the bin subdirectory of the installation directory to your path in your
-    startup script (.bashrc for bash, .cshrc for csh, etc.):
-
-    for csh and tcsh:
-
-      setenv PATH $HOME/OpenArray/bin:$PATH
-
-    for bash and sh:
-
-      PATH=$HOME/OpenArray/bin:$PATH ; export PATH
-
-    Check that everything is in order at this point by doing:
-
-        ./manual_main
-
-    This executable program is a demo written based on OpenArray.
+    This executable program `manual_main` is a demo written based on OpenArray.
     If you have completed all of the above steps, you have successfully installed OpenArray.
 
 -------------------------------------------------------------------------
 
-2. Alternate Configure Options
+## 2. Alternate Configure Options
 
 OpenArray has a number of configure features.  A complete list of configuration
 options can be found using:
@@ -116,14 +93,14 @@ options can be found using:
      CPP         C preprocessor
 -------------------------------------------------------------------------
 
-3. Testing the OpenArray installation
+## 3. Testing the OpenArray installation
 
 For testing OpenArray, the command is
      make test
 
 -------------------------------------------------------------------------
 
-4. Reporting Installation or Usage Problems
+## 4. Reporting Installation or Usage Problems
 
 Please report the problems on our github: https://github.com/hxmhuang/OpenArray/issues
 
