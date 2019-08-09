@@ -2,7 +2,6 @@
 OpenArray is a simple operator library for the decoupling of ocean modelling and parallel computing. The library is promoted as a development tool for the future numerical models to make complex parallel programming transparent. For more details, please refer to our paper (https://www.geosci-model-dev-discuss.net/gmd-2019-28/).
 
 # OpenArray Installation Guide
-==============================
 
 1.  Getting Started
 2.  Alternate Configure Options
@@ -13,7 +12,6 @@ OpenArray is a simple operator library for the decoupling of ocean modelling and
 -------------------------------------------------------------------------
 
 1. Getting Started
-==================
 
 The following instructions take you through a sequence of steps to get the
 default configuration of OpenArray up and running.
@@ -85,42 +83,40 @@ default configuration of OpenArray up and running.
 -------------------------------------------------------------------------
 
 2. Alternate Configure Options
-==============================
 
 OpenArray has a number of configure features.  A complete list of configuration
 options can be found using:
 
    ./configure --help
 
-Here lists a few important options:
+    Here lists a few important options:
 
-  --prefix=PREFIX         install OpenArray files in PREFIX [/usr/local]
-  --with-mpi=/path/to/implementation
+     --prefix=PREFIX         install OpenArray files in PREFIX [/usr/local]
+      --with-mpi=/path/to/implementation
                           The installation prefix path for MPI implementation.
-Some influential environment variables:
-  MPICC       MPI C compiler, [default: CC]
-  MPICXX      MPI C++ compiler, [default: CXX]
-  MPIF77      MPI Fortran 77 compiler, [default: F77]
-  MPIF90      MPI Fortran 90 compiler, [default: FC]
-  CC          C compiler command
-  CFLAGS      C compiler flags
-  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
-              nonstandard directory <lib dir>
-  LIBS        libraries to pass to the linker, e.g. -l<library>
-  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
-              you have headers in a nonstandard directory <include dir>
-  CXX         C++ compiler command
-  CXXFLAGS    C++ compiler flags
-  FC          Fortran compiler command
-  FCFLAGS     Fortran compiler flags
-  PNETCDF_DIR Specify the pnetCdf lib installition root directory which
-              contains the include and lib subdirectory, for example
-              /path/to/pnetcdf_dir/
-  CPP         C preprocessor
+    Some influential environment variables:
+     MPICC       MPI C compiler, [default: CC]
+     MPICXX      MPI C++ compiler, [default: CXX]
+     MPIF77      MPI Fortran 77 compiler, [default: F77]
+     MPIF90      MPI Fortran 90 compiler, [default: FC]
+     CC          C compiler command
+     CFLAGS      C compiler flags
+     LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+                 nonstandard directory <lib dir>
+     LIBS        libraries to pass to the linker, e.g. -l<library>
+     CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
+                  you have headers in a nonstandard directory <include dir>
+     CXX         C++ compiler command
+     CXXFLAGS    C++ compiler flags
+     FC          Fortran compiler command
+     FCFLAGS     Fortran compiler flags
+     PNETCDF_DIR Specify the pnetCdf lib installition root directory which
+                 contains the include and lib subdirectory, for example
+                 /path/to/pnetcdf_dir/
+     CPP         C preprocessor
 -------------------------------------------------------------------------
 
 3. Testing the OpenArray installation
-=====================================
 
 For testing OpenArray, the command is
      make test
