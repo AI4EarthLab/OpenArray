@@ -91,8 +91,8 @@ options can be found using:
 
     Here lists a few important options:
 
-     --prefix=PREFIX         install OpenArray files in PREFIX [/usr/local]
-      --with-mpi=/path/to/implementation
+     --prefix=PREFIX      install OpenArray files in PREFIX [/usr/local]
+     --with-mpi=/path/to/implementation
                           The installation prefix path for MPI implementation.
     Some influential environment variables:
      MPICC       MPI C compiler, [default: CC]
@@ -124,7 +124,6 @@ For testing OpenArray, the command is
 -------------------------------------------------------------------------
 
 4. Reporting Installation or Usage Problems
-===========================================
 
 Please report the problems on our github: https://github.com/hxmhuang/OpenArray/issues
 
