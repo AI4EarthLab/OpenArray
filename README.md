@@ -54,10 +54,9 @@ The following instructions take you through a sequence of steps to get the defau
       make install
       ./manual_main
 
-    This executable program `manual_main` is a demo written based on OpenArray.
-    If you have completed all of the above steps, you have successfully installed OpenArray.
+   This executable program `manual_main` is a demo written based on OpenArray.
+   If you have completed all of the above steps, you have successfully installed OpenArray.
 
--------------------------------------------------------------------------
 
 ## 2. Alternate Configure Options
 
@@ -91,14 +90,13 @@ options can be found using:
                  contains the include and lib subdirectory, for example
                  /path/to/pnetcdf_dir/
      CPP         C preprocessor
--------------------------------------------------------------------------
+
 
 ## 3. Testing the OpenArray installation
 
 For testing OpenArray, the command is
      make test
 
--------------------------------------------------------------------------
 
 ## 4. Reporting Installation or Usage Problems
 
