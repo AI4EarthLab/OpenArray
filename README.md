@@ -16,7 +16,7 @@ The following instructions take you through a sequence of steps to get the defau
 (a) You will need the following prerequisites.
 
 ```shell
-    * The gcc/g++/gfortran compiler, version 6.1.0 or latter
+    * The gcc/g++/gfortran compiler, version 4.9.0 or latter
 
     * An MPI C/C++/Fortran compiler 
       (mpich 3.2.1 or latter, or openmpi v3.0.4 or latter, or Parallel Studio XE 2017 or latter)
