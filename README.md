@@ -11,53 +11,48 @@ OpenArray is a simple operator library for the decoupling of ocean modelling and
 
 ## 1. Getting Started
 
-The following instructions take you through a sequence of steps to get the default configuration of OpenArray up and running.
+The following instructions take you through a sequence of steps to get the default configuration of OpenArray up and running. **Important note: Please use the same set of compilers to build PnetCDF and OpenArray.** 
 
 (a) You will need the following prerequisites.
 
 ```shell
     * The gcc/g++/gfortran compiler, version 4.9.0 or latter
 
-    * An MPI C/C++/Fortran compiler 
-      (mpich 3.2.1 or latter, or openmpi v3.0.4 or latter, or Parallel Studio XE 2017 or latter)
+    * An MPI C/C++/Fortran compiler, there are three options:
+      1) mpich 3.2.1 or latter; 2) openmpi v3.0.4 or latter; 3) Parallel Studio XE 2017 or latter
 
-    * Parallel netCDF (http://cucis.ece.northwestern.edu/projects/PnetCDF/)
+    * Parallel netCDF version 1.11.2 (http://cucis.ece.northwestern.edu/projects/PnetCDF/)
 
     * Some basic development tools, including gzip, make, m4, automake. 
       These are usually part of your operating system's development tools.
 ```
 
-(b) Unzip the package and go to the top level directory:
+   The following example uses GNU Compiler Collection (GCC) with MPICH. For other compilers, please refer to the user manual in the ./docs
+
+(b) Install Parallel netCDF. The default installation directory of PnetCDF is `${HOME}/install`:
+     
+      cd
+      wget http://cucis.ece.northwestern.edu/projects/PnetCDF/Release/pnetcdf-1.11.2.tar.gz
+      tar xf pnetcdf-1.11.2.tar.gz
+      cd pnetcdf-1.11.2
+      ./configure --prefix=${HOME}/install MPICC=mpicc MPICXX=mpicxx MPIF90=mpif90 MPIF77=mpif77
+      make 
+      make install 
+
+
+(c) Install OpenArray. The default installation directory of OpenArray is `${HOME}/install`:
 
       wget https://github.com/hxmhuang/OpenArray/archive/master.zip -O OpenArray-master.zip
       unzip OpenArray-master.zip
       cd OpenArray-master
-
-(c) Configure OpenArray specifying the installation directory, e.g. ${HOME}/install 
-
-      ./configure --prefix=${HOME}/install
-
-   If the Parallel netCDF or MPI compilers are not configured in the default
-   environment variables, you may specify these configurations, for example:
-
-      MPICC=mpicc MPICXX=mpicxx MPIF90=mpif90 PNETCDF_DIR=${where you install pnetcdf} ./configure --prefix=${HOME}/install
-
-(d) Build OpenArray:
-
-      make
-
-   Or try parallel make, e.g. (using 8 simultaneous jobs)
-
-      make -j8
-
-(e) Install OpenArray and test
-
+      ./configure --prefix=${HOME}/install  PNETCDF_DIR=${HOME}/install  MPICC=mpicc MPICXX=mpicxx MPIF90=mpif90 
+      make (make -j8 for parallel make)
       make install
       ./manual_main
 
    This executable program `manual_main` is a demo written based on OpenArray.
    If you have completed all of the above steps, you have successfully installed OpenArray.
-
+      
 
 ## 2. Alternate Configure Options
 
