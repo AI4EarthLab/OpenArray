@@ -23,7 +23,7 @@ The following instructions take you through a sequence of steps to get the defau
 
     * Parallel netCDF version 1.11.2 (http://cucis.ece.northwestern.edu/projects/PnetCDF/)
 
-    * Some basic development tools, including gzip, make, m4, automake. 
+    * Some basic development tools, including gzip, make, m4. 
       These are usually part of your operating system's development tools.
 ```
 
