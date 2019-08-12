@@ -90,9 +90,9 @@ options can be found using:
 
 ## 3. Testing the OpenArray installation
 
-For testing OpenArray, the command is
+For testing OpenArray, the command is:
+      
      make test
-
 
 ## 4. Reporting Installation or Usage Problems
 
