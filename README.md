@@ -1,7 +1,7 @@
 # OpenArray V1.0.0
 OpenArray is a simple operator library for the decoupling of ocean modelling and parallel computing. The library is promoted as a development tool for the future numerical models to make complex parallel programming transparent. For more details, please refer to our paper (https://www.geosci-model-dev-discuss.net/gmd-2019-28/).
 
-# OpenArray Installation Guide
+## OpenArray Installation Guide
 
 1.  Getting Started
 2.  Alternate Configure Options
@@ -9,7 +9,7 @@ OpenArray is a simple operator library for the decoupling of ocean modelling and
 4.  Reporting Installation or Usage Problems
 
 
-## 1. Getting Started
+### 1. Getting Started
 
 The following instructions take you through a sequence of steps to get the default configuration of OpenArray up and running. **Important note: Please use the same set of compilers to build PnetCDF and OpenArray.** 
 
@@ -54,7 +54,7 @@ The following instructions take you through a sequence of steps to get the defau
    If you have completed all of the above steps, you have successfully installed OpenArray.
       
 
-## 2. Alternate Configure Options
+### 2. Alternate Configure Options
 
 OpenArray has a number of configure features.  A complete list of configuration
 options can be found using:
@@ -88,13 +88,13 @@ options can be found using:
      CPP         C preprocessor
 
 
-## 3. Testing the OpenArray installation
+### 3. Testing the OpenArray installation
 
 For testing OpenArray, the command is:
       
      make test
 
-## 4. Reporting Installation or Usage Problems
+### 4. Reporting Installation or Usage Problems
 
 Please report the problems on our github: https://github.com/hxmhuang/OpenArray/issues
 
