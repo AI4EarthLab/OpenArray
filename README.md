@@ -56,8 +56,8 @@ The following instructions take you through a sequence of steps to get the defau
 
 (d) Install OpenArray. The default installation directory of OpenArray is `${HOME}/install`:
 
-      wget https://github.com/hxmhuang/OpenArray/archive/master.zip -O OpenArray-master.zip
-      unzip OpenArray-master.zip
+      wget https://github.com/hxmhuang/OpenArray/archive/master.zip
+      unzip master.zip
       cd OpenArray-master
       ./configure --prefix=${HOME}/install  PNETCDF_DIR=${HOME}/install   
       make (make -j8 for parallel make)
