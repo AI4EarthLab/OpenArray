@@ -16,36 +16,50 @@ The following instructions take you through a sequence of steps to get the defau
 (a) You will need the following prerequisites.
 
 ```shell
-    * The gcc/g++/gfortran compiler, version 4.9.0 or latter
+    * The gcc/g++/gfortran compiler, version 4.9.0 or later
 
     * An MPI C/C++/Fortran compiler, there are three options:
-      1) mpich 3.2.1 or latter; 2) openmpi v3.0.4 or latter; 3) Parallel Studio XE 2017 or latter
+      1) mpich 3.2.1 or later; 2) openmpi v3.0.0 or later; 3) Parallel Studio XE 2017 or later
 
     * Parallel netCDF version 1.11.2 (http://cucis.ece.northwestern.edu/projects/PnetCDF/)
 
-    * Some basic development tools, including gzip, make, m4. 
+    * Some basic development tools, including gzip, uzip, make, m4. 
       These are usually part of your operating system's development tools.
 ```
 
-   The following example uses GNU Compiler Collection (GCC) with MPICH. For other compilers, please refer to the user manual in the ./docs
+(b) Specify the MPI compiler.
+    For MPICH and Openmpi:
 
-(b) Install Parallel netCDF. The default installation directory of PnetCDF is `${HOME}/install`:
+      export MPICC=mpicc  
+      export MPICXX=mpicxx  
+      export MPIF90=mpif90  
+      export MPIF77=mpif77  
+
+    For Intel compiler and Intel MPI library:
+
+      export MPICC=mpiicc  
+      export MPICXX=mpicpc  
+      export MPIF90=mpiifort  
+      export MPIF77=mpiifort  
+
+
+(c) Install Parallel netCDF. The default installation directory of PnetCDF is `${HOME}/install`:
      
       cd
       wget http://cucis.ece.northwestern.edu/projects/PnetCDF/Release/pnetcdf-1.11.2.tar.gz
       tar xf pnetcdf-1.11.2.tar.gz
       cd pnetcdf-1.11.2
-      ./configure --prefix=${HOME}/install MPICC=mpicc MPICXX=mpicxx MPIF90=mpif90 MPIF77=mpif77
+      ./configure --prefix=${HOME}/install  
       make 
       make install 
 
 
-(c) Install OpenArray. The default installation directory of OpenArray is `${HOME}/install`:
+(d) Install OpenArray. The default installation directory of OpenArray is `${HOME}/install`:
 
       wget https://github.com/hxmhuang/OpenArray/archive/master.zip -O OpenArray-master.zip
       unzip OpenArray-master.zip
       cd OpenArray-master
-      ./configure --prefix=${HOME}/install  PNETCDF_DIR=${HOME}/install  MPICC=mpicc MPICXX=mpicxx MPIF90=mpif90 
+      ./configure --prefix=${HOME}/install  PNETCDF_DIR=${HOME}/install   
       make (make -j8 for parallel make)
       make install
       ./manual_main
