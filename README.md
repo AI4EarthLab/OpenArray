@@ -35,7 +35,7 @@ The following instructions take you through a sequence of steps to get the defau
       export MPIF90=mpif90  
       export MPIF77=mpif77  
 
-    For Intel compiler and Intel MPI library:
+   For Intel compiler and Intel MPI library:
 
       export MPICC=mpiicc  
       export MPICXX=mpicpc  
