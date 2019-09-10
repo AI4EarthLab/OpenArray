@@ -38,7 +38,7 @@ The following instructions take you through a sequence of steps to get the defau
    For Intel compiler and Intel MPI library:
 
       export MPICC=mpiicc  
-      export MPICXX=mpicpc  
+      export MPICXX=mpiicpc  
       export MPIF90=mpiifort  
       export MPIF77=mpiifort  
 
